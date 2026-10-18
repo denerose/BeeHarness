@@ -89,6 +89,26 @@ owners, lifetimes, and visibility — mixing them makes both worse.
 - `~/.pi/agent/AGENTS.md`, `<repo>/AGENTS.md` — pointer lines added
 - `~/.pi/agent/skills/memory/` — new skill encoding the rituals
 
+## Amendment (2026-10-18): discovery model and implementation timing
+
+1. **Discovery (supersedes rule 5):** headers-as-index — every shard
+   opens with `Read when:` + summary; the catalog is a *property of the
+   shards*, not a second artifact. No separate INDEX.md. Pointers target
+   the directory.
+2. **CLI as derived layer:** `bee memory list|search|show|add|propose`,
+   `bee park` — views/curators over plain-markdown storage, never owners
+   of it. Derived catalogs can't drift. Write-trust enforced via
+   `PI_SUBAGENT_AGENT` role gate (`add` refuses implementers → points at
+   `propose` queue); provenance stamped per entry; unpark stays human
+   (the CLI runs as the agent; no `unpark` command exists).
+3. **Implementation deferred to the harness build:** storage + CLI +
+   skill + pointers land together and are dogfooded from day one — no
+   transitional system. **Bootstrap exception:** builders run scrappy
+   continuity (session file + parking lot + ADRs); session memory may
+   hold project knowledge until the harness exists, promoted on landing.
+4. **Pain valve:** if bootstrap debt hurts before the build, promote into
+   rough `memory/` shards ad hoc — pain is the trigger, not foresight.
+
 ## References
 
 - Continuity spec: `docs/specs/2026-10-18-continuity-layer.md`

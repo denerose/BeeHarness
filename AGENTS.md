@@ -15,6 +15,15 @@ We are designing the harness before building it. Right now:
 - Drafts are cheap: when context is sufficient, produce a concrete draft
   to react to instead of asking more questions. Refine together.
 
+## Bootstrap conventions (until the harness MVP)
+
+- Continuity runs scrappy by design (ADR-001 amendment):
+  `.bee/session.md` = live session state; `memory/parking-lot.md` =
+  deferred decisions (keeper alone unparks); decisions → ADRs.
+- Session memory may hold project knowledge until the harness lands;
+  promote on landing. Pain valve: rough `memory/` shards ad hoc if debt
+  hurts. Nothing gets built with the harness before MVP.
+
 ## Rules of engagement
 
 - Ask one question at a time, and **always recommend** — never present a

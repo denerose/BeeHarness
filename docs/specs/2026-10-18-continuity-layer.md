@@ -1,7 +1,9 @@
 # Continuity Layer — Design Spec
 
 **Date:** 2026-10-18
-**Status:** Approved for planning (implementation pending)
+**Status:** Design input for the harness build — near-term implementation
+shelved 2026-10-18 (ADR-001 amendment: bootstrap exception). Discovery
+model superseded by headers-as-index; timing now "with the harness".
 **ADRs:** [001](../adr/001-three-tier-memory.md) (memory), [002](../adr/002-git-identity-model.md) (git)
 
 ## Purpose

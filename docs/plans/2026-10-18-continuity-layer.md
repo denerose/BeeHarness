@@ -1,5 +1,13 @@
 # Continuity Layer Implementation Plan
 
+> **STATUS (2026-10-18): SHELVED — design input only, not for execution.**
+> Bootstrap exception (ADR-001 amendment): builders run scrappy
+> continuity; the real memory system (headers-as-index storage +
+> `bee memory` CLI as derived layer) ships with the harness build.
+> Task 4 (PL-001 git identity) was extracted and executed separately.
+> Seeds, skill text, and rituals below are ready-made input for that
+> build.
+
 > **For agentic workers:** This plan executes **manually** — power-planner
 > + keeper, no orchestrator exists yet (it is the pilot artifact future
 > loops will be measured against). Before execution, run the
