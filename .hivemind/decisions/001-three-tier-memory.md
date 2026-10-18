@@ -21,10 +21,10 @@ parking lot:
 
 | Tier | Location | Lifetime | Content |
 |---|---|---|---|
-| Session | `<repo>/.bee/session.md` (gitignored) | live during work-in-flight, retired at end | where we are, current thread, immediate state |
-| Project | `<repo>/memory/` (committed) | life of the project | project knowledge, state, pointers; never duplicates ADRs |
+| Session | `<repo>/.hivemind/sessions/session.md` (gitignored) | live during work-in-flight, retired at end | where we are, current thread, immediate state |
+| Project | `<repo>/.hivemind/memory/` (committed) | life of the project | project knowledge, state, pointers; never duplicates ADRs |
 | Harness | `~/.pi/agent/memory/` | life of the machine | the user, the machine, cross-project workflow knowledge |
-| Parking lot | `<repo>/memory/parking-lot.md` (committed) | until resolved | deferred decisions, session-independent |
+| Parking lot | `<repo>/.hivemind/.hivemind/memory/parking-lot.md` (committed) | until resolved | deferred decisions, session-independent |
 
 Rules:
 
@@ -84,7 +84,7 @@ owners, lifetimes, and visibility — mixing them makes both worse.
 
 ## Affected Areas
 
-- `<repo>/.bee/session.md`, `<repo>/memory/` — created
+- `<repo>/.hivemind/sessions/session.md`, `<repo>/.hivemind/memory/` — created
 - `~/.pi/agent/memory/` — created
 - `~/.pi/agent/AGENTS.md`, `<repo>/AGENTS.md` — pointer lines added
 - `~/.pi/agent/skills/memory/` — new skill encoding the rituals
@@ -108,8 +108,10 @@ owners, lifetimes, and visibility — mixing them makes both worse.
    hold project knowledge until the harness exists, promoted on landing.
 4. **Pain valve:** if bootstrap debt hurts before the build, promote into
    rough `memory/` shards ad hoc — pain is the trigger, not foresight.
+5. **Final locations (ADR-005 amendment):** session state →
+   `.hivemind/sessions/`; project memory → `.hivemind/memory/`.
 
 ## References
 
-- Continuity spec: `docs/specs/2026-10-18-continuity-layer.md`
+- Continuity spec: `.hivemind/designs/2026-10-18-continuity-layer.md`
 - ADR 002 (git identity) — unrelated but same phase

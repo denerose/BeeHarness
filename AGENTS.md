@@ -1,59 +1,67 @@
 # BeeHarness — AGENTS.md (work in progress)
 
 Always-applicable rules for any agent working in this repo. Identity and
-values live in `SOUL.md` — planners should read it fully; implementers may
-skim it. This file is the operational layer: what applies on every task.
+values live in `SOUL.md` — planners should read it fully; implementers
+may skim it. This file is the operational layer: what applies on every
+task.
+
+This repo IS the pi plugin: top-level `skills/` is the single source of
+truth for all bee-* skills (registered machine-wide via
+`~/.pi/agent/settings.json`). Edit skills here; never copy them
+elsewhere.
 
 ## Current mode: DESIGN
 
 We are designing the harness before building it. Right now:
 
-- Discussions produce **documents** (specs, ADRs, plans) — not code.
-  Implementation requires an approved plan (focus discipline).
+- Discussions produce **documents** — never implementation without an
+  approved plan (focus discipline).
 - Every design decision worth keeping becomes an **ADR** once agreed
   (use the `adr` skill). Unrecorded decisions are lost decisions.
-- Drafts are cheap: when context is sufficient, produce a concrete draft
-  to react to instead of asking more questions. Refine together.
+- Drafts are cheap: when context is sufficient, produce a concrete
+  draft to react to instead of asking more questions. Refine together.
 
-## Bootstrap conventions (until the harness MVP)
+## Work modes (all opt-in — never auto-escalate ceremony)
 
-- Continuity runs scrappy by design (ADR-001 amendment):
-  `.bee/session.md` = live session state; `memory/parking-lot.md` =
-  deferred decisions (keeper alone unparks); decisions → ADRs.
-- Session memory may hold project knowledge until the harness lands;
-  promote on landing. Pain valve: rough `memory/` shards ad hoc if debt
-  hurts. Nothing gets built with the harness before MVP.
+- **Direct work** — talk/ask/small changes; normal norms; no gates.
+- **Design mode** — interactive, human-gated shaping; ends with a
+  parking-lot loop-back gate.
+- **Bee-loop** — the orchestrated pipeline; entered ONLY by explicit
+  direction.
 
 ## Rules of engagement
 
-- Ask one question at a time, and **always recommend** — never present a
-  bare menu. Use the `ask_user` tool (Paseo question card) for decisions.
+- Ask one question at a time, and **always recommend** — never a bare
+  menu. Use the `ask_user` tool (Paseo card) for decisions.
 - Verify every factual claim (call sites, tool names, paths) before
-  dispatching subagents — brief prose is cheap to check, expensive to retrofit.
-- Evidence over assertion: no "done" or "works" claim without verification
+  dispatching subagents.
+- Evidence over assertion: no "done"/"works" claim without verification
   output. Reproduce bugs before fixing them.
-- Commit messages: short imperative commands, ≤10 words.
-- When context runs short, run a handoff (`handoff` skill) rather than
-  guess; resume with `pickup-handoff`.
-- Until the memory system exists: durable design knowledge lives in ADRs
-  and specs under `docs/`; session state lives in handoffs.
+- Commit messages: short imperative, ≤10 words.
+- When context runs short, run a handoff (`handoff` skill); resume with
+  `pickup-handoff`. Every handoff ends with a memory sync and
+  parking-lot sweep.
 
-## Document hierarchy
+## Layout & continuity (bootstrap conventions until the harness MVP)
 
-| Layer | Document | Audience |
-|---|---|---|
-| Identity & values | `SOUL.md` | human + planners primarily |
-| Repo rules | `AGENTS.md` (this file) | all agents, always |
-| Decisions | `docs/adr/NNN-*.md` | anyone asking "why" |
-| Work | `docs/specs/`, `docs/plans/` | whoever executes |
+<!-- adr-path: .hivemind/decisions -->
 
-Charter (scope/success) and collaboration contract (mandates, escalation)
-are planned documents — see backlog.
+- `.hivemind/` holds all hive working docs and ephemera:
+  `decisions/` (ADRs) · `designs/` · `plans/` · `phases/` (orchestrator
+  phase lists) · `suggestions/` (hindsight inbox) · `memory/` (parking
+  lot + future shards) · `sessions/` (gitignored live session state).
+- Session memory: `.hivemind/sessions/session.md` — update at each
+  decision point; re-read after compaction/fork/new session.
+- Parking lot: `.hivemind/memory/parking-lot.md` — any agent may
+  propose parking; ONLY the keeper unparks or resolves. Brainstorms end
+  with a loop-back gate over it.
+- Scrappy continuity is sanctioned (ADR-001 amendment): session memory
+  may hold project knowledge until the harness lands. Nothing gets built
+  with the harness before MVP.
 
 ## Tooling constraints
 
-- We may extend the subagents extension (`~/.pi/agent/extensions/subagents`)
-  but must never make it depend on BeeHarness.
 - Pi and Paseo coupling is welcome everywhere.
+- The subagents extension may be extended but must never depend on us.
 - Superpowers skills are reference material during bootstrap: learn the
-  patterns, write our own — do not import or depend on them.
+  patterns, write our own — never import or depend on them.

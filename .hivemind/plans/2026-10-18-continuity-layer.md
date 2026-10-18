@@ -23,7 +23,7 @@ handoff-sync as a rule. See spec for formats and ADR-001 for rationale.
 
 **Tech Stack:** Markdown, git, existing pi auto-load of AGENTS.md.
 
-**Spec:** `docs/specs/2026-10-18-continuity-layer.md`
+**Spec:** `.hivemind/designs/2026-10-18-continuity-layer.md`
 
 ## Global Constraints
 
@@ -42,7 +42,7 @@ handoff-sync as a rule. See spec for formats and ADR-001 for rationale.
 - Modify: `AGENTS.md` (pointer, adr-path marker, handoff-sync, memory rule)
 
 **Interfaces:**
-- Produces: `memory/INDEX.md` referenced by AGENTS.md; `docs/adr/` marker
+- Produces: `memory/INDEX.md` referenced by AGENTS.md; `.hivemind/decisions/` marker
   consumed by the `adr` skill.
 
 - [ ] **Step 1: Create `memory/INDEX.md`**
@@ -51,7 +51,7 @@ handoff-sync as a rule. See spec for formats and ADR-001 for rationale.
 # BeeHarness memory — index
 
 Rule: planners write, implementers propose, keeper prunes. Decisions live
-in ADRs (`docs/adr/`) — memory points at them, never restates them.
+in ADRs (`.hivemind/decisions/`) — memory points at them, never restates them.
 
 | shard | summary |
 |---|---|
@@ -64,7 +64,7 @@ in ADRs (`docs/adr/`) — memory points at them, never restates them.
 insert:
 
 ```markdown
-<!-- adr-path: docs/adr -->
+<!-- adr-path: .hivemind/decisions -->
 
 Project memory: read `memory/INDEX.md` and follow it before planning or
 executing work in this repo.
@@ -85,7 +85,7 @@ executing work in this repo.
   `memory` skill (write/propose/promote/park).
 ```
 
-- [ ] **Step 3: Verify** — `memory/INDEX.md` exists; `grep -n "adr-path\|memory/INDEX" AGENTS.md` shows both; table file referenced (`memory/parking-lot.md`) exists.
+- [ ] **Step 3: Verify** — `memory/INDEX.md` exists; `grep -n "adr-path\|memory/INDEX" AGENTS.md` shows both; table file referenced (`.hivemind/memory/parking-lot.md`) exists.
 
 - [ ] **Step 4: Commit** — `git add memory AGENTS.md && git commit -m "add project memory index and wire AGENTS rules"`
 
@@ -231,7 +231,7 @@ Never write memory directly. End completion reports with a
 Run this as the last step of every handoff.
 
 ## Park
-Append to `<repo>/memory/parking-lot.md`:
+Append to `<repo>/.hivemind/memory/parking-lot.md`:
 `PL-NNN — item — context/recommendation — unpark when`.
 Any agent may propose parking; only the keeper unparks or resolves.
 The brainstorm process ends with a loop-back gate over the parking lot.
@@ -242,7 +242,7 @@ The brainstorm process ends with a loop-back gate over the parking lot.
 ### Task 4: Resolve PL-001 (apply ADR-002)
 
 **Files:**
-- Modify: global git config; `memory/parking-lot.md`
+- Modify: global git config; `.hivemind/memory/parking-lot.md`
 
 - [ ] **Step 1: Flip global identity**
 
@@ -253,7 +253,7 @@ git config --global user.email "285322498+denerose-pi@users.noreply.github.com"
 
 - [ ] **Step 2: Verify** — `git config --global user.name` → `denerose-pi`; `git config --global user.email` → `285322498+denerose-pi@users.noreply.github.com`.
 
-- [ ] **Step 3: Move PL-001 to Resolved in `memory/parking-lot.md`** — under "## Resolved" add:
+- [ ] **Step 3: Move PL-001 to Resolved in `.hivemind/memory/parking-lot.md`** — under "## Resolved" add:
 
 ```markdown
 - **PL-001 — machine-global git identity** — resolved 2026-10-18 via
@@ -263,7 +263,7 @@ git config --global user.email "285322498+denerose-pi@users.noreply.github.com"
 
 and delete the parked entry.
 
-- [ ] **Step 4: Commit** — `git add memory/parking-lot.md && git commit -m "resolve PL-001: global git identity per ADR-002"`
+- [ ] **Step 4: Commit** — `git add .hivemind/memory/parking-lot.md && git commit -m "resolve PL-001: global git identity per ADR-002"`
 
 ### Task 5: End-to-end verification
 

@@ -42,7 +42,7 @@ INDEX+shard shape. Seed shards: `machine.md` (accounts, paths, tools —
 verified facts only), `user.md` (working-style lessons), `workflow.md`
 (cross-project conventions like mandates, the brainstorm modes).
 
-### 4. Parking lot — `<repo>/memory/parking-lot.md`
+### 4. Parking lot — `<repo>/.hivemind/memory/parking-lot.md`
 
 Already exists (PL-001). Deferred decisions, session-independent. Any
 agent may propose parking; **only the human unparks/resolves**. Format

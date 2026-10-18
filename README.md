@@ -1,22 +1,27 @@
 # BeeHarness (name TBC)
 
-Status: **early design** — we are building the harness that will build this
-project (and every project after it). Design first; code comes later, under
-approved plans.
+Status: **early design** — we are building the harness that will build
+this project (and every project after it). Design first; code comes
+later, under approved plans.
 
 ## What this is
 
-An agent harness for one human and a swarm of agents, layered on
-[Pi](https://github.com/earendil-works/pi-coding-agent) and Paseo:
+The **pi plugin** for one human and a swarm of agents — an agent harness
+layered on [Pi](https://github.com/earendil-works/pi-coding-agent) and
+Paseo:
 
-- a **pi extension** + **lightweight CLI** (tooling layer)
-- a set of **skills and rules** (workflow layer) — planning, orchestration,
-  implementation loops, review
-- **memory, handoff, and decision records** (continuity layer) so work
-  survives context limits and session boundaries
+- **`skills/`** — all bee-* workflow skills. Single source of truth:
+  registered machine-wide via `~/.pi/agent/settings.json`
+  (`"skills": ["~/BeeHarness/skills"]`); every harnessed repo uses them;
+  edits here go live everywhere. Git here is the drift defense.
+- **pi extension + lightweight CLI** (when built) — memory tooling,
+  decisions inbox, status surface.
+- **`.hivemind/` per repo** — each harnessed project keeps its own
+  working docs and ephemera (decisions, designs, plans, phases,
+  suggestions, memory, sessions).
 
-Custom-fit to its human. Built by learning from real work on this machine,
-not designed in the abstract. See `SOUL.md`.
+Custom-fit to its human. Built by learning from real work on this
+machine. See `SOUL.md`.
 
 ## Foundations
 
@@ -31,6 +36,7 @@ not designed in the abstract. See `SOUL.md`.
 
 - `SOUL.md` — identity & values (planner-facing; implementers may skim)
 - `AGENTS.md` — always-applicable rules for any agent in this repo
-- `docs/` — ADRs, specs, plans as they land (structure grows with the work)
+- `.hivemind/` — ADRs (`decisions/`), designs, plans, phase lists,
+  suggestions, memory, session state — the hive's working space
 
 Name is a placeholder. Everything here is a work in progress.

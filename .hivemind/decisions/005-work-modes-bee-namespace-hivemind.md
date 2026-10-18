@@ -71,6 +71,32 @@ toolkit."
 - All future bee- skills; harness AGENTS.md rules; repo layout
   (hivemind/ pending); global skills (explicitly NOT affected).
 
+## Amendment (2026-10-18): final layout — the plugin model
+
+Simplification after further discussion (drift avoidance + personal-use
+scope beat per-repo flexibility):
+
+1. **This repo IS the pi plugin.** All bee-* skills live in top-level
+   `skills/`, registered once machine-wide:
+   `~/.pi/agent/settings.json` → `"skills": ["~/BeeHarness/skills"]`.
+   Every harnessed repo gets them; edits here go live everywhere on
+   next session start; git here is the drift defense.
+2. **No per-repo skill layer.** The `.bee/skills/` host-override layer
+   was considered and dropped: same-name shadowing risk + flexibility
+   without a consumer. `.bee/` does not exist.
+3. **Every harnessed repo (including this one) keeps its own
+   `.hivemind/`** (dot-container) for working docs + ephemera:
+   `decisions/` · `designs/` · `plans/` · `phases/` · `suggestions/` ·
+   `memory/` · `sessions/` (gitignored, seeded by init).
+4. **`bee init` (future)** scaffolds `.hivemind/`, seeds the parking
+   lot, gitignores sessions, merges an AGENTS.md bee-block behind
+   markers (never clobbers), optional SOUL stub, offers git init.
+   Identity-neutral about accounts (ADR-002 is a policy instance).
+5. Supersedes the original decision 3 in part: `hivemind/` →
+   `.hivemind/`; `docs/` reservation stands (created when a human-facing
+   doc first exists). ADR-001 tier locations finalize as
+   `.hivemind/sessions/` (session) and `.hivemind/memory/` (project).
+
 ## References
 
 - ADR 003 (document pipeline — bee-plan targets), ADR 004 (right-sized

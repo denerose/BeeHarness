@@ -70,5 +70,5 @@ the model exists to prevent.
 
 ## References
 
-- Resolves parking-lot PL-001 (`memory/parking-lot.md`)
+- Resolves parking-lot PL-001 (`.hivemind/.hivemind/memory/parking-lot.md`)
 - ADR 001 — same phase
