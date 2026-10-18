@@ -1,5 +1,7 @@
 # Review: [task/phase name]
 
+(Save as `.hivemind/records/<plan-slug>-task<N>-review.md`)
+
 **Reviewer:** [role/session]
 **Plan section:** [link]
 **Verify record:** [link — required before review starts]

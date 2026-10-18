@@ -14,21 +14,29 @@ Read `skills/GLOSSARY.md` first if any term below is unclear.
 
 ## How to run it
 
-1. **Size the work before anything else.**
-   - **Quick answer** — a feasibility question. Probe cheaply, report
-     back with a recommendation. No documents.
-   - **Small change** — a bounded change to something that exists. Ask
-     the questions that matter, agree on a short design in chat, stop.
-     No design doc. Then hand to bee-plan or direct work.
-   - **New system** — new project, or a change that reshapes how parts
-     fit. Full flow below.
+1. **Size the work before anything else.** Your read of the size is a
+   guess you correct, not a commitment — if the conversation reveals
+   the work is smaller or bigger, say so and adjust.
+   - **Quick answer** — a feasibility question. Probe the codebase or
+     the keeper's intent cheaply, report back with a recommendation.
+     No documents.
+   - **Small change** — touches one area with a clear seam; no new
+     concept. Ask the questions that matter, agree on a short design
+     in chat, stop. No design doc. Then hand off (below).
+   - **New system** — new project, or work that introduces a concept
+     the project doesn't have yet, or changes that ripple through
+     several areas. Full flow below.
+   Unsure between two sizes? Say your read and let the keeper correct
+   it — that's one sentence, not a gate.
 2. **Conversation first for new-system work.** Talk it through with the
    keeper in plain prose. Do not fire question cards during exploration;
    cards are for when a decision is ready to write down (one question at
    a time, always with your recommendation).
 3. **Draft early.** When you have enough context, write the concrete
    draft (design doc section, ADR text) and let the keeper react to it.
-   Reacting beats interrogating.
+   Reacting beats interrogating. Drafting sections to react to is
+   always fine; what you may not do is finalize a design doc without
+   the keeper approving each section.
 4. **Record decisions as ADRs** (global `adr` skill) as they are agreed.
    Every decision worth remembering gets an ADR. Don't batch them to the
    end.
@@ -37,11 +45,13 @@ Read `skills/GLOSSARY.md` first if any term below is unclear.
    written together with the keeper, section by section. Never write one
    alone.
 6. **Close the session with the parking lot.** Read
-   `.hivemind/memory/parking-lot.md` with the keeper: anything to park?
-   Anything parked that should be resolved now? This loop-back is a
-   required step, not a nicety.
-7. **Hand off clearly.** Next step is bee-plan (if implementing) or
-   direct work (if not). Say which.
+   `.hivemind/memory/parking-lot.md` with the keeper. You propose
+   additions and resolutions; the keeper decides. This loop-back is a
+   required step, even when nothing was parked.
+7. **Hand off clearly.** Say which: bee-plan when the loop will
+   implement (several tasks, or subagents involved); direct work when
+   it's a change you'll just make now; nothing when it was a quick
+   answer.
 
 ## SOUL sessions (`--soul`)
 

@@ -6,8 +6,10 @@
 
 | command | exit | note |
 |---|---|---|
-| npm test | 0 | 42 passed |
+| make test | 0 | 42 passed |
 | npx tsc --noEmit | 0 | — |
 
-**Verdict:** PASS | FAIL
+**Verdict:** PASS | FAIL | BLOCKED
 **Log:** [path or "inline above"]
+
+(BLOCKED = the declared checks can't be run. Say what's missing.)

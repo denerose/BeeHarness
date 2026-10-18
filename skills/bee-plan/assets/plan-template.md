@@ -4,7 +4,8 @@
 **Design doc:** [path, or "none — bounded task"]
 **Validation level:** task | merge | phase | release
 **Detail:** full (verbatim file contents — subagents implement cold) |
-lean (detail worked out at implementation — say why that's safe)
+lean (detail worked out at implementation — name what covers the
+missing detail)
 **Reviewed:** plan-reviewer passed YYYY-MM-DD / PENDING
 
 ## Task N: [name]

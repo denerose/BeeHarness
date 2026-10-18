@@ -11,12 +11,17 @@ small task the keeper wants planned. Output: one file in
 
 ## Rules
 
-1. **Follow the design doc.** If the plan you're writing conflicts with
-   it, stop and escalate. Never quietly change the plan or the design.
+0. **Missing or vague inputs** (no design doc, scope unclear) —
+   escalate before drafting: ask_user with a recommendation.
+1. **Follow the design doc.** If following the design forces a
+   contradiction while you plan, stop and escalate. Never quietly
+   change the plan or the design.
 2. **Say how much detail this plan has.** Short plans are fine when the
-   detail will be worked out close to the implementation. Long plans
+   detail will be worked out close to the implementation; long plans
    with full file contents are right when subagents will implement
-   cold. State which kind you're writing at the top.
+   cold. State which kind you're writing at the top, and for a short
+   plan, name what covers the missing detail (e.g. "implementer works
+   in-repo with the design doc; the review gate checks the result").
 3. **No placeholders.** "TBD", "add error handling", "write tests for
    the above" are plan failures. Write the real content, or mark a code
    block **shape-only** and include a step where the implementer checks
@@ -24,16 +29,21 @@ small task the keeper wants planned. Output: one file in
 4. **Each task stands alone.** Anyone implementing task 4 should learn
    everything they need from task 4 plus the plan header: exact file
    paths, what earlier tasks provide (names, paths, signatures), the
-   verification command.
-5. **Declare the validation level** (GLOSSARY) in the header. Tasks
-   inherit it unless they say otherwise.
+   verification command. Repeat what matters; don't make anyone hunt.
+5. **Declare the validation level** (GLOSSARY) in the header. It comes
+   from the design doc if it declares one; otherwise you recommend a
+   level with a one-line reason, and the keeper or plan-reviewer
+   confirms at review. Tasks inherit it unless they say otherwise.
 6. **Every task ends with a commit step** (short imperative message).
 
 ## Format
 
-Use `assets/plan-template.md`. The plan is done when the global
-`plan-reviewer` skill passes it — that gate is not optional; run it
-before any implementation starts.
+Use `assets/plan-template.md`. Save as
+`.hivemind/plans/YYYY-MM-DD-<slug>.md` with `**Reviewed:** PENDING`.
+Then run the global `plan-reviewer` skill on it — the gate is not
+optional. Fix the findings (the keeper may waive should-fix items with
+a one-line recorded reason), re-run until it passes, then stamp the
+date. A plan that never passes never gets implemented.
 
 ## Boundaries
 

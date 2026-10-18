@@ -12,9 +12,12 @@ directed by the keeper) says to. Read `skills/GLOSSARY.md` first.
 
 1. Read the plan and its design doc (if it has one). If anything in the
    plan conflicts with the design doc, escalate before starting.
-2. Create or update the phase list (`.hivemind/phases/`,
-   `assets/phase-list-template.md`) — your one tracking file.
-3. Confirm the validation level with the plan header.
+2. Create or update the phase list (`.hivemind/phases/<project>.md`,
+   project = repo name unless the keeper says otherwise;
+   `assets/phase-list-template.md`) — your one tracking file. If the
+   plan header carries a phase id, record it there.
+3. Confirm the validation level from the plan header. No level stated?
+   Ask before starting.
 
 ## The cycle, per task
 
@@ -23,10 +26,14 @@ directed by the keeper) says to. Read `skills/GLOSSARY.md` first.
    self-contained or benefits from isolation (fresh context, parallel
    safety). Independent tasks may run in parallel as subagents; verify
    each result before using it.
-3. **Verify** — run `bee-verify` at the task level. No exceptions.
-4. **Review** — dispatch `bee-review` (or the review stage) on the
-   finished work. Don't review your own work when a separate reviewer is
-   available.
+3. **Verify** — run the **bee-verify skill** (sibling skill, see
+   GLOSSARY) at the task level. Its record lands in
+   `.hivemind/records/`.
+4. **Review** — dispatch the **bee-review skill** on the finished work
+   (fresh subagent when available; hand it the plan path, task id,
+   changed files, and verify record path). In a solo session with no
+   separate reviewer, review the work yourself and say so in the
+   review report — the evidence trail matters more than who wrote it.
 5. **Fix rounds** — if review or verify fails: fix, re-verify,
    re-review. Maximum two rounds. Still failing? Escalate.
 6. **Record** — check off the task in the plan, update the phase list,
@@ -36,10 +43,11 @@ directed by the keeper) says to. Read `skills/GLOSSARY.md` first.
 
 ## States
 
-Every task moves `draft → implemented → verified → reviewed → done` and
-each move needs its evidence: verify output to leave *implemented*,
-review signoff to leave *verified*. If you catch yourself advancing a
-state without evidence, stop and go back.
+Every task moves `draft → implemented → verified → reviewed → done`.
+You (the loop) move items between states, and each move needs its
+record in `.hivemind/records/`: a verify record to leave *implemented*,
+a review report to leave *verified*. If you catch yourself advancing a
+state without the record, stop and go back.
 
 ## Escalate when
 
@@ -49,8 +57,9 @@ state without evidence, stop and go back.
 - A decision needs authority you don't have.
 - The task is done but a follow-on decision appeared (park it or ask).
 
-Escalating = ask_user card with a recommendation, record the answer in
-the plan or phase list, continue. Asking is cheap; guessing is not.
+Escalating = ask_user card with a recommendation, record the answer
+where it applies — in the plan (task-scoped) or the phase list
+(phase-scoped) — then continue. Asking is cheap; guessing is not.
 
 ## Bootstrap note
 
