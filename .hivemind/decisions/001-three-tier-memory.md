@@ -24,7 +24,7 @@ parking lot:
 | Session | `<repo>/.hivemind/sessions/session.md` (gitignored) | live during work-in-flight, retired at end | where we are, current thread, immediate state |
 | Project | `<repo>/.hivemind/memory/` (committed) | life of the project | project knowledge, state, pointers; never duplicates ADRs |
 | Harness | `~/.pi/agent/memory/` | life of the machine | the user, the machine, cross-project workflow knowledge |
-| Parking lot | `<repo>/.hivemind/.hivemind/memory/parking-lot.md` (committed) | until resolved | deferred decisions, session-independent |
+| Parking lot | `<repo>/.hivemind/memory/parking-lot.md` (committed) | until resolved | deferred decisions, session-independent |
 
 Rules:
 
