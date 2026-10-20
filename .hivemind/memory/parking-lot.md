@@ -13,11 +13,7 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   amendment: headers-as-index storage; `bee memory` CLI as derived layer
   (role-gated writes, proposals queue, provenance stamps); continuity
   spec + plan shelved as design input — review with keeper when the
-  memory tooling build begins (harness build phase). Scope added
-  2026-10-20: settle the ADR-vs-project-memory boundary at this review.
-  Alternatives were considered and declined (keeper: routing is added
-  complexity with no evidence yet); both genres stay as-is. Revisit
-  earlier only via the pain valve.
+  memory tooling build begins (harness build phase).
 - **PL-003 — "handoff" term overload (ADR-001 rule 7)** — rule 7 (and
   its echoes in AGENTS.md + continuity spec/plan) uses "handoff" for
   two things: the context-refresh skill ritual (`handoff`/`pickup-handoff`:
