@@ -34,7 +34,7 @@ resolves them; the keeper may edit freely or just say the word)
 ## Changed since last report
 
 - Keeper report zoned per your note: agent sections regenerate,
-  **My list** is yours and persistent.
+  **Keeper's list** is the keeper's own and persistent.
 - Design doc ratified by your direction — no read needed.
 - GLOSSARY aligned to ADR-007 naming (plan slugs, record suffixes).
 - Broken design-doc link fixed; harness-wide link review parked
