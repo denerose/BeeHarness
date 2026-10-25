@@ -136,8 +136,218 @@ function cmdInit(rest) {
   };
 }
 
-function cmdReport(rest) { // Task 3 implements this
-  return { code: 0, out: 'bee report: not implemented yet\n', err: '' };
+const ZONE_TITLES = [
+  "Keeper's list",
+  'Needs the keeper',
+  'Changed since last report',
+  'Worth a sample',
+];
+
+const FRESH_HEADER = `# Keeper report
+
+**Generated:** {STAMP} by bee report (fresh) · **Source:** \`.hivemind/status.md\`
+
+**Zones and rules — read before regenerating this file:** *Keeper's
+list* is the keeper's own — roles add items on the keeper's word,
+mark done only on the keeper's resolution (in conversation counts),
+and NEVER drop or overwrite it in a regen. *Needs the keeper*,
+*Changed since last report*, and *Worth a sample* are
+agent-maintained: regenerate freely from status.md, MERGING items
+from both roles (never silently dropping the other role's asks).
+Headings carry no pronouns. Paths absolute (Paseo). The keeper may
+edit any zone directly. (ADR-008 + ADR-007 amendment 1.)
+`;
+
+function stamp() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' +
+    p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+
+function splitZones(text) {
+  const lines = text.split('\n');
+  const at = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith('## ')) {
+      const t = lines[i].slice(3).trim();
+      if (ZONE_TITLES.includes(t)) at.push({ title: t, line: i });
+    }
+  }
+  if (at.length !== ZONE_TITLES.length ||
+      !ZONE_TITLES.every((t, i) => at[i].title === t)) {
+    return null; // unparseable by contract
+  }
+  const header = lines.slice(0, at[0].line).join('\n');
+  const zones = {};
+  for (let i = 0; i < at.length; i++) {
+    const end = i + 1 < at.length ? at[i + 1].line : lines.length;
+    zones[at[i].title] = lines
+      .slice(at[i].line + 1, end)
+      .join('\n')
+      .replace(/^\n+/, '')
+      .replace(/\n+$/, '');
+  }
+  return { header, zones };
+}
+
+function renderZones(zones) {
+  let out = '';
+  for (const t of ZONE_TITLES) {
+    out += `## ${t}\n\n${zones[t] || '(none)'}\n\n`;
+  }
+  return out.replace(/\n+$/, '') + '\n';
+}
+
+function queueBullets(statusText) {
+  const lines = statusText.split('\n');
+  const bullets = [];
+  let inQueue = false;
+  let cur = null;
+  for (const line of lines) {
+    if (line.startsWith('## ')) {
+      if (cur !== null) { bullets.push(cur); cur = null; }
+      inQueue = line.slice(3).startsWith('Awaiting keeper');
+      continue;
+    }
+    if (!inQueue) continue;
+    if (line.startsWith('- ')) {
+      if (cur !== null) bullets.push(cur);
+      cur = line.slice(2);
+    } else if (cur !== null && line.trim() !== '') {
+      cur += ' ' + line.trim();
+    }
+  }
+  if (cur !== null) bullets.push(cur);
+  return bullets.filter((b) => !/^- *$/.test(b));
+}
+
+function absolutize(text, repoRoot) {
+  const rewrite = (m, tok) => {
+    if (tok.startsWith('/') || tok.startsWith('~')) return m;
+    const abs = path.resolve(repoRoot, tok);
+    return fs.existsSync(abs) ? abs : m;
+  };
+  return text
+    .replace(/`([^`]+)`/g, (m, tok) => rewrite(m, tok))
+    .replace(/(^|[\s(])(\.{0,2}\/?\.hivemind\/[^\s`)\]]*)/g,
+      (m, pre, tok) => pre + rewrite(tok, tok));
+}
+
+function normItem(s) {
+  return s.replace(/^\d+\.\s*/, '')
+    .replace(/[*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[.:;]+$/, '')
+    .toLowerCase();
+}
+
+function sameAsk(a, b) {
+  const x = normItem(a), y = normItem(b);
+  return x === y || x.includes(y) || y.includes(x);
+}
+
+function zoneItems(zoneText) {
+  const items = [];
+  let cur = null;
+  for (const raw of zoneText.split('\n')) {
+    const line = raw.trim();
+    if (line === '' || line === '(none)') {
+      if (cur !== null) { items.push(cur); cur = null; }
+    } else if (line.startsWith('(') && cur === null) {
+      // zone note (e.g. placeholder) — not an ask
+    } else if (/^\d+\.\s/.test(line) || /^- /.test(line)) {
+      if (cur !== null) items.push(cur);
+      cur = line.replace(/^\d+\.\s*/, '').replace(/^- /, '');
+    } else if (cur !== null) {
+      cur += ' ' + line; // wrapped continuation line
+    }
+  }
+  if (cur !== null) items.push(cur);
+  return items;
+}
+
+function mergeNeeds(derived, oldZone) {
+  const kept = [];
+  for (const old of zoneItems(oldZone)) {
+    if (!derived.some((d) => sameAsk(d, old))) kept.push(old);
+  }
+  const all = [...derived, ...kept];
+  return all.length === 0
+    ? '(none)'
+    : all.map((t, i) => `${i + 1}. ${t}`).join('\n');
+}
+
+function cmdReport(rest) {
+  const f = flags(rest, {
+    check: { type: 'boolean' },
+    status: { type: 'string' },
+    report: { type: 'string' },
+  });
+  if (f.error) {
+    return { code: 1, out: '', err: String(f.error) + '\n' };
+  }
+  const statusPath = f.values.status
+    ? path.resolve(f.values.status)
+    : path.join(REPO_ROOT, '.hivemind', 'status.md');
+  const reportPath = f.values.report
+    ? path.resolve(f.values.report)
+    : path.join(REPO_ROOT, '.hivemind', 'keeper-report.md');
+  const repoRoot = path.resolve(path.dirname(statusPath), '..');
+
+  let statusText;
+  try {
+    statusText = fs.readFileSync(statusPath, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee report: cannot read ${statusPath}: ${e.message}\n` };
+  }
+
+  const oldText = fs.existsSync(reportPath)
+    ? fs.readFileSync(reportPath, 'utf8')
+    : null;
+  const parsed = oldText !== null ? splitZones(oldText) : null;
+  if (oldText !== null && parsed === null) {
+    return {
+      code: 1, out: '',
+      err: `bee report: ${reportPath} is missing or mis-orders a zone ` +
+           `heading; refusing to write — hand-fix first\n`,
+    };
+  }
+
+  const zones = parsed !== null
+    ? parsed.zones
+    : {
+      "Keeper's list":
+        "(the keeper's come-back items — add on the keeper's word)",
+      'Needs the keeper': '(none)',
+      'Changed since last report': '(none)',
+      'Worth a sample': '(none)',
+    };
+  const header = parsed !== null
+    ? parsed.header.replace(
+        /\*\*Generated:\*\*.*(\n.*)?$/m,
+        `**Generated:** ${stamp()} by bee report (merge regen) · ` +
+        `**Source:** \`.hivemind/status.md\``)
+    : FRESH_HEADER.replace('{STAMP}', stamp());
+
+  const derived = queueBullets(statusText)
+    .map((b) => absolutize(b, repoRoot));
+  zones['Needs the keeper'] = mergeNeeds(
+    derived, zones['Needs the keeper']);
+
+  const out = header.replace(/\n+$/, '') + '\n\n' + renderZones(zones);
+  if (f.values.check) {
+    return { code: 0, out, err: '' };
+  }
+  fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  atomicWrite(reportPath, out);
+  return {
+    code: 0,
+    out: `bee report: wrote ${reportPath}\n`,
+    err: '',
+  };
 }
 
 if (process.argv[1] &&

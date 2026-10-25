@@ -392,7 +392,7 @@ Contract (ADR-008 Accepted + the report file's own header):
   root. Repo root derives from the status path
   (`<repoRoot>/.hivemind/status.md`).
 
-- [ ] Create `tests/fixtures/status.md` with exactly:
+- [x] Create `tests/fixtures/status.md` with exactly:
 
 ```markdown
 # Status — cross-role surface (fixture)
@@ -408,7 +408,7 @@ Contract (ADR-008 Accepted + the report file's own header):
 - none
 ```
 
-- [ ] Create `tests/fixtures/report.md` with exactly:
+- [x] Create `tests/fixtures/report.md` with exactly:
 
 ```markdown
 # Keeper report (fixture)
@@ -441,7 +441,7 @@ verbatim except the Generated line.
 - `/already/absolute/sample.md`
 ```
 
-- [ ] Replace the `cmdReport` stub in `bin/bee.js` and add helpers
+- [x] Replace the `cmdReport` stub in `bin/bee.js` and add helpers
   with exactly:
 
 ```js
@@ -660,7 +660,7 @@ function cmdReport(rest) {
 }
 ```
 
-- [ ] Append to `tests/bee.test.mjs` exactly:
+- [x] Append to `tests/bee.test.mjs` exactly:
 
 ```js
 import { fileURLToPath } from 'node:url';
@@ -772,12 +772,12 @@ test('report: fresh file gets protocol header + placeholder list', () => {
 });
 ```
 
-- [ ] Run `npm test` — expected: 16 tests pass, 0 fail.
-- [ ] Run `node bin/bee.js report --check` against the live repo —
+- [x] Run `npm test` — expected: 16 tests pass, 0 fail.
+- [x] Run `node bin/bee.js report --check` against the live repo —
   expected: exit 0, full zoned output on stdout, live
   `.hivemind/keeper-report.md` unchanged (verify with
   `git status --porcelain .hivemind/keeper-report.md` → empty).
-- [ ] Commit (stage only `bin/bee.js`, `tests/bee.test.mjs`,
+- [x] Commit (stage only `bin/bee.js`, `tests/bee.test.mjs`,
   `tests/fixtures/status.md`, `tests/fixtures/report.md`): message
   `implement bee report zoned regeneration`, trailer
   `Role: project-orchestrator`.
