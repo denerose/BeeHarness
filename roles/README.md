@@ -14,7 +14,11 @@ findable and reviewable.
 Current roles:
 
 - `power-planner.md` — top-level design partner (validated in the
-  BeeHarness bootstrap sessions)
+  BeeHarness bootstrap sessions; codified)
+- `project-orchestrator.md` — **forming**: a model session is running;
+  codify from observed behavior when it wraps. Design and execution
+  are separate roles by design — power-planner shapes, project-
+  orchestrator executes; the design doc is the handoff between them.
 
-Planned roles (design pending, orchestration phase): orchestrator,
-implementer, task reviewer, phase reviewer.
+Planned roles (design pending, orchestration phase): implementer, task
+reviewer, phase reviewer.
