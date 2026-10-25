@@ -5,7 +5,8 @@ status, link the plan, never grow tasks here (tasks live in plans).
 
 Statuses: planned · in-progress · blocked · escalated · done
 
-| id | description | status | plan | escalations |
-|---|---|---|---|---|
-| P0 | bootstrap the build track (roles into ADRs, skills review, registration) | done | — | none |
-| P1 | pilot bee-loop #1: README roles refresh | done | .hivemind/plans/2026-10-20-readme-roles-refresh.md | — |
+| id | description | status | plan | owner | escalations |
+|---|---|---|---|---|---|
+| P0 | bootstrap the build track (roles into ADRs, skills review, registration) | done | — | — | none |
+| P1 | pilot bee-loop #1: README roles refresh | done | .hivemind/plans/2026-10-20-readme-roles-refresh.md | — | — |
+| P2 | `bee` CLI stub: `bee report` + `bee init` | in-progress | .hivemind/plans/2026-10-25-po-bee-cli-stub.md | project-orchestrator 2026-10-25 14:05 | — |
