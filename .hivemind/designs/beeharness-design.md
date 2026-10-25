@@ -69,7 +69,11 @@ an owner column on the phase list.
 
 `.hivemind/status.md` — open escalations, ADRs awaiting the keeper's
 flip, cross-role notes. Both roles read at session start. Replaced by
-the decisions inbox when built.
+the decisions inbox when built. Validated 2026-10-25 (keeper-valued):
+**ambient pickup** — the orchestrator's build-track asks reached the
+power-planner through these surfaces and the keeper report, with no
+keeper relaying. The keeper gates direction, not context; whatever
+replaces these surfaces must preserve that.
 
 ## Artifacts map
 

@@ -81,9 +81,14 @@ it as a term of art.
   then recommend the next move from the board. Trigger is felt
   completion ("this thought is done"), not time or topic change.
   Light by design — two minutes, no gate.
-- **relay** — passing work between different roles (e.g. power-planner
-  → project-orchestrator), usually as a short keeper-gated prompt; the
-  design doc is the relay artifact. Not a handoff.
+- **relay** — passing work or context between different roles (e.g.
+  power-planner → project-orchestrator). Two modes: **gated** — a
+  short keeper-passed prompt (the keeper gates *direction*); and
+  **ambient** — the shared surfaces (status surface, keeper report)
+  carry each role's state, and roles pick up each other's context
+  without the keeper relaying anything (validated 2026-10-25,
+  keeper-valued). The design doc is the relay artifact. Not a
+  handoff.
 - **handoff** — same role, fresh context: the `handoff`/`pickup-handoff`
   skill pair and the `.pi/handoff-<role>.md` files they write. Ends
   with a memory sync (session state current) and a **wake prompt** the

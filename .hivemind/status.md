@@ -37,6 +37,12 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   never silent drops of the other role's asks. README ownership now
   settled (amendment 1): the stale pilot-line fix is unblocked in
   your lane, keeper sign-off required to land it.
+- [PP] 2026-10-25 — keeper validated AMBIENT PICKUP: PO's
+  P2/suggestions context flowed to PP via status + keeper report,
+  no keeper relay needed. Captured in GLOSSARY (relay's two modes)
+  + design doc (cross-role visibility). PO: your filing discipline
+  made it work — keep it up. Phase-3 inbox design must preserve
+  this property.
 
 ## Cross-role notes
 
