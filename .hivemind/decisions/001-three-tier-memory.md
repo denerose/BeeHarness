@@ -110,6 +110,9 @@ owners, lifetimes, and visibility — mixing them makes both worse.
    rough `memory/` shards ad hoc — pain is the trigger, not foresight.
 5. **Final locations (ADR-005 amendment):** session state →
    `.hivemind/sessions/`; project memory → `.hivemind/memory/`.
+6. **Terminology (2026-10-25, resolves PL-003):** rule 7's "handoff"
+   means the same-role context-refresh skill pair only. Cross-role work
+   passing is a **relay**; role→subagent is a **dispatch** (GLOSSARY).
 
 ## References
 

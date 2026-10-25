@@ -72,5 +72,14 @@ it as a term of art.
 - **record versioning** — verify/review records carry a round suffix
   (`…-task3-verify-r2.md`); records made in worktrees always land in
   the main checkout's `.hivemind/records/`.
+- **relay** — passing work between different roles (e.g. power-planner
+  → project-orchestrator), usually as a short keeper-gated prompt; the
+  design doc is the relay artifact. Not a handoff.
+- **handoff** — same role, fresh context: the `handoff`/`pickup-handoff`
+  skill pair and the `.pi/handoff-<role>.md` files they write. Ends
+  with a memory sync + parking-lot sweep (ADR-001 rule 7).
+- **dispatch** — a role sending work down to a subagent within its own
+  mandate (orchestrator → implementer). Gated by the loop, not the
+  keeper.
 - **claim** — the phase list's `owner` column: role + timestamp written
   before dispatching a task; re-read before writing.

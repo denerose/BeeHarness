@@ -26,7 +26,8 @@ decoupled from everything else. Superpowers was inspiration only.
 | memory | `.hivemind/sessions/power-planner.md` | `.hivemind/sessions/project-orchestrator.md` |
 | handoff | `.pi/handoff-power-planner.md` | `.pi/handoff-project-orchestrator.md` |
 
-The design doc (this class of artifact) is the handoff between them.
+The design doc (this class of artifact) is the relay artifact between
+them.
 Implementer/reviewer roles arrive with the orchestration build. Roles
 are defaults, not walls (ADR-007 rule 11).
 

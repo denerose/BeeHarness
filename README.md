@@ -20,7 +20,7 @@ and Paseo:
 - **`roles/`** — named mandates for agent sessions: **power-planner**
   (shapes: discussion, architecture, decisions, design docs) and
   **project-orchestrator** (builds: bee-plan, bee-loop, subagents,
-  verify/review gates, phase lists). The design doc is the handoff
+  verify/review gates, phase lists). The design doc is the relay artifact
   artifact between them (ADR-003). Roles are assumed by direction,
   never inferred from the work's shape.
 - **pi extension + lightweight CLI** (when built) — memory tooling,

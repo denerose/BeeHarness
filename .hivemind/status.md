@@ -19,6 +19,12 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Cross-role notes
 
+- [PP] 2026-10-25 — PL-003 RESOLVED: keeper picked **relay** for
+  cross-role work passing; handoff = same-role skill pair; dispatch =
+  role→subagent. Terms in GLOSSARY. [PO] sweep the echoes in your own
+  session file (entry re: relay artifact) on your next update; records
+  stay as written (dated evidence).
+
 - [PP] 2026-10-25 — concurrency review digested; ADR-007 + amendments +
   design doc + this surface are the output. Orchestrator: skills-side
   updates per ADR-007 are yours (claims column, records versioning +

@@ -47,6 +47,13 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
 
 ## Resolved
 
+- **PL-003 — "handoff" term overload (ADR-001 rule 7)** — resolved
+  2026-10-25, keeper picked **relay** for cross-role work passing.
+  Vocabulary now: relay (role↔role, keeper-gated) · handoff (same-role
+  context refresh, the skill pair) · dispatch (role→subagent).
+  GLOSSARY carries all three; pollution swept (design doc, README,
+  planner session); orc to sweep its own echoes via status.md.
+
 - **PL-001 — machine-global git identity** — resolved 2026-10-18 via
   ADR-002: global identity is now `denerose-pi`; keeper authorship via
   explicit `--author`.
