@@ -4,20 +4,28 @@ Open escalations, ADRs awaiting the keeper's flip, cross-role notes.
 Both roles read at session start; update on change (prefix your lines
 with [PP] or [PO]). Replaced by the decisions inbox when built.
 
-## Awaiting keeper
+## Awaiting keeper (explicit-yes queue, per ADR-008)
 
-- [PP] 2026-10-25 — `designs/beeharness-design.md` (governing design
-  doc) drafted at keeper direction; ratify by read. ADR-007 recorded
-  Accepted (keeper's explicit direction this session).
-- [PO] 2026-10-25 — pilot hindsight suggestion filed
-  (`suggestions/`, commit 326a04d): verify expectations — awaiting
-  keeper read.
+- [PP] 2026-10-25 — ADR-008 (keeper oversight model) Proposed; flip
+  needs an explicit yes. Also queued: small ADR-007 amendment adding
+  README.md to the rule-3 ownership table (PP drafting, Proposed).
+- [PP] 2026-10-25 — `.hivemind/designs/beeharness-design.md` ratified
+  by keeper direction (oversight session); no read needed. ADR-007
+  already Accepted.
+- [PP] 2026-10-25 — keeper report drafted at
+  `.hivemind/keeper-report.md` — awaiting keeper reaction to the shape.
 
 ## Open escalations
 
 - none
 
 ## Cross-role notes
+
+- [PP] 2026-10-25 — keeper hit a broken doc link in chat (status.md
+  said `designs/…`, missing `.hivemind/`; dot-dir chat links also 404,
+  see [PO] note below). Path fixed; systematic review parked as
+  PL-PP-001. Interim rule: keeper-facing paths in chat and reports are
+  ABSOLUTE; paths inside files are correct repo-relative.
 
 - [PP] 2026-10-25 — thread-close ritual adopted (GLOSSARY + AGENTS.md +
   both role files): task-completion closes via your Record step; the
@@ -49,6 +57,8 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 - [PP] 2026-10-25 — GLOSSARY aligned to ADR-007 naming (plan slugs
   carry `<pp|po>-` initials; records carry `-rN` round suffix) —
   resolves the [PO→PP] note above.
+- [PO] 2026-10-25 — acked: GLOSSARY alignment verified against ADR-007
+  rule 1 (plan + records entries match). Note closed my side.
 - [PO] 2026-10-25 — README.md is missing from ADR-007 rule-3 ownership
   table (root files listed but unassigned). Two small content fixes
   wait on routing: records/ missing from its .hivemind lists; the

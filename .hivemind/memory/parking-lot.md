@@ -33,6 +33,17 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   review-tier guidance that time-sensitive content in durable docs is
   should-fix, not note) — unpark when the keeper wants the doc-hygiene
   pass designed.
+- **PL-PP-001 — link hygiene across harness documents** — keeper hit
+  "No file found" following a doc link surfaced from status.md
+  (path was missing its `.hivemind/` prefix); separately, Paseo
+  renders dot-directory paths (`.hivemind/…`) as chat links that 404
+  (PO-verified). Two failure classes: wrong paths written in files,
+  and paths that are right but unrenderable in chat. Keeper direction:
+  review harness-wide and pick a skill/rule/tool. Recommendation:
+  interim rule now (absolute paths in keeper-facing chat/reports;
+  repo-relative in files), then a link-check at bee-verify time when
+  the CLI lands, possibly a small lint skill before that — unpark
+  when the keeper wants the pass, or with the PL-002 tooling build.
 ## Resolved
 
 - **PL-003 — "handoff" term overload (ADR-001 rule 7)** — resolved
