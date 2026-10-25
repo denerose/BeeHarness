@@ -866,22 +866,22 @@ phase list; commit
 **Depends on:** Tasks 1–3
 **Provides:** evidence trail; phase exit
 
-- [ ] Run the full suite: `npm test` — expected: 19 pass, 0 fail.
-- [ ] Run `node bin/bee.js report --check` (live) — expected: exit 0,
+- [x] Run the full suite: `npm test` — expected: 19 pass, 0 fail.
+- [x] Run `node bin/bee.js report --check` (live) — expected: exit 0,
   no write, output contains all four zone headings.
-- [ ] Run `node bin/bee.js init --check` (live) — expected: exit 0,
+- [x] Run `node bin/bee.js init --check` (live) — expected: exit 0,
   `already registered`.
-- [ ] Hand-generation fallback check: read the live
+- [x] Hand-generation fallback check: read the live
   `.hivemind/keeper-report.md` after a `--check` run — the file is
   plain markdown, every zone hand-editable, nothing tool-only.
   (No write happens in this task; the live report is hand-maintained
   until the keeper says otherwise.)
-- [ ] Write verify records per task:
+- [x] Write verify records per task:
   `.hivemind/records/2026-10-25-po-bee-cli-stub-task<N>-verify-r1.md`
   (commands + output excerpts) using
   `skills/bee-verify/assets/verify-record-template.md`.
-- [ ] Update `.hivemind/phases/BeeHarness.md`: P2 → done.
-- [ ] Commit (stage only the records and
+- [x] Update `.hivemind/phases/BeeHarness.md`: P2 → done.
+- [x] Commit (stage only the records and
   `.hivemind/phases/BeeHarness.md`): message `record P2 phase
   verification`, trailer `Role: project-orchestrator`.
 
