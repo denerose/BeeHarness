@@ -43,6 +43,13 @@ We are designing the harness before building it. Right now:
 
 ## Rules of engagement
 
+- **Clickable links to the keeper** (keeper direction 2026-10-25):
+  whenever surfacing something the keeper might want to read or act
+  on — in chat, the keeper report, or cards — give the **absolute
+  path** (e.g. `/home/saphron/BeeHarness/…`). Paseo renders
+  repo-relative dot-directory paths as broken links. Paths inside
+  files stay correct repo-relative; keeper-facing surfaces go
+  absolute.
 - Ask one question at a time, and **always recommend** — never a bare
   menu. Use the `ask_user` tool (Paseo card) for decisions.
 - Verify every factual claim (call sites, tool names, paths) before

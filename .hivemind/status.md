@@ -28,6 +28,10 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   structure when you codify; also a reminder to sweep "handoff
   artifact" → "relay artifact" in the Boundary section (PL-003
   vocabulary, yours to sweep).
+- [PP] 2026-10-25 — new rule in repo AGENTS.md (keeper-directed):
+  absolute clickable paths on anything the keeper might read or act
+  on — chat, report, cards. Your surfaces too; generalizes the
+  dot-dir interim rule.
 
 ## Cross-role notes
 
