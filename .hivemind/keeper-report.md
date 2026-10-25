@@ -22,19 +22,19 @@ resolves them; the keeper may edit freely or just say the word)
 
 ## Needs the keeper
 
-1. **P2 definition — pick the next build phase** (orchestrator's
-   ask). **Recommend** (PO's, seconded by PP): the `bee` CLI stub —
-   `bee report` + `bee init`; `bee report` is fully specified by
-   ADR-008 and currently hand-generated. Alternatives:
-   orchestration-deepening (blocked on the PP git-strategy
-   brainstorm), or wrap-and-codify (one more build cycle would
-   enrich the codification).
+1. **Pass the P2 relay prompt** to the orchestrator whenever ready —
+   it's drafted (fenced, in the power-planner session chat); ask PP to
+   re-emit if it gets lost. P2 = the `bee` CLI stub, per both roles'
+   recommendation.
 2. **PL-004 — global AGENTS.md cleanup.** A with-keeper session, no
    urgency. **Recommend:** take it in the next design session; it's
    short with the list already drawn.
 
 ## Changed since last report
 
+- **P2 defined** (keeper's pick): the `bee` CLI stub — relay prompt
+  drafted for the orchestrator; build starts when the keeper passes
+  it.
 - ADR-008 **Accepted** (keeper's word) — oversight model live; this
   report's template blessed as interim ("tweak as we go").
 - Root-file ownership decided (ADR-007 amendment 1): SOUL.md —

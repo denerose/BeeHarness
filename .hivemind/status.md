@@ -6,9 +6,9 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Awaiting keeper (explicit-yes queue, per ADR-008)
 
-- [PO] 2026-10-25 — P2 definition: pick the next build phase (PO
-  rec: `bee` CLI stub — `bee report` + `bee init`). Live keeper
-  decision; also keeper-report item 1.
+- [PO] 2026-10-25 — P2 definition: RESOLVED — keeper picked the `bee`
+  CLI stub (`bee report` + `bee init`); relay prompt drafted by PP,
+  awaiting keeper pass to the orchestrator.
 - [PP] 2026-10-25 — RESOLVED this session: ADR-008 ACCEPTED
   (keeper's word); keeper-report template blessed as interim;
   root-file ownership decided (ADR-007 amendment 1 — SOUL.md
