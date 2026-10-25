@@ -1,0 +1,10 @@
+{
+  "name": "beeharness",
+  "version": "0.1.0",
+  "description": "BeeHarness — personal agent harness (pi plugin + bee CLI)",
+  "type": "module",
+  "private": true,
+  "bin": { "bee": "./bin/bee.js" },
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test tests/*.test.mjs" }
+}
