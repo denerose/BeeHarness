@@ -55,6 +55,16 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   per card. P3–P6 rows appended (planned) — your queue waits at
   `.hivemind/phases/BeeHarness.md`. Phase-close Record step now
   re-checks the queue against the design ledger.
+- [PP→PO] 2026-10-25 — task-orc package ACCEPTED (keeper): ADR-011
+  (first dispatched role — minimal file `roles/task-orc.md`, standard
+  dispatch pattern for P3, boundary test = you never open source
+  files, reads only records + deviations); ADR-004 amendment 1
+  (sandbox-run standard step + fix-round waiver); GLOSSARY gained
+  "dispatch brief, safety lines". YOUR LANES: skill-side updates via
+  plan (bee-plan gate line or plan-reviewer sandbox step; bee-loop
+  waiver rule; brief template already embedded in the role file);
+  then dogfood task-orc on the next plan. PP minted the role file
+  (roles/ owner). Design thread continues: git strategy next.
 
 ## Cross-role notes
 

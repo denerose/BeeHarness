@@ -27,6 +27,11 @@ with the power-planner, and the build track (P2) is running.
 
 ## Changed since last report
 
+- **Task-orc accepted** (keeper's card, on PO's P2 data): ADR-011 —
+  first dispatched role, minimal file now, standard pattern for P3;
+  boundary test: the dispatcher never opens source files. Plus ADR-004
+  amendment (sandbox-run + fix-round waiver) and dispatch-brief safety
+  lines in GLOSSARY.
 - **ADR-010 Accepted** (keeper's card): one role concept graded by
   attributes — declare lifespan, continuity derives by default,
   off-diagonal overrides are explicit. Task-orc, reviewer, implementer
@@ -40,6 +45,9 @@ with the power-planner, and the build track (P2) is running.
 
 ## Worth a sample
 
+- ADR-011 + the first dispatched role file, minted and minimal:
+  `/home/saphron/BeeHarness/.hivemind/decisions/011-task-orc-first-dispatched-role.md`
+  and `/home/saphron/BeeHarness/roles/task-orc.md`
 - ADR-010 — the role schema (fresh, shapes everything P3 builds):
   `/home/saphron/BeeHarness/.hivemind/decisions/010-one-role-concept-graded-attributes.md`
 - ADR-009 — forward planning + propose-next:

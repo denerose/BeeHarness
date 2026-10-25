@@ -63,3 +63,21 @@ expensive.
 ## References
 
 - ADR 003 (document pipeline — where validation stages attach)
+
+## Amendment 1 (2026-10-25): size verification across the loop
+
+**Status:** Accepted (keeper, task-orc session; P2 evidence — PO
+suggestions `2026-10-25-po-size-verification-across-the-loop`)
+
+The dial applies across the loop, not just at task level:
+
+1. **Plan-reviewer gate:** plans carrying verbatim runnable code get
+   extract-and-sandbox-run as a standard External-reality step
+   (mechanically extract the code blocks, assemble in a sandbox, run
+   the suite). In P2 this improvised check caught two blockers
+   pre-dispatch — it stops being an accident of a good brief.
+2. **Fix-round waiver:** a post-fix confirmation pass may be waived
+   when (a) the fix is the reviewer's own suggested change, applied
+   verbatim, and (b) the fix-round verify record replicates the
+   reviewer's probe method. Record a one-line reason in the verify
+   record. Blocking-tier findings always get a real re-review.

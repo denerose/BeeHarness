@@ -113,6 +113,16 @@ it as a term of art.
   with a memory sync (session state current) and a **wake prompt** the
   keeper pastes into the new context — but no parking-lot sweep: that
   is a work-close ritual, never part of a refresh.
+- **dispatch brief, safety lines** — three standing lines every
+  brief for a write-capable agent carries (P2 near-miss: a reviewer
+  ran `bee report` flagless and wrote the live keeper report):
+  (1) tool defaults may write to live files — always pass `--check`
+  or explicit output paths, and verify with `git status` after;
+  (2) live shared surfaces (`status.md`, `keeper-report.md`) are
+  concurrently edited by a parallel role — never stash or restore
+  them, leave others' modifications untouched;
+  (3) if a live file was touched by accident — `git restore` it
+  immediately, verify porcelain clean, and disclose it in the report.
 - **dispatch** — a role sending work down to a subagent within its own
   mandate (orchestrator → implementer). Gated by the loop, not the
   keeper.
