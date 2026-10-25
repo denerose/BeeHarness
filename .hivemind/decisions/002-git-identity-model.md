@@ -68,6 +68,12 @@ the model exists to prevent.
 - This repo's local config — already set (ADR applied ahead of recording)
 - Future `bee` CLI — `--as keeper` flag reserved
 
+## Amendment (2026-10-25): per-role attribution
+
+With roles running in parallel, one identity can't say which role did
+what. Attribution rides in `Role: <role>` commit trailers and
+record/report headers (ADR-007); the identity itself stays single.
+
 ## References
 
 - Resolves parking-lot PL-001 (`.hivemind/.hivemind/memory/parking-lot.md`)

@@ -12,8 +12,9 @@ elsewhere.
 
 ## Memory ownership
 
-- `.hivemind/sessions/session.md` is the agent's own working memory.
-  Write it freely at each decision point; it retires with the session.
+- `.hivemind/sessions/<role>.md` (one file per role, role name in the
+  filename) is the agent's own working memory. Write it freely at each
+  decision point; it retires with the session.
 - `.hivemind/decisions/` (ADRs) are records of the keeper's actual
   decisions about long-term direction. Create one only on the keeper's
   word or an accepted offer. An answer in conversation is not a

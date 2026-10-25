@@ -60,7 +60,7 @@ registration + pilot run not started.
 ## Key Decisions
 
 All in `.hivemind/decisions/` (ADRs) + temp memories 13–19 in
-`.hivemind/sessions/session.md`. Highlights: work modes are opt-in
+`.hivemind/sessions/<role>.md`. Highlights: work modes are opt-in
 (ADR-005); states move only on records (ADR-006); plugin model with no
 per-repo skill layer (ADR-005 amendment); writing standard: plain
 language, define-or-link via GLOSSARY (scout-validated).
@@ -79,7 +79,7 @@ language, define-or-link via GLOSSARY (scout-validated).
 ## Important Files
 
 - `skills/` — the seven skills + GLOSSARY (the product, so far)
-- `.hivemind/sessions/session.md` — full decision log incl. temp
+- `.hivemind/sessions/<role>.md` (yours) — full decision log incl. temp
   memories 13–19 (gitignored but on disk; read it first)
 - `.hivemind/memory/parking-lot.md` — PL-002 parked
 - `.hivemind/plans/2026-10-18-continuity-layer.md` — SHELVED design
@@ -97,4 +97,4 @@ language, define-or-link via GLOSSARY (scout-validated).
 - Push works over https via gh credential helper (denerose-pi, workflow
   scope); ssh host key for github.com absent from known_hosts
 - Next session boot: run `pickup-handoff`, then read
-  `.hivemind/sessions/session.md`
+  `.hivemind/sessions/<role>.md` (your role file)

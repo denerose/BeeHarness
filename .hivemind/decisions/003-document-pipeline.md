@@ -111,6 +111,14 @@ assumed by direction — never inferred from the work's shape):
    doc disagrees with its instructions, raise the mismatch and ask
    what (if anything) changes — never edit around it.
 
+## Amendment (2026-10-25): ownership extends to every shared artifact
+
+Write ownership is no longer design-docs-only: the full table (ADRs,
+AGENTS.md, GLOSSARY, plans/phases/records, parking lot, suggestions,
+roles, skills) lives in ADR-007, with the keeper-consented scribe
+exception and the flexibility principle (roles are defaults, not
+walls). Design-doc rules here are unchanged.
+
 ## References
 
 - ADR 001 (memory tiers — orchestrator wake-up), ADR 004 (right-sized

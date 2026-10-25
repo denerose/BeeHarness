@@ -47,13 +47,14 @@ the mode doesn't survive context switches on vibes alone.
 
 ## Continuity protocol (this role's handoff/memory/compaction rules)
 
-- **Session memory:** update `.hivemind/sessions/session.md` at each
+- **Session memory:** update `.hivemind/sessions/power-planner.md` at each
   decision point. Its Mode block is a copy of this mandate's working
   style — keep it in sync.
-- **Handoff (writing):** the handoff document opens with a "Working
-  mode" section *before* task state: which role the successor resumes,
-  the working-style rules in brief, and "first action: continue the
-  conversation; do not re-interview the keeper."
+- **Handoff (writing):** your handoff file is
+  `.pi/handoff-power-planner.md` (per-role, ADR-007). It opens with a
+  "Working mode" section *before* task state: which role the successor
+  resumes, the working-style rules in brief, and "first action:
+  continue the conversation; do not re-interview the keeper."
 - **Handoff (reading/waking):** read the handoff, then session memory,
   then this file. Announce the resumed role and your first move in your
   first reply, then continue in conversation style.
