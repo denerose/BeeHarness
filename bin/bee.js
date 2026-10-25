@@ -219,19 +219,27 @@ function queueBullets(statusText) {
     }
   }
   if (cur !== null) bullets.push(cur);
-  return bullets.filter((b) => !/^- *$/.test(b));
+  return bullets
+    .filter((b) => !/^- *$/.test(b))
+    .filter((b) => !/\bRESOLVED\b/.test(b)); // history, not an ask
 }
 
 function absolutize(text, repoRoot) {
-  const rewrite = (m, tok) => {
-    if (tok.startsWith('/') || tok.startsWith('~')) return m;
+  const resolve1 = (tok) => {
+    if (tok.startsWith('/') || tok.startsWith('~')) return null;
     const abs = path.resolve(repoRoot, tok);
-    return fs.existsSync(abs) ? abs : m;
+    return fs.existsSync(abs) ? abs : null;
   };
   return text
-    .replace(/`([^`]+)`/g, (m, tok) => rewrite(m, tok))
+    .replace(/`([^`]+)`/g, (m, tok) => {
+      const abs = resolve1(tok);
+      return abs !== null ? '`' + abs + '`' : m; // keep backticks
+    })
     .replace(/(^|[\s(])(\.{0,2}\/?\.hivemind\/[^\s`)\]]*)/g,
-      (m, pre, tok) => pre + rewrite(tok, tok));
+      (m, pre, tok) => {
+        const abs = resolve1(tok);
+        return abs !== null ? pre + abs : m;
+      });
 }
 
 function normItem(s) {
@@ -327,7 +335,7 @@ function cmdReport(rest) {
     };
   const header = parsed !== null
     ? parsed.header.replace(
-        /\*\*Generated:\*\*.*(\n.*)?$/m,
+        /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*$/m,
         `**Generated:** ${stamp()} by bee report (merge regen) · ` +
         `**Source:** \`.hivemind/status.md\``)
     : FRESH_HEADER.replace('{STAMP}', stamp());

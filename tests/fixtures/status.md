@@ -5,6 +5,7 @@
 - [PP] 2026-10-25 — sample ask one: ratify the widget design at
   `.hivemind/designs/widget.md`.
 - [PO] 2026-10-25 — sample ask two, carried over unchanged.
+- [PP] 2026-10-25 — stale ask: RESOLVED by keeper earlier.
 
 ## Open escalations
 

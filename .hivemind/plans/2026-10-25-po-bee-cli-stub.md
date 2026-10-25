@@ -16,7 +16,9 @@ suite (first code in the repo; it becomes the standard suite).
 (built the plan's code in a sandbox, ran the suite) found 2 🔴 + 4 🟡;
 all fixed in-plan, revised code re-extracted from the plan and
 re-run: 16/16 tests green, live-file simulation clean (no wrapped-line
-residue, idempotent zones).
+residue, idempotent zones). Fix round 1 (bee-review r1 findings)
+applied: header-safe restamp regex, RESOLVED-queue-bullet skip,
+backtick retention; tests 18.
 
 ## Implementation structure (PO lane, not design)
 
@@ -373,8 +375,9 @@ Contract (ADR-008 Accepted + the report file's own header):
   never adds, removes, or rewrites anything in it.
 - *Needs the keeper* regenerates from status.md's
   `## Awaiting keeper` queue: each queue bullet becomes a numbered
-  ask (prefix `[PP]`/`[PO]` kept; repo-relative paths rewritten
-  absolute). MERGE: existing zone items not derivable from status are
+  ask (prefix `[PP]`/`[PO]` kept; bullets containing `RESOLVED` are
+  skipped — resolution history is not an ask; repo-relative paths
+  rewritten absolute, backticks kept). MERGE: existing zone items not derivable from status are
   kept (never silently dropped — they are the other role's asks);
   near-duplicates (same text after stripping numbering/emphasis, or
   one containing the other) collapse onto the derived wording.
@@ -402,6 +405,7 @@ Contract (ADR-008 Accepted + the report file's own header):
 - [PP] 2026-10-25 — sample ask one: ratify the widget design at
   `.hivemind/designs/widget.md`.
 - [PO] 2026-10-25 — sample ask two, carried over unchanged.
+- [PP] 2026-10-25 — stale ask: RESOLVED by keeper earlier.
 
 ## Open escalations
 
@@ -528,19 +532,27 @@ function queueBullets(statusText) {
     }
   }
   if (cur !== null) bullets.push(cur);
-  return bullets.filter((b) => !/^- *$/.test(b));
+  return bullets
+    .filter((b) => !/^- *$/.test(b))
+    .filter((b) => !/\bRESOLVED\b/.test(b)); // history, not an ask
 }
 
 function absolutize(text, repoRoot) {
-  const rewrite = (m, tok) => {
-    if (tok.startsWith('/') || tok.startsWith('~')) return m;
+  const resolve1 = (tok) => {
+    if (tok.startsWith('/') || tok.startsWith('~')) return null;
     const abs = path.resolve(repoRoot, tok);
-    return fs.existsSync(abs) ? abs : m;
+    return fs.existsSync(abs) ? abs : null;
   };
   return text
-    .replace(/`([^`]+)`/g, (m, tok) => rewrite(m, tok))
+    .replace(/`([^`]+)`/g, (m, tok) => {
+      const abs = resolve1(tok);
+      return abs !== null ? '`' + abs + '`' : m; // keep backticks
+    })
     .replace(/(^|[\s(])(\.{0,2}\/?\.hivemind\/[^\s`)\]]*)/g,
-      (m, pre, tok) => pre + rewrite(tok, tok));
+      (m, pre, tok) => {
+        const abs = resolve1(tok);
+        return abs !== null ? pre + abs : m;
+      });
 }
 
 function normItem(s) {
@@ -636,7 +648,7 @@ function cmdReport(rest) {
     };
   const header = parsed !== null
     ? parsed.header.replace(
-        /\*\*Generated:\*\*.*(\n.*)?$/m,
+        /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*$/m,
         `**Generated:** ${stamp()} by bee report (merge regen) · ` +
         `**Source:** \`.hivemind/status.md\``)
     : FRESH_HEADER.replace('{STAMP}', stamp());
@@ -706,7 +718,7 @@ test('report: derived asks land, paths absolute', () => {
   const after = fs.readFileSync(rp, 'utf8');
   assert.ok(after.includes('sample ask two'));
   assert.ok(after.includes(
-    path.join(dir, '.hivemind', 'designs', 'widget.md')));
+    '`' + path.join(dir, '.hivemind', 'designs', 'widget.md') + '`'));
 });
 
 test('report: --check writes nothing', () => {
@@ -732,6 +744,34 @@ test('report: second run is idempotent (zones byte-stable)', () => {
   const second = fs.readFileSync(rp, 'utf8');
   const zones = (s) => s.slice(s.indexOf("## Keeper's list"));
   assert.equal(zones(second), zones(first));
+});
+
+test('report: repeated runs idempotent incl. header', () => {
+  const dir = reportTmp();
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const st = path.join(dir, '.hivemind', 'status.md');
+  const strip = (s) => s.replace(
+    /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*$/m, 'S');
+  let last = '';
+  for (let i = 0; i < 3; i++) {
+    run(['report', '--status', st, '--report', rp]);
+    const cur = fs.readFileSync(rp, 'utf8');
+    if (i > 0) assert.equal(strip(cur), strip(last));
+    last = cur;
+  }
+  assert.ok(last.includes('Protocol block stands in')); // not eaten
+});
+
+test('report: RESOLVED queue bullets are not asks', () => {
+  const dir = reportTmp();
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const r = run(['report', '--status',
+    path.join(dir, '.hivemind', 'status.md'), '--report', rp]);
+  assert.equal(r.code, 0);
+  const after = fs.readFileSync(rp, 'utf8');
+  assert.ok(!after.includes('stale ask'));
 });
 
 test('report: changed/sample zones verbatim, header Generated restamped',
@@ -772,7 +812,7 @@ test('report: fresh file gets protocol header + placeholder list', () => {
 });
 ```
 
-- [x] Run `npm test` — expected: 16 tests pass, 0 fail.
+- [x] Run `npm test` — expected: 18 tests pass, 0 fail.
 - [x] Run `node bin/bee.js report --check` against the live repo —
   expected: exit 0, full zoned output on stdout, live
   `.hivemind/keeper-report.md` unchanged (verify with
@@ -789,7 +829,7 @@ phase list; commit
 **Depends on:** Tasks 1–3
 **Provides:** evidence trail; phase exit
 
-- [ ] Run the full suite: `npm test` — expected: 16 pass, 0 fail.
+- [ ] Run the full suite: `npm test` — expected: 18 pass, 0 fail.
 - [ ] Run `node bin/bee.js report --check` (live) — expected: exit 0,
   no write, output contains all four zone headings.
 - [ ] Run `node bin/bee.js init --check` (live) — expected: exit 0,
@@ -810,7 +850,7 @@ phase list; commit
 
 ## Phase exit
 
-Done means: `npm test` green (16 tests); live dry-runs of both
+Done means: `npm test` green (18 tests); live dry-runs of both
 commands behave per contract (`--check` writes nothing); records in
 `.hivemind/records/`; phase list P2 done. The keeper samples the
 result (ADR-008) — e.g. reads `bin/bee.js` or runs

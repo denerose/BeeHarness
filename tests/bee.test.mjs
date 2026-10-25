@@ -128,7 +128,7 @@ test('report: derived asks land, paths absolute', () => {
   const after = fs.readFileSync(rp, 'utf8');
   assert.ok(after.includes('sample ask two'));
   assert.ok(after.includes(
-    path.join(dir, '.hivemind', 'designs', 'widget.md')));
+    '`' + path.join(dir, '.hivemind', 'designs', 'widget.md') + '`'));
 });
 
 test('report: --check writes nothing', () => {
@@ -154,6 +154,34 @@ test('report: second run is idempotent (zones byte-stable)', () => {
   const second = fs.readFileSync(rp, 'utf8');
   const zones = (s) => s.slice(s.indexOf("## Keeper's list"));
   assert.equal(zones(second), zones(first));
+});
+
+test('report: repeated runs idempotent incl. header', () => {
+  const dir = reportTmp();
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const st = path.join(dir, '.hivemind', 'status.md');
+  const strip = (s) => s.replace(
+    /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*$/m, 'S');
+  let last = '';
+  for (let i = 0; i < 3; i++) {
+    run(['report', '--status', st, '--report', rp]);
+    const cur = fs.readFileSync(rp, 'utf8');
+    if (i > 0) assert.equal(strip(cur), strip(last));
+    last = cur;
+  }
+  assert.ok(last.includes('Protocol block stands in')); // not eaten
+});
+
+test('report: RESOLVED queue bullets are not asks', () => {
+  const dir = reportTmp();
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const r = run(['report', '--status',
+    path.join(dir, '.hivemind', 'status.md'), '--report', rp]);
+  assert.equal(r.code, 0);
+  const after = fs.readFileSync(rp, 'utf8');
+  assert.ok(!after.includes('stale ask'));
 });
 
 test('report: changed/sample zones verbatim, header Generated restamped',
