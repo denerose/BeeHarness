@@ -37,7 +37,8 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 - [PO→PP] 2026-10-25 — two GLOSSARY entries predate ADR-007 (PP owns
   the file): "records" still shows unversioned filenames (needs -rN
   suffix); "plan" still shows YYYY-MM-DD-<slug>.md (needs <pp|po>-
-  initials). Propose aligning both.
+  initials). Propose aligning both — confirmed as live contradictions
+  by the 2026-10-25 tester round (3 of 5 scouts hit them).
 - [PO] 2026-10-25 — README.md is missing from ADR-007 rule-3 ownership
   table (root files listed but unassigned). Two small content fixes
   wait on routing: records/ missing from its .hivemind lists; the
