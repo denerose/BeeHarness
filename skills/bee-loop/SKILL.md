@@ -14,14 +14,18 @@ directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary,
    plan conflicts with the design doc, escalate before starting.
 2. Create or update the phase list (`.hivemind/phases/<project>.md`,
    project = repo name unless the keeper says otherwise;
-   `assets/phase-list-template.md`) — your one tracking file. If the
-   plan header carries a phase id, record it there.
+   `assets/phase-list-template.md`) — your one tracking file, with an
+   `owner` column for claims (GLOSSARY: claim). If the plan header
+   carries a phase id, record it there.
 3. Confirm the validation level from the plan header. No level stated?
    Ask before starting.
 
 ## The cycle, per task
 
-1. **Pick** the next task whose dependencies are done.
+1. **Pick and claim.** Pick the next task whose dependencies are done,
+   then claim it: write your role + timestamp in the phase list's
+   `owner` column (GLOSSARY: claim) before any dispatch, and re-read
+   the phase list before writing again.
 2. **Implement** — yourself for small tasks; a subagent when the task is
    self-contained or benefits from isolation (fresh context, parallel
    safety). Independent tasks may run in parallel as subagents; verify
@@ -35,9 +39,14 @@ directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary,
    separate reviewer, review the work yourself and say so in the
    review report — the evidence trail matters more than who wrote it.
 5. **Fix rounds** — if review or verify fails: fix, re-verify,
-   re-review. Maximum two rounds. Still failing? Escalate.
+   re-review. Maximum two rounds. Still failing? Escalate. Re-runs
+   write versioned records — the round suffix increments
+   (`-r2`, GLOSSARY: record versioning).
 6. **Record** — check off the task in the plan, update the phase list,
-   commit.
+   commit. Stage only the files this task touched — never `git add -A`;
+   carry a `Role:` trailer (GLOSSARY). Records always land in the main
+   checkout's `.hivemind/records/`, even when work happened in a
+   worktree.
 7. Repeat until the plan is done, then run phase-level verification and
    report.
 

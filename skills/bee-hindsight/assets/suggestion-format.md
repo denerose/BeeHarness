@@ -1,7 +1,7 @@
 # Suggestion entry format
 
 One file per suggestion in `.hivemind/suggestions/`, named
-`YYYY-MM-DD-<slug>.md`:
+`YYYY-MM-DD-<pp|po>-<slug>.md` (your role's initials):
 
 ```
 **Date:** YYYY-MM-DD

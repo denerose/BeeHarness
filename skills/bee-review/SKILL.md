@@ -26,8 +26,10 @@ review work that doesn't run.
 
 ## Report
 
-Save to `.hivemind/records/<plan-slug>-task<N>-review.md` using
-`assets/review-report-template.md`. Three tiers, each finding with file
+Save to `.hivemind/records/<plan-slug>-task<N>-review-r<N>.md` (round
+suffix per GLOSSARY: record versioning; first run is `-r1`) using
+`assets/review-report-template.md`, stating your producing role in the
+header (GLOSSARY: Role trailer). Three tiers, each finding with file
 and line and a concrete suggested fix:
 
 - **Blocking** — wrong, broken, or contradicts the plan's intent.

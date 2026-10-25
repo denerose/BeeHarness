@@ -31,10 +31,14 @@ inputs, same result — anyone running this should get the same answer.
 
 ## Output
 
-Save to `.hivemind/records/<plan-slug>-task<N>-verify.md` using
-`assets/verify-record-template.md`: level, date, commands + exit
-statuses, verdict, where the full log lives. Keep it short. A verify
-record that hides a failure is the worst thing in this harness.
+Save to `.hivemind/records/<plan-slug>-task<N>-verify-r<N>.md` (round
+suffix per GLOSSARY: record versioning; the first run is `-r1`, fix
+rounds increment it) using `assets/verify-record-template.md`: level,
+date, commands + exit statuses, verdict, where the full log lives.
+State your producing role in the record header (GLOSSARY: Role
+trailer). Records produced in worktrees always land in the main
+checkout's `.hivemind/records/`. Keep it short. A verify record that
+hides a failure is the worst thing in this harness.
 
 Verdicts: **PASS**, **FAIL** (something ran and broke), or **BLOCKED**
 (the declared checks can't be run — missing commands, missing inputs).
