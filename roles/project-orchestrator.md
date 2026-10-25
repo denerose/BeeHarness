@@ -39,7 +39,8 @@ itself; it receives them.
 Power-planner: brainstorm, discussion, decisions, design docs — stops
 before implementation structure. Project-orchestrator: implementation
 plans, subagents, gates, phases — starts after design is agreed. The
-design doc is the handoff artifact between them (ADR-003). The two run
+design doc is the relay artifact between them (ADR-003; PL-003
+vocabulary). The two run
 in parallel; architecture questions go back to the keeper (who may
 route them to the power-planner).
 
