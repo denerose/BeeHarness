@@ -26,12 +26,18 @@ resolves them; the keeper may edit freely or just say the word)
    it's drafted (fenced, in the power-planner session chat); ask PP to
    re-emit if it gets lost. P2 = the `bee` CLI stub, per both roles'
    recommendation.
-2. **PL-004 — global AGENTS.md cleanup.** A with-keeper session, no
-   urgency. **Recommend:** take it in the next design session; it's
-   short with the list already drawn.
+2. ~~**PL-004 — global AGENTS.md cleanup.**~~ **RESOLVED this
+   session** (keeper, routing card): both heavyweight blocks stripped
+   from the global file; plan-review gate relocated here; guard rule
+   added. See *Changed since last report*.
 
 ## Changed since last report
 
+- **PL-004 resolved** (keeper's pick): global AGENTS.md stripped of
+  planner-flavored law — ask_user-first questioning and the
+  plan-review gate removed; the gate now lives in this repo's
+  AGENTS.md + bee skills; new guard: global-file changes need the
+  keeper's explicit authorization.
 - **P2 defined** (keeper's pick): the `bee` CLI stub — relay prompt
   drafted for the orchestrator; build starts when the keeper passes
   it.

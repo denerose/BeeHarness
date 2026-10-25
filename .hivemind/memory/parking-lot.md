@@ -46,6 +46,15 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   when the keeper wants the pass, or with the PL-002 tooling build.
 ## Resolved
 
+- **PL-004 — global AGENTS.md overreach cleanup** — resolved 2026-10-25
+  (keeper picked "strip both" via routing card): ask_user-first
+  questioning and the plan-review gate removed from the global file;
+  gate relocated to this repo's AGENTS.md + bee skills; ask_user
+  retry-error rule kept globally as tool mechanics; guard added —
+  global AGENTS.md changes need the keeper's explicit authorization.
+  Note: the global file lives outside this repo — untracked by its
+  git; the guard rule is its protection.
+
 - **PL-003 — "handoff" term overload (ADR-001 rule 7)** — resolved
   2026-10-25, keeper picked **relay** for cross-role work passing.
   Vocabulary now: relay (role↔role, keeper-gated) · handoff (same-role

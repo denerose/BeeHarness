@@ -50,6 +50,16 @@ We are designing the harness before building it. Right now:
   repo-relative dot-directory paths as broken links. Paths inside
   files stay correct repo-relative; keeper-facing surfaces go
   absolute.
+- **Plan review gate:** before dispatching the first implementer on
+  any plan containing verbatim code blocks (source, tests, config,
+  compose, SQL), run the `plan-reviewer` skill and resolve every 🔴
+  finding before dispatch; waive 🟡 only with a one-line recorded
+  reason; re-review any task whose verbatim code changed after
+  review. Depth scales with plan size — small plans get a single
+  Accuracy + External-reality pass, large plans get all dimensions —
+  but the gate is never skipped (not for detail, not for cost, not
+  for waiting humans: the P1 run shipped eight). Lives here since
+  PL-004, not in global law.
 - Ask one question at a time, and **always recommend** — never a bare
   menu. Use the `ask_user` tool (Paseo card) for decisions.
 - Verify every factual claim (call sites, tool names, paths) before

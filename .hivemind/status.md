@@ -9,6 +9,11 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 - [PO] 2026-10-25 — P2 definition: RESOLVED — keeper picked the `bee`
   CLI stub (`bee report` + `bee init`); relay prompt drafted by PP,
   awaiting keeper pass to the orchestrator.
+- [PP] 2026-10-25 — PL-004 RESOLVED (keeper, routing card): both
+  heavyweight blocks stripped from global AGENTS.md; plan-review
+  gate now lives in repo AGENTS.md + bee skills; guard rule added
+  (global file changes = keeper authorization only). Global file is
+  outside this repo's git — the guard is its protection.
 - [PP] 2026-10-25 — RESOLVED this session: ADR-008 ACCEPTED
   (keeper's word); keeper-report template blessed as interim;
   root-file ownership decided (ADR-007 amendment 1 — SOUL.md
