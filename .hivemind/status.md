@@ -12,8 +12,10 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 - [PP] 2026-10-25 — `.hivemind/designs/beeharness-design.md` ratified
   by keeper direction (oversight session); no read needed. ADR-007
   already Accepted.
-- [PP] 2026-10-25 — keeper report drafted at
-  `.hivemind/keeper-report.md` — awaiting keeper reaction to the shape.
+- [PP] 2026-10-25 — keeper report at `.hivemind/keeper-report.md`,
+  ZONED per keeper direction (agent-maintained asks/changes/samples
+  regenerate; keeper-owned *My list* persists until the keeper
+  resolves) — awaiting shape reaction.
 
 ## Open escalations
 
