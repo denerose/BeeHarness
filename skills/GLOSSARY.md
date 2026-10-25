@@ -62,3 +62,15 @@ it as a term of art.
 - **bee-loop** — the plan → implement → verify → review cycle, run by
   the `bee-loop` skill. Entered only when the keeper or a directed role
   says so; never inferred from task size.
+- **Role trailer** — a `Role: <role>` line in commit messages and
+  record/report headers saying which role produced the work (ADR-007).
+- **escalation envelope** — every ask_user card states: role, context
+  (plan/phase), the question, and where the answer will be recorded.
+- **status surface** — `.hivemind/status.md`: open escalations, ADRs
+  awaiting the keeper's flip, cross-role notes. Both roles read it at
+  session start; interim until the decisions inbox exists.
+- **record versioning** — verify/review records carry a round suffix
+  (`…-task3-verify-r2.md`); records made in worktrees always land in
+  the main checkout's `.hivemind/records/`.
+- **claim** — the phase list's `owner` column: role + timestamp written
+  before dispatching a task; re-read before writing.
