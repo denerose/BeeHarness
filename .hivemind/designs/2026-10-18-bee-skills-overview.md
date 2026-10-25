@@ -42,7 +42,8 @@ list as its one writable tracking surface. Boundaries: entered only by
 explicit direction; designs nothing (escalates contradictions); never
 reviews or verifies its own work where a separate stage can do it
 (separation of duties); during bootstrap it runs manually inside the
-power-planner session — same skill, no orchestrator yet.
+project-orchestrator session — same skill, no automated orchestrator
+yet.
 
 **4. bee-review — judgment checks.**
 The reviewer stage: reads verified work and judges what mechanics can't
