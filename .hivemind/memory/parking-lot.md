@@ -14,6 +14,13 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   (role-gated writes, proposals queue, provenance stamps); continuity
   spec + plan shelved as design input — review with keeper when the
   memory tooling build begins (harness build phase).
+- **PL-003 — global AGENTS.md overreach cleanup** — existing global
+  AGENTS.md hardcodes planner behaviors (ask_user-first questioning) as
+  if law; probably one agent's self-instructions accreted. With keeper:
+  strip mode-specific behavior (roles own it now), keep mode-neutral
+  law, add explicit rule that global AGENTS.md changes need keeper
+  authorization — unpark next session touching global config or when
+  harness rules land.
 - **PL-003 — "handoff" term overload (ADR-001 rule 7)** — rule 7 (and
   its echoes in AGENTS.md + continuity spec/plan) uses "handoff" for
   two things: the context-refresh skill ritual (`handoff`/`pickup-handoff`:

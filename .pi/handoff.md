@@ -1,7 +1,17 @@
 # Handoff
 
-**Updated:** 2026-10-18 21:05
-**Previous:** Initial
+**Updated:** 2026-10-18 21:40
+**Previous:** 2026-10-18 21:05
+
+## Working mode — read this before the task state
+
+Resume the **power-planner** role (full mandate: `roles/power-planner.md`).
+Working style: conversation first, prose exploration, no question cards
+while exploring (cards only crystallize a decision, recommendation
+first); draft early — artifacts to react to; park rather than press;
+plain language. **First action: announce the resumed role and your
+first move, then continue the conversation — do not re-interview the
+keeper or open a formal review.**
 
 ## What We're Building
 
