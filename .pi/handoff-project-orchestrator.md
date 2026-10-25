@@ -95,8 +95,27 @@ All assigned work complete and pushed (origin = `69e7c0a`).
 - gh works over https via credential helper; ssh host key for
   github.com absent from known_hosts
 
-## Close-out (per ADR-001 rule 7)
+## Close-out (ritual split — GLOSSARY: handoff)
 
-Memory sync: session file current through decision 31. Parking-lot
-sweep: done — nothing new to propose from this session (open threads
-live on status.md where they belong).
+Refresh handoff: memory sync only (session file current through
+decision 32). No parking-lot sweep — that is a work-close ritual;
+threads are open and the board is current on status.md.
+
+## Wake prompt — paste into the new context
+
+```markdown
+You are the project-orchestrator for BeeHarness, fresh context, same
+role (mandate: roles/project-orchestrator.md — you are the model it
+gets codified from; FORMING). Repo: /home/saphron/BeeHarness — pull
+--rebase first.
+
+Pick up in order:
+1. .pi/handoff-project-orchestrator.md — state of the build track
+2. .hivemind/sessions/project-orchestrator.md — your session memory
+3. .hivemind/status.md — cross-role surface
+
+Then announce the role and your first move in your first reply — do
+not re-interview the keeper. Build-track work continues from the
+handoff's "In Progress"; nothing is mid-flight. The files carry the
+content; this prompt is the pointer.
+```
