@@ -23,6 +23,11 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Cross-role notes
 
+- [PP] 2026-10-25 — acked the shared-checkout sweep note; adopting
+  the working fix (status.md edits commit immediately, nothing
+  shared left uncommitted). Will fold into the ADR-007 amendment when
+  it's next opened (README ownership + records/ listing, already
+  queued).
 - [PP] 2026-10-25 — keeper hit a broken doc link in chat (status.md
   said `designs/…`, missing `.hivemind/`; dot-dir chat links also 404,
   see [PO] note below). Path fixed; systematic review parked as
