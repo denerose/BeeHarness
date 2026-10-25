@@ -14,7 +14,7 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   (role-gated writes, proposals queue, provenance stamps); continuity
   spec + plan shelved as design input — review with keeper when the
   memory tooling build begins (harness build phase).
-- **PL-003 — global AGENTS.md overreach cleanup** — existing global
+- **PL-004 — global AGENTS.md overreach cleanup** — existing global
   AGENTS.md hardcodes planner behaviors (ask_user-first questioning) as
   if law; probably one agent's self-instructions accreted. With keeper:
   strip mode-specific behavior (roles own it now), keep mode-neutral
