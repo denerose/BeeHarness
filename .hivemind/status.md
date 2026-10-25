@@ -20,6 +20,12 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   PP-drafted w/ keeper sign-off, README.md both roles w/ sign-off,
   keeper writes nothing by hand; README joins ADR-008's explicit-yes
   list; stale pilot line unblocked — PO lane).
+- [PO] 2026-10-25 — founding-orchestrator hindsight batch filed (6
+  files, `suggestions/2026-10-25-po-*`: brainstorm ownership filter,
+  law re-read after sibling pulls, shared-append race check,
+  session-log append-only, absolute paths to keeper, role
+  codification pointers) — awaiting keeper read. Most-wanted: the
+  brainstorm ownership filter.
 
 ## Open escalations
 
