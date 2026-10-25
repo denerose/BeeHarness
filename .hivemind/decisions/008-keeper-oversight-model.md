@@ -42,10 +42,11 @@ not on full-file attention.
 
 **Keeper report** — the digest surface: `.hivemind/keeper-report.md`,
 **zoned** (keeper direction: it is the keeper's to-do list, not a
-pure derived view): *My list* — the keeper's come-back items,
+pure derived view): *Keeper's list* — the keeper's come-back items,
 keeper-owned; roles add on the keeper's word, mark done only when the
 keeper resolves (in conversation counts), never drop for staleness;
-the keeper may edit the file directly. *Needs you* (decision asks
+the keeper may edit the file directly. *Needs the keeper* (decision
+asks
 with recommendations — may be empty), *Changed since last report*
 (≤5 lines), *Worth a sample* (optional) — agent-maintained,
 regenerated freely from status.md. All paths absolute (Paseo-safe).
@@ -60,9 +61,9 @@ Interim: maintained by hand; the `bee` CLI automates it later
 - "Ratify by read" language in the design doc's status line and the
   status surface is superseded; design doc amended on flip.
 - Keeper attention concentrates on explicit-yes gates and sampling.
-- Hive asks in the report trace to status.md (no drift); *My list*
-  is keeper voice by design — persistence beats freshness there. Git
-  history of the report doubles as a change log.
+- Hive asks in the report trace to status.md (no drift); *Keeper's
+  list* is keeper voice by design — persistence beats freshness there.
+  Git history of the report doubles as a change log.
 
 ## Alternatives considered
 

@@ -14,8 +14,9 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   already Accepted.
 - [PP] 2026-10-25 — keeper report at `.hivemind/keeper-report.md`,
   ZONED per keeper direction (agent-maintained asks/changes/samples
-  regenerate; keeper-owned *My list* persists until the keeper
-  resolves) — awaiting shape reaction.
+  regenerate; keeper-owned *Keeper's list* persists until the keeper
+  resolves) — awaiting shape reaction. Zone names carry no pronouns
+  (keeper referent point, decision 41 in my log).
 
 ## Open escalations
 
