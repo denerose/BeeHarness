@@ -1,47 +1,44 @@
 # Keeper report
 
-**Generated:** 2026-10-25 by power-planner · **Source:** `.hivemind/status.md`
+**Generated:** 2026-10-25 by project-orchestrator · **Source:** `.hivemind/status.md`
+(derived view — whole-file regeneration, never hand-edited; regenerate
+when status.md changes, at session start if stale, or on request)
 
-Zoned (keeper direction 2026-10-25): **Keeper's list** below is
-the keeper's own — roles add items on the keeper's word, mark them
-done only when the keeper resolves them (in conversation counts), and
-never drop them for staleness. The other sections are
-agent-maintained and regenerate freely. The keeper may edit this
-file directly, any zone.
+## Needs you
 
-## Keeper's list
-
-(the keeper's come-back items — they persist until the keeper
-resolves them; the keeper may edit freely or just say the word)
-
-- Harness name still TBC.
-
-## Needs the keeper
-
-1. **ADR-008 — keeper oversight model + zoned report.** Proposed at
+1. **P2 definition — pick the next build phase.** Recommend: the `bee`
+   CLI stub (`bee report` + `bee init`) — `bee report` is fully
+   specified by ADR-008 and currently hand-generated; PL-002 gates
+   only the memory build, not the stub. Alternatives:
+   orchestration-deepening (blocked on the PP git-strategy
+   brainstorm), or wrap-and-codify (one more build cycle would enrich
+   the codification).
+2. **ADR-008 — keeper oversight model.** Proposed at
    `/home/saphron/BeeHarness/.hivemind/decisions/008-keeper-oversight-model.md`.
-   The five-piece model you approved, amended to the zoned-report
-   design from your note. One explicit yes flips it Accepted.
-   **Recommend:** accept as amended.
-2. **This report's shape.** The zoned revision responds to your note
-   — zones now named without pronouns (Keeper's list / Needs the
-   keeper) per your referent point. React if anything still reads
-   wrong.
-3. **PL-004 — global AGENTS.md cleanup.** A with-keeper session, no
+   Records the five-piece model you approved in conversation
+   (no duty-reads; digests; silence accepts; sampling; tests as review)
+   plus this report. Needs an explicit yes to flip Accepted.
+   **Recommend:** accept as drafted.
+3. **This report's shape.** React to this format — sections, length,
+   tone. It regenerates whole, so shape changes are cheap.
+4. **PL-004 — global AGENTS.md cleanup.** A with-keeper session, no
    urgency. **Recommend:** take it in the next design session; it's
    short with the list already drawn.
 
 ## Changed since last report
 
-- Keeper report zoned per your note: agent sections regenerate,
-  **Keeper's list** is the keeper's own and persistent.
-- Design doc ratified by your direction — no read needed.
-- GLOSSARY aligned to ADR-007 naming (plan slugs, record suffixes).
-- Broken design-doc link fixed; harness-wide link review parked
-  (PL-PP-001).
+- Two orchestrator suggestions filed (the pickup stall: forward
+  planning) — see *Worth a sample*.
+- Shared-checkout sweep: PP's `489e34f` carried one `[PO]` status line
+  (no data lost; atomic-commit practice now standard).
+- GLOSSARY alignment to ADR-007 verified against the ADR; note closed.
 
 ## Worth a sample
 
+- The two new suggestions:
+  `/home/saphron/BeeHarness/.hivemind/suggestions/2026-10-25-po-orchestrator-what-next-gap.md`
+  and
+  `/home/saphron/BeeHarness/.hivemind/suggestions/2026-10-25-po-phases-artifact-in-design.md`
 - Orchestrator's pilot hindsight suggestion (verify expectations as
   minimums):
   `/home/saphron/BeeHarness/.hivemind/suggestions/2026-10-20-verify-expectations-as-minimums.md`

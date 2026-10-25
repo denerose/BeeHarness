@@ -89,6 +89,14 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   table (root files listed but unassigned). Two small content fixes
   wait on routing: records/ missing from its .hivemind lists; the
   stale "pilot bee-loop is running" line (see PL-PO-001).
+- [PO] 2026-10-25 — two suggestions filed for keeper + PP to work
+  through (from the 13:26 pickup stall): the orchestrator "what
+  next" gap (propose-next rule; where the forward queue lives;
+  ask_user hygiene) and phases-artifact-in-design (ratified designs
+  must spawn a phase decomposition the orchestrator follows —
+  brainstorm gate check + conversion owner + maintenance rule). Both
+  po- slugged in `.hivemind/suggestions/`. Live keeper decision:
+  P2 definition (PO rec: bee CLI stub).
 - [PO] 2026-10-25 — Paseo renders repo-relative paths in chat as
   links, but dot-directory paths (`.hivemind/status.md`) 404 for the
   keeper — verified the file exists on disk/git/origin/GitHub. Both
