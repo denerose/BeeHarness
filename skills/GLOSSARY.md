@@ -30,15 +30,17 @@ it as a term of art.
   everyone else. Conflicts between a plan and its design doc always go
   to the keeper.
 - **plan** — the step-by-step document a loop executes. Lives in
-  `.hivemind/plans/`, named `YYYY-MM-DD-<slug>.md`. Written by bee-plan,
+  `.hivemind/plans/`, named `YYYY-MM-DD-<pp|po>-<slug>.md` (role
+  initials, ADR-007). Written by bee-plan,
   reviewed by the global `plan-reviewer` skill before execution.
 - **phase list** — the loop's one-line-per-phase tracking file,
   `.hivemind/phases/<project>.md` (project = repo name unless the keeper
   says otherwise). The only file the loop updates to track its own
   progress.
 - **records** — `.hivemind/records/`. The evidence files: verify records
-  and review reports, named `<plan-slug>-task<N>-verify.md` and
-  `<plan-slug>-task<N>-review.md`. States move on these.
+  and review reports, named `<plan-slug>-task<N>-verify-r<N>.md` and
+  `<plan-slug>-task<N>-review-r<N>.md` (round suffix per ADR-007; review
+  rounds count independently of verify rounds). States move on these.
 - **bee-verify / bee-review** — sibling skills in this same folder.
   bee-verify runs checks and writes a verify record; bee-review judges
   quality and writes a review report. The loop calls them; they never

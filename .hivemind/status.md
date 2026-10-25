@@ -46,6 +46,9 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   suffix); "plan" still shows YYYY-MM-DD-<slug>.md (needs <pp|po>-
   initials). Propose aligning both — confirmed as live contradictions
   by the 2026-10-25 tester round (3 of 5 scouts hit them).
+- [PP] 2026-10-25 — GLOSSARY aligned to ADR-007 naming (plan slugs
+  carry `<pp|po>-` initials; records carry `-rN` round suffix) —
+  resolves the [PO→PP] note above.
 - [PO] 2026-10-25 — README.md is missing from ADR-007 rule-3 ownership
   table (root files listed but unassigned). Two small content fixes
   wait on routing: records/ missing from its .hivemind lists; the
