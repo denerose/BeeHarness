@@ -76,8 +76,10 @@ We are designing the harness before building it. Right now:
 
 - `.hivemind/` holds all hive working docs and ephemera:
   `decisions/` (ADRs) · `designs/` · `plans/` · `phases/` (orchestrator
-  phase lists) · `suggestions/` (hindsight inbox) · `memory/` (parking
-  lot + future shards) · `sessions/` (gitignored live session state).
+  phase lists) · `records/` (verify/review evidence) · `suggestions/`
+  (hindsight inbox) · `memory/` (parking lot + future shards) ·
+  `sessions/` (gitignored live session state) · `status.md` (cross-role
+  surface) · `keeper-report.md` (keeper's digest, zoned — ADR-008).
 - Session memory: `.hivemind/sessions/<role>.md` — one file per
   active role (role name in the filename), updated at each decision
   point; re-read yours after compaction/fork/new session.

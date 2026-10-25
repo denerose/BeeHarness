@@ -77,8 +77,10 @@ the decisions inbox when built.
 designs) · `plans/` · `phases/` (phase lists) · `records/` (verify/
 review evidence) · `suggestions/` (hindsight inbox, any role) ·
 `memory/` (parking lot now; shards later) · `sessions/` (per-role,
-gitignored) · `status.md`. Root: `SOUL.md`, `README.md`, `AGENTS.md`,
-`roles/`, `skills/`. Write ownership per ADR-007's table.
+gitignored) · `status.md` (cross-role surface) · `keeper-report.md`
+(the keeper's zoned digest, ADR-008). Root: `SOUL.md`, `README.md`,
+`AGENTS.md`, `roles/`, `skills/`. Write ownership per ADR-007's table
+(+ Amendment 1: SOUL.md and README.md).
 
 ## Not built yet (bootstrap honest ledger)
 

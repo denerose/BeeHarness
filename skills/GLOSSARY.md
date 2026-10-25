@@ -21,7 +21,8 @@ it as a term of art.
 - **hivemind** — the `.hivemind/` folder in a repo. Holds all the
   working files the agents produce: `decisions/` (ADRs), `designs/`,
   `plans/`, `phases/`, `suggestions/`, `memory/`, `records/`,
-  `sessions/` (gitignored).
+  `sessions/` (gitignored), `status.md` (cross-role surface), and
+  `keeper-report.md` (the keeper's zoned digest).
 - **ADR** — architecture decision record, one file per decision, in
   `.hivemind/decisions/`. Written with the global `adr` skill.
 - **design doc** — the document that says what we're building and why,

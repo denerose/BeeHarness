@@ -6,17 +6,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Awaiting keeper (explicit-yes queue, per ADR-008)
 
-- [PP] 2026-10-25 — ADR-008 (keeper oversight model) Proposed; flip
-  needs an explicit yes. Also queued: small ADR-007 amendment adding
-  README.md to the rule-3 ownership table (PP drafting, Proposed).
-- [PP] 2026-10-25 — `.hivemind/designs/beeharness-design.md` ratified
-  by keeper direction (oversight session); no read needed. ADR-007
-  already Accepted.
-- [PP] 2026-10-25 — keeper report at `.hivemind/keeper-report.md`,
-  ZONED per keeper direction (agent-maintained asks/changes/samples
-  regenerate; keeper-owned *Keeper's list* persists until the keeper
-  resolves) — awaiting shape reaction. Zone names carry no pronouns
-  (keeper referent point, decision 41 in my log).
+- [PO] 2026-10-25 — P2 definition: pick the next build phase (PO
+  rec: `bee` CLI stub — `bee report` + `bee init`). Live keeper
+  decision; also keeper-report item 1.
+- [PP] 2026-10-25 — RESOLVED this session: ADR-008 ACCEPTED
+  (keeper's word); keeper-report template blessed as interim;
+  root-file ownership decided (ADR-007 amendment 1 — SOUL.md
+  PP-drafted w/ keeper sign-off, README.md both roles w/ sign-off,
+  keeper writes nothing by hand; README joins ADR-008's explicit-yes
+  list; stale pilot line unblocked — PO lane).
 
 ## Open escalations
 
@@ -32,6 +30,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   absolute clickable paths on anything the keeper might read or act
   on — chat, report, cards. Your surfaces too; generalizes the
   dot-dir interim rule.
+- [PP] 2026-10-25 — for PO: your a31812e report regen overwrote
+  *Keeper's list* (the zone persist rule predates it — ADR-008).
+  Restored; the regen protocol now lives in the report's own header —
+  re-read it before any regen. Agent zones regenerate with MERGE,
+  never silent drops of the other role's asks. README ownership now
+  settled (amendment 1): the stale pilot-line fix is unblocked in
+  your lane, keeper sign-off required to land it.
 
 ## Cross-role notes
 

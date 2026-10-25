@@ -101,6 +101,32 @@ time.
   `skills/bee-loop` (claims, records), `skills/bee-plan` and
   `bee-hindsight` (slugs); `roles/` continuity protocols; GLOSSARY.
 
+## Amendment 1 (2026-10-25): root files, shared surfaces, layout completeness
+
+**Status:** Accepted (keeper direction, oversight session 2026-10-25:
+"I don't want to be writing anything by hand" — roles write, the
+keeper signs off)
+
+1. **Root-file ownership** — rule 3's table gains:
+
+   | artifact | writer |
+   |---|---|
+   | `SOUL.md` | power-planner drafts and updates, in collaboration with the keeper; changes land only on the keeper's sign-off |
+   | `README.md` | power-planner and project-orchestrator both amend; changes land only on the keeper's sign-off |
+
+   README.md joins ADR-008's explicit-yes list (that list extends
+   here); SOUL.md was already on it.
+2. **Shared-surface atomicity** (codifies the orchestrator's working
+   fix, 2026-10-25): edits to files both roles maintain — `status.md`,
+   the keeper report's agent zones — commit immediately in their own
+   commit, never left uncommitted: `git add` stages whole files and
+   can sweep a sibling role's in-flight line. Line-prefix attribution
+   is the provenance that survives sweeps.
+3. **Layout completeness:** the `.hivemind/` holdings lists (repo
+   AGENTS.md Layout section, GLOSSARY "hivemind", design doc
+   artifacts map) must be exhaustive — `records/`, `status.md`, and
+   `keeper-report.md` included. Applied alongside this amendment.
+
 ## References
 
 - ADR-002 (identity — amended today), ADR-003 (pipeline — amended

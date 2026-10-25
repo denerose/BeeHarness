@@ -1,8 +1,9 @@
 # ADR 008: Keeper oversight model — authority, not attention
 
 **Date:** 2026-10-25
-**Status:** Proposed (power-planner, keeper direction in session 2026-10-25;
-keeper approved the shape in conversation — flip when read, or amend)
+**Status:** Accepted (keeper direction in session; explicit acceptance
+2026-10-25 — "ADR-008 looks good, accepted"; keeper report template
+blessed as interim, "tweak as we go")
 
 ## Context
 
