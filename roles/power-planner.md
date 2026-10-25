@@ -65,7 +65,10 @@ the mode doesn't survive context switches on vibes alone.
   mid-work handoff (crash, fork, weird context) is a memory sync only —
   session state current + the handoff file. The promote ritual
   (including the parking-lot sweep) happens at session close, not
-  here.
+  here. **Final step: hand the keeper a wake prompt for the successor**
+  (fenced markdown): who it is, how to pick up (handoff file → session
+  memory → status.md → announce role + first move). Short — the files
+  carry the content; the prompt is the pointer.
 - **Handoff (reading/waking):** read the handoff, then session memory,
   then this file. Announce the resumed role and your first move in your
   first reply, then continue in conversation style.

@@ -83,8 +83,9 @@ it as a term of art.
   design doc is the relay artifact. Not a handoff.
 - **handoff** — same role, fresh context: the `handoff`/`pickup-handoff`
   skill pair and the `.pi/handoff-<role>.md` files they write. Ends
-  with a memory sync (session state current) only — the parking-lot
-  sweep is a work-close ritual, never part of a refresh.
+  with a memory sync (session state current) and a **wake prompt** the
+  keeper pastes into the new context — but no parking-lot sweep: that
+  is a work-close ritual, never part of a refresh.
 - **dispatch** — a role sending work down to a subagent within its own
   mandate (orchestrator → implementer). Gated by the loop, not the
   keeper.

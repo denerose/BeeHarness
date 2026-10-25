@@ -54,7 +54,9 @@ We are designing the harness before building it. Right now:
   `pickup-handoff`. A handoff ends with a memory sync (session state
   current) — NOT a parking-lot sweep. Sweeps belong to closing work
   (brainstorm loop-back, session close, phase gates), when something
-  actually ended.
+  actually ended. Every handoff's final step: give the keeper a
+  **wake prompt** for the successor (fenced markdown: who it is, how to
+  pick up) — the files carry the content; the prompt is the pointer.
 - When a thread of work completes mid-session (**thread-close**,
   GLOSSARY): update your session log, offer durable bits for promotion,
   park new deferrals, then recommend the next move. Either party may
