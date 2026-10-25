@@ -49,9 +49,9 @@ Read `skills/GLOSSARY.md` first if any term below is unclear.
    additions and resolutions; the keeper decides. This loop-back is a
    required step, even when nothing was parked.
 7. **Hand off clearly.** Say which: bee-plan when the loop will
-   implement (several tasks, or subagents involved); direct work when
-   it's a change you'll just make now; nothing when it was a quick
-   answer.
+   implement (several tasks, or subagents involved — bee-plan runs in
+   the project-orchestrator's session); direct work when it's a change
+   you'll just make now; nothing when it was a quick answer.
 
 ## SOUL sessions (`--soul`)
 

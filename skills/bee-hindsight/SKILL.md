@@ -6,15 +6,15 @@ description: After a phase or project wraps (or when the keeper asks), review ho
 # bee-hindsight
 
 Look back at finished work and tell us how to do it better. Any role may
-run it when the keeper asks; the orchestrator or planner may also
-self-schedule it at wrap points (end of a phase, end of a project). Read
-`skills/GLOSSARY.md` first.
+run it when the keeper asks; the project-orchestrator or power-planner
+may also self-schedule it at wrap points (end of a phase, end of a
+project). Read `skills/GLOSSARY.md` first.
 
 ## Inputs — re-read before judging
 
 Don't trust recall over the record. Re-read, in this order:
 
-1. `.hivemind/sessions/session.md` (what actually happened)
+1. session memory `.hivemind/sessions/<role>.md` (what actually happened)
 2. the phase list (`.hivemind/phases/`)
 3. the plan and its check-boxes
 4. verify records and review reports in `.hivemind/records/`

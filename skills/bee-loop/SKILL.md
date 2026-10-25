@@ -63,9 +63,9 @@ where it applies — in the plan (task-scoped) or the phase list
 
 ## Bootstrap note
 
-Until the orchestrator exists this skill runs inside the current
-session. Same rules, no exceptions — the manual version is the pilot for
-the automated one.
+Until an automated orchestrator exists this skill runs inside a
+session — today, the project-orchestrator's. Same rules, no exceptions
+— the manual version is the pilot for the automated one.
 
 ## Boundaries
 

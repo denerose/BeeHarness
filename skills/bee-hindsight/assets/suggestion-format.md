@@ -6,7 +6,7 @@ One file per suggestion in `.hivemind/suggestions/`, named
 ```
 **Date:** YYYY-MM-DD
 **Project:** [repo name]
-**Role:** orchestrator | loop | reviewer | implementer | planner
+**Role:** power-planner | project-orchestrator | implementer | reviewer | other
 **Scope:** repo | harness (harness = a bee skill/template/rule)
 **What happened:** one or two sentences, concrete
 **Suggestion:** the change someone could make (skill edit, template fix,

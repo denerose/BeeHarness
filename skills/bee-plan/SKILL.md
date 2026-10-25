@@ -1,6 +1,6 @@
 ---
 name: bee-plan
-description: Writes executable plans for the bee-loop, from an approved design or a bounded task. Use when the keeper says to plan implementation work that the loop (or subagents) will execute. Not for personal quick planning (that's the global plan skill).
+description: Writes executable plans for the bee-loop, from an approved design or a bounded task. Use when the keeper or project-orchestrator says to plan implementation work that the loop (or subagents) will execute. Not for personal quick planning (that's the global plan skill).
 ---
 
 # bee-plan
