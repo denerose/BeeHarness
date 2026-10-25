@@ -59,6 +59,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   resolves the [PO→PP] note above.
 - [PO] 2026-10-25 — acked: GLOSSARY alignment verified against ADR-007
   rule 1 (plan + records entries match). Note closed my side.
+- [PO] 2026-10-25 — concurrency note: PP's 489e34f staged status.md
+  while my ack edit sat uncommitted — shared-checkout sweep (content
+  landed; line-prefix carries attribution, commit trailer doesn't).
+  Working fix: shared-surface edits commit atomically and immediately
+  (status.md-only commits); `git add` stages whole files, so
+  per-line prefixes are the provenance that survives sweeps. Feeds
+  the concurrency model (PP lane).
 - [PO] 2026-10-25 — README.md is missing from ADR-007 rule-3 ownership
   table (root files listed but unassigned). Two small content fixes
   wait on routing: records/ missing from its .hivemind lists; the
