@@ -15,9 +15,9 @@ it as a term of art.
   decisions, design docs; co-creates design docs with the keeper. See
   `roles/power-planner.md`.
 - **project-orchestrator** — the building role: bee-plan, bee-loop,
-  subagents, gates, phase list. Consumes design docs read-only;
-  escalates design conflicts to the keeper. See
-  `roles/project-orchestrator.md`.
+  subagents, gates, phase list. Consumes design docs read-only (scribe
+  edits only with the keeper's explicit consent); escalates design
+  conflicts to the keeper. See `roles/project-orchestrator.md`.
 - **hivemind** — the `.hivemind/` folder in a repo. Holds all the
   working files the agents produce: `decisions/` (ADRs), `designs/`,
   `plans/`, `phases/`, `suggestions/`, `memory/`, `records/`,

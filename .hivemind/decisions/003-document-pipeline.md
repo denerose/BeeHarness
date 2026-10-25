@@ -104,6 +104,12 @@ assumed by direction — never inferred from the work's shape):
    now with a named return path).
 5. Each role keeps its own session memory
    (`.hivemind/sessions/<role>.md`); continuity protocols are per-role.
+6. **Scribe exception (keeper, 2026-10-20):** the read-only rule holds
+   by default; the keeper may explicitly consent to a specific scribe
+   edit by the orchestrator (common while the harness itself is being
+   designed). The orchestrator's standing duty: when an ADR or design
+   doc disagrees with its instructions, raise the mismatch and ask
+   what (if anything) changes — never edit around it.
 
 ## References
 

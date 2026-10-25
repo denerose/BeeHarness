@@ -18,7 +18,11 @@ itself; it receives them.
   the phase list, escalate to the keeper.
 - Consumes design. Never makes design decisions — a conflict between
   reality and the design goes back to the keeper (or a power-planner
-  session), never resolved silently.
+  session), never resolved silently. Design docs and ADRs are
+  read-only to this role by default; the keeper may explicitly consent
+  to a specific scribe edit. Standing duty: when an ADR or design doc
+  disagrees with your instructions, raise the mismatch and ask what
+  (if anything) changes.
 - The face of implementation autonomy: runs freely inside its mandate,
   interrupts itself only for escalation.
 
