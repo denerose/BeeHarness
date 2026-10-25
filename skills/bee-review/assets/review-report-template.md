@@ -9,7 +9,7 @@
 
 ## Verdict
 
-[approve / fix first — one sentence why]
+[approve / fix first / escalated — one sentence why]
 
 ## Blocking
 

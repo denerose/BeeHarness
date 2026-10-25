@@ -27,9 +27,13 @@ review work that doesn't run.
 ## Report
 
 Save to `.hivemind/records/<plan-slug>-task<N>-review-r<N>.md` (round
-suffix per GLOSSARY: record versioning; first run is `-r1`) using
+suffix per GLOSSARY: record versioning; review rounds count
+independently of verify rounds — your first report is `-r1`, and
+re-reviews after fixes increment it) using
 `assets/review-report-template.md`, stating your producing role in the
-header (GLOSSARY: Role trailer). Three tiers, each finding with file
+header (GLOSSARY: Role trailer) — dispatched as a stage agent, that is
+the dispatching loop's role (e.g. `project-orchestrator`). Three
+tiers, each finding with file
 and line and a concrete suggested fix:
 
 - **Blocking** — wrong, broken, or contradicts the plan's intent.
@@ -38,7 +42,8 @@ and line and a concrete suggested fix:
 - **Note** — worth saying, not worth a round.
 
 If your reading of the plan's *intent* conflicts with its literal text,
-that's an escalation, not a finding.
+that's an escalation, not a finding — return it to whoever dispatched
+you; the loop takes it to the keeper and records the answer.
 
 ## After the report
 

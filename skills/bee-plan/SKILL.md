@@ -40,11 +40,13 @@ small task the keeper wants planned. Output: one file in
 
 Use `assets/plan-template.md`. Save as
 `.hivemind/plans/YYYY-MM-DD-<pp|po>-<slug>.md` — your role's initials
-in the slug (ADR-007) — with `**Reviewed:** PENDING`.
+in the slug (ADR-007; pp = power-planner, po = project-orchestrator) —
+with `**Reviewed:** PENDING`.
 Then run the global `plan-reviewer` skill on it — the gate is not
-optional. Fix the findings (the keeper may waive should-fix items with
-a one-line recorded reason), re-run until it passes, then stamp the
-date. A plan that never passes never gets implemented.
+optional. Fix the findings (the keeper may waive should-fix items —
+plan-reviewer's 🟡 tier — with a one-line recorded reason), re-run
+until it passes, then stamp the date. A plan that never passes never
+gets implemented.
 
 ## Boundaries
 

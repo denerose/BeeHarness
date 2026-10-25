@@ -5,7 +5,7 @@
 **Role:** [producing role — GLOSSARY: Role trailer]
 **Level:** task | merge | phase | release
 **Date/time:** YYYY-MM-DD HH:MM
-**Work item state after this record:** implemented → verified
+**Work item state after this record:** implemented → verified (on FAIL: unchanged)
 
 | command | exit | note |
 |---|---|---|

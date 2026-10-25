@@ -33,12 +33,15 @@ inputs, same result — anyone running this should get the same answer.
 
 Save to `.hivemind/records/<plan-slug>-task<N>-verify-r<N>.md` (round
 suffix per GLOSSARY: record versioning; the first run is `-r1`, fix
-rounds increment it) using `assets/verify-record-template.md`: level,
-date, commands + exit statuses, verdict, where the full log lives.
-State your producing role in the record header (GLOSSARY: Role
-trailer). Records produced in worktrees always land in the main
-checkout's `.hivemind/records/`. Keep it short. A verify record that
-hides a failure is the worst thing in this harness.
+rounds increment it — the dispatch states the round; if it doesn't,
+use the highest existing `-rN` for this task plus one) using
+`assets/verify-record-template.md`: level, date, commands + exit
+statuses, verdict, where the full log lives. Run the checks where the
+code is (a worktree if dispatched there); write the record to the main
+checkout. State your producing role in the record header (GLOSSARY:
+Role trailer) — dispatched as a stage agent, that is the dispatching
+loop's role (e.g. `project-orchestrator`). Keep it short. A verify
+record that hides a failure is the worst thing in this harness.
 
 Verdicts: **PASS**, **FAIL** (something ran and broke), or **BLOCKED**
 (the declared checks can't be run — missing commands, missing inputs).

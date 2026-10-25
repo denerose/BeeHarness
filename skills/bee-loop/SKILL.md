@@ -22,33 +22,40 @@ directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary,
 
 ## The cycle, per task
 
-1. **Pick and claim.** Pick the next task whose dependencies are done,
-   then claim it: write your role + timestamp in the phase list's
-   `owner` column (GLOSSARY: claim) before any dispatch, and re-read
-   the phase list before writing again.
+1. **Pick and claim.** Pick the next task whose dependencies are done.
+   Before a phase's first dispatch, claim the phase: write your role +
+   timestamp in the phase list's `owner` column (GLOSSARY: claim), and
+   re-read the phase list before writing again. Tasks are tracked by
+   the plan's checkboxes, not the phase list.
 2. **Implement** — yourself for small tasks; a subagent when the task is
    self-contained or benefits from isolation (fresh context, parallel
    safety). Independent tasks may run in parallel as subagents; verify
    each result before using it.
 3. **Verify** — run the **bee-verify skill** (sibling skill, see
    GLOSSARY) at the task level. Its record lands in
-   `.hivemind/records/`.
+   `.hivemind/records/`. State the round in the dispatch brief (first
+   run is `r1`).
 4. **Review** — dispatch the **bee-review skill** on the finished work
    (fresh subagent when available; hand it the plan path, task id,
-   changed files, and verify record path). In a solo session with no
-   separate reviewer, review the work yourself and say so in the
-   review report — the evidence trail matters more than who wrote it.
+   changed files, and verify record path). Review rounds count
+   independently of verify rounds — the first review is `r1`. In a
+   solo session with no separate reviewer, review the work yourself
+   and say so in the review report — the evidence trail matters more
+   than who wrote it.
 5. **Fix rounds** — if review or verify fails: fix, re-verify,
-   re-review. Maximum two rounds. Still failing? Escalate. Re-runs
-   write versioned records — the round suffix increments
-   (`-r2`, GLOSSARY: record versioning).
+   re-review. A round is one fix attempt plus its re-runs; the initial
+   failure is not a round. Maximum two rounds. Still failing?
+   Escalate. Re-runs write versioned records — the round suffix
+   increments (`-r2`, GLOSSARY: record versioning).
 6. **Record** — check off the task in the plan, update the phase list,
-   commit. Stage only the files this task touched — never `git add -A`;
-   carry a `Role:` trailer (GLOSSARY). Records always land in the main
+   commit. Stage only the files this task touched — its code changes,
+   its records, the plan and phase-list updates; never `git add -A`.
+   Carry a `Role:` trailer (GLOSSARY). Records always land in the main
    checkout's `.hivemind/records/`, even when work happened in a
    worktree.
-7. Repeat until the plan is done, then run phase-level verification and
-   report.
+7. Repeat until the plan is done, then run **bee-verify at the phase
+   level** (GLOSSARY: validation level — the full suite the plan lists)
+   and report to the keeper.
 
 ## States
 

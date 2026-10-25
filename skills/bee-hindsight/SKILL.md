@@ -34,7 +34,8 @@ Your own process, not the code (code quality was review's job):
 ## What to produce
 
 One file per suggestion in `.hivemind/suggestions/`, named
-`YYYY-MM-DD-<pp|po>-<slug>.md` (your role's initials, ADR-007), using
+`YYYY-MM-DD-<pp|po>-<slug>.md` (your role's initials, ADR-007; pp =
+power-planner, po = project-orchestrator), using
 `assets/suggestion-format.md` — including the **Scope** field: `repo` (this project's docs/templates) or `harness`
 (a bee skill, a template, the rules — routed to the harness inbox once
 the CLI exists). Write suggestions someone can act on: "parking-lot
@@ -55,3 +56,5 @@ most like acted on. You edit nothing that already exists.
 - Adds new files only; edits no docs, skills, plans, or code.
 - Process, not product.
 - Never self-schedules outside wrap points.
+- Files you add land in the main checkout's `.hivemind/suggestions/`,
+  even when running from a worktree.
