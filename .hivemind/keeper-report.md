@@ -1,7 +1,7 @@
 # Keeper report
 
-**Generated:** 2026-10-25 by power-planner (merge regen over the
-orchestrator's a31812e) · **Source:** `.hivemind/status.md`
+**Generated:** 2026-10-25 by power-planner (mid-P3-brainstorm regen) ·
+**Source:** `.hivemind/status.md`
 
 **Zones and rules — read before regenerating this file:** *Keeper's
 list* is the keeper's own — roles add items on the keeper's word,
@@ -22,42 +22,27 @@ resolves them; the keeper may edit freely or just say the word)
 
 ## Needs the keeper
 
-1. **Pass the P2 relay prompt** to the orchestrator whenever ready —
-   it's drafted (fenced, in the power-planner session chat); ask PP to
-   re-emit if it gets lost. P2 = the `bee` CLI stub, per both roles'
-   recommendation.
-2. ~~**PL-004 — global AGENTS.md cleanup.**~~ **RESOLVED this
-   session** (keeper, routing card): both heavyweight blocks stripped
-   from the global file; plan-review gate relocated here; guard rule
-   added. See *Changed since last report*.
+Nothing right now — the P3 design session is live in conversation
+with the power-planner, and the build track (P2) is running.
 
 ## Changed since last report
 
-- **PL-004 resolved** (keeper's pick): global AGENTS.md stripped of
-  planner-flavored law — ask_user-first questioning and the
-  plan-review gate removed; the gate now lives in this repo's
-  AGENTS.md + bee skills; new guard: global-file changes need the
-  keeper's explicit authorization.
-- **P2 defined** (keeper's pick): the `bee` CLI stub — relay prompt
-  drafted for the orchestrator; build starts when the keeper passes
-  it.
-- ADR-008 **Accepted** (keeper's word) — oversight model live; this
-  report's template blessed as interim ("tweak as we go").
-- Root-file ownership decided (ADR-007 amendment 1): SOUL.md —
-  power-planner drafts in collaboration, keeper sign-off; README.md —
-  both roles amend, keeper sign-off. The keeper writes nothing by
-  hand. The stale pilot line in README is now unblocked (PO lane).
-- Orchestrator filed two suggestions (what-next gap; phases artifact
-  in design) — see *Worth a sample*.
-- Honesty note: PP claimed ADR-008 flipped a turn before actually
-  doing it — caught by verification, flipped for real this turn.
+- **ADR-010 Accepted** (keeper's card): one role concept graded by
+  attributes — declare lifespan, continuity derives by default,
+  off-diagonal overrides are explicit. Task-orc, reviewer, implementer
+  mint as dispatched role files in P3; two levels, one concept.
+- **ADR-009 Accepted** + the phase queue seeded: P3–P6 planned rows in
+  the phase list; propose-next is the orchestrator's empty-board move.
+- P2 relay passed — the orchestrator planned through the reviewer gate
+  and is building (`bee` stub scaffold already landed).
+- PL-004 resolved: global AGENTS.md stripped of planner law; gate
+  relocated here; guard rule added.
 
 ## Worth a sample
 
-- The orchestrator's two new suggestions:
-  `/home/saphron/BeeHarness/.hivemind/suggestions/2026-10-25-po-orchestrator-what-next-gap.md`
-  and
-  `/home/saphron/BeeHarness/.hivemind/suggestions/2026-10-25-po-phases-artifact-in-design.md`
-- Orchestrator's pilot hindsight suggestion (verify expectations as
-  minimums):
-  `/home/saphron/BeeHarness/.hivemind/suggestions/2026-10-20-verify-expectations-as-minimums.md`
+- ADR-010 — the role schema (fresh, shapes everything P3 builds):
+  `/home/saphron/BeeHarness/.hivemind/decisions/010-one-role-concept-graded-attributes.md`
+- ADR-009 — forward planning + propose-next:
+  `/home/saphron/BeeHarness/.hivemind/decisions/009-forward-planning-phase-queue.md`
+- The live phase queue, first time it's ever been full:
+  `/home/saphron/BeeHarness/.hivemind/phases/BeeHarness.md`

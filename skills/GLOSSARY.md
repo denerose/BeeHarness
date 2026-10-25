@@ -11,6 +11,13 @@ it as a term of art.
   style, entry conditions, continuity), defined in `roles/` in the
   BeeHarness plugin. Assumed by direction from the keeper or a
   handoff — never inferred from the work's shape.
+- **role** — a named agent spec in `roles/`: mandate plus attributes
+  (entry, escalation, workspace, lifespan, continuity — ADR-010).
+  First-class roles (power-planner, project-orchestrator) take keeper
+  direction and keep session files; dispatched roles (task-orc,
+  reviewer, implementer — minted in P3) are spawned by other roles,
+  escalate upward through their dispatcher, and remember via records
+  unless their file overrides. Not every role is first-class.
 - **power-planner** — the shaping role: discussion, architecture,
   decisions, design docs; co-creates design docs with the keeper. See
   `roles/power-planner.md`.
