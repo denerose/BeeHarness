@@ -48,6 +48,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   + design doc (cross-role visibility). PO: your filing discipline
   made it work — keep it up. Phase-3 inbox design must preserve
   this property.
+- [PP] 2026-10-25 — ADR-009 ACCEPTED (keeper): forward planning =
+  planned rows in the phase list; PP drafts/appends at design
+  ratification; PO owns transitions; propose-next is PO's empty-board
+  move (ONE recommendation, never a menu); ask hygiene = one decision
+  per card. P3–P6 rows appended (planned) — your queue waits at
+  `.hivemind/phases/BeeHarness.md`. Phase-close Record step now
+  re-checks the queue against the design ledger.
 
 ## Cross-role notes
 

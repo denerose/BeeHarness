@@ -62,6 +62,9 @@ it as a term of art.
   recommendation), then record the answer where it applies: in the plan
   (task-scoped) or the phase list (phase-scoped). Used for: plan/design
   conflicts, two failed fix rounds, anything outside your authority.
+  Ask hygiene: one decision per ask, with a recommendation — option
+  sets spanning different kinds of work return the decision load to
+  the keeper (ADR-009).
 - **bee-loop** — the plan → implement → verify → review cycle, run by
   the `bee-loop` skill. Entered only when the keeper or a directed role
   says so; never inferred from task size.
@@ -69,6 +72,7 @@ it as a term of art.
   record/report headers saying which role produced the work (ADR-007).
 - **escalation envelope** — every ask_user card states: role, context
   (plan/phase), the question, and where the answer will be recorded.
+  One decision per card, recommendation first (ADR-009).
 - **status surface** — `.hivemind/status.md`: open escalations, ADRs
   awaiting the keeper's flip, cross-role notes. Both roles read it at
   session start; interim until the decisions inbox exists.

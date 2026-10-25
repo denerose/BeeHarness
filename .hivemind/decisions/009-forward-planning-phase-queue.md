@@ -1,8 +1,8 @@
 # ADR 009: Forward planning — the phase queue
 
 **Date:** 2026-10-25
-**Status:** Proposed (power-planner, P3 brainstorm session; drafted for
-keeper reaction — flip on agreement)
+**Status:** Accepted (keeper's explicit yes, P3 brainstorm session
+2026-10-25 — both ADR and the four seed rows)
 
 ## Context
 
