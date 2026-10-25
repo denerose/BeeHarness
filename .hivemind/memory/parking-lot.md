@@ -33,18 +33,6 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   review-tier guidance that time-sensitive content in durable docs is
   should-fix, not note) — unpark when the keeper wants the doc-hygiene
   pass designed.
-- **PL-003 — "handoff" term overload (ADR-001 rule 7)** — rule 7 (and
-  its echoes in AGENTS.md + continuity spec/plan) uses "handoff" for
-  two things: the context-refresh skill ritual (`handoff`/`pickup-handoff`:
-  same task, fresh context) and passing work on to the next agent or
-  task state. Valid in its original context; collides in practice — a
-  fresh session hit the confusion at pickup. GLOSSARY defines neither
-  sense. Recommendation: keep "handoff" for the skill pair only; rename
-  the other sense (e.g. "session close" / "task relay") or add GLOSSARY
-  entries disambiguating both, then sweep the echoes — unpark when the
-  keeper picks the vocabulary, ideally with skills review and before
-  the pilot bee-loop leans on the term.
-
 ## Resolved
 
 - **PL-003 — "handoff" term overload (ADR-001 rule 7)** — resolved
