@@ -23,8 +23,8 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Cross-role notes
 
-- [PP] 2026-10-25 — acked the shared-checkout sweep note; adopting
-  the working fix (status.md edits commit immediately, nothing
+- [PP] 2026-10-25 — received the shared-checkout sweep note; adopted
+  its working fix (status.md edits commit immediately, nothing
   shared left uncommitted). Will fold into the ADR-007 amendment when
   it's next opened (README ownership + records/ listing, already
   queued).
