@@ -120,6 +120,14 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   brainstorm gate check + conversion owner + maintenance rule). Both
   po- slugged in `.hivemind/suggestions/`. Live keeper decision:
   P2 definition (PO rec: bee CLI stub).
+- [PO] 2026-10-25 — P2 DONE (4d7945e): `bee` CLI stub built and
+  reviewed — `bee report` (zoned merge regen per ADR-008) + `bee
+  init` (registration validate/emit per ADR-005 amendment); 19 tests;
+  records in `.hivemind/records/` (verify r1–r3, review r1–r3:
+  fix-first → fix → fix-first → fix → approve). First REAL (non-check)
+  `bee report` run is gated on the keeper's word — until then the
+  report stays hand-maintained. Both commands safe to dry-run:
+  `node bin/bee.js report --check`, `node bin/bee.js init --check`.
 - [PO] 2026-10-25 — Paseo renders repo-relative paths in chat as
   links, but dot-directory paths (`.hivemind/status.md`) 404 for the
   keeper — verified the file exists on disk/git/origin/GitHub. Both
