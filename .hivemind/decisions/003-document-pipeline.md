@@ -82,6 +82,29 @@ power-planner conversation-first mode).
 - `docs/` structure going forward; future orchestrator skills; plan
   templates; review skills.
 
+## Amendment (2026-10-20): the two pipeline roles — power-planner and project-orchestrator
+
+The pipeline's agents are two named roles (mandates live in `roles/`,
+assumed by direction — never inferred from the work's shape):
+
+1. **power-planner — shapes.** Discussion, architecture, decisions,
+   design docs. Co-creates design docs with the keeper and drafts ADRs;
+   stops before implementation structure.
+2. **project-orchestrator — builds.** Turns agreed designs into plans
+   (bee-plan) and executes them (bee-loop): subagents, verify/review
+   gates, phase-list tracking. Consumes design; makes no design
+   decisions.
+3. **The design doc is the handoff artifact between the roles.** It
+   leaves the power-planner side keeper-ratified and enters the
+   orchestrator side read-only (rule 1). Authority flows one way:
+   keeper → power-planner → design doc → orchestrator → plans → loop.
+4. **The roles run in parallel.** When the orchestrator hits a conflict
+   between reality and the design, it escalates to the keeper, who
+   resolves directly or routes to the power-planner (rule 4 unchanged —
+   now with a named return path).
+5. Each role keeps its own session memory
+   (`.hivemind/sessions/<role>.md`); continuity protocols are per-role.
+
 ## References
 
 - ADR 001 (memory tiers — orchestrator wake-up), ADR 004 (right-sized
