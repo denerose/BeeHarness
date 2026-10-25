@@ -7,6 +7,17 @@ it as a term of art.
 - **keeper** — the human owner. Final authority on every decision that
   matters; the only one who unparks parking-lot items or amends design
   docs.
+- **role** — a named mandate for an agent session (authority, working
+  style, entry conditions, continuity), defined in `roles/` in the
+  BeeHarness plugin. Assumed by direction from the keeper or a
+  handoff — never inferred from the work's shape.
+- **power-planner** — the shaping role: discussion, architecture,
+  decisions, design docs; co-creates design docs with the keeper. See
+  `roles/power-planner.md`.
+- **project-orchestrator** — the building role: bee-plan, bee-loop,
+  subagents, gates, phase list. Consumes design docs read-only;
+  escalates design conflicts to the keeper. See
+  `roles/project-orchestrator.md`.
 - **hivemind** — the `.hivemind/` folder in a repo. Holds all the
   working files the agents produce: `decisions/` (ADRs), `designs/`,
   `plans/`, `phases/`, `suggestions/`, `memory/`, `records/`,
