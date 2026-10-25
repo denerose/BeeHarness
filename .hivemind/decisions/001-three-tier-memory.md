@@ -113,6 +113,12 @@ owners, lifetimes, and visibility — mixing them makes both worse.
 6. **Terminology (2026-10-25, resolves PL-003):** rule 7's "handoff"
    means the same-role context-refresh skill pair only. Cross-role work
    passing is a **relay**; role→subagent is a **dispatch** (GLOSSARY).
+7. **Ritual split (2026-10-25, keeper correction):** rule 7's
+   "memory sync + parking-lot sweep" bundled two rituals. A handoff
+   (context refresh — crash, fork, weird context; work continues) ends
+   with a memory sync ONLY. The parking-lot sweep belongs to closing
+   work — brainstorm loop-back, session close (the promote ritual),
+   phase gates — when something actually ended.
 
 ## References
 

@@ -54,7 +54,11 @@ the mode doesn't survive context switches on vibes alone.
   `.pi/handoff-power-planner.md` (per-role, ADR-007). It opens with a
   "Working mode" section *before* task state: which role the successor
   resumes, the working-style rules in brief, and "first action:
-  continue the conversation; do not re-interview the keeper."
+  continue the conversation; do not re-interview the keeper." A
+  mid-work handoff (crash, fork, weird context) is a memory sync only —
+  session state current + the handoff file. The promote ritual
+  (including the parking-lot sweep) happens at session close, not
+  here.
 - **Handoff (reading/waking):** read the handoff, then session memory,
   then this file. Announce the resumed role and your first move in your
   first reply, then continue in conversation style.

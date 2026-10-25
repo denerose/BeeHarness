@@ -51,8 +51,10 @@ We are designing the harness before building it. Right now:
   output. Reproduce bugs before fixing them.
 - Commit messages: short imperative, ≤10 words.
 - When context runs short, run a handoff (`handoff` skill); resume with
-  `pickup-handoff`. Every handoff ends with a memory sync and
-  parking-lot sweep.
+  `pickup-handoff`. A handoff ends with a memory sync (session state
+  current) — NOT a parking-lot sweep. Sweeps belong to closing work
+  (brainstorm loop-back, session close, phase gates), when something
+  actually ended.
 
 ## Layout & continuity (bootstrap conventions until the harness MVP)
 
