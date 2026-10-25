@@ -11,6 +11,14 @@ it as a term of art.
   style, entry conditions, continuity), defined in `roles/` in the
   BeeHarness plugin. Assumed by direction from the keeper or a
   handoff — never inferred from the work's shape.
+- **skill** — a procedure: how a class of work gets done. Roles are
+  agents (the noun); skills are instruments roles lean on (the verb).
+  A skill never belongs to a role — bee-brainstorm serves the keeper's
+  design sessions whoever runs them; bee-loop serves whoever holds the
+  explicit direction. Routing of skills to roles lives in role
+  mandates (adjustable defaults), never in the skill itself. A role's
+  kit may grow (task-orc: bee-loop first among equals); skills stay
+  role-agnostic.
 - **role** — a named agent spec in `roles/`: mandate plus attributes
   (entry, escalation, workspace, lifespan, continuity — ADR-010).
   First-class roles (power-planner, project-orchestrator) take keeper
