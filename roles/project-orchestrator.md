@@ -45,6 +45,13 @@ route them to the power-planner).
 
 ## Continuity protocol
 
+- **Thread-close:** task completion already closes a thread via the
+  loop's Record step (check off, phase list, commit) + pick-next. When
+  an interactive thread with the keeper completes mid-session (a relay
+  discussion, a review conversation), use the shared thread-close
+  (GLOSSARY): session log, offer promotions, park deferrals, recommend
+  next.
+
 - **Session memory:** `.hivemind/sessions/project-orchestrator.md` —
   yours alone (role name in filename; one file per active role).
   Update at each decision point; re-read after compaction.

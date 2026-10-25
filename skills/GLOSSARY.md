@@ -72,6 +72,12 @@ it as a term of art.
 - **record versioning** — verify/review records carry a round suffix
   (`…-task3-verify-r2.md`); records made in worktrees always land in
   the main checkout's `.hivemind/records/`.
+- **thread-close** — the mid-session ritual when a thread of work
+  completes but the session continues: update the session log, offer
+  durable bits for promotion (offer-first), park any new deferrals,
+  then recommend the next move from the board. Trigger is felt
+  completion ("this thought is done"), not time or topic change.
+  Light by design — two minutes, no gate.
 - **relay** — passing work between different roles (e.g. power-planner
   → project-orchestrator), usually as a short keeper-gated prompt; the
   design doc is the relay artifact. Not a handoff.

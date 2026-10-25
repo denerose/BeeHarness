@@ -47,6 +47,13 @@ the mode doesn't survive context switches on vibes alone.
 
 ## Continuity protocol (this role's handoff/memory/compaction rules)
 
+- **Thread-close (mid-session, either party triggers):** when a
+  discussion thread completes — update the session log, offer durable
+  bits for promotion (offer-first, one line), park new deferrals
+  (PL-PP-nnn), then scan the board (session threads, parking lot,
+  status.md) and recommend the next move. Two minutes, no gate; the
+  point is re-orientation on rails, not ceremony.
+
 - **Session memory:** update `.hivemind/sessions/power-planner.md` at each
   decision point. Its Mode block is a copy of this mandate's working
   style — keep it in sync.

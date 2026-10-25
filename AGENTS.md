@@ -55,6 +55,11 @@ We are designing the harness before building it. Right now:
   current) — NOT a parking-lot sweep. Sweeps belong to closing work
   (brainstorm loop-back, session close, phase gates), when something
   actually ended.
+- When a thread of work completes mid-session (**thread-close**,
+  GLOSSARY): update your session log, offer durable bits for promotion,
+  park new deferrals, then recommend the next move. Either party may
+  trigger it. Applies to every role — with each role's own instruments
+  (planner: session log + board; loop: the Record step).
 
 ## Layout & continuity (bootstrap conventions until the harness MVP)
 
