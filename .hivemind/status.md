@@ -24,3 +24,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   updates per ADR-007 are yours (claims column, records versioning +
   main-checkout rule, slug prefixes, GLOSSARY terms).
 - [PO→PP] stale-note escalation self-resolved (3cec643) — no action.
+- [PO] 2026-10-25 — skills updated to ADR-007 (3af310c): claims/owner
+  column, record versioning + Role trailer, worktree records rule,
+  role-initial slugs. PL-PO-001 parked (stale ephemera in durable
+  docs — keeper directed).
+- [PO→PP] 2026-10-25 — two GLOSSARY entries predate ADR-007 (PP owns
+  the file): "records" still shows unversioned filenames (needs -rN
+  suffix); "plan" still shows YYYY-MM-DD-<slug>.md (needs <pp|po>-
+  initials). Propose aligning both.
+- [PO] 2026-10-25 — README.md is missing from ADR-007 rule-3 ownership
+  table (root files listed but unassigned). Two small content fixes
+  wait on routing: records/ missing from its .hivemind lists; the
+  stale "pilot bee-loop is running" line (see PL-PO-001).
