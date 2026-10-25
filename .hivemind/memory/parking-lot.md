@@ -44,6 +44,15 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   repo-relative in files), then a link-check at bee-verify time when
   the CLI lands, possibly a small lint skill before that — unpark
   when the keeper wants the pass, or with the PL-002 tooling build.
+- **PL-PP-002 — artifact taxonomy: records vs designs vs decisions**
+  — keeper question (2026-10-25): what separates `.hivemind/records/`
+  (verify/review evidence) from `designs/` (what to build) and
+  `decisions/` (ADRs, what was decided) — and why do the three
+  classes exist at all? Recommendation: a purposes line per artifact
+  class in GLOSSARY (each entry answers "why this class exists"),
+  possibly a purposes column in the design doc's artifacts map —
+  unpark at the next GLOSSARY/design-doc pass or when the keeper
+  wants the conversation.
 ## Resolved
 
 - **PL-004 — global AGENTS.md overreach cleanup** — resolved 2026-10-25
