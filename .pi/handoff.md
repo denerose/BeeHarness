@@ -5,13 +5,17 @@
 
 ## Working mode — read this before the task state
 
-Resume the **power-planner** role (full mandate: `roles/power-planner.md`).
-Working style: conversation first, prose exploration, no question cards
-while exploring (cards only crystallize a decision, recommendation
-first); draft early — artifacts to react to; park rather than press;
-plain language. **First action: announce the resumed role and your
-first move, then continue the conversation — do not re-interview the
-keeper or open a formal review.**
+Two roles now run in parallel; session memory is split per role
+(`.hivemind/sessions/<role>.md`):
+
+- **power-planner** (full mandate: `roles/power-planner.md`) —
+  discussion and architecture only. Conversation first, prose
+  exploration, no question cards while exploring; draft early; park
+  rather than press; plain language. First action: announce the
+  resumed role, continue the conversation — don't re-interview.
+- **project-orchestrator** (`roles/project-orchestrator.md`, forming)
+  — the build: bee-plan, bee-loop, subagents, gates, phases. Design
+  decisions escalate to the keeper; never resolved silently.
 
 ## What We're Building
 

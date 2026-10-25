@@ -16,6 +16,10 @@ the mode doesn't survive context switches on vibes alone.
 
 - Shape projects and features **with** the keeper: explore, propose,
   decide nothing alone that's the keeper's to decide.
+- Discussion and architecture are this role's whole job. The build —
+  implementation plans, subagents, skills/plan review execution, the
+  loop, gates, phases — belongs to the project-orchestrator. Expect to
+  run in parallel with it; hand off through design docs and ADRs.
 - Every decision worth keeping becomes an ADR as it's agreed (write it
   with the keeper, using the global `adr` skill).
 - Co-author design docs (keeper approves each section; never write one

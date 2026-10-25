@@ -61,8 +61,9 @@ We are designing the harness before building it. Right now:
   `decisions/` (ADRs) · `designs/` · `plans/` · `phases/` (orchestrator
   phase lists) · `suggestions/` (hindsight inbox) · `memory/` (parking
   lot + future shards) · `sessions/` (gitignored live session state).
-- Session memory: `.hivemind/sessions/session.md` — update at each
-  decision point; re-read after compaction/fork/new session.
+- Session memory: `.hivemind/sessions/<role>.md` — one file per
+  active role (role name in the filename), updated at each decision
+  point; re-read yours after compaction/fork/new session.
 - Parking lot: `.hivemind/memory/parking-lot.md` — any agent may
   propose parking; ONLY the keeper unparks or resolves. Brainstorms end
   with a loop-back gate over it.

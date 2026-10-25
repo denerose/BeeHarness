@@ -27,10 +27,23 @@ itself; it receives them.
 Power-planner: brainstorm, discussion, decisions, design docs — stops
 before implementation structure. Project-orchestrator: implementation
 plans, subagents, gates, phases — starts after design is agreed. The
-design doc is the handoff artifact between them (ADR-003).
+design doc is the handoff artifact between them (ADR-003). The two run
+in parallel; architecture questions go back to the keeper (who may
+route them to the power-planner).
+
+## First assigned tasks (from the keeper, at the split)
+
+1. Review the previous decisions (`.hivemind/decisions/`) and the
+   design docs/plans; update them to add the two roles — power-planner
+   and project-orchestrator — their designations and differences.
+2. Take over the build track: keeper skills review, machine-wide
+   registration, first pilot bee-loop run.
 
 ## Continuity protocol
 
-TBD — write it when codifying from the model session, fitted to this
-role's actual work (likely: phase list + records as primary state; see
-decision 22).
+- **Session memory:** `.hivemind/sessions/project-orchestrator.md` —
+  yours alone (role name in filename; one file per active role).
+  Update at each decision point; re-read after compaction.
+- Full protocol (handoff/wake/compaction/promote) to be written when
+  this role is codified from the model session — fitted to the loop's
+  actual state: phase list, plan checkboxes, records.
