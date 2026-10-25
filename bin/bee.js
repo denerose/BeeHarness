@@ -54,8 +54,86 @@ function flags(rest, spec) {
   }
 }
 
-function cmdInit(rest) { // Task 2 implements this
-  return { code: 0, out: 'bee init: not implemented yet\n', err: '' };
+function expandTilde(p) {
+  return p.startsWith('~/') || p === '~'
+    ? path.join(os.homedir(), p.slice(1))
+    : p;
+}
+
+function tildeForm(p) {
+  const h = os.homedir();
+  return p === h || p.startsWith(h + path.sep)
+    ? '~' + p.slice(h.length)
+    : p;
+}
+
+function cmdInit(rest) {
+  const f = flags(rest, {
+    check: { type: 'boolean' },
+    settings: { type: 'string' },
+  });
+  if (f.error) {
+    return { code: 1, out: '', err: String(f.error) + '\n' };
+  }
+  const settingsPath = f.values.settings
+    ? path.resolve(f.values.settings)
+    : path.join(os.homedir(), '.pi', 'agent', 'settings.json');
+  const skillsDir = path.join(REPO_ROOT, 'skills');
+
+  let settings;
+  try {
+    settings = JSON.parse(fs.readFileSync(settingsPath, 'utf8'));
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      settings = {};
+    } else {
+      return {
+        code: 1, out: '',
+        err: `bee init: cannot parse ${settingsPath}: ${e.message}\n`,
+      };
+    }
+  }
+  if (typeof settings !== 'object' || settings === null ||
+      Array.isArray(settings)) {
+    return { code: 1, out: '',
+      err: `bee init: ${settingsPath} is not a settings object\n` };
+  }
+  if (settings.skills !== undefined && !Array.isArray(settings.skills)) {
+    return { code: 1, out: '',
+      err: `bee init: 'skills' in ${settingsPath} is not an array\n` };
+  }
+
+  const entries = settings.skills ?? [];
+  const target = path.resolve(skillsDir);
+  const hit = entries.find(
+    (e) => typeof e === 'string' &&
+      path.resolve(expandTilde(e)) === target);
+
+  if (hit !== undefined) {
+    return {
+      code: 0,
+      out: `bee init: already registered: ${hit} (${settingsPath})\n`,
+      err: '',
+    };
+  }
+  if (f.values.check) {
+    return {
+      code: 1,
+      out: '',
+      err: `bee init: NOT registered (${tildeForm(skillsDir)}) ` +
+           `— run without --check to add it (${settingsPath})\n`,
+    };
+  }
+
+  settings.skills = [...entries, tildeForm(skillsDir)];
+  fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+  atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+  return {
+    code: 0,
+    out: `bee init: registered ${tildeForm(skillsDir)} in ` +
+         `${settingsPath}\n`,
+    err: '',
+  };
 }
 
 function cmdReport(rest) { // Task 3 implements this

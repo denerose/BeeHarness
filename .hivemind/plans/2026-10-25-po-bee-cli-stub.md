@@ -43,7 +43,7 @@ residue, idempotent zones).
 **Provides:** `bin/bee.js` exporting `run(argv)`; `package.json` with
 `scripts.test` = `node --test tests/*.test.mjs`; `VERSION` export
 
-- [ ] Create `package.json` with exactly:
+- [x] Create `package.json` with exactly:
 
 ```json
 {
@@ -63,11 +63,7 @@ residue, idempotent zones).
   "Cannot find module" on node v24; verified on this machine). The
   shell-expanded glob works on node 20–24.
 
-- [ ] Create `bin/bee.js` with exactly:"test": "node --test tests/" }
-}
-```
-
-- [ ] Create `bin/bee.js` with exactly:
+- [x] Create `bin/bee.js` with exactly:
 
 ```js
 #!/usr/bin/env node
@@ -143,7 +139,7 @@ if (process.argv[1] &&
 }
 ```
 
-- [ ] Create `tests/bee.test.mjs` with exactly:
+- [x] Create `tests/bee.test.mjs` with exactly:
 
 ```js
 import { test } from 'node:test';
@@ -171,10 +167,10 @@ test('version prints VERSION', () => {
 });
 ```
 
-- [ ] Run `npm test` — expected: 4 tests pass, 0 fail.
-- [ ] Run `node bin/bee.js help` — expected: usage text, exit 0.
-- [ ] Run `chmod +x bin/bee.js`.
-- [ ] Commit (stage only `package.json`, `bin/bee.js`,
+- [x] Run `npm test` — expected: 4 tests pass, 0 fail.
+- [x] Run `node bin/bee.js help` — expected: usage text, exit 0.
+- [x] Run `chmod +x bin/bee.js`.
+- [x] Commit (stage only `package.json`, `bin/bee.js`,
   `tests/bee.test.mjs`): message `scaffold bee CLI package and
   command skeleton`, trailer `Role: project-orchestrator`.
 
@@ -194,7 +190,7 @@ this repo's skills dir registered (tilde-form or absolute — compare
 resolved paths)? Emit: append the entry if missing. Never remove or
 reorder existing entries; never touch any other settings key.
 
-- [ ] Replace the `cmdInit` stub in `bin/bee.js` with exactly:
+- [x] Replace the `cmdInit` stub in `bin/bee.js` with exactly:
 
 ```js
 function expandTilde(p) {
@@ -280,7 +276,7 @@ function cmdInit(rest) {
 }
 ```
 
-- [ ] Append to `tests/bee.test.mjs` exactly:
+- [x] Append to `tests/bee.test.mjs` exactly:
 
 ```js
 import fs from 'node:fs';
@@ -352,11 +348,11 @@ test('init: missing settings file is created fresh', () => {
   checkout moves, the test compares against `tildeForm` logic and only
   that one literal changes.
 
-- [ ] Run `npm test` — expected: 9 tests pass, 0 fail.
-- [ ] Run `node bin/bee.js init --check` against the real settings —
+- [x] Run `npm test` — expected: 9 tests pass, 0 fail.
+- [x] Run `node bin/bee.js init --check` against the real settings —
   expected: `already registered: ~/BeeHarness/skills`, exit 0 (this
   repo's live registration).
-- [ ] Commit (stage only `bin/bee.js`, `tests/bee.test.mjs`):
+- [x] Commit (stage only `bin/bee.js`, `tests/bee.test.mjs`):
   message `implement bee init registration validate/emit`, trailer
   `Role: project-orchestrator`.
 
