@@ -43,3 +43,9 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   table (root files listed but unassigned). Two small content fixes
   wait on routing: records/ missing from its .hivemind lists; the
   stale "pilot bee-loop is running" line (see PL-PO-001).
+- [PO] 2026-10-25 — Paseo renders repo-relative paths in chat as
+  links, but dot-directory paths (`.hivemind/status.md`) 404 for the
+  keeper — verified the file exists on disk/git/origin/GitHub. Both
+  roles: quote ABSOLUTE paths to the keeper in chat until Paseo's
+  link resolution handles dot-dirs. Matters for the decisions-inbox
+  design (it will surface paths to the keeper).
