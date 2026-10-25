@@ -335,7 +335,7 @@ function cmdReport(rest) {
     };
   const header = parsed !== null
     ? parsed.header.replace(
-        /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*$/m,
+        /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*(?:\n\*\*Source:\*\*[^\n]*)?$/m,
         `**Generated:** ${stamp()} by bee report (merge regen) · ` +
         `**Source:** \`.hivemind/status.md\``)
     : FRESH_HEADER.replace('{STAMP}', stamp());

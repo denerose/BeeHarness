@@ -18,7 +18,7 @@ all fixed in-plan, revised code re-extracted from the plan and
 re-run: 16/16 tests green, live-file simulation clean (no wrapped-line
 residue, idempotent zones). Fix round 1 (bee-review r1 findings)
 applied: header-safe restamp regex, RESOLVED-queue-bullet skip,
-backtick retention; tests 18.
+backtick retention; tests 18. Fix round 2 (review r2 Should-fix): restamp also consumes a following **Source:** line — wrapped stamps leave no stale duplicate; tests 19.
 
 ## Implementation structure (PO lane, not design)
 
@@ -648,7 +648,7 @@ function cmdReport(rest) {
     };
   const header = parsed !== null
     ? parsed.header.replace(
-        /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*$/m,
+        /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*(?:\n\*\*Source:\*\*[^\n]*)?$/m,
         `**Generated:** ${stamp()} by bee report (merge regen) · ` +
         `**Source:** \`.hivemind/status.md\``)
     : FRESH_HEADER.replace('{STAMP}', stamp());
@@ -752,7 +752,7 @@ test('report: repeated runs idempotent incl. header', () => {
   fs.copyFileSync(path.join(FIX, 'report.md'), rp);
   const st = path.join(dir, '.hivemind', 'status.md');
   const strip = (s) => s.replace(
-    /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*$/m, 'S');
+    /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*(?:\n\*\*Source:\*\*[^\n]*)?$/m, 'S');
   let last = '';
   for (let i = 0; i < 3; i++) {
     run(['report', '--status', st, '--report', rp]);
@@ -772,6 +772,43 @@ test('report: RESOLVED queue bullets are not asks', () => {
   assert.equal(r.code, 0);
   const after = fs.readFileSync(rp, 'utf8');
   assert.ok(!after.includes('stale ask'));
+});
+
+
+test('report: stamp wrapped before Source leaves no duplicate', () => {
+  const dir = reportTmp();
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.writeFileSync(rp, `# Keeper report (wrap probe)
+
+**Generated:** 2026-10-25 by hand ·
+**Source:** \`.hivemind/status.md\`
+
+**Zones and rules** protocol line.
+
+## Keeper's list
+
+- item one.
+
+## Needs the keeper
+
+1. Old ask kept from before.
+
+## Changed since last report
+
+- Fixture change line.
+
+## Worth a sample
+
+- \`/already/absolute/sample.md\`
+`);
+  const st = path.join(dir, '.hivemind', 'status.md');
+  for (let i = 0; i < 2; i++) {
+    run(['report', '--status', st, '--report', rp]);
+  }
+  const after = fs.readFileSync(rp, 'utf8');
+  const srcCount = (after.match(/\*\*Source:\*\*/g) || []).length;
+  assert.equal(srcCount, 1); // no stale duplicate
+  assert.ok(after.includes('**Zones and rules** protocol line.'));
 });
 
 test('report: changed/sample zones verbatim, header Generated restamped',
@@ -812,7 +849,7 @@ test('report: fresh file gets protocol header + placeholder list', () => {
 });
 ```
 
-- [x] Run `npm test` — expected: 18 tests pass, 0 fail.
+- [x] Run `npm test` — expected: 19 tests pass, 0 fail.
 - [x] Run `node bin/bee.js report --check` against the live repo —
   expected: exit 0, full zoned output on stdout, live
   `.hivemind/keeper-report.md` unchanged (verify with
@@ -829,7 +866,7 @@ phase list; commit
 **Depends on:** Tasks 1–3
 **Provides:** evidence trail; phase exit
 
-- [ ] Run the full suite: `npm test` — expected: 18 pass, 0 fail.
+- [ ] Run the full suite: `npm test` — expected: 19 pass, 0 fail.
 - [ ] Run `node bin/bee.js report --check` (live) — expected: exit 0,
   no write, output contains all four zone headings.
 - [ ] Run `node bin/bee.js init --check` (live) — expected: exit 0,
@@ -850,7 +887,7 @@ phase list; commit
 
 ## Phase exit
 
-Done means: `npm test` green (18 tests); live dry-runs of both
+Done means: `npm test` green (19 tests); live dry-runs of both
 commands behave per contract (`--check` writes nothing); records in
 `.hivemind/records/`; phase list P2 done. The keeper samples the
 result (ADR-008) — e.g. reads `bin/bee.js` or runs

@@ -184,6 +184,42 @@ test('report: RESOLVED queue bullets are not asks', () => {
   assert.ok(!after.includes('stale ask'));
 });
 
+test('report: stamp wrapped before Source leaves no duplicate', () => {
+  const dir = reportTmp();
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.writeFileSync(rp, `# Keeper report (wrap probe)
+
+**Generated:** 2026-10-25 by hand ·
+**Source:** \`.hivemind/status.md\`
+
+**Zones and rules** protocol line.
+
+## Keeper's list
+
+- item one.
+
+## Needs the keeper
+
+1. Old ask kept from before.
+
+## Changed since last report
+
+- Fixture change line.
+
+## Worth a sample
+
+- \`/already/absolute/sample.md\`
+`);
+  const st = path.join(dir, '.hivemind', 'status.md');
+  for (let i = 0; i < 2; i++) {
+    run(['report', '--status', st, '--report', rp]);
+  }
+  const after = fs.readFileSync(rp, 'utf8');
+  const srcCount = (after.match(/\*\*Source:\*\*/g) || []).length;
+  assert.equal(srcCount, 1); // no stale duplicate
+  assert.ok(after.includes('**Zones and rules** protocol line.'));
+});
+
 test('report: changed/sample zones verbatim, header Generated restamped',
     () => {
   const dir = reportTmp();
