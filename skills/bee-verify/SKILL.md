@@ -5,7 +5,7 @@ description: Runs the deterministic checks for a stage — build, tests, lint, f
 
 # bee-verify
 
-Run the checks, record what happened. Read `skills/GLOSSARY.md` first.
+Run the checks, record what happened. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
 
 ## Levels
 

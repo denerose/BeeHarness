@@ -6,7 +6,7 @@ description: Quality review of finished, verified work — does the implementati
 # bee-review
 
 Read work that has already passed verification and judge what the checks
-could not: intent, coherence, quality. Read `skills/GLOSSARY.md` first.
+could not: intent, coherence, quality. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
 
 ## Input
 

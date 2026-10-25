@@ -7,7 +7,7 @@ description: Writes executable plans for the bee-loop, from an approved design o
 
 Write the plan a loop will execute. Input: an agreed design doc, or a
 small task the keeper wants planned. Output: one file in
-`.hivemind/plans/`. Read `skills/GLOSSARY.md` first if needed.
+`.hivemind/plans/`. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first if needed.
 
 ## Rules
 

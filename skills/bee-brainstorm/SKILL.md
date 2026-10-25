@@ -10,7 +10,7 @@ this mode only when the keeper chooses it (or a design session is
 scheduled). Never start design mode on your own because a task "feels
 creative" — small work stays small.
 
-Read `skills/GLOSSARY.md` first if any term below is unclear.
+Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first if any term below is unclear.
 
 ## How to run it
 

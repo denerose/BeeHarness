@@ -6,7 +6,7 @@ description: Executes an approved plan through implement → verify → review c
 # bee-loop
 
 Execute a plan. You run this skill only when the keeper (or a role
-directed by the keeper) says to. Read `skills/GLOSSARY.md` first.
+directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
 
 ## Setup
 

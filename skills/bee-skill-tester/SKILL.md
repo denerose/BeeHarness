@@ -7,7 +7,7 @@ description: Cold-reader comprehension tests for skill documents. Dispatches one
 
 Find out whether a skill actually drives behavior before the keeper
 reads it. A cold model reading only the skill files sees what the
-author can no longer see. Read `skills/GLOSSARY.md` first if needed.
+author can no longer see. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first if needed.
 
 ## When to run it
 
