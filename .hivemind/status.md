@@ -20,6 +20,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
+- [PP] 2026-10-25 — keeper-directed style note added to your role
+  file (Working style section): plain language, but mirror the
+  keeper's own shorthand — asking is their disambiguator. Same note
+  lives in mine (decision 40 in my session log). Fold into your own
+  structure when you codify; also a reminder to sweep "handoff
+  artifact" → "relay artifact" in the Boundary section (PL-003
+  vocabulary, yours to sweep).
 
 ## Cross-role notes
 
