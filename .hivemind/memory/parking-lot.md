@@ -21,6 +21,18 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   law, add explicit rule that global AGENTS.md changes need keeper
   authorization — unpark next session touching global config or when
   harness rules land.
+- **PL-PO-001 — stale ephemera in durable docs (pilot #1 post-mortem)** —
+  the pilot's implementation agent wrote "the first pilot bee-loop is
+  running" into README.md — a durable, human-facing doc — and it went
+  stale the same day. The plan embedded the sentence verbatim,
+  plan-reviewer passed it, bee-review flagged it only as a note (no
+  round). Living state has homes (session memory, phase list, status
+  surface); the README is not one. Keeper direction: look into how and
+  why this happened and how to prevent it. Recommendation: examine each
+  gate (bee-plan rule against ephemeral status prose in durable docs;
+  review-tier guidance that time-sensitive content in durable docs is
+  should-fix, not note) — unpark when the keeper wants the doc-hygiene
+  pass designed.
 - **PL-003 — "handoff" term overload (ADR-001 rule 7)** — rule 7 (and
   its echoes in AGENTS.md + continuity spec/plan) uses "handoff" for
   two things: the context-refresh skill ritual (`handoff`/`pickup-handoff`:
