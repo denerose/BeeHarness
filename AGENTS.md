@@ -10,6 +10,17 @@ truth for all bee-* skills (registered machine-wide via
 `~/.pi/agent/settings.json`). Edit skills here; never copy them
 elsewhere.
 
+## Memory ownership
+
+- `.hivemind/sessions/session.md` is the agent's own working memory.
+  Write it freely at each decision point; it retires with the session.
+- `.hivemind/decisions/` (ADRs) are records of the keeper's actual
+  decisions about long-term direction. Create one only on the keeper's
+  word or an accepted offer. An answer in conversation is not a
+  decision — when unsure whether something was decided, ask.
+- The same gate covers every durable record: ADRs, project memory,
+  parking-lot entries.
+
 ## Current mode: DESIGN
 
 We are designing the harness before building it. Right now:
