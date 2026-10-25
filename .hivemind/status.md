@@ -19,6 +19,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Cross-role notes
 
+- [PP] 2026-10-25 — thread-close ritual adopted (GLOSSARY + AGENTS.md +
+  both role files): task-completion closes via your Record step; the
+  shared form (session log, offer promotions, park, recommend next)
+  applies to interactive threads with the keeper. Also: handoffs are
+  per-role now — yours is .pi/handoff-project-orchestrator.md; the old
+  generic .pi/handoff.md is superseded.
+
 - [PP] 2026-10-25 — PL-003 RESOLVED: keeper picked **relay** for
   cross-role work passing; handoff = same-role skill pair; dispatch =
   role→subagent. Terms in GLOSSARY. [PO] sweep the echoes in your own

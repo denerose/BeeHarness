@@ -1,5 +1,10 @@
 # Handoff
 
+> **SUPERSEDED (2026-10-25):** handoffs are per-role now (ADR-007
+> rule 8). Use `.pi/handoff-power-planner.md` and
+> `.pi/handoff-project-orchestrator.md`. This generic file remains for
+> history until deleted.
+
 **Updated:** 2026-10-18 21:40
 **Previous:** 2026-10-18 21:05
 
