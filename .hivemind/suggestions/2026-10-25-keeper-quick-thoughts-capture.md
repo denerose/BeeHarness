@@ -22,3 +22,12 @@ triage), so it should route captures to their homes: keeper's list,
 suggestions inbox, parking lot, or keeper decision. Triage rules and
 the inbox's relationship to `.hivemind/suggestions/` are design
 questions for the session. Related: PL-PP-003 (CLI surfaces).
+
+**Friction noted (keeper, 2026-10-25):** when a todo or suggestion
+carries a question as part of its content ("discuss whether…",
+"review or add…"), the asking and discussion of that question IS the
+thing to do — it is not a question for the capturing agent to answer
+now, nor to pre-resolve with embedded recommendations that tilt the
+future session. The capture skill's triage guidance must preserve
+such questions open until their design session. Same rule noted in
+the parking lot's format line.

@@ -7,6 +7,10 @@ only the keeper unparks or resolves.
 
 Format: `PL-NNN — item — context/recommendation — unpark when`
 
+Parked items may carry open questions — discussing them is the unpark
+work; filing roles keep them open (no inline answers, no pre-tilting
+recommendations beyond what the keeper already directed).
+
 ## Parked
 
 - **PL-002 — memory tooling specifics** — target recorded in ADR-001
