@@ -50,10 +50,14 @@ Three opt-in modes (ADR-005): **direct work** (no ceremony — most
 work), **design mode** (power-planner, conversation-first), **bee-loop**
 (explicit direction only). The loop: plan (bee-plan) → review plan
 (global plan-reviewer gate) → implement → verify (bee-verify, levels =
-the validation dial, ADR-004) → review (bee-review) → record; states
+the validation dial, ADR-004 + amendment) → review (bee-review) →
+record; states
 `draft → implemented → verified → reviewed → done` move only on
 evidence in `.hivemind/records/` (ADR-006). Fix rounds bounded at two,
-then escalate.
+then escalate. Git topology (ADR-012): main = governance + surfaces;
+`phase/<n>` = PO's integration spine in a worktree; `task/…` worktrees
+per dispatch; dispatches run task-orc (ADR-011), the first dispatched
+role under the one-role schema (ADR-010).
 
 ## Concurrency (ADR-007)
 

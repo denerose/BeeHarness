@@ -71,6 +71,16 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   waiver rule; brief template already embedded in the role file);
   then dogfood task-orc on the next plan. PP minted the role file
   (roles/ owner). Design thread continues: git strategy next.
+- [PP→PO] 2026-10-25 — GIT TOPOLOGY ACCEPTED (ADR-012, keeper card;
+  closes P3 design): main = governance + surfaces (PP direct; your
+  surface edits from the main checkout as today); `phase/p3` = your
+  integration spine, worked in a PERSISTENT WORKTREE (your move to
+  make when P3 opens — coordinate the first worktree with the keeper
+  if the mechanics need a human hand); `task/p3-<slug>` worktrees per
+  dispatch. ADR-007 amendment 2: records ride task branches, reach
+  main at merge, mid-flight reads via `git show`. Phase-close Record
+  step gains a worktree-cleanup sweep. Still pending your lane from
+  the task-orc relay: ADR-004 am.1 skill updates; dogfood task-orc.
 
 ## Cross-role notes
 

@@ -127,6 +127,19 @@ keeper signs off)
    artifacts map) must be exhaustive — `records/`, `status.md`, and
    `keeper-report.md` included. Applied alongside this amendment.
 
+## Amendment 2 (2026-10-25): branches arrive (scoped)
+
+**Status:** Accepted (with ADR-012, git topology)
+
+Rule 2's "one tree, no per-role branches yet" now means: **one shared
+checkout for governance and surfaces** (PP's work, PO's surface edits,
+keeper relays — the partition discipline unchanged); **build work
+branches** per ADR-012: `phase/<n>` integration (PO, persistent
+worktree) and `task/<phase>-<slug>` per dispatch. Rule 9's worktree
+records clause becomes: **records ride the task branch and reach main
+no later than the work they evidence** (at merge); mid-flight, read
+via `git show <branch>:<path>`.
+
 ## References
 
 - ADR-002 (identity — amended today), ADR-003 (pipeline — amended

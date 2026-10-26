@@ -113,6 +113,14 @@ it as a term of art.
   with a memory sync (session state current) and a **wake prompt** the
   keeper pastes into the new context — but no parking-lot sweep: that
   is a work-close ritual, never part of a refresh.
+- **phase branch** — `phase/<n>`: the project-orchestrator's
+  integration spine (ADR-012). PO works it in a persistent worktree;
+  task branches merge here; phase end is a tiered review into main.
+  Two-size resets: task (delete branch + worktree) vs phase (abandon
+  the branch; main untouched — keeper's word).
+- **task branch** — `task/<phase>-<slug>`: one worktree per task-orc
+  dispatch, off the phase branch. Records ride it; the diff is the
+  review artifact (ADR-012).
 - **dispatch brief, safety lines** — three standing lines every
   brief for a write-capable agent carries (P2 near-miss: a reviewer
   ran `bee report` flagless and wrote the live keeper report):

@@ -27,6 +27,11 @@ with the power-planner, and the build track (P2) is running.
 
 ## Changed since last report
 
+- **Git topology accepted** (keeper's card): ADR-012 — main =
+  governance + surfaces; phase branch = the orchestrator's spine in a
+  worktree; task worktrees per dispatch; two-size resets. Closes P3's
+  design work: schema (ADR-010), contract (ADR-011), topology
+  (ADR-012).
 - **Task-orc accepted** (keeper's card, on PO's P2 data): ADR-011 —
   first dispatched role, minimal file now, standard pattern for P3;
   boundary test: the dispatcher never opens source files. Plus ADR-004

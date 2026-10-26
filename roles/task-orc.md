@@ -10,8 +10,8 @@ boundary test.
 - **escalation:** one hop up — stop-and-return; never cards the keeper
 - **lifespan:** per-dispatch (declared)
 - **continuity:** derived — records-only; no session file
-- **workspace:** main checkout until the P3 git strategy lands;
-  worktree thereafter
+- **workspace:** worktree per dispatch (ADR-012) — branch
+  `task/<phase>-<slug>` off the phase branch; records ride the branch
 
 ## Mandate
 
