@@ -19,6 +19,11 @@ edit any zone directly. (ADR-008 + ADR-007 amendment 1.)
 resolves them; the keeper may edit freely or just say the word)
 
 - Harness name still TBC.
+- Review superpowers with PP — plan how we replace its functionality
+  (standing rule says reference-only during bootstrap; this session
+  decides which bee-native skills/rules absorb which patterns).
+  Related parked design: PL-PP-003 (CLI help surfaces + guidance
+  injection + session rules).
 
 ## Needs the keeper
 

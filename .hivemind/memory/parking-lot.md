@@ -53,6 +53,18 @@ Format: `PL-NNN — item — context/recommendation — unpark when`
   possibly a purposes column in the design doc's artifacts map —
   unpark at the next GLOSSARY/design-doc pass or when the keeper
   wants the conversation.
+- **PL-PP-003 — `bee` CLI help surfaces, guidance injection, session
+  rules** — keeper direction (2026-10-25), related to the
+  superpowers-replacement todo on the keeper's list: (a) help for
+  HUMANS and help for AIs as CLI surfaces (agents invoke `bee` too —
+  machine-parseable guidance, e.g. the GLOSSARY/ADR graph queryable);
+  (b) using-bee-harness guidance injection — session-start guidance
+  for repos with the harness (AGENTS.md-like, bee-managed); (c) review
+  or add start/end-of-session rules (wake prompts, thread-close,
+  status reads — bee-assisted rituals). Recommendation: design with
+  the P4 CLI lane, alongside the capture tool (see keeper's
+  suggestion `2026-10-25-keeper-quick-thoughts-capture.md`) — unpark
+  when P4 opens or the keeper wants the design session.
 ## Resolved
 
 - **PL-004 — global AGENTS.md overreach cleanup** — resolved 2026-10-25
