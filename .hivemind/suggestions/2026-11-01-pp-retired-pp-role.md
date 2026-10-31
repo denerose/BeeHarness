@@ -14,17 +14,21 @@ planner-owned artifacts — crosses write-ownership lanes.
 **Suggestion (the keeper's):** a **'retired-PP'** role — a lightweight
 planner persona for quick fixes that don't merit the full wake: fix
 the lost thing, record it, retire again. Under the one-role concept
-(ADR-010) it grades attributes down rather than adding a new class:
-per-dispatch lifespan, records-only continuity, minimal entry (the
-handoff and the specific records it needs — not the live session
-memory, not the full surface reads).
+(ADR-010) it grades attributes down rather than adding a new class.
+
+**Keeper constraints (2026-11-01, same session):**
+
+- **Entry:** an explicit prompt from the keeper inside an existing
+  session/context — never a fresh session, never a dispatch.
+- **Authority:** only on the keeper's say-so — no role summons it, no
+  self-triggering.
+- **Host:** only a session whose agent was previously the
+  power-planner.
 
 **Open questions (filed open; the design session answers them):**
 
 - Name — 'retired-PP' is the keeper's coinage; keep it or find the
   plainer name at design time?
-- Dispatch — the keeper directs it directly, or may a standing role
-  summon it (the way the orchestrator dispatches task-orc)?
 - Boundary — which artifacts may it touch: live surfaces only, or
   planner-owned durable records too? Where does its write authority
   stop (ADRs and design docs presumably stay keeper-gated)?
