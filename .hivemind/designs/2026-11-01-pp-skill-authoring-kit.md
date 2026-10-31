@@ -249,6 +249,20 @@ Compensation — strict rules, clear wording, at the skill level:
   Notes lines are the first candidate for rewording); becomes part
   of bee-skill-write's authoring standard.
 
+## Keeper mid-P7 rulings (2026-11-01 decision cards — SUPERSEDE the
+post-pickup design sections below where they conflict)
+
+- Task-branch logbook routing; handoff pair → session kit; ALL
+  skill-review dimension failures block; sync-last-write /
+  prompt-last-act kept; **entry checks dropped** (the gate idea
+  folds into bee-skill-write's authoring standard later — the
+  entry-discipline section below is design input to that fold, not
+  live law). Mid-review directive: review findings are disputable;
+  disputes escalate; blocking stands until ruled.
+- Folder name: PO built `skills/session/` from the design it had
+  absorbed; PP's later thinking/ rename never reached it. Which
+  name stands is OPEN for the keeper (P8 reconciles either way).
+
 ## Sequencing notes (2026-11-01 audit)
 
 P7 depends on nothing in P4/P5/P6 — dependencies run the helpful
