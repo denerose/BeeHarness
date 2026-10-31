@@ -1,4 +1,5 @@
 ---
+kit: session
 name: bee-hindsight
 description: After a phase or project wraps (or when the keeper asks), review how the work went and file concrete improvement suggestions to the suggestions inbox. Examines process, not code quality. Adds new files only — edits nothing.
 ---
@@ -8,7 +9,7 @@ description: After a phase or project wraps (or when the keeper asks), review ho
 Look back at finished work and tell us how to do it better. Any role may
 run it when the keeper asks; the project-orchestrator or power-planner
 may also self-schedule it at wrap points (end of a phase, end of a
-project). Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
+project). Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first.
 
 ## Inputs — re-read before judging
 
@@ -27,7 +28,7 @@ Your own process, not the code (code quality was review's job):
 - What was slow or awkward that shouldn't have been?
 - Which decisions turned out wrong or dated badly? (Link the ADR.)
 - What did the keeper have to correct more than once?
-- What did the plan get wrong that the plan-reviewer gate should have
+- What did the plan get wrong that the bee-plan-review gate should have
   caught?
 - Did anything skip the states/evidence rules?
 - Did any work embed task-specific examples, dated stories, or
@@ -39,7 +40,7 @@ Your own process, not the code (code quality was review's job):
 ## What to produce
 
 One file per suggestion in `.hivemind/suggestions/`, named
-`YYYY-MM-DD-<pp|po>-<slug>.md` (your role's initials, ADR-007; pp =
+`YYYY-MM-DD-<pp|po>-<slug>.md` (your role's initials; pp =
 power-planner, po = project-orchestrator), using
 `assets/suggestion-format.md` — including the **Scope** field: `repo` (this project's docs/templates) or `harness`
 (a bee skill, a template, the rules — routed to the harness inbox once

@@ -1,11 +1,12 @@
 ---
+kit: session
 name: bee-argue
 description: For genuine forks — one dispatched worker per option argues that option's best case in parallel; the caller summarizes the cases and puts the choice to the keeper with a recommendation. Use when options are few, genuinely distinct, and worth the dispatch cost. Not for cheap forks or exploration.
 ---
 
 # bee-argue
 
-Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill
+Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit
 folder) first if any term below is unclear.
 
 When a real decision has two to four defensible options and the

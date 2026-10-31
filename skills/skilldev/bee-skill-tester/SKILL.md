@@ -1,4 +1,5 @@
 ---
+kit: skilldev
 name: bee-skill-tester
 description: Cold-reader comprehension tests for skill documents. Dispatches one cheap subagent per skill with a realistic scenario and asks how it would actually use the skill, then the parent fixes the gaps. Use when drafting or revising skills; not part of the bee-loop.
 ---
@@ -7,7 +8,7 @@ description: Cold-reader comprehension tests for skill documents. Dispatches one
 
 Find out whether a skill actually drives behavior before the keeper
 reads it. A cold model reading only the skill files sees what the
-author can no longer see. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first if needed.
+author can no longer see. Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first if needed.
 
 ## When to run it
 
@@ -55,7 +56,7 @@ no context; note the rest and move on.
 ## Boundaries
 
 - Tests skill documents. Code and plans have their own reviewers
-  (bee-review, plan-reviewer).
+  (bee-review, bee-plan-review).
 - Testers report; the parent fixes.
 - Not part of the bee-loop states or gates. This is an authoring tool
   kept for skill work.

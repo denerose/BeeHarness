@@ -1,11 +1,12 @@
 ---
+kit: loop
 name: bee-verify
 description: Runs the deterministic checks for a stage — build, tests, lint, file existence, output-vs-claim — and records the evidence that lets work move to the next state. Pass/fail facts only; quality judgment is bee-review's job.
 ---
 
 # bee-verify
 
-Run the checks, record what happened. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
+Run the checks, record what happened. Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first.
 
 ## Levels
 
@@ -47,6 +48,19 @@ Verdicts: **PASS**, **FAIL** (something ran and broke), or **BLOCKED**
 (the declared checks can't be run — missing commands, missing inputs).
 You produce the record; the loop decides what happens next and flips
 the work-item state.
+
+## Judgment you keep
+
+Pass/fail is mechanical, but you keep one judgment: is this output
+sane? A green run of the wrong thing, or output that cannot be right
+— results empty where results belong, the same numbers on every run —
+is not a PASS; note what looks wrong in the record. When a check
+fails or the output looks wrong, the anomaly gets reproduced — run
+it again, see it fail again — before any fix is proposed.
+
+Boundary: the mechanics here (run commands, capture statuses, write
+the record) move to the `bee verify` CLI at P4; the judgment line
+(is this output sane; anomalies reproduced) stays in the skill.
 
 ## Boundaries
 

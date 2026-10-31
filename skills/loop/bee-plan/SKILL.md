@@ -1,4 +1,5 @@
 ---
+kit: loop
 name: bee-plan
 description: Writes executable plans for the bee-loop, from an approved design or a bounded task. Use when the keeper or project-orchestrator says to plan implementation work that the loop (or subagents) will execute. Not for personal quick planning (that's the global plan skill).
 ---
@@ -7,7 +8,7 @@ description: Writes executable plans for the bee-loop, from an approved design o
 
 Write the plan a loop will execute. Input: an agreed design doc, or a
 small task the keeper wants planned. Output: one file in
-`.hivemind/plans/`. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first if needed.
+`.hivemind/plans/`. Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first if needed.
 
 ## Rules
 
@@ -32,7 +33,7 @@ small task the keeper wants planned. Output: one file in
    verification command. Repeat what matters; don't make anyone hunt.
 5. **Declare the validation level** (GLOSSARY) in the header. It comes
    from the design doc if it declares one; otherwise you recommend a
-   level with a one-line reason, and the keeper or plan-reviewer
+   level with a one-line reason, and the keeper or bee-plan-review
    confirms at review. Tasks inherit it unless they say otherwise.
 6. **Every task ends with a commit step** (short imperative message).
 7. **No ephemeral status prose in durable docs.** Plans must not
@@ -41,16 +42,26 @@ small task the keeper wants planned. Output: one file in
    docs, GLOSSARY. Live state has homes: the phase queue, the keeper
    report, the status surface. Plans describe work, not the state of
    the world while it runs.
+8. **Determinism at plan time** (GLOSSARY: determinism test).
+   Deterministic work goes to scripts: any step two careful executors
+   would run identically is assigned to a script the plan names, not
+   written as prose steps. Every agent step the plan keeps names the
+   judgment it keeps — what that step decides that a script could
+   not.
 
 ## Format
 
-Use `assets/plan-template.md`. Save as
+Use `assets/plan-template.md`. Fill its machine header (phase,
+validation, state-source, targets, suite) — the mechanical checks
+and the plan reviewer's sandbox-run read it — and path-tag every
+verbatim code block (`path=exact/target.ext`) so blocks extract
+mechanically. Save as
 `.hivemind/plans/YYYY-MM-DD-<pp|po>-<slug>.md` — your role's initials
-in the slug (ADR-007; pp = power-planner, po = project-orchestrator) —
+in the slug (pp = power-planner, po = project-orchestrator) —
 with `**Reviewed:** PENDING`.
-Then run the global `plan-reviewer` skill on it — the gate is not
+Then run the `bee-plan-review` skill on it — the gate is not
 optional. Fix the findings (the keeper may waive should-fix items —
-plan-reviewer's 🟡 tier — with a one-line recorded reason), re-run
+bee-plan-review's should-fix tier — with a one-line recorded reason), re-run
 until it passes, then stamp the date. A plan that never passes never
 gets implemented.
 

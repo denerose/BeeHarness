@@ -26,6 +26,13 @@ their own documents (`docs/AXI.md`).
   mandates (adjustable defaults), never in the skill itself. A role's
   kit may grow (task-orc: bee-loop first among equals); skills stay
   role-agnostic.
+- **bee- namespace** — the `bee-` prefix marks the shipped kit: the
+  bee-* skills this repo ships under `skills/`, grouped in kit
+  folders (`loop/`, `session/`, `skilldev/`, and `roles/` when role
+  tools land — every SKILL.md carries a `kit:` field naming its
+  folder). Ad-hoc and repo-local skills never take the prefix; it
+  is reserved for what ships with the harness, so a reader can
+  tell a shipped instrument from a repo's own at a glance.
 - **power-planner** — the shaping role: discussion, architecture,
   decisions, design docs; co-creates design docs with the keeper. See
   `roles/power-planner.md`.
@@ -48,7 +55,7 @@ their own documents (`docs/AXI.md`).
 - **plan** — the step-by-step document a loop executes. Lives in
   `.hivemind/plans/`, named `YYYY-MM-DD-<pp|po>-<slug>.md` (role
   initials, ADR-007). Written by bee-plan,
-  reviewed by the global `plan-reviewer` skill before execution.
+  reviewed by `bee-plan-review` before execution.
 - **phase list** — the loop's one-line-per-phase tracking file,
   `.hivemind/phases/<project>.md` (project = repo name unless the keeper
   says otherwise). The only file the loop updates to track its own
@@ -59,10 +66,10 @@ their own documents (`docs/AXI.md`).
   `<plan-slug>-task<N>-review-r<N>.md` (round suffix; review rounds
   count independently of verify rounds). Claims don't move states —
   these documents do (ADR-006; renamed from "records", ADR-013).
-- **bee-verify / bee-review** — sibling skills in this same folder.
-  bee-verify runs checks and writes a verify entry; bee-review judges
-  quality and writes a review report. The loop calls them; they never
-  call each other.
+- **bee-verify / bee-review** — sibling skills in the loop kit
+  folder. bee-verify runs checks and writes a verify entry; bee-review
+  judges quality and writes a review report. The loop calls them; they
+  never call each other.
 - **parking lot** — `.hivemind/memory/parking-lot.md`. Deferred
   decisions with an unpark condition. Any agent may propose adding an
   item; only the keeper removes or resolves one.
@@ -87,6 +94,46 @@ their own documents (`docs/AXI.md`).
 - **bee-loop** — the plan → implement → verify → review cycle, run by
   the `bee-loop` skill. Entered only when the keeper or a directed role
   says so; never inferred from task size.
+- **bee-skill-write** — the authoring skill: drafts and revises bee
+  skills. Carries the artifact test (skill vs script vs role-file line
+  vs glossary entry), the house structure and front-matter registry
+  conventions (name + kit + description, kept machine-readable), the
+  determinism split (judgment wrapped around a scripted core, the kept
+  judgment named), and the lifecycle draft → cold-test → review →
+  sign-off, with keeper sign-off for law-touching skills. Cold-read
+  comprehension testing is bee-skill-tester's (same kit);
+  design-quality review is a separate gate. Style law for skill text:
+  `docs/WRITING-STANDARD.md`.
+- **bee-skill-review** — the design-quality gate for skill documents:
+  reviews a drafted or revised skill on five dimensions — procedure
+  soundness, scripts-first compliance, duplication, the invariants
+  (role-agnostic, ambient pickup, consistency with recorded
+  decisions), scope. Cold-dispatched (the reviewer never wrote the
+  skill); every dimension failure blocks — findings and advisory
+  notes stay separate — and it never fixes. The
+  review step of bee-skill-write's draft → cold-test → review →
+  sign-off lifecycle (same kit; comprehension testing is
+  bee-skill-tester's); states whether the draft touches law, which
+  decides if keeper sign-off applies.
+- **bee-plan-review** — the plan review gate: reviews a written plan
+  before the loop executes it. Two halves — a deterministic core
+  (`scripts/plan-checks.sh`: target existence, block tagging,
+  ephemeral prose in durable targets, and with `--run` the plan's
+  suite in a throwaway sandbox) and the reviewer's judgment on six
+  dimensions: accuracy, external reality, sandbox-run, ephemeral
+  prose, determinism/AXI, no-globals boundary. Cold-dispatched (the
+  reviewer never wrote the plan); reports tiered findings —
+  blocking, or should-fix where a waiver needs a one-line recorded
+  reason — and never fixes. Plans carry a machine header and
+  path-tagged verbatim blocks; those conventions are this gate's
+  input format. Finished work is bee-review's (same kit), skill
+  documents bee-skill-review's (skilldev kit).
+- **cold read** — reading a document with no context beyond the
+  document and its named references — no drafting conversation, no
+  session memory. A cold reader is who skills are written for; a
+  cold dispatch sends one (a reviewer who did not write the thing
+  under review). Basis of bee-skill-tester's comprehension tests
+  and the review gate's independence.
 - **Role trailer** — a `Role: <role>` line in commit messages and
   record/report headers saying which role produced the work (ADR-007).
 - **escalation envelope** — every ask_user card states: role, context
@@ -112,11 +159,22 @@ their own documents (`docs/AXI.md`).
   without the keeper relaying anything (validated 2026-10-25,
   keeper-valued). The design doc is the relay artifact. Not a
   handoff.
-- **handoff** — same role, fresh context: the `handoff`/`pickup-handoff`
-  skill pair and the `.pi/handoff-<role>.md` files they write. Ends
-  with a memory sync (session state current) and a **wake prompt** the
-  keeper pastes into the new context — but no parking-lot sweep: that
-  is a work-close ritual, never part of a refresh.
+- **handoff** — same role, fresh context: the
+  `bee-handoff`/`bee-pickup-handoff` skill pair and the
+  `.pi/handoff-<role>.md` files they write. Ends with a memory sync
+  (session state current) and a **wake prompt** the keeper pastes into
+  the new context — but no parking-lot sweep: that is a work-close
+  ritual, never part of a refresh.
+- **bee-handoff / bee-pickup-handoff** — the handoff pair, sibling
+  skills in the session kit folder. bee-handoff writes a role's handoff
+  file — working mode first, then task state, boot sequence (what the
+  successor reads, in order), environment notes, and the wake prompt
+  as a fenced block — and ends with a memory sync. bee-pickup-handoff
+  resumes from it: read whole, follow the boot sequence, re-read law
+  files changed since it was written, verify against the repo, then
+  announce the resumed role and first move in the first reply — never
+  re-interviewing the keeper. The pair's concept and rules live in
+  the `handoff` entry; the mid-session counterpart is thread-close.
 - **phase branch** — `phase/<n>`: the project-orchestrator's
   integration spine (ADR-012). PO works it in a persistent worktree;
   task branches merge here; phase end is a tiered review into main.
@@ -132,6 +190,7 @@ their own documents (`docs/AXI.md`).
   The test: if a sentence can go stale, it doesn't belong. PP and PO
   may amend; changes land only on the keeper's sign-off (ADR-007
   amendment 1).
+- **dispatch brief** — the contract a dispatcher sends a dispatched agent: plan path (absolute), phase id, validation level, escalation envelope (decide-alone vs return), workspace (worktree path + branch), and the pass-back shape (a done-ness digest — paths, never contents). Template: `skills/loop/bee-loop/assets/dispatch-brief-template.md`. The safety lines are their own entry, below.
 - **dispatch brief, safety lines** — three standing lines every
   brief for a write-capable agent carries (born from a real near-miss:
   a dispatched reviewer ran a write-by-default command without flags
