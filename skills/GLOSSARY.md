@@ -87,6 +87,16 @@ their own documents (`docs/AXI.md`).
 - **bee-loop** — the plan → implement → verify → review cycle, run by
   the `bee-loop` skill. Entered only when the keeper or a directed role
   says so; never inferred from task size.
+- **bee-skill-write** — the authoring skill: drafts and revises bee
+  skills. Carries the artifact test (skill vs script vs role-file line
+  vs glossary entry), the house structure and front-matter registry
+  conventions (name + description, kept machine-readable), the
+  determinism split (judgment wrapped around a scripted core, the kept
+  judgment named), and the lifecycle draft → cold-test → review →
+  sign-off, with keeper sign-off for law-touching skills. Cold-read
+  comprehension testing is bee-skill-tester's (same folder);
+  design-quality review is a separate gate. Style law for skill text:
+  `docs/WRITING-STANDARD.md`.
 - **Role trailer** — a `Role: <role>` line in commit messages and
   record/report headers saying which role produced the work (ADR-007).
 - **escalation envelope** — every ask_user card states: role, context
