@@ -143,7 +143,11 @@ recommendations beyond what the keeper already directed).
   (standing vs on-call; continuity is probably records-only — the
   store IS the memory); relation to the keeper's quick-thoughts
   capture suggestion (the role may reduce to the capture skill +
-  triage in a dedicated context); what "keeps track" means — aging,
+  simple routing — which bucket a note lands in — in a dedicated
+  context; note: "triage" in that suggestion means routing, NOT the
+  keeper's interactive triage skill — terminology friction flagged
+  2026-11-01, "routing" is the capture meaning from now on); what
+  "keeps track" means — aging,
   surfacing, the keeper's list — unpark when the keeper brings it
   back, after parking/suggestions mechanics are proven.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
