@@ -219,10 +219,16 @@ bias toward acting directly; permissive wording ("a tool, not a
 rule"; "the common right move is still…") licenses silent skipping.
 Compensation — strict rules, clear wording, at the skill level:
 
-- Every skill carries its own **"should you use this skill?"**
-  entry check — criteria stated so that meeting them means USE IT,
-  and skipping requires naming, out loud, which entry condition
-  fails. Never a silent default.
+- Every DISCRETIONARY skill — one where using it is a judgment
+  call and sometimes the answer is legitimately no (bee-argue,
+  bee-hindsight, future judgment tools) — carries its own
+  **"should you use this skill?"** gate: criteria stated so that
+  meeting them means USE IT, and skipping requires naming, out
+  loud, which entry condition fails. Never a silent default.
+  Pipeline stages (trigger = position in the loop) and
+  externally-gated skills (trigger = explicit direction or a
+  declared mode) carry their trigger conditions instead — a gate
+  there would be noise.
 - **Two layers (keeper, 2026-11-01):** the entry check governs
   SELF-initiated use — conservative judgment, not every
   consideration. A KEEPER invocation (their verb — "argue", "park",
