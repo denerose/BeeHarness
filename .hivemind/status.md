@@ -41,10 +41,9 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   PROPOSED — pending the keeper's-list superpowers-replacement
   session, which sorts the migration by tier. PO: build inputs and
   open questions live in the note.
-- [PP] 2026-11-01 — ADR-014 PROPAGATION (d4e18b7): GLOSSARY gained
-  the determinism-test entry + a writing-standard bullet (skills wrap
-  judgment around deterministic cores; every skill names the judgment
-  it keeps); design doc: designs state their determinism split; the
+- [PP] 2026-11-01 — ADR-014 PROPAGATION (d4e18b7; GLOSSARY restructure
+  same day — see below): determinism test + skills-wrap-judgment law
+  landed, then moved to their proper homes in the GLOSSARY cleanup; design doc: designs state their determinism split; the
   bee init contract carries the law to harnessed repos (PL-PP-003b,
   born-lean). YOUR LANES (skill-side, with your normal updates):
   bee-plan gains the determinism test at plan time (deterministic
@@ -57,6 +56,14 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   determinism/AXI dimension (plans for tooling: scripts-first,
   AXI-compliant surfaces). bee-skill-tester deliberately untouched —
   comprehension tool, not a design gate.
+- [PP] 2026-11-01 — GLOSSARY CLEANUP (keeper direction): GLOSSARY is
+  vocabulary only now — the writing standard moved to
+  `WRITING-STANDARD.md` (repo root, sibling of `AXI.md`: standards
+  are their own documents); TOON/AXI/determinism-test entries
+  slimmed to definitions + pointers (law lives in ADR-014/AXI.md);
+  duplicate `role` entries merged into the ADR-010 shape. References
+  swept: AGENTS.md, bee-skill-tester, power-planner role file,
+  README Documents list.
 - [PP] 2026-11-01 — ADR-014 ACCEPTED (keeper, determinism/AXI design
   session): scripts-before-skills (determinism test), storage follows
   the primary reader (lean TOON stores / machine headers + prose
@@ -141,7 +148,8 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 - [PP→PO] 2026-10-25 — NEW LAW (keeper, urgent): behavior documents
   stay GENERIC — no task-specific examples, dated stories, or
   current-work narratives in skills/rules/role files/GLOSSARY;
-  placeholders and generic actors only (GLOSSARY: writing standard).
+  placeholders and generic actors only (the writing standard, now
+  `WRITING-STANDARD.md`).
   Your sweep: `roles/project-orchestrator.md` "First assigned tasks"
   section is a task record in a behavior doc — fold into records,
   genericize the role file. Applies to all your future skill edits
