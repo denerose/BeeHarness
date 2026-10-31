@@ -73,8 +73,8 @@ it as a term of art.
   `release` (phase checks plus anything extra the plan demands).
   More risk, more checking.
 - **work-item states** — `draft → implemented → verified → reviewed →
-  done`. The loop moves items between states, and each move needs its
-  document in `.hivemind/logbook/`; verify/review write the documents.
+  done`. The loop moves items between states, each move needing its
+  evidence in `.hivemind/logbook/`; verify/review produce it.
 - **escalate** — stop and ask the keeper (ask_user card, with a
   recommendation), then record the answer where it applies: in the plan
   (task-scoped) or the phase list (phase-scoped). Used for: plan/design

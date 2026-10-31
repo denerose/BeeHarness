@@ -53,7 +53,7 @@ work), **design mode** (power-planner, conversation-first), **bee-loop**
 the validation dial, ADR-004 + amendment) → review (bee-review) →
 record; states
 `draft → implemented → verified → reviewed → done` move only on
-documents in `.hivemind/logbook/` (ADR-006). Fix rounds bounded at two,
+evidence in `.hivemind/logbook/` (ADR-006). Fix rounds bounded at two,
 then escalate. Git topology (ADR-012): main = governance + surfaces;
 `phase/<n>` = PO's integration spine in a worktree; `task/…` worktrees
 per dispatch; dispatches run task-orc (ADR-011), the first dispatched
