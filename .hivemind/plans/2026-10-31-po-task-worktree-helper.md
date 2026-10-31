@@ -110,12 +110,12 @@ test sandboxes); git ops run in cwd. Reject a `<slug>` containing
 
 **Depends on:** Task 2
 
-- [ ] `npm test` green from the repo root of THIS worktree.
-- [ ] Write logbook verify entry covering Tasks 1–2 (template:
+- [x] `npm test` green from the repo root of THIS worktree.
+- [x] Write logbook verify entry covering Tasks 1–2 (template:
   `skills/bee-verify/assets/verify-record-template.md`; name it
   `2026-10-31-po-task-worktree-helper-task1-2-verify-r1.md` —
   combined numbering has prior art).
-- [ ] Commit (`Role: task-orc` trailer): `verify task worktree helper`
+- [x] Commit (`Role: task-orc` trailer): `verify task worktree helper`
 
 ## Phase exit
 
