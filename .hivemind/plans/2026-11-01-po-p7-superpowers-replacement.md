@@ -65,7 +65,7 @@ suite: node --test tests/*.test.mjs
 later tasks follow; the artifact-test (skill vs script vs role-file
 line vs glossary entry)
 
-- [ ] Draft `skills/bee-skill-write/SKILL.md` from the design note's
+- [x] Draft `skills/bee-skill-write/SKILL.md` from the design note's
   "Decided" section. Content it must carry (structure, not verbatim —
   lean detail): skill structure and front matter; the artifact test
   ("is a skill even the right artifact" — vs script, role-file line,
@@ -76,20 +76,20 @@ line vs glossary entry)
   skills); front-matter registry conventions (name, description;
   machine-indexable — a `bee skills` command is explicitly out of
   scope for P7). Self-contained text; no ADR citations.
-- [ ] Add GLOSSARY entry: `bee-skill-write` — one-paragraph
+- [x] Add GLOSSARY entry: `bee-skill-write` — one-paragraph
   definition, sibling-skill pointers, no ADR anchors beyond file
   paths.
-- [ ] Cold-test: dispatch `bee-skill-tester` on the drafted skill
+- [x] Cold-test: dispatch `bee-skill-tester` on the drafted skill
   (one cheap subagent per its procedure); expected: comprehension
   gaps found get fixed; tester verdict recorded in the logbook entry.
-- [ ] Quality review: cold-dispatch a reviewer subagent (P3 pattern)
+- [x] Quality review: cold-dispatch a reviewer subagent (P3 pattern)
   against the design note's bee-skill-write bullet list; findings
   fixed; verdict + evidence in the logbook entry.
-- [ ] Verify: `grep -rn "ADR-\|\.hivemind" skills/bee-skill-write/`
+- [x] Verify: `grep -rn "ADR-\|\.hivemind" skills/bee-skill-write/`
   returns nothing (shipping test); `ls skills/bee-skill-write/SKILL.md`.
-- [ ] Record: logbook `2026-11-01-po-p7-task1-{verify,review}-r1.md`
+- [x] Record: logbook `2026-11-01-po-p7-task1-{verify,review}-r1.md`
   (task-branch saves, ADR-013 naming).
-- [ ] Commit: `add bee-skill-write authoring skill`
+- [x] Commit: `add bee-skill-write authoring skill`
 
 ## Task 2: bee-skill-review (build 2 of the meta pair)
 
@@ -100,7 +100,7 @@ order reads cleaner once the lifecycle skill exists)
 **Provides:** the design-quality gate; the review dimensions the
 phase's later builds are reviewed against
 
-- [ ] Draft `skills/bee-skill-review/SKILL.md` from the design note's
+- [x] Draft `skills/bee-skill-review/SKILL.md` from the design note's
   "Decided" section. Must carry: the dimensions (procedure soundness,
   scripts-first compliance, duplication, invariants — role-agnostic,
   ambient pickup, decision-record consistency phrased generically,
@@ -108,13 +108,13 @@ phase's later builds are reviewed against
   tiered findings (blocking / should-fix — self-contained wording,
   no ADR citations); when keeper sign-off applies (law-touching
   skills). Self-contained text.
-- [ ] Add GLOSSARY entry: `bee-skill-review` (same shape as Task 1's).
-- [ ] Cold-test via `bee-skill-tester`; fix findings.
-- [ ] Quality review: cold-dispatch (same pattern as Task 1) against
+- [x] Add GLOSSARY entry: `bee-skill-review` (same shape as Task 1's).
+- [x] Cold-test via `bee-skill-tester`; fix findings.
+- [x] Quality review: cold-dispatch (same pattern as Task 1) against
   the design note's bullet list; fix findings; record.
-- [ ] Verify: shipping-test grep (as Task 1); file exists.
-- [ ] Record: logbook `…-task2-{verify,review}-r1.md`.
-- [ ] Commit: `add bee-skill-review design-quality gate`
+- [x] Verify: shipping-test grep (as Task 1); file exists.
+- [x] Record: logbook `…-task2-{verify,review}-r1.md`.
+- [x] Commit: `add bee-skill-review design-quality gate`
 
 ## Task 3: bee-plan-review — the in-house plan reviewer (build 3)
 

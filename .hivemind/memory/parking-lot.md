@@ -131,6 +131,25 @@ recommendations beyond what the keeper already directed).
   machine-readable records making observation possible in the
   first place — unpark when the keeper wants the conversation, or
   alongside the signals/guides session.
+- **PL-PP-009 — a lightweight keeper-secretary role (capture and
+  track only)** — keeper direction (2026-11-01): a new top-level
+  role, much lighter than the existing two — literally takes short
+  directions and notes from the keeper and keeps track of them;
+  nothing else. Might be a shared parking-item type; might end up
+  using the same suggestions model internal agents use. Open for
+  the unpark session, filed open: the store (parking lot vs
+  suggestions vs its own — likely shaped by the P4 inbox + capture
+  tooling once their kinks are worked out); attributes per ADR-010
+  (standing vs on-call; continuity is probably records-only — the
+  store IS the memory); relation to the keeper's quick-thoughts
+  capture suggestion (the role may reduce to the capture skill +
+  simple routing — which bucket a note lands in — in a dedicated
+  context; note: "triage" in that suggestion means routing, NOT the
+  keeper's interactive triage skill — terminology friction flagged
+  2026-11-01, "routing" is the capture meaning from now on); what
+  "keeps track" means — aging,
+  surfacing, the keeper's list — unpark when the keeper brings it
+  back, after parking/suggestions mechanics are proven.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any
