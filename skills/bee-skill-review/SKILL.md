@@ -13,12 +13,14 @@ of this skill folder) first.
 
 ## Input
 
-The dispatch names the skill under review (its folder under
-`skills/`) and, where they matter, the sibling skills and glossary
-entries to compare against — duplication is only visible against
-the thing duplicated. It also names where the report goes. If the
-skill path is missing or the draft does not exist, return the
-dispatch: nothing to review.
+The dispatch names three things: the skill under review (its folder
+under `skills/`), the comparison set — sibling skills and glossary
+entries duplication could hide in — and where the report goes. If
+any of the three is missing, or the draft does not exist, return
+the dispatch: findings need a home before the review starts.
+Reading order: this glossary first, the draft, then the comparison
+set — the skill folder's own siblings are always in it, named or
+not.
 
 ## Cold dispatch
 
@@ -58,8 +60,9 @@ dimension, the file and line, and a concrete suggested fix.
     memory.
   - **Consistency with recorded decisions** — the text must not
     contradict or silently rewrite a standing recorded decision
-    (GLOSSARY: ADR). A conflict is an escalation back through the
-    dispatcher, not a fix in the skill text.
+    (GLOSSARY: ADR). A conflict is returned to the dispatcher, who
+    escalates (GLOSSARY: escalate) — never resolved in the skill
+    text.
 - **Scope** — the skill does what its name and description claim,
   and nothing else: front matter matches body, and the boundaries
   section tells a reader when to stop. A skill quietly doing a
@@ -73,13 +76,20 @@ Findings come in two tiers:
 - **Blocking** — the draft fails a dimension in a way that would
   stop or mislead anyone relying on the skill: an unsound
   procedure, a broken invariant, scope mismatch, a contradiction
-  with a recorded decision. Fix or escalate before the skill is
-  relied on; a blocking finding is never waived.
+  with a recorded decision. A lower-tier finding promotes to
+  blocking when it misleads — a restated script step that no
+  longer matches the script it restates, duplication that
+  contradicts its canonical text. Fix or escalate before the skill
+  is relied on; a blocking finding is never waived.
 - **Should fix** — a real problem, not fatal; fixing before relying
   on the skill is the right call, but blocking is not the
-  reviewer's. A should-fix may be waived instead of fixed — the
-  waiver needs a one-line recorded reason beside the finding in the
-  same report; silence is not a waiver.
+  reviewer's. Scripts-first restatements and duplication land here
+  unless they mislead (above). A should-fix may be waived instead
+  of fixed — the waiver is written by whoever received the
+  findings, one line beside the finding in this same report;
+  silence is not a waiver. A re-review is a fresh dispatch over
+  the fixed text; waived findings do not re-litigate — the record
+  carries them.
 
 The report also states whether the draft touches law (creates,
 changes, or removes a standing rule other work follows). That

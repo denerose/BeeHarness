@@ -108,6 +108,12 @@ their own documents (`docs/AXI.md`).
   sign-off lifecycle (same folder; comprehension testing is
   bee-skill-tester's); states whether the draft touches law, which
   decides if keeper sign-off applies.
+- **cold read** — reading a document with no context beyond the
+  document and its named references — no drafting conversation, no
+  session memory. A cold reader is who skills are written for; a
+  cold dispatch sends one (a reviewer who did not write the thing
+  under review). Basis of bee-skill-tester's comprehension tests
+  and the review gate's independence.
 - **Role trailer** — a `Role: <role>` line in commit messages and
   record/report headers saying which role produced the work (ADR-007).
 - **escalation envelope** — every ask_user card states: role, context
