@@ -88,6 +88,16 @@ recommendations beyond what the keeper already directed).
   the P4 CLI design or productization (P6), or when the keeper wants
   the conversation. Related: PL-002 (memory tooling), the capture
   suggestion.
+- **PL-PO-002 — `bee init` from a worktree registers the worktree's
+  skills dir** — surfaced by P3's first dispatch: `bee init` derives
+  the skills path from its own location, so running it from any
+  worktree would register that worktree's `skills/` instead of the
+  main checkout's. Behavior unchanged in P3 (only test expectations
+  were made location-neutral). Open question for the keeper: should
+  `bee init` resolve the main checkout via `--git-common-dir` like
+  `scripts/task.sh` does? — unpark when the keeper rules on
+  worktree-aware registration (natural home: a later `bee` CLI phase).
+
 ## Resolved
 
 - **PL-PO-001 — stale ephemera in durable docs (pilot #1 post-mortem)**
