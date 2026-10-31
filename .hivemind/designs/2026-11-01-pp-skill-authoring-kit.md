@@ -183,6 +183,26 @@ tooling on the keeper's kit — nothing ships for it.
   review exists it reviews everything after — the kit dogfoods from
   its third build on.
 
+## Sequencing notes (2026-11-01 audit)
+
+P7 depends on nothing in P4/P5/P6 — dependencies run the helpful
+way (P4 dogfoods the meta pair; P4's plans get the new reviewer).
+Three coordination items, none blocking:
+
+- **Fold order:** if P7 lands before P4, the etiquette/debug folds
+  sit in bee-loop/bee-verify BEFORE P4's thinning — the thinning
+  preserves the judgment lines the folds added (mechanics move to
+  the CLI; judgment text stays in the skill).
+- **Gate-rule law edit:** when the in-house reviewer lands, the
+  AGENTS.md plan-review gate rule is rewritten to point at it — a
+  PP rules edit riding PO's build, per the sweep inventory.
+- **Registry index optional:** the meta pair defines front-matter
+  conventions; a `bee skills` index command is P4/P6 CLI work if
+  wanted — never a blocker.
+
+No further design needed — PO can plan P7 from this note on the
+keeper's direction.
+
 ## Feeds
 
 Keeper's list (superpowers + global skills replacement session); PO
