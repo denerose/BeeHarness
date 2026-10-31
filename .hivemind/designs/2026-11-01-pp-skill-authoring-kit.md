@@ -133,6 +133,28 @@ Recorded here so it outlives the status note that first carried it
   never ours. Produced in P8; scaffolding lands with the P6 init
   contract.
 
+## Replacement-session decisions (2026-11-01, keeper)
+
+Accepted: review-etiquette fold (into bee-loop + bee-review) ·
+dispatch pattern ships as task-orc/dispatch documentation · tier sort
+as proposed (core = bee-* set; meta = authoring kit + dispatch
+docs; structurally-replaced ship as nothing) · reviewer dimensions
+confirmed (accuracy, external reality, sandbox-run, ephemeral prose,
+determinism/AXI, no-globals boundary — self-contained text) ·
+handoff pair confirmed (bee-native, mirrors the current ritual).
+
+NEW DIRECTION — `bee guidance`: a CLI command returning guidance
+per topic — task types (cli work, test work, C#, TypeScript,
+backend, frontend…), work-mode guidance (how to be a bee, scraped
+from using-superpowers — its strongest aspect), and distinctions
+(the keeper's triage is human+AI together; in-loop triage inside an
+automated bee-loop is different — guidance carries both). TDD
+guidance rides here too. `--help` stays; users are encouraged to
+seek guidance on available topics. Feeds PL-PP-003 (its likely
+design home) and the P4/P6 CLI lanes.
+
+Under discussion: explore (item 4).
+
 ## The shipping test (keeper, 2026-11-01 — governing rule for slice 2)
 
 A preferred behavior is replaced only when it lives in a SHIPPED
