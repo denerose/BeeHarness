@@ -102,6 +102,22 @@ recommendations beyond what the keeper already directed).
   (one shipped guide vs injected guidance vs per-skill rule text),
   the home, and the sort itself — unpark with P8/P6 planning or
   when the keeper wants the distillation session.
+- **PL-PP-007 — project mapping and architecture navigation docs
+  (built-as-we-build)** — keeper direction (2026-11-01, from the
+  explore discussion): this repo has many ADRs but little
+  architectural documentation — a side effect of agent-tooling work
+  (little code to map); product projects (real C#/TS codebases) WILL
+  need navigation plans. That is the worth-capturing part of the
+  dropped explore concept, in a new context: maps written as the
+  project is BUILT, growing with the code — never retroactive
+  exploration. Open for the unpark session: the form (a living
+  architecture map in `.hivemind/`? a per-stack guidance section?
+  maintained at phase gates or by the loop's record steps?), the
+  layer split (designs say what to build; the map says what
+  exists), and when it starts (first product project). Related:
+  PL-PP-006, the `bee guidance` direction — unpark when the first
+  product project needs orientation or the keeper wants the design
+  session.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any
