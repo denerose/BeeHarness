@@ -1,6 +1,6 @@
 # Dispatch brief — task-orc
 
-(Fill one per dispatch; this template carries ADR-011's brief
+(Fill one per dispatch — this template carries the brief
 contract. Everything between the markers goes to the subagent.)
 
 ---

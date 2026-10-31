@@ -40,7 +40,7 @@ Your own process, not the code (code quality was review's job):
 ## What to produce
 
 One file per suggestion in `.hivemind/suggestions/`, named
-`YYYY-MM-DD-<pp|po>-<slug>.md` (your role's initials, ADR-007; pp =
+`YYYY-MM-DD-<pp|po>-<slug>.md` (your role's initials; pp =
 power-planner, po = project-orchestrator), using
 `assets/suggestion-format.md` — including the **Scope** field: `repo` (this project's docs/templates) or `harness`
 (a bee skill, a template, the rules — routed to the harness inbox once

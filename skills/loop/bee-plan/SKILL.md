@@ -57,7 +57,7 @@ and the plan reviewer's sandbox-run read it — and path-tag every
 verbatim code block (`path=exact/target.ext`) so blocks extract
 mechanically. Save as
 `.hivemind/plans/YYYY-MM-DD-<pp|po>-<slug>.md` — your role's initials
-in the slug (ADR-007; pp = power-planner, po = project-orchestrator) —
+in the slug (pp = power-planner, po = project-orchestrator) —
 with `**Reviewed:** PENDING`.
 Then run the `bee-plan-review` skill on it — the gate is not
 optional. Fix the findings (the keeper may waive should-fix items —

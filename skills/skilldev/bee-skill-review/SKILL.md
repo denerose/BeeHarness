@@ -88,6 +88,13 @@ a tighter example). Notes are not findings: they carry no tier,
 no waiver, and never block. A re-review after fixes is a fresh
 dispatch over the fixed text.
 
+**Disagreement escalates.** The author may dispute any finding —
+agreement is not a condition of review. A dispute travels up
+through the dispatcher to the keeper (GLOSSARY: escalate), who
+rules; the ruling — fix, or accept-as-is with its reason — is
+recorded beside the finding. Until ruled, a disputed blocking
+finding still blocks.
+
 The report also states whether the draft touches law (creates,
 changes, or removes a standing rule other work follows). That
 statement decides the lifecycle: an ordinary skill is done at
