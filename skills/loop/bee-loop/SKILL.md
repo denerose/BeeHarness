@@ -1,4 +1,5 @@
 ---
+kit: loop
 name: bee-loop
 description: Executes an approved plan through implement → verify → review cycles, tracking states and escalating to the keeper when needed. Use only when explicitly directed ("run the bee-loop on <plan>"). Never infer loop entry from task size or type.
 ---
@@ -6,7 +7,7 @@ description: Executes an approved plan through implement → verify → review c
 # bee-loop
 
 Execute a plan. You run this skill only when the keeper (or a role
-directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
+directed by the keeper) says to. Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first.
 
 ## Setup
 

@@ -1,4 +1,5 @@
 ---
+kit: session
 name: bee-brainstorm
 description: Design mode for BeeHarness. Use when the keeper deliberately opens design work — shaping a new project or feature, deciding how something should work, or shaping a project's SOUL. Not for implementation planning, code, or quick questions.
 ---
@@ -10,7 +11,7 @@ this mode only when the keeper chooses it (or a design session is
 scheduled). Never start design mode on your own because a task "feels
 creative" — small work stays small.
 
-Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first if any term below is unclear.
+Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first if any term below is unclear.
 
 ## How to run it
 

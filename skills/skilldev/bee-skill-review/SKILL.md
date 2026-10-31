@@ -1,4 +1,5 @@
 ---
+kit: skilldev
 name: bee-skill-review
 description: Design-quality review of a drafted or revised bee skill — the gate comprehension testing is not. Judges procedure soundness, scripts-first compliance, duplication, the three invariants (role-agnostic, ambient pickup, consistency with recorded decisions), and scope; reports tiered findings and never fixes. Use when a skill draft or revision needs quality review before anyone relies on it; cold-read comprehension testing is bee-skill-tester's job.
 ---
@@ -8,13 +9,13 @@ description: Design-quality review of a drafted or revised bee skill — the gat
 Judge a skill draft for design quality — the questions a
 comprehension test never asks. The tester asks "could a cold reader
 follow this?"; this skill asks "is following it the right
-procedure?" Read `../GLOSSARY.md` (the shared bee glossary, sibling
-of this skill folder) first.
+procedure?" Read `../../GLOSSARY.md` (the shared bee glossary, sibling
+of this kit folder) first.
 
 ## Input
 
 The dispatch names three things: the skill under review (its folder
-under `skills/`), the comparison set — sibling skills and glossary
+under `skills/<kit>/`), the comparison set — sibling skills and glossary
 entries duplication could hide in — and where the report goes. If
 any of the three is missing, or the draft does not exist, return
 the dispatch: findings need a home before the review starts.

@@ -1,4 +1,5 @@
 ---
+kit: loop
 name: bee-plan-review
 description: Reviews a written plan before the loop executes it — the gate between planning and implementation. Runs the mechanical core first (plan-checks.sh — target existence, block tagging, ephemeral prose, optional sandbox suite run), then judges six dimensions — accuracy, external reality, sandbox-run, ephemeral prose, determinism/AXI, no-globals boundary. Cold-dispatched; reports tiered findings and never fixes. Use before any plan is executed; finished work is bee-review's job, skill documents are bee-skill-review's.
 ---
@@ -7,8 +8,8 @@ description: Reviews a written plan before the loop executes it — the gate bet
 
 Judge a plan before anyone executes it. The mechanical core checks
 what a script can check; this skill adds what only a reader can —
-the plan's claims against the world. Read `../GLOSSARY.md` (the
-shared bee glossary, sibling of this skill folder) first.
+the plan's claims against the world. Read `../../GLOSSARY.md` (the
+shared bee glossary, sibling of this kit folder) first.
 
 ## Input
 
@@ -133,7 +134,7 @@ verdict: pass, or fail with the blocking findings named.
 
 - Plans only, before execution. Finished work is bee-review's;
   skill documents are bee-skill-review's; comprehension testing is
-  bee-skill-tester's (siblings in this folder).
+  bee-skill-tester's (both in the skilldev kit).
 - Findings, never fixes; no edits to the plan under review.
 - The core is the mechanical half: the reviewer reads its output,
   triages it, and never edits it either.

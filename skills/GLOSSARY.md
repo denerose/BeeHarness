@@ -26,6 +26,13 @@ their own documents (`docs/AXI.md`).
   mandates (adjustable defaults), never in the skill itself. A role's
   kit may grow (task-orc: bee-loop first among equals); skills stay
   role-agnostic.
+- **bee- namespace** — the `bee-` prefix marks the shipped kit: the
+  bee-* skills this repo ships under `skills/`, grouped in kit
+  folders (`loop/`, `session/`, `skilldev/`, and `roles/` when role
+  tools land — every SKILL.md carries a `kit:` field naming its
+  folder). Ad-hoc and repo-local skills never take the prefix; it
+  is reserved for what ships with the harness, so a reader can
+  tell a shipped instrument from a repo's own at a glance.
 - **power-planner** — the shaping role: discussion, architecture,
   decisions, design docs; co-creates design docs with the keeper. See
   `roles/power-planner.md`.
@@ -59,10 +66,10 @@ their own documents (`docs/AXI.md`).
   `<plan-slug>-task<N>-review-r<N>.md` (round suffix; review rounds
   count independently of verify rounds). Claims don't move states —
   these documents do (ADR-006; renamed from "records", ADR-013).
-- **bee-verify / bee-review** — sibling skills in this same folder.
-  bee-verify runs checks and writes a verify entry; bee-review judges
-  quality and writes a review report. The loop calls them; they never
-  call each other.
+- **bee-verify / bee-review** — sibling skills in the loop kit
+  folder. bee-verify runs checks and writes a verify entry; bee-review
+  judges quality and writes a review report. The loop calls them; they
+  never call each other.
 - **parking lot** — `.hivemind/memory/parking-lot.md`. Deferred
   decisions with an unpark condition. Any agent may propose adding an
   item; only the keeper removes or resolves one.
@@ -119,8 +126,8 @@ their own documents (`docs/AXI.md`).
   blocking, or should-fix where a waiver needs a one-line recorded
   reason — and never fixes. Plans carry a machine header and
   path-tagged verbatim blocks; those conventions are this gate's
-  input format. Finished work is bee-review's, skill documents
-  bee-skill-review's (same folder).
+  input format. Finished work is bee-review's (same kit), skill
+  documents bee-skill-review's (skilldev kit).
 - **cold read** — reading a document with no context beyond the
   document and its named references — no drafting conversation, no
   session memory. A cold reader is who skills are written for; a

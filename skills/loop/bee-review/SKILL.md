@@ -1,4 +1,5 @@
 ---
+kit: loop
 name: bee-review
 description: Quality review of finished, verified work — does the implementation match the plan's intent, what would a careful developer flag. Runs after bee-verify. Reports findings; never fixes. Not for reviewing plans (bee-plan-review does that).
 ---
@@ -6,7 +7,7 @@ description: Quality review of finished, verified work — does the implementati
 # bee-review
 
 Read work that has already passed verification and judge what the checks
-could not: intent, coherence, quality. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
+could not: intent, coherence, quality. Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first.
 
 ## Input
 

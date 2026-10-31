@@ -1,11 +1,12 @@
 ---
+kit: loop
 name: bee-verify
 description: Runs the deterministic checks for a stage — build, tests, lint, file existence, output-vs-claim — and records the evidence that lets work move to the next state. Pass/fail facts only; quality judgment is bee-review's job.
 ---
 
 # bee-verify
 
-Run the checks, record what happened. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
+Run the checks, record what happened. Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first.
 
 ## Levels
 

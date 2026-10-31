@@ -1,4 +1,5 @@
 ---
+kit: skilldev
 name: bee-skill-write
 description: Drafts and revises bee skills — the artifact test (skill vs script vs role-file line vs glossary entry), house structure and front-matter registry conventions, the determinism split (judgment wrapped around a scripted core), and the draft → cold-test → review → sign-off lifecycle. Use when creating or substantially revising a skill; comprehension testing is bee-skill-tester's job, not this skill's.
 ---
@@ -8,8 +9,8 @@ description: Drafts and revises bee skills — the artifact test (skill vs scrip
 Write a skill that works for a cold reader. The craft is four moves:
 pick the right artifact, give it the house structure, keep only
 judgment in the prose, and send it through the lifecycle before
-anyone relies on it. Read `../GLOSSARY.md` (the shared bee glossary,
-sibling of this skill folder) first.
+anyone relies on it. Read `../../GLOSSARY.md` (the shared bee glossary,
+sibling of this kit folder) first.
 
 ## The artifact test: skill, script, role-file line, or glossary entry
 
@@ -28,17 +29,17 @@ amount of good prose saves it. The alternatives, and their tells:
   the glossary, not a procedure document.
 - **Skill** — the work recurs as a class, spans roles or sessions,
   and judgment sits at its steps. Only that earns
-  `skills/<name>/SKILL.md`.
+  `skills/<kit>/<name>/SKILL.md`.
 
 ## Structure
 
-One directory per skill: `skills/<name>/SKILL.md`, with briefs and
+One directory per skill: `skills/<kit>/<name>/SKILL.md`, with briefs and
 templates the skill dispatches from in `assets/` beside it. The
 document, top to bottom:
 
 1. Front matter — the registry surface, below.
 2. An opener: a few plain sentences on what the skill is for,
-   pointing at `../GLOSSARY.md` for shared terms. A skill never
+   pointing at `../../GLOSSARY.md` for shared terms. A skill never
    re-defines glossary vocabulary.
 3. The procedure: sections of short bullets or plain declaratives,
    each step runnable by a reader with no context beyond the skill
@@ -48,11 +49,13 @@ document, top to bottom:
 
 ## Front matter: the registry
 
-`name` and `description` are the machine-readable surface of a
-skill; any index of the kit is built on them.
+`name`, `description`, and `kit` are the machine-readable surface of
+a skill; any index of the kit is built on them.
 
 - `name` — exactly the directory name, kebab-case; kit skills carry
   the `bee-` prefix.
+- `kit` — the kit folder the skill lives in (`loop`, `session`,
+  `skilldev`, `roles`).
 - `description` — what the skill does, when to use it, when not;
   written for a reader who sees only this line in a listing.
 - Keep both accurate and self-contained. A `bee skills` command that

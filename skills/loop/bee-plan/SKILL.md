@@ -1,4 +1,5 @@
 ---
+kit: loop
 name: bee-plan
 description: Writes executable plans for the bee-loop, from an approved design or a bounded task. Use when the keeper or project-orchestrator says to plan implementation work that the loop (or subagents) will execute. Not for personal quick planning (that's the global plan skill).
 ---
@@ -7,7 +8,7 @@ description: Writes executable plans for the bee-loop, from an approved design o
 
 Write the plan a loop will execute. Input: an agreed design doc, or a
 small task the keeper wants planned. Output: one file in
-`.hivemind/plans/`. Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first if needed.
+`.hivemind/plans/`. Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first if needed.
 
 ## Rules
 

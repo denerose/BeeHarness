@@ -1,4 +1,5 @@
 ---
+kit: session
 name: bee-hindsight
 description: After a phase or project wraps (or when the keeper asks), review how the work went and file concrete improvement suggestions to the suggestions inbox. Examines process, not code quality. Adds new files only — edits nothing.
 ---
@@ -8,7 +9,7 @@ description: After a phase or project wraps (or when the keeper asks), review ho
 Look back at finished work and tell us how to do it better. Any role may
 run it when the keeper asks; the project-orchestrator or power-planner
 may also self-schedule it at wrap points (end of a phase, end of a
-project). Read `../GLOSSARY.md` (the shared bee glossary, sibling of this skill folder) first.
+project). Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first.
 
 ## Inputs — re-read before judging
 
