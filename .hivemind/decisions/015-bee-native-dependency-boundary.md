@@ -1,7 +1,8 @@
 # ADR 015: the bee-native boundary — what BeeHarness may depend on
 
 **Date:** 2026-11-01
-**Status:** Accepted (keeper direction, determinism/AXI session)
+**Status:** Accepted (keeper direction, determinism/AXI session);
+amended same day — git-identity reclassified (below)
 
 ## Context
 
@@ -38,10 +39,17 @@ docs, rules) and ships with it.
   boundary violations, not just stale-name risks. They close with the
   P7 replacement migration — each build finishing only when its
   references update.
-- Known additional leak: the git identity rule (commits and pushes as
-  the machine's agent account) currently lives only in the global
-  AGENTS.md. It needs a bee-native home (repo rule or `bee init`
-  scaffolding); the replacement session routes it.
+- **Machine settings are followed, not forked.** Some things the
+  harness reads from the machine SHOULD change harness behavior when
+  the machine changes them. The git identity rule in the global
+  AGENTS.md is the example: if the machine's expected git behavior
+  for agents changes, harness users on that machine follow the new
+  rule — copying it into repo law would fork it and drift. The
+  boundary therefore runs between *procedures* (bee-native; global
+  changes never silently alter harness behavior) and *machine
+  settings* (ambient; the harness follows the machine). Where
+  exactly that line sits is found in use, refined with the keeper as
+  cases come up — not settled in advance.
 - New bee work is checked against this boundary at plan review — no
   global-skill dependencies in anything the loop runs.
 - The ADR-writer and handoff-pair homes (P7 open items) are required
