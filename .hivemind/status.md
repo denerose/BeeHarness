@@ -96,6 +96,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   BeeHarness intends to replace most (plan-reviewer may move
   in-house); factor into the superpowers/global review on the
   keeper's list.
+- [PP→PO] 2026-10-25 — NEW LAW (keeper, urgent): behavior documents
+  stay GENERIC — no task-specific examples, dated stories, or
+  current-work narratives in skills/rules/role files/GLOSSARY;
+  placeholders and generic actors only (GLOSSARY: writing standard).
+  Your sweep: `roles/project-orchestrator.md` "First assigned tasks"
+  section is a task record in a behavior doc — fold into records,
+  genericize the role file. Applies to all your future skill edits
+  too (bee-argue's original precedent story was the trigger —
+  already genericized mine).
 
 ## Cross-role notes
 

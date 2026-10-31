@@ -134,15 +134,39 @@ it as a term of art.
   may amend; changes land only on the keeper's sign-off (ADR-007
   amendment 1).
 - **dispatch brief, safety lines** — three standing lines every
-  brief for a write-capable agent carries (P2 near-miss: a reviewer
-  ran `bee report` flagless and wrote the live keeper report):
+  brief for a write-capable agent carries (born from a real near-miss:
+  a dispatched reviewer ran a write-by-default command without flags
+  and overwrote a live shared file):
   (1) tool defaults may write to live files — always pass `--check`
   or explicit output paths, and verify with `git status` after;
-  (2) live shared surfaces (`status.md`, `keeper-report.md`) are
+  (2) live shared surfaces (status surfaces, keeper digests) are
   concurrently edited by a parallel role — never stash or restore
   them, leave others' modifications untouched;
   (3) if a live file was touched by accident — `git restore` it
   immediately, verify porcelain clean, and disclose it in the report.
+
+## Writing standard
+
+How behavior documents are written — skills, rules, role files,
+GLOSSARY entries, templates. (Records — ADRs, logbook, session logs,
+status — carry specifics; that is their job.)
+
+- **Plain declaratives.** Say the thing; define or link any term of
+  art; no invented compounds, no unnamed rules, no filler.
+- **Shared vocabulary only.** Jargon must be shared with the keeper —
+  their shorthand is fine in moderation (mirror it); agents never
+  coin phrases the keeper wouldn't understand. The plain version of
+  any technique comes first.
+- **Generic examples only.** Examples in behavior documents use
+  placeholders and generic actors (`option A`, `a dispatched worker`,
+  `<repo-root>/…`) — never specifics of current tasks, dated
+  stories, or work narratives. Future readers must not inherit this
+  week's context. Law citations (ADR numbers) and one-line
+  attribution are fine; task narratives are not.
+- **Self-contained asks.** Anything asking the keeper to decide
+  carries its own context summary — written for a reader days away
+  from the conversation that produced it.
+
 - **dispatch** — a role sending work down to a subagent within its own
   mandate (orchestrator → implementer). Gated by the loop, not the
   keeper.

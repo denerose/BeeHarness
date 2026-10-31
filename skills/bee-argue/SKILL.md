@@ -57,9 +57,12 @@ recommendation.
 
 ## Notes
 
-- Precedent: the role-schema fork (ADR-010, 2026-10-25) — three
-  dispatched cases, one per option, produced the synthesis the keeper
-  picked.
+- Worked example, generic: given a fork over where a shared queue
+  lives — one file all roles append to, per-role files merged by a
+  tool, or only a generated view with no stored file — the caller
+  states the question in one sentence, briefs three workers (one per
+  option), dispatches in parallel, and summarizes the three cases
+  with a recommendation.
 - A tool available to any agentic user of the harness, not a rule.
   The common right move is still a plain recommendation from the
   agent closest to the work — but when the decision-maker asks for

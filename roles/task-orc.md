@@ -1,8 +1,7 @@
 # task-orc — dispatched role
 
-First dispatched role minted under ADR-010; contract per ADR-011
-(P2 post-mortem data). Minimal by design — formalization waits on the
-boundary test.
+First dispatched role minted under ADR-010; contract per ADR-011.
+Minimal by design — formalization waits on the boundary test.
 
 ## Attributes (ADR-010)
 

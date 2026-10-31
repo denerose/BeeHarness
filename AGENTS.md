@@ -43,6 +43,13 @@ We are designing the harness before building it. Right now:
 
 ## Rules of engagement
 
+- **Behavior documents stay generic** (keeper direction 2026-10-25;
+  the writing standard in GLOSSARY carries the full text): skills,
+  rules, role files, and templates contain NO task-specific
+  examples, dated stories, or current-work narratives — placeholders
+  and generic actors only. Future agents must not inherit this
+  week's context. Specifics live in the records (ADRs, logbook,
+  session logs); that is their job.
 - **Plain language, shared vocabulary** (keeper direction
   2026-10-25): jargon must be something the hive and the keeper
   *share* — the keeper's own shorthand is fine in moderation (mirror

@@ -30,7 +30,10 @@ author can no longer see. Read `../GLOSSARY.md` (the shared bee glossary, siblin
 2. **Keep the four questions in every brief** — they earn their keep:
    walk through concretely what you'd do step by step; what's unclear,
    contradictory, or missing; quote lines that could be read two ways;
-   how would you know when NOT to use this skill.
+   how would you know when NOT to use this skill. Add a fifth check:
+   quote any example in the skill that names real tasks, dates, or
+   artifacts of current work — behavior documents stay generic
+   (GLOSSARY: writing standard).
 3. Dispatch in parallel when testing several skills.
 4. **Synthesize across skills before fixing.** Shared findings (a term
    nobody could find, a record with no home) matter more than any

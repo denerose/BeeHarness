@@ -30,6 +30,11 @@ Your own process, not the code (code quality was review's job):
 - What did the plan get wrong that the plan-reviewer gate should have
   caught?
 - Did anything skip the states/evidence rules?
+- Did any work embed task-specific examples, dated stories, or
+  current-work narratives into behavior documents (skills, rules,
+  role files, GLOSSARY)? Flag each one — behavior documents stay
+  generic (GLOSSARY: writing standard); specifics belong to the
+  records.
 
 ## What to produce
 
