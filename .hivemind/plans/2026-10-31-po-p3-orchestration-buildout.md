@@ -35,13 +35,13 @@ no repo files changed beyond this plan + phase list
 **Provides:** `phase/3` branch; `../BeeHarness-phase3` worktree (PO's
 persistent integration worktree for P3+)
 
-- [ ] Commit this plan + the phase-list claim on main FIRST (stage
+- [x] Commit this plan + the phase-list claim on main FIRST (stage
   only these two files — the tree carries sibling-role edits; never
   `git add -A`, ADR-007 rule 2). The phase branch must start from
   this commit.
-- [ ] Then, from the main checkout: `git worktree add -b phase/3
+- [x] Then, from the main checkout: `git worktree add -b phase/3
   ../BeeHarness-phase3` — verify with `git worktree list`.
-- [ ] The straddle rule, recorded here (this checklist item), not in
+- [x] The straddle rule, recorded here (this checklist item), not in
   a new doc: shared surfaces (`status.md`, `keeper-report.md`, phase
   list, plans) are edited ONLY from the main checkout, atomic-commit
   rule per ADR-007 amendment 1; build work happens in the phase
@@ -53,17 +53,17 @@ persistent integration worktree for P3+)
 **Depends on:** Task 1
 **Provides:** the filled-in brief format every task-orc dispatch uses
 
-- [ ] Implement the template from ADR-011's dispatch-brief contract:
+- [x] Implement the template from ADR-011's dispatch-brief contract:
   plan path · phase id · validation level (from plan header) ·
   escalation envelope (decides-alone vs returns) · the three GLOSSARY
   safety lines · workspace facts (task worktree path, branch name,
   `logbook/` rides the branch, records reach main at merge) · pass-back
   reminder (done-ness digest, paths not contents). Shape-only here;
   the template is short prose, no code.
-- [ ] Verify: the template covers every bullet of `roles/task-orc.md`'s
+- [x] Verify: the template covers every bullet of `roles/task-orc.md`'s
   "Dispatch brief" section — the only permitted additions are the
   workspace facts and the pass-back reminder named above.
-- [ ] Commit: `add task-orc dispatch brief template`
+- [x] Commit: `add task-orc dispatch brief template`
 
 ## Task 3: payload plan — task-worktree helper
 
@@ -71,7 +71,7 @@ persistent integration worktree for P3+)
 **Depends on:** Task 2
 **Provides:** a gate-passed, cold-readable plan for the first dispatch
 
-- [ ] bee-plan (lean) for `scripts/task.sh` — a deterministic helper
+- [x] bee-plan (lean) for `scripts/task.sh` — a deterministic helper
   implementing ADR-012's task tier: `create <phase>-<slug>` (worktree
   `../BeeHarness-task-<slug>` + branch `task/<phase>-<slug>` off the
   current phase branch), `merge <slug>` (merge into the phase branch
@@ -82,14 +82,14 @@ persistent integration worktree for P3+)
   `.test.mjs` wrapper that exercises the script via `child_process`
   (so `node --test` stays the single suite entry — `npm test`
   unchanged).
-- [ ] Run the global plan-reviewer gate on it; fix findings; stamp.
+- [x] Run the global plan-reviewer gate on it; fix findings; stamp.
   If findings resist two fix rounds: card the keeper with the
   findings + recommendation (escalation envelope) — never dispatch an
   ungated plan.
-- [ ] The payload plan's tests sandbox in temp git repos
+- [x] The payload plan's tests sandbox in temp git repos
   (`fs.mkdtempSync` + `git init` — the in-repo convention) so `npm
   test` is safe from any worktree.
-- [ ] Commit on main (stage only the payload plan): `plan task
+- [x] Commit on main (stage only the payload plan): `plan task
   worktree helper through gate`
 
 ## Task 4: first task-orc dispatch (the boundary test)
@@ -137,20 +137,20 @@ calibration index
 **Provides:** P3 done; material for PP's codification (reviewer/
 implementer formalization, orchestrator role)
 
-- [x] Phase-level verify in the phase worktree: full suite (`npm test`)
+- [ ] Phase-level verify in the phase worktree: full suite (`npm test`)
   + boundary-test verdict (held/violated, with evidence pointer).
-- [x] Dispatch a phase-diff review (bee-review on `main..phase/3`).
-- [x] Merge `phase/3` → main (ADR-004 phase tier). If main moved
+- [ ] Dispatch a phase-diff review (bee-review on `main..phase/3`).
+- [ ] Merge `phase/3` → main (ADR-004 phase tier). If main moved
   during the phase (PP lands an ADR), this is a merge commit —
   expected, not a conflict: the straddle keeps file sets disjoint.
   Verify shared surfaces were never touched on the phase branch.
 - [x] Cleanup ritual: `git worktree list` shows only the phase
   worktree; task worktrees and branches gone.
-- [x] Calibration index: logbook entry
+- [ ] Calibration index: logbook entry
   `2026-10-31-po-p3-calibration.md` pointing PP at the P3 evidence
   (dispatch brief, pass-back digest, deviations, boundary verdict) —
   the observed-behavior input for codification.
-- [x] Update phase list: P3 done. Commit: `close P3 orchestration
+- [ ] Update phase list: P3 done. Commit: `close P3 orchestration
   build-out`
 
 ## Phase exit
