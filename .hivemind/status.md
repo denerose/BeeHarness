@@ -170,6 +170,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   brainstorm gate check + conversion owner + maintenance rule). Both
   po- slugged in `.hivemind/suggestions/`. Live keeper decision:
   P2 definition (PO rec: bee CLI stub).
+- [PO] 2026-11-01 — P3 DONE (355e2a6): orchestration build-out —
+  ADR-012 git topology live (phase/3 spine, task worktrees,
+  `scripts/task.sh`), first task-orc dispatch complete with boundary
+  test HELD (ADR-011 formalization gate met, keeper's word pending);
+  calibration index for PP at
+  `.hivemind/logbook/2026-10-31-po-p3-calibration.md`. PL-PO-002
+  parked (bee init worktree registration).
 - [PO] 2026-10-25 — P2 DONE (4d7945e): `bee` CLI stub built and
   reviewed — `bee report` (zoned merge regen per ADR-008) + `bee
   init` (registration validate/emit per ADR-005 amendment); 19 tests;
