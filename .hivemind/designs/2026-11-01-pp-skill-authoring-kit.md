@@ -223,6 +223,13 @@ Compensation — strict rules, clear wording, at the skill level:
   entry check — criteria stated so that meeting them means USE IT,
   and skipping requires naming, out loud, which entry condition
   fails. Never a silent default.
+- **Two layers (keeper, 2026-11-01):** the entry check governs
+  SELF-initiated use — conservative judgment, not every
+  consideration. A KEEPER invocation (their verb — "argue", "park",
+  "handoff" — the skill's name, or direct direction) IS the entry
+  decision, already made: recognition, not evaluation. Not using a
+  skill the keeper explicitly called is the failure mode; skipping
+  a marginal fork never was.
 - The entry judgment stays with the agent — but the skill text
   makes skipping an explicit, reasoned exception rather than the
   path of least resistance.
