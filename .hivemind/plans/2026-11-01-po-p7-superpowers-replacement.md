@@ -9,7 +9,7 @@ law-touching skills)
 and sweep edit lists; lean for skill prose (drafted at implementation
 from the design note; coverage = design note + `docs/WRITING-STANDARD.md`
 + `skills/GLOSSARY.md`; the review gates check the result)
-**Reviewed:** PENDING
+**Reviewed:** plan-reviewer passed 2026-11-01 (round 1 FAIL: 2🔴 4🟡, all resolved at d0d525b; round 2 PASS — waiver recorded: status.md not machine-targeted, live surface)
 **Phase:** P7 (spine `phase/7`; status surface: status.md)
 
 <!-- machine (ADR-014 mixed-document rule)
