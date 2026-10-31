@@ -191,13 +191,15 @@ visible at a glance. Two layers, both now:
 
 - **Kit folders** (pi discovers SKILL.md recursively — verified):
   `skills/loop/` (bee-loop, bee-plan, bee-verify, bee-review) ·
-  `skills/session/` (bee-brainstorm, bee-hindsight, bee-argue,
-  bee-skill-tester) · `skills/authoring/` (bee-skill-write,
-  bee-skill-review when built) · `skills/roles/` (role-specific
-  tools, starting with the phase-kickoff skill). GLOSSARY stays at
-  `skills/` root, shared.
+  `skills/session/` (bee-brainstorm, bee-hindsight, bee-argue) ·
+  `skills/skilldev/` (bee-skill-write, bee-skill-review when built,
+  bee-skill-tester — the tools that work ON the skill kit) ·
+  `skills/roles/` (role-specific tools, starting with the
+  phase-kickoff skill). GLOSSARY stays at `skills/` root, shared.
+  File-structure names stay precise (skilldev, not "authoring" or
+  "meta" — those are conversation shorthand at most).
 - **`kit:` front-matter field** on every SKILL.md (values: loop,
-  session, authoring, roles) — machine-readable grouping feeding
+  session, skilldev, roles) — machine-readable grouping feeding
   the future `bee skills` index, init advertising, and P8 tier
   work.
 - **Namespace rule:** the `bee-` prefix marks the shipped kit (all
