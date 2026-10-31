@@ -163,7 +163,7 @@ kit dogfoods from build 3 on)
 the global plan-reviewer references; the path-tagged code-block
 convention
 
-- [ ] Create `scripts/plan-checks.sh` (verbatim below; executable bit
+- [x] Create `scripts/plan-checks.sh` (verbatim below; executable bit
   set). Checks, in order — counts first, failures-only detail, exit
   1 on any failure (AXI: structured output, definitive empty states):
 
@@ -299,7 +299,7 @@ fi
 exit $fail
 ```
 
-- [ ] Create `tests/plan-checks.test.mjs` (verbatim below; suite:
+- [x] Create `tests/plan-checks.test.mjs` (verbatim below; suite:
   `node --test tests/*.test.mjs`):
 
 ```javascript path=tests/plan-checks.test.mjs
@@ -342,7 +342,7 @@ suite: echo ok
 -->`;
 
 test('clean plan passes with counts and no findings', () => {
-  const { planPath, dir } = fixture(`${MACHINE}\n\n# Plan\n\n- [ ] step one\n- [x] step two\n`, { 'exists.md': 'durable text\n' });
+  const { planPath, dir } = fixture(`${MACHINE}\n\n# Plan\n\n- [x] step one\n- [x] step two\n`, { 'exists.md': 'durable text\n' });
   const r = run([planPath], dir);
   assert.equal(r.code, 0);
   assert.match(r.out, /boxes: 1\/2/);
@@ -396,7 +396,7 @@ test('usage errors exit 2', () => {
 });
 ```
 
-- [ ] Verify: `bash -n scripts/plan-checks.sh` (syntax);
+- [x] Verify: `bash -n scripts/plan-checks.sh` (syntax);
   `node --test tests/plan-checks.test.mjs` — 6/6 pass. Run the script
   against THIS plan: `bash scripts/plan-checks.sh
   .hivemind/plans/2026-11-01-po-p7-superpowers-replacement.md` —
@@ -404,7 +404,7 @@ test('usage errors exit 2', () => {
   rule text plus the genuine one on `skills/bee-review/SKILL.md`'s
   "currently undecided" line (that line is rephrased in Task 5);
   anything else gets named and fixed.
-- [ ] Draft `skills/bee-plan-review/SKILL.md` — self-contained text,
+- [x] Draft `skills/bee-plan-review/SKILL.md` — self-contained text,
   no ADR citations. Must carry: the six dimensions (accuracy,
   external reality, sandbox-run — extract the plan's tagged blocks
   and run them, ephemeral prose, determinism/AXI — scripts-first,
@@ -413,9 +413,9 @@ test('usage errors exit 2', () => {
   findings feed the judgment); tiered findings (blocking / should-fix
   with waiver rule: waived should-fix needs a one-line recorded
   reason); cold-dispatch pattern; reports findings, never fixes.
-- [ ] Review THIS build with `bee-skill-review` (dogfood, build 3) +
+- [x] Review THIS build with `bee-skill-review` (dogfood, build 3) +
   cold-test via `bee-skill-tester`; fix findings; record.
-- [ ] Reference sweep (each edit verbatim; after this sweep no
+- [x] Reference sweep (each edit verbatim; after this sweep no
   live doc names the global plan-reviewer as the gate):
   - `skills/bee-plan/SKILL.md`: three `plan-reviewer` mentions →
     point at `bee-plan-review` (the gate line names the bee-native
@@ -436,11 +436,11 @@ test('usage errors exit 2', () => {
     (**law edit — power-planner's**: post the [PO] status note when
     this task starts; PP lands the AGENTS.md edit on main in the
     same window; build not finished until law and tool agree).
-- [ ] Verify sweep: `grep -rn "plan-reviewer" skills/ AGENTS.md
+- [x] Verify sweep: `grep -rn "plan-reviewer" skills/ AGENTS.md
     roles/ docs/` returns only historical/plans/logbook paths (live
     behavior docs: zero).
-- [ ] Record: logbook `…-task3-{verify,review}-r1.md`.
-- [ ] Commit: `add bee-plan-review with scripted mechanical core`
+- [x] Record: logbook `…-task3-{verify,review}-r1.md`.
+- [x] Commit: `add bee-plan-review with scripted mechanical core`
 
 ## Task 4: bee-native handoff pair
 
