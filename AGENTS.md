@@ -73,7 +73,7 @@ We are designing the harness before building it. Right now:
   absolute.
 - **Plan review gate:** before dispatching the first implementer on
   any plan containing verbatim code blocks (source, tests, config,
-  compose, SQL), run the `plan-reviewer` skill and resolve every 🔴
+  compose, SQL), run the `bee-plan-review` skill and resolve every 🔴
   finding before dispatch; waive 🟡 only with a one-line recorded
   reason; re-review any task whose verbatim code changed after
   review. Depth scales with plan size — small plans get a single
@@ -103,8 +103,8 @@ We are designing the harness before building it. Right now:
   (3) After any multi-file sweep, grep for residuals BEFORE
   committing — not after.
 - Commit messages: short imperative, ≤10 words.
-- When context runs short, run a handoff (`handoff` skill); resume with
-  `pickup-handoff`. A handoff ends with a memory sync (session state
+- When context runs short, run a handoff (`bee-handoff` skill); resume with
+  `bee-pickup-handoff`. A handoff ends with a memory sync (session state
   current) — NOT a parking-lot sweep. Sweeps belong to closing work
   (brainstorm loop-back, session close, phase gates), when something
   actually ended. Every handoff's final step: give the keeper a
