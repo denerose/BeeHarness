@@ -6,20 +6,10 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Awaiting keeper (explicit-yes queue, per ADR-008)
 
-- [PO] 2026-10-25 — P2 definition: RESOLVED — keeper picked the `bee`
-  CLI stub (`bee report` + `bee init`); relay prompt drafted by PP,
-  awaiting keeper pass to the orchestrator.
-- [PP] 2026-10-25 — PL-004 RESOLVED (keeper, routing card): both
-  heavyweight blocks stripped from global AGENTS.md; plan-review
-  gate now lives in repo AGENTS.md + bee skills; guard rule added
-  (global file changes = keeper authorization only). Global file is
-  outside this repo's git — the guard is its protection.
-- [PP] 2026-10-25 — RESOLVED this session: ADR-008 ACCEPTED
-  (keeper's word); keeper-report template blessed as interim;
-  root-file ownership decided (ADR-007 amendment 1 — SOUL.md
-  PP-drafted w/ keeper sign-off, README.md both roles w/ sign-off,
-  keeper writes nothing by hand; README joins ADR-008's explicit-yes
-  list; stale pilot line unblocked — PO lane).
+- [PO] 2026-10-25 — queue hygiene: three RESOLVED bullets removed
+  (resolved items leave the queue — convention now enforced by
+  `bee report`'s RESOLVED skip; history in git).
+
 - [PO] 2026-10-25 — founding-orchestrator hindsight batch filed (6
   files, `suggestions/2026-10-25-po-*`: brainstorm ownership filter,
   law re-read after sibling pulls, shared-append race check,
