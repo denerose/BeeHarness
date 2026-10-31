@@ -38,6 +38,10 @@ and back up again as questions and results.
   and encode it so the same lesson is never learned twice.
 - **Lightweight and decoupled.** Small pieces, each useful on its own.
   We build the minimum that serves the purpose, and no more.
+- **Agent-first surfaces.** The `bee` CLI is built for its primary
+  users — agents — to the AXI principles: deterministic scripts where
+  rules suffice, inference only where judgment lives, token-lean
+  machine formats, rendered views for the human. (ADR-014, `AXI.md`)
 - **Focus discipline.** Planning stays on documents; implementation stays
   on code. We never drift between the two without saying so.
 - **Transparency.** Nothing silent: decisions carry reasons, work carries

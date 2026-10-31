@@ -145,3 +145,11 @@ We are designing the harness before building it. Right now:
 - The subagents extension may be extended but must never depend on us.
 - Superpowers skills are reference material during bootstrap: learn the
   patterns, write our own — never import or depend on them.
+- **Agent-first CLI (ADR-014):** the `bee` CLI and every agent-facing
+  surface follows the ten AXI principles (`AXI.md`) — and prefer
+  scripts over skills for deterministic work: if two careful people
+  following the same rules produce the same result, it is a script.
+  Storage follows the primary reader: agent-primary stores go TOON,
+  mixed documents carry a machine header with a prose body, and
+  keeper-facing views render to prose. Never hand-convert a store
+  ahead of the tool that owns it.

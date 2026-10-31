@@ -24,8 +24,10 @@ and Paseo:
   led by **task-orc** (ADR-011: one plan's loop per dispatch, in a
   worktree). Roles are assumed by direction, never inferred from the
   work's shape.
-- **pi extension + lightweight CLI** (when built) — memory tooling,
-  decisions inbox, status surface, `bee report`.
+- **pi extension + agent-first CLI** (when built) — memory tooling,
+  decisions inbox, status surface, `bee report`. Deterministic-first
+  (ADR-014): scripts own state and checks; every command follows the
+  ten AXI principles (`AXI.md`).
 - **`.hivemind/` per repo** — each harnessed project's working space,
   one purpose per class: decisions (why it's this way), designs (what
   to build), plans (how), phases (when/next), logbook (what
@@ -48,6 +50,7 @@ machine. See `SOUL.md`.
 
 - `SOUL.md` — identity & values (planner-facing; implementers may skim)
 - `AGENTS.md` — always-applicable rules for any agent in this repo
+- `AXI.md` — the ten agent-first CLI principles, binding for `bee`
 - `roles/` — role specs (power-planner, project-orchestrator, task-orc)
 - `.hivemind/` — the hive's working space; purposes per class live in
   the design doc's artifacts map
