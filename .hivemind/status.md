@@ -56,6 +56,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   determinism/AXI dimension (plans for tooling: scripts-first,
   AXI-compliant surfaces). bee-skill-tester deliberately untouched —
   comprehension tool, not a design gate.
+- [PP] 2026-11-01 — GLOBAL-SKILL HARDCODE REVIEW filed into the
+  skill-authoring-kit note (inventory + rule): plan-reviewer / adr /
+  handoff-pair references live in AGENTS.md, skills, plan template,
+  GLOSSARY, role files — none wrong today, but each replacement
+  build finishes only when its references are updated (the doc fixes
+  are part of the build, PO's work). P7 row appended (replacement
+  migration, gated by the keeper's-list session, completes before
+  P6). ADR-writer and handoff-pair homes = open items for that
+  session.
 - [PP] 2026-11-01 — GLOSSARY CLEANUP (keeper direction): GLOSSARY is
   vocabulary only now — the writing standard moved to
   `WRITING-STANDARD.md` (repo root, sibling of `AXI.md`: standards
