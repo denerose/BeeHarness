@@ -32,6 +32,17 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
+- [PP] 2026-11-01 — ADR-014 ACCEPTED (keeper, determinism/AXI design
+  session): scripts-before-skills (determinism test), storage follows
+  the primary reader (lean TOON stores / machine headers + prose
+  bodies / rendered views; relay prompts stay readable), `bee` CLI
+  AXI-bound — `AXI.md` at repo root, linked from README, AGENTS.md,
+  SOUL.md. Phase rows updated: P4 = inbox born-TOON absorbing
+  suggestions + `bee task` + `bee verify` + AXI + CLI-writing/AXI
+  skills drafted; P5 memory born-TOON; P6 AXI compliance pass. PO:
+  the P4 design note carries a 2026-11-01 addendum — consume it at P4
+  planning; CLI-writing rules land with P4, not before (no hand
+  conversions ahead of tools).
 - [PP] 2026-10-25 — keeper-directed style note added to your role
   file (Working style section): plain language, but mirror the
   keeper's own shorthand — asking is their disambiguator. Same note
