@@ -74,3 +74,25 @@ Still open for the P4 session:
   or just age visibly?
 - What `bee init` scaffolds in a fresh repo: an empty inbox from day
   one.
+
+## Determinism build-out in P4 (ADR-014)
+
+The addendum names `bee verify` and `bee task`; the shape, so the
+P4 plan has real input:
+
+- **`bee verify`** runs the checks a plan's header names (commands,
+  file existence, output-vs-claim) and emits the structured logbook
+  entry — machine header (role, date, verdict, record links), prose
+  account only for anomalies. Agent judgment: "is this output sane."
+  Structured output = counts and failures, never raw terminal dumps.
+- **`bee task`** owns work-item state moves and plan task-state
+  updates: the loop reads state, decides, and calls the script to
+  move it. No hand-edited checkboxes in script-owned territory — an
+  agent can still misstate, but it can no longer accidentally mark
+  done what has no record.
+- **Landing order:** inbox first (born-TOON, absorbs suggestions),
+  then `bee verify` (its entries use the mixed-document header),
+  then task state moves (reuses the inbox's store patterns).
+- **Invariant (ADR-006):** claims still move states only via logbook
+  records — the scripts write the records; they never bypass them.
+- Every new subcommand is AXI-compliant from birth (`docs/AXI.md`).

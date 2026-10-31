@@ -94,6 +94,26 @@ ephemeral global kit.
 Existing plans and records keep their mentions — history stays as
 written.
 
+## Loop-skill updates (ADR-014, PO lane)
+
+Recorded here so it outlives the status note that first carried it
+(2026-11-01):
+
+- **bee-plan:** the determinism test applies at plan time —
+  deterministic work is assigned to scripts, and the plan names the
+  judgment each agent step keeps; plans carry the machine header
+  (validation level, phase, task state, targets — ADR-014's
+  mixed-document rule).
+- **bee-verify:** thins toward `bee verify` once the CLI lands (P4);
+  the agent's judgment shrinks to "is this output sane."
+- **bee-review:** runs the mechanical claim-vs-record check (checked
+  boxes vs logbook entries, states vs evidence) before quality
+  judgment.
+- **bee-loop:** the Record step never hand-edits state a script owns.
+- **The in-house plan reviewer (P7)** gains determinism/AXI
+  dimensions: plans for tooling show scripts-first and AXI-compliant
+  surfaces, and no global-skill dependencies (ADR-015).
+
 ## Feeds
 
 Keeper's list (superpowers + global skills replacement session); PO
