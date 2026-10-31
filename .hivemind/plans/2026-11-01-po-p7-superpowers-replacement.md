@@ -30,6 +30,7 @@ targets:
   - skills/bee-plan/SKILL.md (modify)
   - skills/bee-plan/assets/plan-template.md (modify)
   - skills/GLOSSARY.md (modify)
+  - .hivemind/phases/BeeHarness.md (modify)
 suite: node --test tests/*.test.mjs
 -->
 
@@ -348,7 +349,10 @@ test('usage errors exit 2', () => {
   `node --test tests/plan-checks.test.mjs` — 6/6 pass. Run the script
   against THIS plan: `bash scripts/plan-checks.sh
   .hivemind/plans/2026-11-01-po-p7-superpowers-replacement.md` —
-  expected: clean or named findings fixed.
+  expected: findings limited to the quoted-example class in existing
+  rule text plus the genuine one on `skills/bee-review/SKILL.md`'s
+  "currently undecided" line (that line is rephrased in Task 5);
+  anything else gets named and fixed.
 - [ ] Draft `skills/bee-plan-review/SKILL.md` — self-contained text,
   no ADR citations. Must carry: the six dimensions (accuracy,
   external reality, sandbox-run — extract the plan's tagged blocks
@@ -413,9 +417,11 @@ rule re-pointed (PP law edit, coordinated)
   the bee pair; `AGENTS.md` handoff rule → names the bee pair
   (**law edit — power-planner's**, same coordination pattern as
   Task 3: [PO] status note, PP lands it in-window).
-- [ ] Verify sweep: `grep -rn "handoff skill\|pickup-handoff"
-    skills/ AGENTS.md` — no live doc names the global pair as the
-    instrument (ritual descriptions may name the bee pair only).
+- [ ] Verify sweep: `grep -rn "pickup-handoff" skills/ AGENTS.md
+    | grep -v "bee-pickup-handoff"` → empty, and
+    `grep -n "handoff" AGENTS.md | grep -v "bee-"` → empty (the
+    handoff rule names only the bee pair; expected residue: none).
+    No live doc names the global pair as the instrument.
 - [ ] Dogfood: the next handoff this session runs uses the pair.
 - [ ] Record: logbook `…-task4-{verify,review}-r1.md`.
 - [ ] Commit: `add bee-native handoff pair`
@@ -460,8 +466,27 @@ fold-order note P4's plan must carry
   the template (phase, validation, state-source, targets, suite —
   the block this plan already carries; path-tagged code blocks for
   verbatim content, so the reviewer's sandbox-run is mechanical).
+- [ ] Dispatch-pattern documentation (design decision: the dispatch
+  pattern ships as task-orc/dispatch documentation, not a skill):
+  verify the shipped homes carry the pattern complete —
+  `roles/task-orc.md` (dispatch-brief section + boundary rules),
+  `skills/bee-loop/assets/dispatch-brief-template.md`, and the
+  GLOSSARY dispatch entries (`dispatch`, `dispatch brief`, safety
+  lines). Fill any gap so a cold dispatcher can run the pattern from
+  these homes alone (self-contained text). ADR-citation stripping
+  across shipped docs is P8's ship-tier sweep — out of scope here.
+- [ ] Rephrase the genuine ephemeral line in `skills/bee-review/SKILL.md`
+  ("currently undecided, so if asked, escalate") to durable wording
+  (e.g. "the keeper decides this; if asked, escalate") — surfaced by
+  plan-checks' prose check during plan review.
 - [ ] Cold-test the four modified skills via `bee-skill-tester`
   (modified skills get the same comprehension bar as new ones).
+- [ ] Verify: `node --test tests/*.test.mjs` green; targeted greps
+    confirm each added rule line landed (bee-loop: waiver rule +
+    Record-step rule; bee-review: claim-vs-record check; bee-verify:
+    P4-boundary judgment line; bee-plan: determinism test + machine
+    header fields in template); `bash scripts/plan-checks.sh` on this
+    plan stays clean on files/blocks.
 - [ ] Record: logbook `…-task5-{verify,review}-r1.md`.
 - [ ] Commit: `fold etiquette and debug guidance, add determinism lines`
 
@@ -497,10 +522,15 @@ all bee-native)
 ## Phase exit
 
 - `node --test tests/*.test.mjs` green (P2 + P3 + plan-checks suites).
-- Shipping test: no live skill text cites ADRs, designs, plans, or
-  `.hivemind/` paths (`grep -rn "ADR-\|\.hivemind" skills/` —
-  GLOSSARY's ADR anchors are the working-file exception, decided in
-  the design note's two-glossaries section).
+- Shipping test (scoped to what P7 ships): skill text added or
+  modified by this phase carries no citations of our ADRs, designs,
+  or plans, and no references into our working documents —
+  self-contained text only (pattern: `grep -nE "ADR-[0-9]|designs/|plans/"`
+  over the phase-touched skill files → empty). Runtime working
+  paths the loop itself operates on (e.g. `.hivemind/logbook/`,
+  `.hivemind/phases/`) and the working GLOSSARY's ADR anchors are
+  the decided exceptions (design note: two-glossaries section). The
+  repo-wide ship-tier strip is P8's sweep, not this gate.
 - Bee-native boundary: AGENTS.md gate + handoff rules name
   bee-native instruments; law and tool agree.
 - Keeper has signed off on the pair + reviewer texts; P8 remains
