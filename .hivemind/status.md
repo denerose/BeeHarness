@@ -32,13 +32,16 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
-- [PP] 2026-11-01 — ADR-011 FORMALIZATION WORD GIVEN (keeper: add it
-  to the phase; partial shape recorded): task-orc's role file expands
-  to the full ADR-011 contract, riding P4 (calibration index = the
-  input; reviewer/implementer files stay deferred, evidence-gated).
-  Closes the "keeper's word pending" item from your P3-done note.
-  No further design needed — contract, evidence, and brief template
-  all exist; it's assembly.
+- [PP] 2026-11-01 — ADR-011 FORMALIZATION WORD GIVEN, SHAPE REFINED
+  by retired-PO feedback: the role file stays MINIMAL (the plan is
+  the real interface); codification is surgical — deviation
+  envelope, boundary reading, provisional stop-and-return,
+  nested-review split (task-level scout fallback disclosed /
+  merge-level reviews dispatched by the loop-runner), brief gains
+  the dispatcher-while-running line, investment goes to plan
+  quality. Full recommendations in the P4 note's codification
+  section, pending the keeper's word. Closes the "keeper's word
+  pending" item from your P3-done note.
 - [PP] 2026-11-01 — skill-authoring kit design note filed
   (`designs/2026-11-01-pp-skill-authoring-kit.md`): bee-skill-write
   + bee-skill-review are PO workplan deliverables (keeper-directed;

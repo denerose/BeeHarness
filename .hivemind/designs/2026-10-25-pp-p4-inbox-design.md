@@ -75,6 +75,36 @@ Still open for the P4 session:
 - What `bee init` scaffolds in a fresh repo: an empty inbox from day
   one.
 
+## Task-orc codification (retired-PO feedback, 2026-11-01)
+
+Evidence-first correction to the queued shape: the role file stays
+MINIMAL — the plan is the real interface (a cold, self-contained
+plan did the whole job; the dispatched agent needed nothing beyond
+plan + minimal role file + GLOSSARY). Codification is surgical, and
+the real investment goes to plan-quality standards, not role prose.
+PP recommendations (pending the keeper's word; raw material: the
+calibration index and its dispatch record):
+
+- **Write in — deviation envelope:** deviations that repair the
+  plan's own exit criteria are in-envelope; the pass-back carries
+  them. (Inferred correctly once; now authorized.)
+- **Write in — boundary reading:** running the shipped tooling (the
+  task worktree helper) is dispatch mechanics, not source-reading;
+  the boundary test holds on that reading.
+- **Mark provisional:** stop-and-return never fired in contact —
+  the one-hop escalation design is untested-in-use.
+- **Nested reviews — split by level:** task-level reviews inside
+  the dispatch may fall back to a cold scout, disclosed (the
+  loop-runner's merge review backstops them); merge- and phase-level
+  reviews are dispatched by the loop-runner — fresh, worker-typed.
+  Codifies the de facto P3 arrangement.
+- **Brief template:** gains one line stating what the dispatcher
+  does while the dispatch runs (disciplines against peeking at the
+  worktree mid-flight).
+- **Plan quality:** bee-plan's self-contained-task standard (rule 4)
+  is the interface that made cold dispatch work — codification
+  attention lands there.
+
 ## Determinism build-out in P4 (ADR-014)
 
 The addendum names `bee verify` and `bee task`; the shape, so the
