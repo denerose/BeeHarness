@@ -150,6 +150,21 @@ recommendations beyond what the keeper already directed).
   "keeps track" means — aging,
   surfacing, the keeper's list — unpark when the keeper brings it
   back, after parking/suggestions mechanics are proven.
+- **PL-PP-010 — a rubber-duck skill and a "do-I-need-the-keeper"
+  skill** — keeper direction (2026-11-01): two candidate skills.
+  Rubber-duck: externalize and examine one's own reasoning before
+  deciding/proceeding. Do-I-need-the-keeper: helps an agent see
+  when it is about to make a decision that is not its to make —
+  likely users: project-orchestrator, planners (though they have
+  the plan reviewer), maybe task-orcs; probably HOOKED into the
+  loop somehow, still TBD. Open for the unpark session, filed
+  open: form and kit placement (loop/session/roles?) for each;
+  where the hook points land in the loop (Record step? deviation
+  handling? stop-and-return triggers?); relation to existing
+  instruments (escalation envelope, plan reviewer, bee-argue);
+  whether they ship or stay harness-build tools — unpark when the
+  keeper brings it back (natural moment: after P7's skill-building
+  practice).
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any
