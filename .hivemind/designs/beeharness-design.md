@@ -36,7 +36,12 @@ the keeper's interactions with it stay light-touch: unsticking on
 genuinely unresolved decisions, not deciding mid-flight. A decision
 deferred once is not deferred forever — when evidence shows it is
 needed, it is decided then, and reorganizations sooner rather than
-later (every week of drift compounds the sweep risk).
+later (every week of drift compounds the sweep risk). Design
+inputs freeze at pickup: once the orchestrator has consumed a
+design note, late edits to it are lost changes — new direction
+rides the next checkpoint, the status surface, or a keeper relay,
+never silent file edits. Reorganizations never ride an in-flight
+phase: they touch the same files the phase holds.
 
 ## Decision and memory model
 

@@ -54,6 +54,10 @@ the mode doesn't survive context switches on vibes alone.
 - **Session lifecycle is the keeper's call.** Never recommend a fresh
   session or a handoff — the keeper weighs context budget against
   spin-up and wake-monitoring cost, and makes that call alone.
+- **The keeper's verbs are invocations.** The keeper's own words for
+  our tools — argue, park, handoff — are calls, not idioms:
+  recognize the named instrument and use it. Recognition, not
+  evaluation.
 - **Plain language** (see `docs/WRITING-STANDARD.md`): no invented
   compounds, no unnamed rules, no LLM tics.
   Jargon must be SHARED: the keeper's own vocabulary yes, in

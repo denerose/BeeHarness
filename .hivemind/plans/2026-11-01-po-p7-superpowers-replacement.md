@@ -24,11 +24,11 @@ targets:
   - skills/loop/bee-pickup-handoff/SKILL.md (create)
   - scripts/plan-checks.sh
   - tests/plan-checks.test.mjs
-  - skills/bee-loop/SKILL.md (modify)
-  - skills/bee-review/SKILL.md (modify)
-  - skills/bee-verify/SKILL.md (modify)
-  - skills/bee-plan/SKILL.md (modify)
-  - skills/bee-plan/assets/plan-template.md (modify)
+  - skills/loop/bee-loop/SKILL.md (modify)
+  - skills/loop/bee-review/SKILL.md (modify)
+  - skills/loop/bee-verify/SKILL.md (modify)
+  - skills/loop/bee-plan/SKILL.md (modify)
+  - skills/loop/bee-plan/assets/plan-template.md (modify)
   - skills/GLOSSARY.md (modify)
   - .hivemind/phases/BeeHarness.md (modify)
 suite: node --test tests/*.test.mjs
@@ -457,7 +457,7 @@ window for the PP law edits)
 **Provides:** bee-native handoff scaffolding; the AGENTS.md handoff
 rule re-pointed (PP law edit, coordinated)
 
-- [ ] Draft both skills — they mirror the current handoff ritual
+- [x] Draft both skills — they mirror the current handoff ritual
   (already bee-native in the role files; the skills scaffold it):
   `bee-handoff` (locate the role's handoff file; absorb session
   state; write the handoff: goal, done, in-flight, next, wake prompt
@@ -467,20 +467,20 @@ rule re-pointed (PP law edit, coordinated)
   against the repo — `git status`, `git log`; announce role + first
   move in the first reply). Self-contained text; per-role file
   paths stay placeholders (`<repo-root>/.pi/handoff-<role>.md`).
-- [ ] Cold-test both via `bee-skill-tester`; quality review via
+- [x] Cold-test both via `bee-skill-tester`; quality review via
   `bee-skill-review` (exists since Task 2); fix; record.
-- [ ] Reference sweep: `skills/GLOSSARY.md` handoff entry → names
+- [x] Reference sweep: `skills/GLOSSARY.md` handoff entry → names
   the bee pair; `AGENTS.md` handoff rule → names the bee pair
   (**law edit — power-planner's**, same coordination pattern as
   Task 3: [PO] status note, PP lands it in-window).
-- [ ] Verify sweep: `grep -rn "pickup-handoff" skills/ AGENTS.md
+- [x] Verify sweep: `grep -rn "pickup-handoff" skills/ AGENTS.md
     | grep -v "bee-pickup-handoff"` → empty, and
     `grep -n "handoff" AGENTS.md | grep -v "bee-"` → empty (the
     handoff rule names only the bee pair; expected residue: none).
     No live doc names the global pair as the instrument.
-- [ ] Dogfood: the next handoff this session runs uses the pair.
-- [ ] Record: logbook `…-task4-{verify,review}-r1.md`.
-- [ ] Commit: `add bee-native handoff pair`
+- [x] Dogfood: the next handoff this session runs uses the pair.
+- [x] Record: logbook `…-task4-{verify,review}-r1.md`.
+- [x] Commit: `add bee-native handoff pair`
 
 ## Task 5: loop-skill folds + determinism-law lines
 
@@ -495,7 +495,7 @@ adds content, not references)
 ADR-014 plan-time determinism lines; machine-header template; the
 fold-order note P4's plan must carry
 
-- [ ] `bee-loop`: add (a) review-etiquette fold — reviewer briefs
+- [x] `bee-loop`: add (a) review-etiquette fold — reviewer briefs
   carry the etiquette lines (findings cite evidence, no re-design
   essays, tiered findings only); (b) debug fold — systematic-debug
   guidance as loop steps (reproduce before fixing; evidence before
@@ -507,22 +507,22 @@ fold-order note P4's plan must carry
   verbatim AND the fix-round verify record replicates the reviewer's
   probe — one-line reason recorded; blocking findings always
   re-reviewed).
-- [ ] `bee-review`: add (a) etiquette fold (same lines); (b) the
+- [x] `bee-review`: add (a) etiquette fold (same lines); (b) the
   mechanical claim-vs-record check runs BEFORE quality judgment:
   checked boxes vs logbook entries, states vs evidence — findings
   from this check are blocking.
-- [ ] `bee-verify`: add the debug fold's judgment line — anomalies
+- [x] `bee-verify`: add the debug fold's judgment line — anomalies
   get reproduced before any fix is proposed. Mark the P4 boundary
   inline: "mechanics move to the `bee verify` CLI at P4; the
   judgment line (is this output sane; anomalies reproduced) stays
   in the skill."
-- [ ] `bee-plan` + template: add the plan-time determinism test
+- [x] `bee-plan` + template: add the plan-time determinism test
   (deterministic work is assigned to scripts; the plan names the
   judgment each agent step keeps) and the machine-header fields to
   the template (phase, validation, state-source, targets, suite —
   the block this plan already carries; path-tagged code blocks for
   verbatim content, so the reviewer's sandbox-run is mechanical).
-- [ ] Dispatch-pattern documentation (design decision: the dispatch
+- [x] Dispatch-pattern documentation (design decision: the dispatch
   pattern ships as task-orc/dispatch documentation, not a skill):
   verify the shipped homes carry the pattern complete —
   `roles/task-orc.md` (dispatch-brief section + boundary rules),
@@ -531,20 +531,20 @@ fold-order note P4's plan must carry
   lines). Fill any gap so a cold dispatcher can run the pattern from
   these homes alone (self-contained text). ADR-citation stripping
   across shipped docs is P8's ship-tier sweep — out of scope here.
-- [ ] Rephrase the genuine ephemeral line in `skills/bee-review/SKILL.md`
+- [x] Rephrase the genuine ephemeral line in `skills/bee-review/SKILL.md`
   ("currently undecided, so if asked, escalate") to durable wording
   (e.g. "the keeper decides this; if asked, escalate") — surfaced by
   plan-checks' prose check during plan review.
-- [ ] Cold-test the four modified skills via `bee-skill-tester`
+- [x] Cold-test the four modified skills via `bee-skill-tester`
   (modified skills get the same comprehension bar as new ones).
-- [ ] Verify: `node --test tests/*.test.mjs` green; targeted greps
+- [x] Verify: `node --test tests/*.test.mjs` green; targeted greps
     confirm each added rule line landed (bee-loop: waiver rule +
     Record-step rule; bee-review: claim-vs-record check; bee-verify:
     P4-boundary judgment line; bee-plan: determinism test + machine
     header fields in template); `bash scripts/plan-checks.sh` on this
     plan stays clean on files/blocks.
-- [ ] Record: logbook `…-task5-{verify,review}-r1.md`.
-- [ ] Commit: `fold etiquette and debug guidance, add determinism lines`
+- [x] Record: logbook `…-task5-{verify,review}-r1.md`.
+- [x] Commit: `fold etiquette and debug guidance, add determinism lines`
 
 ## Task 6: keeper sign-off + phase close
 

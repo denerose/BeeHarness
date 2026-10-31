@@ -205,12 +205,18 @@ visible at a glance. Two layers, both now:
 - **Namespace rule:** the `bee-` prefix marks the shipped kit (all
   folders); ad-hoc and repo-local skills never take it.
 
-Execution: P7's OPENING TASK — the phase already touches loop and
-  session skills, so one sweep covers moves, front matter, the
-  `../GLOSSARY.md` sibling-pointer fixes (they become
-  `../../GLOSSARY.md`), and doc references. Open for the P6 init
-  contract, deliberately: how a repo customizes or overrides a kit
-  skill.
+Execution: P8 — THE RECTIFICATION PHASE (keeper direction: never
+interrupt in-flight work; plan a rectification instead). P8 runs
+after P7 closes and absorbs everything that accumulated after P7's
+pickup in one sweep: entry-discipline application to the meta pair,
+this reorganization (moves, front matter, the `../GLOSSARY.md`
+sibling-pointer fixes → `../../GLOSSARY.md`, doc references), and
+the ship-tier cleanup. Never an in-flight phase's task: edits to
+consumed inputs don't land, and the reorg touches the same files
+in-flight work holds. Post-P7 is the cheaper sweep regardless:
+the meta pair lands once, directly into `skilldev/`. Open for the
+P6 init contract, deliberately: how a repo customizes or overrides
+a kit skill.
 
 ## Entry discipline lives in the skill (keeper direction, 2026-11-01)
 
@@ -219,10 +225,23 @@ bias toward acting directly; permissive wording ("a tool, not a
 rule"; "the common right move is still…") licenses silent skipping.
 Compensation — strict rules, clear wording, at the skill level:
 
-- Every skill carries its own **"should you use this skill?"**
-  entry check — criteria stated so that meeting them means USE IT,
-  and skipping requires naming, out loud, which entry condition
-  fails. Never a silent default.
+- Every DISCRETIONARY skill — one where using it is a judgment
+  call and sometimes the answer is legitimately no (bee-argue,
+  bee-hindsight, future judgment tools) — carries its own
+  **"should you use this skill?"** gate: criteria stated so that
+  meeting them means USE IT, and skipping requires naming, out
+  loud, which entry condition fails. Never a silent default.
+  Pipeline stages (trigger = position in the loop) and
+  externally-gated skills (trigger = explicit direction or a
+  declared mode) carry their trigger conditions instead — a gate
+  there would be noise.
+- **Two layers (keeper, 2026-11-01):** the entry check governs
+  SELF-initiated use — conservative judgment, not every
+  consideration. A KEEPER invocation (their verb — "argue", "park",
+  "handoff" — the skill's name, or direct direction) IS the entry
+  decision, already made: recognition, not evaluation. Not using a
+  skill the keeper explicitly called is the failure mode; skipping
+  a marginal fork never was.
 - The entry judgment stays with the agent — but the skill text
   makes skipping an explicit, reasoned exception rather than the
   path of least resistance.
