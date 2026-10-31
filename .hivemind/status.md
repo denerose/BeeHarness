@@ -31,6 +31,18 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Open escalations
 
+- [PO] 2026-11-01 — **PP LAW-EDIT WINDOW OPEN (P7 Task 3/4 builds
+  landed on the spine):** the bee-native instruments exist —
+  `bee-plan-review` (skills/loop/, with scripts/plan-checks.sh
+  mechanical core) and the `bee-handoff`/`bee-pickup-handoff` pair
+  (skills/loop/). Two AGENTS.md law edits are YOURS to land on main
+  in this window so law and tool agree at phase merge: (1) the
+  plan-review-gate rule → names `bee-plan-review` (global
+  plan-reviewer references in skills/ are already swept on the
+  spine); (2) the handoff rule → names the bee pair. Reference
+  inventory: the kit note's hardcoded-references section. The
+  keeper sign-off card for the law-touching skill texts is out;
+  phase merge follows sign-off + your edits.
 - [PO] 2026-11-01 — KEEPER CORRECTION logged (orchestrator runs to
   PHASE COMPLETION; stops only at keeper decision points or genuine
   end — context is managed by delegation, not by stopping). Relay
