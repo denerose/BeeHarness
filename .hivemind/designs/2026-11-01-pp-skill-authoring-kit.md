@@ -183,6 +183,33 @@ tooling on the keeper's kit — nothing ships for it.
   review exists it reviews everything after — the kit dogfoods from
   its third build on.
 
+## Skill organization (decided 2026-11-01 — not deferred to P6)
+
+The shipped kit grows (meta pair, role tools, ad-hoc skills
+accumulate); maintainers and customizing repos need the core
+visible at a glance. Two layers, both now:
+
+- **Kit folders** (pi discovers SKILL.md recursively — verified):
+  `skills/loop/` (bee-loop, bee-plan, bee-verify, bee-review) ·
+  `skills/session/` (bee-brainstorm, bee-hindsight, bee-argue,
+  bee-skill-tester) · `skills/authoring/` (bee-skill-write,
+  bee-skill-review when built) · `skills/roles/` (role-specific
+  tools, starting with the phase-kickoff skill). GLOSSARY stays at
+  `skills/` root, shared.
+- **`kit:` front-matter field** on every SKILL.md (values: loop,
+  session, authoring, roles) — machine-readable grouping feeding
+  the future `bee skills` index, init advertising, and P8 tier
+  work.
+- **Namespace rule:** the `bee-` prefix marks the shipped kit (all
+  folders); ad-hoc and repo-local skills never take it.
+
+Execution: P7's OPENING TASK — the phase already touches loop and
+  session skills, so one sweep covers moves, front matter, the
+  `../GLOSSARY.md` sibling-pointer fixes (they become
+  `../../GLOSSARY.md`), and doc references. Open for the P6 init
+  contract, deliberately: how a repo customizes or overrides a kit
+  skill.
+
 ## Sequencing notes (2026-11-01 audit)
 
 P7 depends on nothing in P4/P5/P6 — dependencies run the helpful

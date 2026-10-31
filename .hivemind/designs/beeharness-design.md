@@ -28,6 +28,16 @@ them.
 Implementer/reviewer roles arrive with the orchestration build. Roles
 are defaults, not walls (ADR-007 rule 11).
 
+Direction flows planner-ward first: PP and the keeper resolve design
+questions before and during a phase, so the orchestrator takes a
+plan whose decisions are already made — it organizes tasks and
+executes. Its questions surface at phase kickoff (front-loaded);
+the keeper's interactions with it stay light-touch: unsticking on
+genuinely unresolved decisions, not deciding mid-flight. A decision
+deferred once is not deferred forever — when evidence shows it is
+needed, it is decided then, and reorganizations sooner rather than
+later (every week of drift compounds the sweep risk).
+
 ## Decision and memory model
 
 - **Ownership is the routing axis** (keeper reframe, 2026-10-20):
