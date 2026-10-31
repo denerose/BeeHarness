@@ -205,12 +205,16 @@ visible at a glance. Two layers, both now:
 - **Namespace rule:** the `bee-` prefix marks the shipped kit (all
   folders); ad-hoc and repo-local skills never take it.
 
-Execution: P7's OPENING TASK — the phase already touches loop and
-  session skills, so one sweep covers moves, front matter, the
-  `../GLOSSARY.md` sibling-pointer fixes (they become
-  `../../GLOSSARY.md`), and doc references. Open for the P6 init
-  contract, deliberately: how a repo customizes or overrides a kit
-  skill.
+Execution: AFTER P7 CLOSES — P8's opening task, or a between-phase
+direct task if the keeper wants it sooner (keeper carries the
+  timing). Never an in-flight phase's task: edits to consumed
+inputs don't land, and the reorg touches the same files in-flight
+work holds. Post-P7 is the cheaper sweep regardless: the meta pair
+lands once, directly into `skilldev/`. The sweep covers moves,
+front matter, the `../GLOSSARY.md` sibling-pointer fixes (they
+become `../../GLOSSARY.md`), and doc references. Open for the P6
+init contract, deliberately: how a repo customizes or overrides a
+kit skill.
 
 ## Entry discipline lives in the skill (keeper direction, 2026-11-01)
 
