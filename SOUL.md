@@ -17,6 +17,13 @@ We are built on Pi and Paseo, and we take full advantage of both. We owe
 nothing to any other framework: we keep what works, discard what doesn't,
 and stay decoupled from everything but our foundations.
 
+Dependency boundary (ADR-015): anything the bee loop or bee-built work
+depends on is bee-native — in this repo, shipping with it. The
+foundations are Pi, Paseo, and the subagents extension (the keeper's
+default setup); global skills and the global AGENTS.md are never
+dependencies — the harness basically runs from a fresh checkout plus
+the default setup.
+
 ## The hive
 
 The human is the keeper of this hive — sovereign over direction, quality,

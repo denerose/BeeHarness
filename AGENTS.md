@@ -146,6 +146,11 @@ We are designing the harness before building it. Right now:
 - The subagents extension may be extended but must never depend on us.
 - Superpowers skills are reference material during bootstrap: learn the
   patterns, write our own — never import or depend on them.
+- **Bee-native boundary (ADR-015):** the loop and bee-built work
+  depend only on bee-native instruments plus the foundations (Pi,
+  Paseo, subagents extension) — never on global skills or the global
+  AGENTS.md; those are the keeper's ephemeral personal kit. A fresh
+  checkout plus the default setup must basically run the harness.
 - **Agent-first CLI (ADR-014):** the `bee` CLI and every agent-facing
   surface follows the ten AXI principles (`AXI.md`) — and prefer
   scripts over skills for deterministic work: if two careful people

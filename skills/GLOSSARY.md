@@ -154,6 +154,11 @@ live as their own documents (`AXI.md`).
 - **determinism test** — if two careful people following the same
   rules would produce the same result, the work is a script; if they
   would differ, it needs an agent (ADR-014).
+- **bee-native** — lives in the BeeHarness repo and ships with it.
+  The loop and bee-built work may depend only on bee-native
+  instruments plus the foundations (Pi, Paseo, subagents extension;
+  ADR-015). Global skills and the global AGENTS.md are never
+  dependencies.
 
 - **dispatch** — a role sending work down to a subagent within its own
   mandate (orchestrator → implementer). Gated by the loop, not the

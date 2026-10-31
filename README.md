@@ -45,6 +45,7 @@ machine. See `SOUL.md`.
 | Paseo | human↔agent surface + dispatch — coupled, embraced |
 | subagents extension | we may extend it; it must never depend on us |
 | Superpowers | workflow inspiration only, during bootstrap — to be replaced by bee-native equivalents; zero new coupling |
+| Global skills & global AGENTS.md | the keeper's personal, ephemeral kit — never a harness dependency (ADR-015) |
 
 ## Documents
 
