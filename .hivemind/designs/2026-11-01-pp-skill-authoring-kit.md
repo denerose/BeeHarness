@@ -1,11 +1,13 @@
 # Skill authoring kit — design note
 
 **Date:** 2026-11-01
-**Status:** partial. Pieces marked **decided** carry keeper direction
-from the 2026-11-01 determinism session; pieces marked **proposed**
-are inputs to the superpowers-replacement session (keeper's list), not
-decided. Nothing is built — PO delivers through its workplan; the
-power-planner does not draft skills.
+**Status:** PARTIAL P7 input, by design. This note covers the
+meta-pair slice (skill-write/skill-review — decided, buildable) plus
+the reference inventory and propagation lists. It does NOT contain
+the superpowers + global skills replacement design — that is
+produced by the keeper's-list replacement session (capability
+inventory, core/meta tier sort, migration plan) and does not exist
+yet. Do not infer or invent it from this note.
 
 ## The problem
 
