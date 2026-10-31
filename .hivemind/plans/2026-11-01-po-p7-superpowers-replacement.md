@@ -100,7 +100,7 @@ order reads cleaner once the lifecycle skill exists)
 **Provides:** the design-quality gate; the review dimensions the
 phase's later builds are reviewed against
 
-- [ ] Draft `skills/bee-skill-review/SKILL.md` from the design note's
+- [x] Draft `skills/bee-skill-review/SKILL.md` from the design note's
   "Decided" section. Must carry: the dimensions (procedure soundness,
   scripts-first compliance, duplication, invariants — role-agnostic,
   ambient pickup, decision-record consistency phrased generically,
@@ -108,13 +108,13 @@ phase's later builds are reviewed against
   tiered findings (blocking / should-fix — self-contained wording,
   no ADR citations); when keeper sign-off applies (law-touching
   skills). Self-contained text.
-- [ ] Add GLOSSARY entry: `bee-skill-review` (same shape as Task 1's).
-- [ ] Cold-test via `bee-skill-tester`; fix findings.
-- [ ] Quality review: cold-dispatch (same pattern as Task 1) against
+- [x] Add GLOSSARY entry: `bee-skill-review` (same shape as Task 1's).
+- [x] Cold-test via `bee-skill-tester`; fix findings.
+- [x] Quality review: cold-dispatch (same pattern as Task 1) against
   the design note's bullet list; fix findings; record.
-- [ ] Verify: shipping-test grep (as Task 1); file exists.
-- [ ] Record: logbook `…-task2-{verify,review}-r1.md`.
-- [ ] Commit: `add bee-skill-review design-quality gate`
+- [x] Verify: shipping-test grep (as Task 1); file exists.
+- [x] Record: logbook `…-task2-{verify,review}-r1.md`.
+- [x] Commit: `add bee-skill-review design-quality gate`
 
 ## Task 3: bee-plan-review — the in-house plan reviewer (build 3)
 
