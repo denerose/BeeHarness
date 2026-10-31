@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, mkdirSync, chmodSync, existsSync, readFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, chmodSync, existsSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -72,6 +72,18 @@ test('--run executes the declared suite and passes', () => {
   const r = run(['--run', planPath], dir);
   assert.equal(r.code, 0);
   assert.match(r.out, /suite: pass/);
+});
+
+test('--extract keeps and reports the sandbox', () => {
+  const { planPath, dir } = fixture(
+    `${MACHINE}\n\n\`\`\`bash path=scripts/x.sh\necho hi\n\`\`\`\n`,
+    { 'exists.md': 'ok\n' });
+  const r = run(['--extract', planPath], dir);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /sandbox: \S/);
+  const m = r.out.match(/sandbox: (\S+)/);
+  assert.ok(existsSync(join(m[1], 'scripts', 'x.sh')), 'tagged block extracted into kept sandbox');
+  rmSync(m[1], { recursive: true, force: true });
 });
 
 test('usage errors exit 2', () => {

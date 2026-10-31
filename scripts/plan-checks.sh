@@ -9,10 +9,11 @@
 set -u
 PROG=$(basename "$0")
 
-usage() { echo "usage: $PROG [--run] <plan.md>" >&2; exit 2; }
+usage() { echo "usage: $PROG [--run | --extract] <plan.md>" >&2; exit 2; }
 
-RUN=0
-[[ "${1:-}" == "--run" ]] && { RUN=1; shift; }
+MODE=check
+[[ "${1:-}" == "--run" ]] && { MODE=run; shift; }
+[[ "${1:-}" == "--extract" ]] && { MODE=extract; shift; }
 [[ $# -eq 1 ]] || usage
 PLAN=$1
 [[ -f $PLAN ]] || { echo "error: no plan file: $PLAN" >&2; exit 2; }
@@ -105,7 +106,9 @@ echo "blocks: $n_tagged/$n_expected tagged, $n_untagged untagged"
 [[ $n_blocks -ge $n_expected ]] || note "finding blocks: extraction mismatch — $n_expected fenced block(s) in plan, $n_blocks extracted"
 
 # --run: execute the plan's declared suite in the sandbox.
-if [[ $RUN -eq 1 ]]; then
+# --extract: keep the sandbox, print its path (the reviewer runs
+# off-suite blocks there); cleanup is the caller's.
+if [[ $MODE == run ]]; then
   suite=$(grep -oE '^suite: .*' "$PLAN" | head -1 | cut -d' ' -f2-)
   if [[ -n $suite ]]; then
     echo "suite: $suite"
@@ -117,8 +120,10 @@ if [[ $RUN -eq 1 ]]; then
   else
     note "finding suite: no suite: line in machine block (--run given)"
   fi
+elif [[ $MODE == extract ]]; then
+  echo "sandbox: $SANDBOX"
 fi
 
 [[ $fail -eq 0 ]] && echo "checks: clean" || echo "checks: findings"
-rm -rf "$SANDBOX"
+[[ $MODE != extract ]] && rm -rf "$SANDBOX"
 exit $fail

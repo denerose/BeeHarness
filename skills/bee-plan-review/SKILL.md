@@ -20,8 +20,10 @@ The gate reads two plan conventions — a plan without them fails
 mechanically before judgment starts:
 
 - **Machine header** — the plan's first `<!-- machine … -->` block
-  carries phase, validation level, state-source, the file targets
-  (each marked create or modify), and the suite command.
+  carries phase, validation level, state-source (which surface
+  holds the live task state — usually the plan's own checkboxes),
+  the file targets (each marked create or modify), and the suite
+  command.
 - **Path-tagged verbatim blocks** — every fenced code block whose
   content is meant to land in a file carries a `path=` infostring
   naming that file; the core extracts tagged blocks into a sandbox,
@@ -30,19 +32,25 @@ mechanically before judgment starts:
 
 ## The deterministic core: run it first
 
-Run `scripts/plan-checks.sh` (repo root) before reading the plan
+Run this repo's `scripts/plan-checks.sh` before reading the plan
 for judgment — mechanical findings feed the judgment, they never
-wait behind it. Two modes:
+wait behind it. If the script is missing or errors (any exit other
+than 0, 1, or 2), return the dispatch — a broken core is not a
+finding, it is a stopped review. Two modes:
 
 - `plan-checks.sh <plan.md>` — checks the targets against the repo
   (create targets reachable, modify targets existing), counts the
-  task boxes, scans the plan's modify-targets for ephemeral markers
-  ("currently", "as of today", and kin), and verifies every
-  verbatim block carries a path tag.
+  task boxes, scans the plan's modify-targets for ephemeral prose
+  markers (the marker list lives in the script — the script, not
+  this text, is its source of truth), and verifies every verbatim
+  block carries a path tag.
 - `plan-checks.sh --run <plan.md>` — also runs the plan's declared
   suite command in a throwaway sandbox built from the extracted
   blocks. The script writes only to a temporary directory; nothing
-  live is touched.
+  live is touched. For verbatim blocks the suite does not reach:
+  `plan-checks.sh --extract <plan.md>` builds the sandbox, keeps
+  it, and prints its path — run the block there the way its
+  `path=` says it runs; clean the directory up when done.
 
 Counts print always; findings print with a `finding` prefix; exit 0
 is clean, 1 findings, 2 usage. Every script finding appears in the
@@ -73,7 +81,8 @@ the file and line, and a concrete suggested fix.
   the repo hold: commands exist and behave as assumed, versions and
   flags match, the environment provides what the plan presumes.
   Verify against reality — run the command, read the docs — never
-  against recall.
+  against recall. A wrong assumption misleads exactly like a wrong
+  fact; same tier.
 - **Sandbox-run** — the plan's verbatim code runs before anyone
   implements it. `--run` covers the declared suite; verbatim blocks
   the suite does not reach get run in the sandbox too. A block that
@@ -89,7 +98,9 @@ the file and line, and a concrete suggested fix.
   deterministic step to a script (GLOSSARY: determinism test) and
   names the judgment each agent step keeps; agent-facing output it
   designs follows `docs/AXI.md` — structured output, counts first,
-  definitive empty states, structured errors.
+  definitive empty states, structured errors. An unassigned
+  deterministic step is should-fix; one that misleads (the prose
+  claims script-ownership the plan does not deliver) blocks.
 - **No-globals boundary** — the work the plan directs depends only
   on bee-native instruments plus the foundations (GLOSSARY:
   bee-native); no step leans on a global skill or a global rules
