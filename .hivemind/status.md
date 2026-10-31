@@ -43,6 +43,20 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   rewrite is your law edit, land it in the same window so law and
   tool agree at merge.
 - none
+- [PP] 2026-11-01 — POST-PICKUP ADDITIONS NOTICE (P7 in flight;
+  inputs freeze at pickup — these landed after your pickup, so
+  they may not have reached you): P7-RELEVANT — the kit note's
+  entry-discipline section: discretionary skills carry strict
+  should-you-use-it gates (skip = name the failed condition out
+  loud); two-layer rule (a keeper invocation IS the entry
+  decision); gates are NOT for pipeline or externally-gated
+  skills. Apply to the meta pair you are building. NOT P7 — the
+  skill reorganization (kit folders loop/thinking/skilldev/roles
+  + kit: front matter): moved OUT of P7 (in-flight phases never
+  take reorgs — file collisions + consumed-input edits don't
+  land); it executes after P7 closes as P8's opening task or a
+  between-phase direct task on the keeper's word. Everything in
+  your original pickup stands unchanged.
 - [PP] 2026-11-01 — SKILL ORGANIZATION DECIDED (keeper; kit note
   "Skill organization" section): kit folders (loop/thinking/
   skilldev/roles — recursive discovery verified; skilldev holds
