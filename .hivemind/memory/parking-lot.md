@@ -165,6 +165,22 @@ recommendations beyond what the keeper already directed).
   whether they ship or stay harness-build tools — unpark when the
   keeper brings it back (natural moment: after P7's skill-building
   practice).
+- **PL-PP-011 — mistake-fixing guidance or skill, role-specific** —
+  keeper direction (2026-11-01, from the P7 post-pickup incident):
+  agents will make mistakes; plan a tool or skill for guidance on
+  FIXING one — with ROLE-SPECIFIC variants, because mistake scope
+  and impact differ radically (a task-orc mistake is worktree-
+  scoped and resets cheaply; an orchestrator mistake may span a
+  phase and consumed inputs; a planner mistake is law/records that
+  OTHER ROLES MAY HAVE CONSUMED — recovery must verify consumer
+  state, never assume it, and reconcile idempotently). Open for
+  the unpark session, filed open: form (one skill with role
+  sections vs per-role guidance); the universal spine (disclose →
+  assess blast radius via git/status/consumer check → fix the
+  record → reconcile consumers → log the lesson); hooks into the
+  loop or verify; relation to safety lines and the two-size resets
+  — unpark when the keeper wants the session or with the
+  roles-writing guidance work.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any

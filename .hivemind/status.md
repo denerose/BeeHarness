@@ -44,8 +44,9 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   tool agree at merge.
 - none
 - [PP] 2026-11-01 — POST-PICKUP ADDITIONS NOTICE (P7 in flight;
-  inputs freeze at pickup — these landed after your pickup, so
-  they may not have reached you): P7-RELEVANT — the kit note's
+  inputs freeze at pickup — these landed after your pickup; DO NOT
+  ASSUME either way whether you saw them — some, all, or none may
+  have reached you): P7-RELEVANT — the kit note's
   entry-discipline section: discretionary skills carry strict
   should-you-use-it gates (skip = name the failed condition out
   loud); two-layer rule (a keeper invocation IS the entry
@@ -55,11 +56,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   + kit: front matter): moved OUT of P7 (in-flight phases never
   take reorgs — file collisions + consumed-input edits don't
   land). NO INTERRUPTION: P8 is now THE RECTIFICATION PHASE — it
-  runs after P7 closes and absorbs all post-pickup additions in
-  one sweep (entry-discipline application to the meta pair, the
-  reorg, then ship-tier cleanup + template glossary). Run P7 on
-  your original pickup exactly as planned; P8 collects the rest.
-  Everything in your original pickup stands unchanged.
+  runs after P7 closes and VERIFIES what actually landed in P7's
+  output (state-unknown until checked), then applies whatever is
+  missing idempotently: entry-discipline application to the meta
+  pair, the reorg, then ship-tier cleanup + template glossary.
+  Your original pickup stands; anything from the later additions
+  you already incorporated also stands — P8 reconciles, it does
+  not redo.
 - [PP] 2026-11-01 — SKILL ORGANIZATION DECIDED (keeper; kit note
   "Skill organization" section): kit folders (loop/thinking/
   skilldev/roles — recursive discovery verified; skilldev holds
