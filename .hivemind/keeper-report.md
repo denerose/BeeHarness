@@ -23,7 +23,12 @@ resolves them; the keeper may edit freely or just say the word)
   BeeHarness intends to replace most global skills; the global
   plan-reviewer may be deleted — pull it in-house as a bee-native
   copy when that happens). Related parked design: PL-PP-003 (CLI
-  help surfaces + guidance injection + session rules).
+  help surfaces + guidance injection + session rules). Session
+  inputs ready (2026-11-01):
+  /home/saphron/BeeHarness/.hivemind/designs/2026-11-01-pp-skill-authoring-kit.md
+  — first PO builds are the bee-skill-write + bee-skill-review
+  pair; two-tier kit (core ships, meta dormant) proposed, pending
+  this session.
 
 ## Needs the keeper
 
