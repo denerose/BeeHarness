@@ -80,8 +80,10 @@ Still open for the P4 session:
 Evidence-first correction to the queued shape: the role file stays
 MINIMAL — the plan is the real interface (a cold, self-contained
 plan did the whole job; the dispatched agent needed nothing beyond
-plan + minimal role file + GLOSSARY). Codification is surgical, and
-the real investment goes to plan-quality standards, not role prose.
+plan + minimal role file + GLOSSARY). Keeper direction: keep
+everything minimal until proven useful. Codification is surgical,
+and the real investment goes to plan-quality standards, not role
+prose.
 PP recommendations (pending the keeper's word; raw material: the
 calibration index and its dispatch record):
 
@@ -93,11 +95,17 @@ calibration index and its dispatch record):
   the boundary test holds on that reading.
 - **Mark provisional:** stop-and-return never fired in contact —
   the one-hop escalation design is untested-in-use.
-- **Nested reviews — split by level:** task-level reviews inside
-  the dispatch may fall back to a cold scout, disclosed (the
-  loop-runner's merge review backstops them); merge- and phase-level
-  reviews are dispatched by the loop-runner — fresh, worker-typed.
-  Codifies the de facto P3 arrangement.
+- **Nested reviews — split by level.** task-orc is exactly a
+  subagent with a role file running bee-loop (no special machinery);
+  the depth issue is one level down — bee-loop's review stage itself
+  dispatches a cold reviewer, and a subagent-dispatching-a-subagent
+  found no worker-type agent on its surface (P3 observation), so the
+  review fell back to a cold scout analysis filed by task-orc
+  (disclosed). Split: task-level reviews inside the dispatch may
+  use that fallback, disclosed (the loop-runner's merge review
+  backstops them); merge- and phase-level reviews are dispatched by
+  the loop-runner at depth 1, where worker types exist — fresh,
+  worker-typed. Codifies the de facto P3 arrangement.
 - **Brief template:** gains one line stating what the dispatcher
   does while the dispatch runs (disciplines against peeking at the
   worktree mid-flight).
