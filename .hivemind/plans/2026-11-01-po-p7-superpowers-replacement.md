@@ -17,18 +17,18 @@ phase: P7
 validation: phase
 state-source: checkboxes below (script-owned when bee task lands)
 targets:
-  - skills/authoring/bee-skill-write/SKILL.md (create)
-  - skills/authoring/bee-skill-review/SKILL.md (create)
+  - skills/skilldev/bee-skill-write/SKILL.md (create)
+  - skills/skilldev/bee-skill-review/SKILL.md (create)
   - skills/loop/bee-plan-review/SKILL.md (create)
   - skills/loop/bee-handoff/SKILL.md (create)
   - skills/loop/bee-pickup-handoff/SKILL.md (create)
   - scripts/plan-checks.sh (create)
   - tests/plan-checks.test.mjs (create)
-  - skills/bee-loop/SKILL.md (modify → moves to skills/loop/)
-  - skills/bee-review/SKILL.md (modify → moves to skills/loop/)
-  - skills/bee-verify/SKILL.md (modify → moves to skills/loop/)
-  - skills/bee-plan/SKILL.md (modify → moves to skills/loop/)
-  - skills/bee-plan/assets/plan-template.md (modify → moves with bee-plan)
+  - skills/bee-loop/SKILL.md (modify)
+  - skills/bee-review/SKILL.md (modify)
+  - skills/bee-verify/SKILL.md (modify)
+  - skills/bee-plan/SKILL.md (modify)
+  - skills/bee-plan/assets/plan-template.md (modify)
   - skills/GLOSSARY.md (modify)
   - .hivemind/phases/BeeHarness.md (modify)
 suite: node --test tests/*.test.mjs
@@ -56,7 +56,7 @@ suite: node --test tests/*.test.mjs
 - Every task's finished-test includes its reference sweep — the build
   is not finished until no stale reference remains (grep shown).
 
-## Task 0: kit-folder organization (opening sweep — design addendum 2026-11-01)
+## Task 0: kit-folder organization (opening sweep — design addendum 2026-11-01, as amended by e71b34d)
 
 **Files:** moves every skill into its kit folder; `kit:` front-matter
 on every SKILL.md; pointer + reference fixes. GLOSSARY.md stays at
@@ -68,13 +68,19 @@ layout; one sweep moves everything)
 
 - [ ] Move skills per the design note's "Skill organization"
   section: `skills/loop/` ← bee-loop, bee-plan, bee-verify,
-  bee-review, bee-plan-review; `skills/session/` ← bee-brainstorm,
-  bee-hindsight, bee-argue, bee-skill-tester;
-  `skills/authoring/` ← bee-skill-write, bee-skill-review. Assets
-  move with their skills. `skills/roles/` lands when its first
-  skill does (no empty folders). Use `git mv` so history follows.
+  bee-review, bee-plan-review (the plan gate is a loop tool — the
+  design's loop list predates its build; placement is the
+  orchestrator's call, recorded here); `skills/session/` ←
+  bee-brainstorm, bee-hindsight, bee-argue; `skills/skilldev/` ←
+  bee-skill-write, bee-skill-review, bee-skill-tester (the tools
+  that work ON the skill kit). Assets move with their skills.
+  `skills/roles/` lands when its first skill does (no empty
+  folders). Use `git mv` so history follows.
 - [ ] Add `kit:` front matter to every SKILL.md (values: loop,
-  session, authoring — the folder it lives in).
+  session, skilldev — the folder it lives in).
+- [ ] Namespace rule lands in GLOSSARY (vocabulary entry): the
+  `bee-` prefix marks the shipped kit; ad-hoc and repo-local
+  skills never take it.
 - [ ] Fix glossary pointers in moved skills: `../GLOSSARY.md` →
   `../../GLOSSARY.md` (every moved SKILL.md + any asset that
   references it).
@@ -82,12 +88,11 @@ layout; one sweep moves everything)
   entries, sibling skills, AGENTS.md path mentions EXCEPT the
   plan-gate rule — that law edit is PP's, already coordinated).
   Expected end state: `grep -rn "skills/bee-" README.md AGENTS.md
-  docs/ skills/GLOSSARY.md` shows only skills/GLOSSARY.md internal
-  sibling mentions, no stale flat paths.
-- [ ] Verify: `node --test tests/*.test.mjs` green (suites don't
-  touch skills paths, but run anyway); pi discovery is recursive
-  (verified in the design note) — spot-check by listing kit
-  folders; every SKILL.md carries `kit:`.
+  docs/ skills/GLOSSARY.md` shows no stale flat paths.
+- [ ] Verify: `node --test tests/*.test.mjs` green; pi discovery
+  is recursive (verified in the design note) — spot-check by
+  listing kit folders; every SKILL.md carries `kit:`; no skill
+  directory remains at `skills/` root beside GLOSSARY.md.
 - [ ] Commit: `organize skills into kit folders with front matter`
 
 ## Task 1: bee-skill-write (build 1 of the meta pair)
@@ -444,8 +449,8 @@ test('usage errors exit 2', () => {
 
 ## Task 4: bee-native handoff pair
 
-**Files:** create `skills/bee-handoff/SKILL.md`;
-create `skills/bee-pickup-handoff/SKILL.md`; modify
+**Files:** create `skills/loop/bee-handoff/SKILL.md`;
+create `skills/loop/bee-pickup-handoff/SKILL.md`; modify
 `skills/GLOSSARY.md` (handoff entry sweep + pair entries)
 **Depends on:** nothing structural (after Task 3 keeps one sweep
 window for the PP law edits)
@@ -479,11 +484,11 @@ rule re-pointed (PP law edit, coordinated)
 
 ## Task 5: loop-skill folds + determinism-law lines
 
-**Files:** modify `skills/bee-loop/SKILL.md`;
-modify `skills/bee-review/SKILL.md`;
-modify `skills/bee-verify/SKILL.md`;
-modify `skills/bee-plan/SKILL.md`;
-modify `skills/bee-plan/assets/plan-template.md`
+**Files:** modify `skills/loop/bee-loop/SKILL.md`;
+modify `skills/loop/bee-review/SKILL.md`;
+modify `skills/loop/bee-verify/SKILL.md`;
+modify `skills/loop/bee-plan/SKILL.md`;
+modify `skills/loop/bee-plan/assets/plan-template.md`
 **Depends on:** Task 3 (sweep already touched bee-plan; this task
 adds content, not references)
 **Provides:** review-etiquette and debug guidance folded bee-native;
@@ -521,7 +526,7 @@ fold-order note P4's plan must carry
   pattern ships as task-orc/dispatch documentation, not a skill):
   verify the shipped homes carry the pattern complete —
   `roles/task-orc.md` (dispatch-brief section + boundary rules),
-  `skills/bee-loop/assets/dispatch-brief-template.md`, and the
+  `skills/loop/bee-loop/assets/dispatch-brief-template.md`, and the
   GLOSSARY dispatch entries (`dispatch`, `dispatch brief`, safety
   lines). Fill any gap so a cold dispatcher can run the pattern from
   these homes alone (self-contained text). ADR-citation stripping
@@ -585,7 +590,8 @@ all bee-native)
 - Kit conformance: every SKILL.md under `skills/` lives in a kit
   folder, carries `kit:` front matter matching its folder; only
   `GLOSSARY.md` sits at `skills/` root; moved skills' glossary
-  pointers read `../../GLOSSARY.md`.
+  pointers read `../../GLOSSARY.md`; no non-kit skill carries the
+  `bee-` prefix (namespace rule).
 - Bee-native boundary: AGENTS.md gate + handoff rules name
   bee-native instruments; law and tool agree.
 - Keeper has signed off on the pair + reviewer texts; P8 remains
