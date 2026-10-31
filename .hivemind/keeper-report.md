@@ -31,6 +31,13 @@ resolves them; the keeper may edit freely or just say the word)
 
 ## Changed since last report
 
+- **P4 inbox design note written** (keeper blessed the shape):
+  one waiting-state home, views for report/status, `bee task` CLI.
+  Interim stance recorded: the notice board is the interim, no
+  extensions.
+- **Handoff refresh** — power-planner context renewed; wake prompt
+  issued to the keeper. Session renamed for sleep.
+
 - **Git topology accepted** (keeper's card): ADR-012 — main =
   governance + surfaces; phase branch = the orchestrator's spine in a
   worktree; task worktrees per dispatch; two-size resets. Closes P3's
