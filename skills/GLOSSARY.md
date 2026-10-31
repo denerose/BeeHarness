@@ -2,15 +2,22 @@
 
 Short list of terms the bee skills use. Defined here once; skills link
 here instead of re-explaining. If a word is not in this file, do not use
-it as a term of art.
+it as a term of art. Vocabulary only — the writing standard for behavior
+documents lives in `WRITING-STANDARD.md` (repo root); other standards
+live as their own documents (`AXI.md`).
 
 - **keeper** — the human owner. Final authority on every decision that
   matters; the only one who unparks parking-lot items or amends design
   docs.
-- **role** — a named mandate for an agent session (authority, working
-  style, entry conditions, continuity), defined in `roles/` in the
-  BeeHarness plugin. Assumed by direction from the keeper or a
-  handoff — never inferred from the work's shape.
+- **role** — a named agent spec in `roles/`: mandate plus attributes
+  (entry, escalation, workspace, lifespan, continuity — ADR-010).
+  Assumed by direction from the keeper or a handoff — never inferred
+  from the work's shape. First-class roles (power-planner,
+  project-orchestrator) take keeper direction and keep session files;
+  dispatched roles (task-orc, reviewer, implementer) are spawned by
+  other roles, escalate upward through their dispatcher, and remember
+  via their work's logbook unless their file overrides. Not every role
+  is first-class.
 - **skill** — a procedure: how a class of work gets done. Roles are
   agents (the noun); skills are instruments roles lean on (the verb).
   A skill never belongs to a role — bee-brainstorm serves the keeper's
@@ -19,14 +26,6 @@ it as a term of art.
   mandates (adjustable defaults), never in the skill itself. A role's
   kit may grow (task-orc: bee-loop first among equals); skills stay
   role-agnostic.
-- **role** — a named agent spec in `roles/`: mandate plus attributes
-  (entry, escalation, workspace, lifespan, continuity — ADR-010).
-  First-class roles (power-planner, project-orchestrator) take keeper
-  direction and keep session files; dispatched roles (task-orc,
-  reviewer, implementer — minted in P3) are spawned by other roles,
-  escalate upward through their dispatcher, and remember via their
-  work's logbook unless their file overrides. Not every role is
-  first-class.
 - **power-planner** — the shaping role: discussion, architecture,
   decisions, design docs; co-creates design docs with the keeper. See
   `roles/power-planner.md`.
@@ -145,49 +144,16 @@ it as a term of art.
   (3) if a live file was touched by accident — `git restore` it
   immediately, verify porcelain clean, and disclose it in the report.
 
-- **TOON** — token-oriented notation: a token-lean, line-oriented
-  format for structured data exchanged with agents. In this harness it
-  is both the storage format for agent-primary stores and the emission
-  format for `bee`'s agent-facing output (ADR-014). Humans get
-  rendered views, not raw TOON.
-- **AXI** — the ten agent-first CLI principles (axi.md; the list lives
-  in `AXI.md` at the repo root): token-efficient output, minimal
-  schemas, truncation with `--full`, pre-computed aggregates,
-  definitive empty states, structured errors and idempotent mutations,
-  ambient context first, content-first bare calls, contextual
-  disclosure, consistent help. Binding on every `bee` command
-  (ADR-014).
+- **TOON** — token-oriented notation: the token-lean, line-oriented
+  format for structured data exchanged with agents; the storage and
+  emission format for agent-facing surfaces (ADR-014). Humans get
+  rendered views.
+- **AXI** — the ten agent-first CLI principles (axi.md); the binding
+  list lives in `AXI.md` at the repo root. Every `bee` command
+  follows them (ADR-014).
 - **determinism test** — if two careful people following the same
   rules would produce the same result, the work is a script; if they
-  would differ, it needs an agent (ADR-014). Scripts own state,
-  structure, checks, and derived views; agents own drafting, judgment,
-  dispatch, and conversation.
-
-## Writing standard
-
-How behavior documents are written — skills, rules, role files,
-GLOSSARY entries, templates. (Records — ADRs, logbook, session logs,
-status — carry specifics; that is their job.)
-
-- **Plain declaratives.** Say the thing; define or link any term of
-  art; no invented compounds, no unnamed rules, no filler.
-- **Shared vocabulary only.** Jargon must be shared with the keeper —
-  their shorthand is fine in moderation (mirror it); agents never
-  coin phrases the keeper wouldn't understand. The plain version of
-  any technique comes first.
-- **Generic examples only.** Examples in behavior documents use
-  placeholders and generic actors (`option A`, `a dispatched worker`,
-  `<repo-root>/…`) — never specifics of current tasks, dated
-  stories, or work narratives. Future readers must not inherit this
-  week's context. Law citations (ADR numbers) and one-line
-  attribution are fine; task narratives are not.
-- **Self-contained asks.** Anything asking the keeper to decide
-  carries its own context summary — written for a reader days away
-  from the conversation that produced it.
-- **Skills wrap judgment around deterministic cores.** Any step two
-  careful executors would run identically is written as a script the
-  skill calls, not as prose steps — and every skill names the judgment
-  it keeps, so the line holds in both directions (ADR-014).
+  would differ, it needs an agent (ADR-014).
 
 - **dispatch** — a role sending work down to a subagent within its own
   mandate (orchestrator → implementer). Gated by the loop, not the

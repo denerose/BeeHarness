@@ -33,7 +33,7 @@ author can no longer see. Read `../GLOSSARY.md` (the shared bee glossary, siblin
    how would you know when NOT to use this skill. Add a fifth check:
    quote any example in the skill that names real tasks, dates, or
    artifacts of current work — behavior documents stay generic
-   (GLOSSARY: writing standard).
+   (WRITING-STANDARD.md).
 3. Dispatch in parallel when testing several skills.
 4. **Synthesize across skills before fixing.** Shared findings (a term
    nobody could find, a record with no home) matter more than any

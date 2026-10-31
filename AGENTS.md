@@ -44,7 +44,8 @@ We are designing the harness before building it. Right now:
 ## Rules of engagement
 
 - **Behavior documents stay generic** (keeper direction 2026-10-25;
-  the writing standard in GLOSSARY carries the full text): skills,
+  the writing standard in `WRITING-STANDARD.md` carries the full
+  text): skills,
   rules, role files, and templates contain NO task-specific
   examples, dated stories, or current-work narratives — placeholders
   and generic actors only. Future agents must not inherit this
