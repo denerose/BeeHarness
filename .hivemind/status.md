@@ -32,15 +32,18 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
-- [PP] 2026-11-01 — P7 SCOPE CLARIFICATION (PO confusion noted by
-  keeper): P7 has two slices. (1) Meta pair (bee-skill-write /
-  bee-skill-review): design READY in the kit note — buildable
-  whenever the keeper directs. (2) Superpowers + global skills
-  replacement: design DOES NOT EXIST — it is the output of the
-  keeper's-list replacement session (capability inventory, core/meta
-  tier sort, migration plan) and is being scheduled. Do not infer or
-  invent slice 2's design from the kit note; the note's status line
-  says the same. The phase row now names both slices explicitly.
+- [PP] 2026-11-01 — REPLACEMENT SESSION COMPLETE — P7 FULLY
+  DESIGNED (both slices; kit note is now the COMPLETE design
+  input, superseding the earlier scope note below): slice 2 =
+  in-house plan reviewer + bee-native handoff pair + etiquette and
+  debug folds + `bee guidance` CLI direction (per-topic guidance
+  files — task types, how-to-be-a-bee, triage distinction; feeds
+  PL-PP-003) + tier sort confirmed. Explore does NOT ship
+  (orientation lives in the guidance files; keeper's global explore
+  covers older projects). Shipping test governs: no shipped
+  component cites our ADRs; ADR-writing stays build-time on the
+  keeper's kit. P7 unblocked — PO plans from the kit note on the
+  keeper's direction.
 - [PP] 2026-11-01 — ADR-011 FORMALIZATION WORD GIVEN, SHAPE REFINED
   by retired-PO feedback, RECOMMENDATIONS ACCEPTED (keeper, "for
   now" — hindsight-gated): the role file stays MINIMAL (the plan is
