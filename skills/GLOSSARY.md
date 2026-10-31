@@ -159,11 +159,22 @@ their own documents (`docs/AXI.md`).
   without the keeper relaying anything (validated 2026-10-25,
   keeper-valued). The design doc is the relay artifact. Not a
   handoff.
-- **handoff** — same role, fresh context: the `handoff`/`pickup-handoff`
-  skill pair and the `.pi/handoff-<role>.md` files they write. Ends
-  with a memory sync (session state current) and a **wake prompt** the
-  keeper pastes into the new context — but no parking-lot sweep: that
-  is a work-close ritual, never part of a refresh.
+- **handoff** — same role, fresh context: the
+  `bee-handoff`/`bee-pickup-handoff` skill pair and the
+  `.pi/handoff-<role>.md` files they write. Ends with a memory sync
+  (session state current) and a **wake prompt** the keeper pastes into
+  the new context — but no parking-lot sweep: that is a work-close
+  ritual, never part of a refresh.
+- **bee-handoff / bee-pickup-handoff** — the handoff pair, sibling
+  skills in the loop kit folder. bee-handoff writes a role's handoff
+  file — working mode first, then task state, boot sequence (what the
+  successor reads, in order), environment notes, and the wake prompt
+  as a fenced block — and ends with a memory sync. bee-pickup-handoff
+  resumes from it: read whole, follow the boot sequence, re-read law
+  files changed since it was written, verify against the repo, then
+  announce the resumed role and first move in the first reply — never
+  re-interviewing the keeper. The pair's concept and rules live in
+  the `handoff` entry; the mid-session counterpart is thread-close.
 - **phase branch** — `phase/<n>`: the project-orchestrator's
   integration spine (ADR-012). PO works it in a persistent worktree;
   task branches merge here; phase end is a tiered review into main.
@@ -179,6 +190,7 @@ their own documents (`docs/AXI.md`).
   The test: if a sentence can go stale, it doesn't belong. PP and PO
   may amend; changes land only on the keeper's sign-off (ADR-007
   amendment 1).
+- **dispatch brief** — the contract a dispatcher sends a dispatched agent: plan path (absolute), phase id, validation level, escalation envelope (decide-alone vs return), workspace (worktree path + branch), and the pass-back shape (a done-ness digest — paths, never contents). Template: `skills/loop/bee-loop/assets/dispatch-brief-template.md`. The safety lines are their own entry, below.
 - **dispatch brief, safety lines** — three standing lines every
   brief for a write-capable agent carries (born from a real near-miss:
   a dispatched reviewer ran a write-by-default command without flags
