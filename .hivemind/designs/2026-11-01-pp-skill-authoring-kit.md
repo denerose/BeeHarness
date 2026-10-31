@@ -1,13 +1,11 @@
 # Skill authoring kit — design note
 
 **Date:** 2026-11-01
-**Status:** PARTIAL P7 input, by design. This note covers the
-meta-pair slice (skill-write/skill-review — decided, buildable) plus
-the reference inventory and propagation lists. It does NOT contain
-the superpowers + global skills replacement design — that is
-produced by the keeper's-list replacement session (capability
-inventory, core/meta tier sort, migration plan) and does not exist
-yet. Do not infer or invent it from this note.
+**Status:** COMPLETE P7 design input (replacement session ran
+2026-11-01). This note carries BOTH slices: the meta pair (decided,
+buildable) and the superpowers/global replacement design (session
+decisions below — builds, folds, guidance system, drops, tier sort).
+PO plans P7 from this note.
 
 ## The problem
 
@@ -153,7 +151,13 @@ guidance rides here too. `--help` stays; users are encouraged to
 seek guidance on available topics. Feeds PL-PP-003 (its likely
 design home) and the P4/P6 CLI lanes.
 
-Under discussion: explore (item 4).
+Under discussion: explore (item 4). RESOLVED: explore does NOT ship
+— most keeper work is fresh projects; repo-orientation content
+lives in the per-stack guidance files (TypeScript, frontend,
+backend, dotnet…); the keeper's own global explore covers occasional
+older-project injections (keeper's kit, not the harness's). ALL
+numbered session items resolved; slice 2's design is complete in
+this note.
 
 ## The shipping test (keeper, 2026-11-01 — governing rule for slice 2)
 
