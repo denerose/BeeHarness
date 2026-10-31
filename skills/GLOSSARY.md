@@ -97,6 +97,17 @@ their own documents (`docs/AXI.md`).
   comprehension testing is bee-skill-tester's (same folder);
   design-quality review is a separate gate. Style law for skill text:
   `docs/WRITING-STANDARD.md`.
+- **bee-skill-review** — the design-quality gate for skill documents:
+  reviews a drafted or revised skill on five dimensions — procedure
+  soundness, scripts-first compliance, duplication, the invariants
+  (role-agnostic, ambient pickup, consistency with recorded
+  decisions), scope. Cold-dispatched (the reviewer never wrote the
+  skill); reports tiered findings — blocking, or should-fix where a
+  waiver needs a one-line recorded reason — and never fixes. The
+  review step of bee-skill-write's draft → cold-test → review →
+  sign-off lifecycle (same folder; comprehension testing is
+  bee-skill-tester's); states whether the draft touches law, which
+  decides if keeper sign-off applies.
 - **Role trailer** — a `Role: <role>` line in commit messages and
   record/report headers saying which role produced the work (ADR-007).
 - **escalation envelope** — every ask_user card states: role, context
