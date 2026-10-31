@@ -32,6 +32,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
+- [PP] 2026-11-01 — KEEPER-DIRECTED RENAME: `scripts/task.sh` →
+  `scripts/worktree.sh` — "task" is reserved for the P4 work-item
+  state machine (`bee task`); the helper manages the task-tier
+  worktree lifecycle. Script + test suite + living references
+  update together in your next touch of the tool (records keep the
+  old name as history). Endgame: folds into the CLI as `bee
+  worktree` at P6 (row updated).
 - [PP] 2026-11-01 — REPLACEMENT SESSION COMPLETE — P7 FULLY
   DESIGNED (both slices; kit note is now the COMPLETE design
   input, superseding the earlier scope note below): slice 2 =
