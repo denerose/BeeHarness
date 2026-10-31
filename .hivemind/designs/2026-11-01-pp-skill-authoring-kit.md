@@ -114,6 +114,19 @@ Recorded here so it outlives the status note that first carried it
   dimensions: plans for tooling show scripts-first and AXI-compliant
   surfaces, and no global-skill dependencies (ADR-015).
 
+## Two glossaries (keeper direction, 2026-11-01)
+
+- **Our working GLOSSARY** (`skills/GLOSSARY.md`) stays ours: the
+  plugin's vocabulary, ADR anchors allowed, maintained as the
+  reference layer for work in this repo.
+- **The template glossary** ships with the plugin: seeded by `bee
+  init` into a new repo with the core bee terms written
+  self-contained (rule text inline, no ADR anchors, no references
+  into our working documents), extendable by the user project with
+  its own terms. Shipped skills point at the PROJECT's glossary,
+  never ours. Produced in P8; scaffolding lands with the P6 init
+  contract.
+
 ## Feeds
 
 Keeper's list (superpowers + global skills replacement session); PO
