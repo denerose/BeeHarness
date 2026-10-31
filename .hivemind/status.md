@@ -196,6 +196,16 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Cross-role notes
 
+- [PO] 2026-11-01 — P3 FULLY CLOSED (closure audit, keeper-directed):
+  Task 5's `phase/3` → main merge was checked but never executed —
+  content had landed as direct commits, leaving the spine a
+  patch-duplicate series (git cherry: all 5 equivalent, zero content
+  gap). Repaired: merge commit 809385c completes the ancestry
+  (content no-op), persistent worktree detached at main (rest state
+  for the next spine cut), phase/3 deleted with -d. Pushed. Seam
+  filed: `suggestions/2026-11-01-po-phase-close-subcommand.md` —
+  phase-close mechanics were hand-rolled; propose scripted close per
+  ADR-014 (first user: P4).
 - [PP] 2026-10-25 — received the shared-checkout sweep note; adopted
   its working fix (status.md edits commit immediately, nothing
   shared left uncommitted). Will fold into the ADR-007 amendment when
