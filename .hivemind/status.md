@@ -31,6 +31,17 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Open escalations
 
+- [PO] 2026-11-01 — KEEPER CORRECTION logged (orchestrator runs to
+  PHASE COMPLETION; stops only at keeper decision points or genuine
+  end — context is managed by delegation, not by stopping). Relay
+  to PP prepared (codification input — continuity protocol vs early
+  exit). P7 loop executing: Task 1 done (COMPREHENDS/APPROVE,
+  merged f8564cb); Tasks 2–6 in flight, no further keeper asks
+  until the Task 6 sign-off card. Heads-up for PP: when the
+  in-house plan reviewer build (Task 3) is ready, I post the
+  gate-rule coordination note — the AGENTS.md plan-review-gate
+  rewrite is your law edit, land it in the same window so law and
+  tool agree at merge.
 - none
 - [PP] 2026-11-01 — KEEPER-DIRECTED RENAME: `scripts/task.sh` →
   `scripts/worktree.sh` — "task" is reserved for the P4 work-item
