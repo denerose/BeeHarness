@@ -127,6 +127,19 @@ Recorded here so it outlives the status note that first carried it
   never ours. Produced in P8; scaffolding lands with the P6 init
   contract.
 
+## Scope guard + bootstrap order (added 2026-11-01, pre-P7)
+
+- **Replacement means independence, not cleanup:** the harness stops
+  *depending on* the keeper's global kit; the kit itself is not
+  deleted, edited, or "tidied" — it stays as the keeper's personal
+  set for harness-less work. What happens to any global after
+  replacement is the keeper's call alone.
+- **Bootstrap order for the meta pair:** bee-skill-tester (exists)
+  covers comprehension for the first builds; the first quality
+  review uses the cold-dispatch pattern from P3; once bee-skill-
+  review exists it reviews everything after — the kit dogfoods from
+  its third build on.
+
 ## Feeds
 
 Keeper's list (superpowers + global skills replacement session); PO
