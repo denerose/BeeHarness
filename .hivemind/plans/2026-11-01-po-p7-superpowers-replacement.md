@@ -22,8 +22,8 @@ targets:
   - skills/loop/bee-plan-review/SKILL.md (create)
   - skills/loop/bee-handoff/SKILL.md (create)
   - skills/loop/bee-pickup-handoff/SKILL.md (create)
-  - scripts/plan-checks.sh (create)
-  - tests/plan-checks.test.mjs (create)
+  - scripts/plan-checks.sh
+  - tests/plan-checks.test.mjs
   - skills/bee-loop/SKILL.md (modify)
   - skills/bee-review/SKILL.md (modify)
   - skills/bee-verify/SKILL.md (modify)
