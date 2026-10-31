@@ -42,10 +42,20 @@ small task the keeper wants planned. Output: one file in
    docs, GLOSSARY. Live state has homes: the phase queue, the keeper
    report, the status surface. Plans describe work, not the state of
    the world while it runs.
+8. **Determinism at plan time** (GLOSSARY: determinism test).
+   Deterministic work goes to scripts: any step two careful executors
+   would run identically is assigned to a script the plan names, not
+   written as prose steps. Every agent step the plan keeps names the
+   judgment it keeps — what that step decides that a script could
+   not.
 
 ## Format
 
-Use `assets/plan-template.md`. Save as
+Use `assets/plan-template.md`. Fill its machine header (phase,
+validation, state-source, targets, suite) — the mechanical checks
+and the plan reviewer's sandbox-run read it — and path-tag every
+verbatim code block (`path=exact/target.ext`) so blocks extract
+mechanically. Save as
 `.hivemind/plans/YYYY-MM-DD-<pp|po>-<slug>.md` — your role's initials
 in the slug (ADR-007; pp = power-planner, po = project-orchestrator) —
 with `**Reviewed:** PENDING`.

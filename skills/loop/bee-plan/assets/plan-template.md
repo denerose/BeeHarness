@@ -8,6 +8,16 @@ lean (detail worked out at implementation — name what covers the
 missing detail)
 **Reviewed:** bee-plan-review passed YYYY-MM-DD / PENDING
 
+<!-- machine
+phase: <phase id, e.g. P1>
+validation: task | merge | phase | release
+state-source: checkboxes below
+targets:
+  - exact/path/file.ext (create)
+  - exact/path/file.ext (modify)
+suite: <the command that proves the plan's work, e.g. node --test tests/*.test.mjs>
+-->
+
 ## Task N: [name]
 
 **Files:** create/modify `exact/paths`
@@ -17,6 +27,13 @@ missing detail)
 - [ ] Step: what to do (verbatim content or shape-only + spike step)
 - [ ] Step: run `verification command` — expected result
 - [ ] Commit: `short imperative message`
+
+Verbatim file content goes in a path-tagged block — the tag says
+where the block extracts to in the reviewer's sandbox:
+
+```<lang> path=exact/path/file.ext
+…verbatim content…
+```
 
 ## Task N+1: …
 

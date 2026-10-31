@@ -16,9 +16,10 @@ e.g. plan conflicts, two failed fix rounds, anything outside the
 plan's scope, design questions>. Never card the keeper directly.
 
 **Workspace:** task worktree `<path>` on branch `task/<phase>-<slug>`,
-cut from the phase branch. Logbook entries ride this branch and reach
-main at merge. Mid-flight reads from other checkouts use
-`git show <branch>:<path>`.
+cut from the phase branch by the dispatcher before dispatch (e.g.
+`scripts/task.sh create <phase>-<slug>`). Logbook entries ride this
+branch and reach main at merge. Mid-flight reads from other checkouts
+use `git show <branch>:<path>`.
 
 **Safety lines:**
 1. Tool defaults may write to live files — always pass `--check` or

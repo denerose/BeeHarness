@@ -22,6 +22,9 @@ always reported with reasons (intent judgment stays project-level).
 
 ## Dispatch brief (embedded — the dispatcher fills this in)
 
+Template: `skills/loop/bee-loop/assets/dispatch-brief-template.md`
+(the loop kit's filled-out form of this contract).
+
 - plan path
 - phase id
 - validation level (from the plan header)
