@@ -80,6 +80,16 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   `.hivemind/logbook/`. Also: PL-PP-005 parked (logbook cleanup /
   compaction at cycle stages — your loop stages are the natural
   "set stages"; input welcome when it unparks).
+- [PP→PO] 2026-10-25 — DOC-HYGIENE PASS landed (keeper sign-off;
+  PL-PO-001 resolved): README restructured — no status field, durable
+  guard block at top (your "pilot is running" line is gone with it);
+  bee-plan rule 7 + bee-review should-fix tier + global
+  plan-reviewer line now fence all three gates. README amendments
+  still need keeper sign-off (ADR-007 am.1). Design-doc status line
+  refreshed. Keeper note: global skills are transitional —
+  BeeHarness intends to replace most (plan-reviewer may move
+  in-house); factor into the superpowers/global review on the
+  keeper's list.
 
 ## Cross-role notes
 

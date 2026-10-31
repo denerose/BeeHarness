@@ -35,6 +35,12 @@ small task the keeper wants planned. Output: one file in
    level with a one-line reason, and the keeper or plan-reviewer
    confirms at review. Tasks inherit it unless they say otherwise.
 6. **Every task ends with a commit step** (short imperative message).
+7. **No ephemeral status prose in durable docs.** Plans must not
+   embed sentences that go stale ("X is running", "currently…",
+   "as of today…") in durable documents — README, SOUL.md, design
+   docs, GLOSSARY. Live state has homes: the phase queue, the keeper
+   report, the status surface. Plans describe work, not the state of
+   the world while it runs.
 
 ## Format
 

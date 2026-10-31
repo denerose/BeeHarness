@@ -38,7 +38,9 @@ and line and a concrete suggested fix:
 
 - **Blocking** — wrong, broken, or contradicts the plan's intent.
 - **Should fix** — real problem, not fatal; fixing before merge is the
-  right call but blocking is not yours.
+  right call but blocking is not yours. Time-sensitive content in a
+  durable doc (status prose in a README, "currently running…") is
+  always this tier, never a note — it will go stale and mislead.
 - **Note** — worth saying, not worth a round.
 
 If your reading of the plan's *intent* conflicts with its literal text,

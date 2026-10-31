@@ -123,6 +123,13 @@ it as a term of art.
 - **task branch** — `task/<phase>-<slug>`: one worktree per task-orc
   dispatch, off the phase branch. logbook entries ride it; the diff is the
   review artifact (ADR-012).
+- **README** — the repo's front door: durable description only —
+  what the project is, its foundations, where documents live.
+  Never a work log: live state belongs to the phase queue (what's
+  next), the keeper report (digest), the status surface (cross-role).
+  The test: if a sentence can go stale, it doesn't belong. PP and PO
+  may amend; changes land only on the keeper's sign-off (ADR-007
+  amendment 1).
 - **dispatch brief, safety lines** — three standing lines every
   brief for a write-capable agent carries (P2 near-miss: a reviewer
   ran `bee report` flagless and wrote the live keeper report):

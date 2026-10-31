@@ -90,6 +90,20 @@ recommendations beyond what the keeper already directed).
   suggestion.
 ## Resolved
 
+- **PL-PO-001 — stale ephemera in durable docs (pilot #1 post-mortem)**
+  — resolved 2026-10-25 (keeper-directed doc-hygiene pass). How/why:
+  the README carried a literal `Status:` field (structural magnet);
+  no gate had a rule against ephemeral prose in durable docs (each
+  assumed another's job); live state had thinner homes at P1 (no
+  keeper report yet). Prevention, all three gates fenced: README
+  restructured (no status field; durable-pointer guard block at top;
+  keeper sign-off restated), bee-plan rule 7, bee-review should-fix
+  tier, global plan-reviewer External-reality line (ephemeral prose
+  in durable docs = 🔴). Plus: live state now has mature homes
+  (phase queue, keeper report, status surface). Collateral: design
+  doc's own status line refreshed. Keeper note recorded: global
+  skills are transitional — BeeHarness replaces most; plan-reviewer
+  may be pulled in-house as a bee-native copy.
 - **PL-PP-002 — artifact taxonomy: records vs designs vs decisions**
   — resolved 2026-10-25 (keeper session): purposes now written per
   class in the design doc's artifacts map and AGENTS.md (why / what /

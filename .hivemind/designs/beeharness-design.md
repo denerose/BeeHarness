@@ -1,10 +1,7 @@
 # BeeHarness — design (governing document)
 
-**Status:** drafted by power-planner 2026-10-25, consolidating agreed
-decisions (ADRs 001–007 + keeper-directed sessions 2026-10-18..25).
-Keeper ratifies by read; changes via ADR-003's amendment ritual.
-**Living document** (undated filename on purpose — event docs carry
-dates, governing docs don't).
+**Status:** living document — ratified by keeper direction 2026-10-25;
+changes via ADR-003's amendment ritual.
 
 ## What BeeHarness is
 

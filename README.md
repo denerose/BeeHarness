@@ -1,11 +1,11 @@
 # BeeHarness (name TBC)
 
-Status: **design and build in parallel** — two roles carry the project:
-the power-planner shapes (discussion, architecture, decisions, design
-docs); the project-orchestrator builds (plans, the bee-loop,
-subagents, gates, phase lists). Bee skills v1 are written,
-comprehension-tested, and registered machine-wide; the first pilot
-bee-loop is running.
+The front door: what this project is, in durable terms only. **Not a
+work log** — live state has homes: `.hivemind/phases/BeeHarness.md`
+(the queue: what's done, running, next), `.hivemind/keeper-report.md`
+(the keeper's digest), `.hivemind/status.md` (cross-role surface). If
+a sentence can go stale next week, it doesn't belong here (GLOSSARY:
+README). Amendments need the keeper's sign-off (ADR-007 amendment 1).
 
 ## What this is
 
@@ -17,17 +17,20 @@ and Paseo:
   registered machine-wide via `~/.pi/agent/settings.json`
   (`"skills": ["~/BeeHarness/skills"]`); every harnessed repo uses
   them; edits here go live everywhere. Git here is the drift defense.
-- **`roles/`** — named mandates for agent sessions: **power-planner**
-  (shapes: discussion, architecture, decisions, design docs) and
-  **project-orchestrator** (builds: bee-plan, bee-loop, subagents,
-  verify/review gates, phase lists). The design doc is the relay artifact
-  artifact between them (ADR-003). Roles are assumed by direction,
-  never inferred from the work's shape.
+- **`roles/`** — agent specs, one concept graded by attributes
+  (ADR-010): **power-planner** (shapes: discussion, architecture,
+  decisions, design docs), **project-orchestrator** (builds: bee-plan,
+  bee-loop, dispatches, gates, the phase queue), and dispatched roles
+  led by **task-orc** (ADR-011: one plan's loop per dispatch, in a
+  worktree). Roles are assumed by direction, never inferred from the
+  work's shape.
 - **pi extension + lightweight CLI** (when built) — memory tooling,
-  decisions inbox, status surface.
-- **`.hivemind/` per repo** — each harnessed project keeps its own
-  working docs and ephemera (decisions, designs, plans, phases,
-  suggestions, memory, sessions).
+  decisions inbox, status surface, `bee report`.
+- **`.hivemind/` per repo** — each harnessed project's working space,
+  one purpose per class: decisions (why it's this way), designs (what
+  to build), plans (how), phases (when/next), logbook (what
+  happened), suggestions (the inbox), memory (deferred), sessions
+  (live).
 
 Custom-fit to its human. Built by learning from real work on this
 machine. See `SOUL.md`.
@@ -39,14 +42,15 @@ machine. See `SOUL.md`.
 | Pi | base harness — coupled, embraced |
 | Paseo | human↔agent surface + dispatch — coupled, embraced |
 | subagents extension | we may extend it; it must never depend on us |
-| Superpowers | workflow inspiration only, during bootstrap — will be removed; zero new coupling |
+| Superpowers | workflow inspiration only, during bootstrap — to be replaced by bee-native equivalents; zero new coupling |
 
 ## Documents
 
 - `SOUL.md` — identity & values (planner-facing; implementers may skim)
 - `AGENTS.md` — always-applicable rules for any agent in this repo
-- `roles/` — role mandates (power-planner, project-orchestrator)
-- `.hivemind/` — ADRs (`decisions/`), designs, plans, phase lists,
-  suggestions, memory, session state — the hive's working space
+- `roles/` — role specs (power-planner, project-orchestrator, task-orc)
+- `.hivemind/` — the hive's working space; purposes per class live in
+  the design doc's artifacts map
 
-Name is a placeholder. Everything here is a work in progress.
+Name is a placeholder. Everything here is a work in progress — and
+its current state lives in the queue, not here.
