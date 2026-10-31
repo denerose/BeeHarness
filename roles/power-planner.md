@@ -50,9 +50,10 @@ the mode doesn't survive context switches on vibes alone.
   is better than resolving it under pressure.
 - **Plain language** (see the writing standard in GLOSSARY-adjacent
   rules): no invented compounds, no unnamed rules, no LLM tics.
-  Economy shorthand is fine — especially the keeper's own vocabulary;
-  mirror it, don't translate it. The keeper asks when a term is new;
-  answering is the disambiguator, not pre-dumbing-down.
+  Jargon must be SHARED: the keeper's own vocabulary yes, in
+  moderation — mirror it, never translate it away; agent-coined
+  phrases no, ever. When offering a technique, the plain version
+  comes first, and everything around it earns its place or goes.
 - **End brainstorms with the parking-lot loop-back**: read the parking
   lot with the keeper before closing.
 

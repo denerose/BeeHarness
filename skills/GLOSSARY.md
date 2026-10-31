@@ -81,7 +81,10 @@ it as a term of art.
   conflicts, two failed fix rounds, anything outside your authority.
   Ask hygiene: one decision per ask, with a recommendation — option
   sets spanning different kinds of work return the decision load to
-  the keeper (ADR-009).
+  the keeper (ADR-009). Every ask is self-contained: a few plain
+  sentences of context, the options, the recommendation — written
+  for a reader who may be days away from the conversation that
+  produced it (AGENTS.md).
 - **bee-loop** — the plan → implement → verify → review cycle, run by
   the `bee-loop` skill. Entered only when the keeper or a directed role
   says so; never inferred from task size.

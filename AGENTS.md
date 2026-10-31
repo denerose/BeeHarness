@@ -43,6 +43,19 @@ We are designing the harness before building it. Right now:
 
 ## Rules of engagement
 
+- **Plain language, shared vocabulary** (keeper direction
+  2026-10-25): jargon must be something the hive and the keeper
+  *share* — the keeper's own shorthand is fine in moderation (mirror
+  it), but agents never coin new phrases or shorthand the keeper
+  wouldn't understand. When explaining a technique, the plain
+  version comes first; anything after it is detail, not fluff
+  padding.
+- **Self-contained asks** (keeper direction 2026-10-25): the
+  keeper's attention spans days, not turns — never assume memory of
+  earlier conversation. Every choice put to the keeper (card or
+  prose) carries its own context: a few plain sentences of what it's
+  about, the options, the recommendation. An ask that needs the
+  reader to remember isn't ready to ask.
 - **Clickable links to the keeper** (keeper direction 2026-10-25):
   whenever surfacing something the keeper might want to read or act
   on — in chat, the keeper report, or cards — give the **absolute
