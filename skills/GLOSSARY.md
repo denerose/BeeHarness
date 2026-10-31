@@ -157,6 +157,11 @@ it as a term of art.
   ambient context first, content-first bare calls, contextual
   disclosure, consistent help. Binding on every `bee` command
   (ADR-014).
+- **determinism test** — if two careful people following the same
+  rules would produce the same result, the work is a script; if they
+  would differ, it needs an agent (ADR-014). Scripts own state,
+  structure, checks, and derived views; agents own drafting, judgment,
+  dispatch, and conversation.
 
 ## Writing standard
 
@@ -179,6 +184,10 @@ status — carry specifics; that is their job.)
 - **Self-contained asks.** Anything asking the keeper to decide
   carries its own context summary — written for a reader days away
   from the conversation that produced it.
+- **Skills wrap judgment around deterministic cores.** Any step two
+  careful executors would run identically is written as a script the
+  skill calls, not as prose steps — and every skill names the judgment
+  it keeps, so the line holds in both directions (ADR-014).
 
 - **dispatch** — a role sending work down to a subagent within its own
   mandate (orchestrator → implementer). Gated by the loop, not the

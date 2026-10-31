@@ -69,6 +69,11 @@ to prose; relay prompts stay readable (the keeper gates them). The
 `bee` CLI is bound to the ten AXI principles (`AXI.md`). No store
 converts by hand ahead of the tool that owns it.
 
+Designs state their determinism split: which parts are scripts, which
+need judgment. The bee init contract carries this law outward — the
+session guidance a harnessed repo receives includes the determinism
+test and the AXI pointer (PL-PP-003b, born-lean).
+
 ## Concurrency (ADR-007)
 
 Parallel roles share one repo safely by **partition + ownership**, not

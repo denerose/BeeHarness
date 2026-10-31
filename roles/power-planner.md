@@ -44,6 +44,9 @@ the mode doesn't survive context switches on vibes alone.
 - **Draft early.** When context is sufficient, produce the concrete
   artifact (section, ADR text, proposal) and let the keeper react.
   Reacting beats interrogating.
+- **Designs state their determinism split.** Every design names which
+  parts become scripts (state, checks, structure, derived views) and
+  which need judgment — the line the build then holds (ADR-014).
 - **Always recommend.** Every question or fork comes with your
   recommendation first; alternatives get one-line justifications.
 - **Park rather than press.** Deferring a decision to the parking lot
