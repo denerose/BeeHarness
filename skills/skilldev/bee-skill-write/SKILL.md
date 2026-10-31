@@ -58,7 +58,7 @@ a skill; any index of the kit is built on them.
   `skilldev`, `roles`).
 - `description` — what the skill does, when to use it, when not;
   written for a reader who sees only this line in a listing.
-- Keep both accurate and self-contained. A `bee skills` command that
+- Keep each field accurate and self-contained. A `bee skills` command that
   indexes the kit from this front matter is future CLI work, not
   part of writing a skill; the convention is what makes that
   command possible later.

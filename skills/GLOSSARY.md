@@ -97,11 +97,11 @@ their own documents (`docs/AXI.md`).
 - **bee-skill-write** — the authoring skill: drafts and revises bee
   skills. Carries the artifact test (skill vs script vs role-file line
   vs glossary entry), the house structure and front-matter registry
-  conventions (name + description, kept machine-readable), the
+  conventions (name + kit + description, kept machine-readable), the
   determinism split (judgment wrapped around a scripted core, the kept
   judgment named), and the lifecycle draft → cold-test → review →
   sign-off, with keeper sign-off for law-touching skills. Cold-read
-  comprehension testing is bee-skill-tester's (same folder);
+  comprehension testing is bee-skill-tester's (same kit);
   design-quality review is a separate gate. Style law for skill text:
   `docs/WRITING-STANDARD.md`.
 - **bee-skill-review** — the design-quality gate for skill documents:
@@ -112,7 +112,7 @@ their own documents (`docs/AXI.md`).
   skill); reports tiered findings — blocking, or should-fix where a
   waiver needs a one-line recorded reason — and never fixes. The
   review step of bee-skill-write's draft → cold-test → review →
-  sign-off lifecycle (same folder; comprehension testing is
+  sign-off lifecycle (same kit; comprehension testing is
   bee-skill-tester's); states whether the draft touches law, which
   decides if keeper sign-off applies.
 - **bee-plan-review** — the plan review gate: reviews a written plan
