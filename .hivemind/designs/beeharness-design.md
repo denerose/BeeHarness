@@ -56,6 +56,19 @@ then escalate. Git topology (ADR-012): main = governance + surfaces;
 per dispatch; dispatches run task-orc (ADR-011), the first dispatched
 role under the one-role schema (ADR-010).
 
+## Determinism & agent-first surfaces (ADR-014)
+
+Scripts before skills: if two careful people following the same rules
+produce the same result, it is a script — scripts own state, checks,
+structure, and derived views; agents own drafting, judgment, dispatch,
+conversation. Storage follows the primary reader: agent-primary stores
+(inbox, memory, parking lot, suggestions, dispatch briefs and digests)
+go TOON; mixed documents (logbook entries, plans, ADRs, role files)
+carry a machine header with a prose body; keeper-facing views render
+to prose; relay prompts stay readable (the keeper gates them). The
+`bee` CLI is bound to the ten AXI principles (`AXI.md`). No store
+converts by hand ahead of the tool that owns it.
+
 ## Concurrency (ADR-007)
 
 Parallel roles share one repo safely by **partition + ownership**, not
