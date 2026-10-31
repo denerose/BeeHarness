@@ -42,7 +42,7 @@ test('init: adds skills entry, preserves other keys', () => {
   const after = JSON.parse(fs.readFileSync(sp, 'utf8'));
   assert.equal(after.theme, 'dark');
   assert.deepEqual(after.skills,
-    ['~/other/skills', '~/BeeHarness/skills']);
+    ['~/other/skills', BEE_SKILLS]);
 });
 
 test('init: --check on unregistered exits 1, writes nothing', () => {
@@ -60,7 +60,7 @@ test('init: already registered exits 0 (tilde entry)', () => {
   const dir = tmp();
   const sp = path.join(dir, 'settings.json');
   fs.writeFileSync(sp, JSON.stringify({
-    skills: ['~/BeeHarness/skills'],
+    skills: [BEE_SKILLS],
   }, null, 2));
   const r = run(['init', '--settings', sp]);
   assert.equal(r.code, 0);
@@ -82,12 +82,19 @@ test('init: missing settings file is created fresh', () => {
   const r = run(['init', '--settings', sp]);
   assert.equal(r.code, 0);
   const after = JSON.parse(fs.readFileSync(sp, 'utf8'));
-  assert.deepEqual(after.skills, ['~/BeeHarness/skills']);
+  assert.deepEqual(after.skills, [BEE_SKILLS]);
 });
 
 import { fileURLToPath } from 'node:url';
 const TESTS_DIR = path.dirname(fileURLToPath(import.meta.url));
 const FIX = path.join(TESTS_DIR, 'fixtures');
+// What `bee init` registers: tilde form of this checkout's skills dir
+// (bee.js derives it from its own location, so tests must too — the
+// suite runs in worktrees where the checkout is not ~/BeeHarness).
+const SKILLS_ABS = path.resolve(TESTS_DIR, '..', 'skills');
+const BEE_SKILLS = SKILLS_ABS.startsWith(os.homedir() + path.sep)
+  ? '~' + SKILLS_ABS.slice(os.homedir().length)
+  : SKILLS_ABS;
 
 function reportTmp() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-report-'));

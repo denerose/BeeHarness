@@ -77,7 +77,7 @@ test sandboxes); git ops run in cwd. Reject a `<slug>` containing
 **Depends on:** Task 1
 **Provides:** deterministic coverage; `npm test` unchanged
 
-- [ ] Wrapper pattern: `node:test` + `assert/strict`; each test
+- [x] Wrapper pattern: `node:test` + `assert/strict`; each test
   builds a sandbox git repo in `fs.mkdtempSync(os.tmpdir())` —
   `git init -b main`, then local identity (`git config user.email
   test@example.com; git config user.name test`) before the initial
@@ -89,7 +89,7 @@ test sandboxes); git ops run in cwd. Reject a `<slug>` containing
   note the derived worktree path lands OUTSIDE the sandbox dir, as
   `<sandbox-parent>/$(basename <sandbox>)-task-<slug>`; clean it up
   per case — branches via `git branch --list`).
-- [ ] Cases (one `test()` each):
+- [x] Cases (one `test()` each):
   1. create → branch `task/9-alpha` + worktree exist, exit 0;
   2. merge → branch merged into `phase/9`, worktree + branch gone;
   3. abandon (unmerged task branch with a commit) → exit 5, branch
@@ -103,8 +103,8 @@ test sandboxes); git ops run in cwd. Reject a `<slug>` containing
   Setup may use raw git for preconditions (e.g. `git branch
   task/8-alpha` for case 7); commits inside a task worktree run via
   `git -C <worktree-path>` using the printed path.
-- [ ] Run `npm test` — all pass (existing 19 + 8 new).
-- [ ] Commit (`Role: task-orc` trailer): `add task helper suite wrapper`
+- [x] Run `npm test` — all pass (existing 19 + 8 new).
+- [x] Commit (`Role: task-orc` trailer): `add task helper suite wrapper`
 
 ## Task 3: verify at merge level
 
