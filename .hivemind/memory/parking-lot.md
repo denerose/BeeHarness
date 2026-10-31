@@ -88,6 +88,20 @@ recommendations beyond what the keeper already directed).
   the P4 CLI design or productization (P6), or when the keeper wants
   the conversation. Related: PL-002 (memory tooling), the capture
   suggestion.
+- **PL-PP-006 — distill ADR-referenced rules into bee behavior
+  guidance (universal vs project)** — keeper direction (2026-11-01):
+  our docs carry the real rules as "ADR-blah" pointers — fine while
+  we learn; before shipping to other projects, capture the rules we
+  want to keep as actual how-to-be-a-bee guidance (using the
+  harness, agents' help, top-level behavior rules), sorted into
+  rules for ALL projects vs rules specific to this repo
+  (project/machine-specific rules stay here). Feeds P8 (which
+  strips the references) and PL-PP-003 (the guidance injection
+  carries the universal set); the template glossary covers
+  vocabulary — this covers rules. Open for the session: the form
+  (one shipped guide vs injected guidance vs per-skill rule text),
+  the home, and the sort itself — unpark with P8/P6 planning or
+  when the keeper wants the distillation session.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any
