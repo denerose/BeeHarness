@@ -136,3 +136,17 @@ P4 plan has real input:
 - **Invariant (ADR-006):** claims still move states only via logbook
   records — the scripts write the records; they never bypass them.
 - Every new subcommand is AXI-compliant from birth (`docs/AXI.md`).
+- **AXI compliance is tested, not asserted:** each subcommand ships
+  mechanical checks for the testable principles (bare-call content,
+  definitive empty states, unknown-flag failure, exit codes, `--full`
+  where truncation exists, aggregates in output) in the same phase
+  it is built; the compliance suite joins the standard suite, so
+  `bee verify` at merge and phase level runs it automatically.
+- **State moves carry provenance:** every `bee task` move records
+  role and timestamp in the store — designed in from birth; the
+  views render it. (Mutations define their idempotency semantics in
+  the same plan.)
+- Open question for P4 planning: the plan-header field contract —
+  the header is the interface between bee-plan (writer) and `bee
+  verify` (reader); settle the field list there, including how
+  checks are named.
