@@ -72,7 +72,9 @@ Behavior docs name three global instruments that will be replaced.
 None has a bee-native equivalent yet, so the references are not wrong
  today — but each replacement build must also update its references;
 the build is not finished until they point at the new skill (keeper,
-2026-11-01).
+2026-11-01). These are also violations of the bee-native dependency
+boundary (ADR-015): the loop must not depend on the keeper's
+ephemeral global kit.
 
 - **`plan-reviewer`** — AGENTS.md (plan review gate rule); bee-plan
   SKILL (three mentions, plus the plan template's `Reviewed:` line,
