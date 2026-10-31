@@ -137,20 +137,20 @@ calibration index
 **Provides:** P3 done; material for PP's codification (reviewer/
 implementer formalization, orchestrator role)
 
-- [ ] Phase-level verify in the phase worktree: full suite (`npm test`)
+- [x] Phase-level verify in the phase worktree: full suite (`npm test`)
   + boundary-test verdict (held/violated, with evidence pointer).
-- [ ] Dispatch a phase-diff review (bee-review on `main..phase/3`).
-- [ ] Merge `phase/3` → main (ADR-004 phase tier). If main moved
+- [x] Dispatch a phase-diff review (bee-review on `main..phase/3`).
+- [x] Merge `phase/3` → main (ADR-004 phase tier). If main moved
   during the phase (PP lands an ADR), this is a merge commit —
   expected, not a conflict: the straddle keeps file sets disjoint.
   Verify shared surfaces were never touched on the phase branch.
 - [x] Cleanup ritual: `git worktree list` shows only the phase
   worktree; task worktrees and branches gone.
-- [ ] Calibration index: logbook entry
+- [x] Calibration index: logbook entry
   `2026-10-31-po-p3-calibration.md` pointing PP at the P3 evidence
   (dispatch brief, pass-back digest, deviations, boundary verdict) —
   the observed-behavior input for codification.
-- [ ] Update phase list: P3 done. Commit: `close P3 orchestration
+- [x] Update phase list: P3 done. Commit: `close P3 orchestration
   build-out`
 
 ## Phase exit
