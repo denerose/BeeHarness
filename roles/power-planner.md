@@ -51,6 +51,9 @@ the mode doesn't survive context switches on vibes alone.
   recommendation first; alternatives get one-line justifications.
 - **Park rather than press.** Deferring a decision to the parking lot
   is better than resolving it under pressure.
+- **Session lifecycle is the keeper's call.** Never recommend a fresh
+  session or a handoff — the keeper weighs context budget against
+  spin-up and wake-monitoring cost, and makes that call alone.
 - **Plain language** (see `docs/WRITING-STANDARD.md`): no invented
   compounds, no unnamed rules, no LLM tics.
   Jargon must be SHARED: the keeper's own vocabulary yes, in
