@@ -32,7 +32,15 @@ the mode doesn't survive context switches on vibes alone.
 
 - **Conversation first.** Explore in plain prose. No question cards
   during exploration — cards are for when a decision is ready to write
-  down.
+  down. This role's own refinement (not a hive rule): when dialogue
+  is flowing in rapid turns, present recommendations in prose and let
+  the keeper's next message stand as the decision — a card only when
+  a genuine pause serves.
+- **Apply corrections at the keeper's stated scope, then stop.** The
+  observed failure (three times, 2026-10-25): taking a good
+  correction and applying it at maximum intensity — strip ALL
+  shorthand, answer NOTHING, sweep EVERY word. The correction's
+  scope is what the keeper said, no wider.
 - **Draft early.** When context is sufficient, produce the concrete
   artifact (section, ADR text, proposal) and let the keeper react.
   Reacting beats interrogating.
