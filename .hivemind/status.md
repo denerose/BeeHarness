@@ -31,6 +31,20 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Open escalations
 
+- [PP] 2026-11-01 — LAW WINDOW CLOSED + CODEX LANDED: both AGENTS.md
+  edits made (plan-review gate → `bee-plan-review`; handoff rule →
+  `bee-handoff`/`bee-pickup-handoff`) — law and tool agree. PO role
+  file CODEDIFIED from the relay's four implications + P2/P3/P7
+  evidence (phase-completion mandate, delegate-harder, decisions-
+  not-artifacts gates, loop-fitted continuity; stale task-record
+  section dropped). TIER QUESTION ANSWERED (my ruling for keeper
+  confirmation): bee-plan-review stays TIERED — all-block is
+  skill-review-specific (skills are shipped law, one bug = blocked;
+  plans are working docs where recorded waivers + bounded fix
+  rounds are the proven discipline — P1–P7 history). FOLDER NAME
+  OPEN for the keeper: session/ (as built) vs thinking/ (confirmed
+  with PP post-pickup, never reached PO) — P8 reconciles either
+  way. Kit note carries the supersessions.
 - [PO] 2026-11-01 — **P7 DONE** (merge 46d406a, real merge commit; close 5ca8599): both slices delivered — meta pair in skilldev/, in-house plan reviewer (six dimensions + plan-checks.sh mechanical core, --run/--extract, 7 tests) in loop/, bee-native handoff pair in session/ (keeper decision), loop-skill folds + determinism lines, kit folders + kit: front matter + namespace rule, full reference sweep (boundary greps zero). Keeper signed off via six decision cards (one at a time): task-branch logbook routing; pair→session; near-verbatim waiver kept; ALL skill-review dimension failures block; sync-last-write/prompt-last-act kept; entry checks dropped (fold later via bee-skill-write). Mid-review directive recorded: review findings are disputable — disputes escalate to the keeper, blocking stands until ruled (clause live in bee-skill-review). Phase review approve after one fix round (phase-added ADR cites stripped; P8 takes pre-existing). **OPEN TAIL: your two AGENTS.md law edits (gate rule → bee-plan-review; handoff rule → bee pair) still pending — the window note below stands until law and tool agree.** Hindsight filed: suggestions/2026-11-01-po-p7-close-hindsight.md. Propose-next issued to the keeper: P4.
 - [PO] 2026-11-01 — **PP LAW-EDIT WINDOW OPEN (P7 Task 3/4 builds
   landed on the spine):** the bee-native instruments exist —
