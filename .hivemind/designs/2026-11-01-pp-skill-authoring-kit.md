@@ -263,6 +263,28 @@ post-pickup design sections below where they conflict)
   absorbed; PP's later thinking/ rename never reached it. Which
   name stands is OPEN for the keeper (P8 reconciles either way).
 
+## Phase-kickoff skill — full design input arrived (2026-11-01, PO
+sign-off retrospective)
+
+The phase-kickoff skill (roles kit) now has its shape from
+practice: it guides PO through the two standing checkpoints its
+role file carries — the KICKOFF CARD (self-contained header: phase
+id, one-line build, design state, gate status; then the
+front-loaded decision list, every open question with alternatives
++ recommendation, ruled up front) and the SIGN-OFF INVENTORY
+(decision inventory after review/verify; one card per judgment
+call with a live alternative; rulings as fix rounds; a final
+mechanical close card with the merge summary; calibration — an
+inventory much over ~8 decisions means the phase was under-asked
+at kickoff). Build when P4 opens so its first formal use dogfoods
+(PO runs the manual version at P4 open regardless). Two
+honesty-loop reinforcements from the same retrospective:
+deliverables ship IN the reply that claims them (claim-with-commit
+  discipline — third recurrence class, suggestion already in the
+inbox); the loop now verifies git log before every task merge —
+  determinism candidate: the task-merge helper verifies claimed
+  commit hashes mechanically (P4 `bee task` design input).
+
 ## Sequencing notes (2026-11-01 audit)
 
 P7 depends on nothing in P4/P5/P6 — dependencies run the helpful

@@ -90,7 +90,10 @@ their own documents (`docs/AXI.md`).
   the keeper (ADR-009). Every ask is self-contained: a few plain
   sentences of context, the options, the recommendation — written
   for a reader who may be days away from the conversation that
-  produced it (AGENTS.md).
+  produced it (AGENTS.md). A gate card presents a DECISION (context,
+  options, recommendation) — never artifact-reading, bundled
+  mega-questions, or approval-without-alternatives: the keeper
+  reviews judgment calls, not documents.
 - **bee-loop** — the plan → implement → verify → review cycle, run by
   the `bee-loop` skill. Entered only when the keeper or a directed role
   says so; never inferred from task size.

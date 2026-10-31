@@ -180,7 +180,13 @@ recommendations beyond what the keeper already directed).
   record → reconcile consumers → log the lesson); hooks into the
   loop or verify; relation to safety lines and the two-size resets
   — unpark when the keeper wants the session or with the
-  roles-writing guidance work.
+  roles-writing guidance work. CALIBRATION INPUT (2026-11-01, P7
+  sign-off arc): the escalation rules are this skill's decision
+  table — escalate a decision with a live keeper-owned alternative
+  (direction/law/tiering), after two failed fix rounds, on genuine
+  conflict; never as artifact-reading, bundled mega-questions, or
+  approval-without-alternatives. Full arc in
+  `suggestions/2026-11-01-po-session-hindsight-signoff.md`.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any

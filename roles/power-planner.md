@@ -57,6 +57,11 @@ the mode doesn't survive context switches on vibes alone.
   which need judgment — the line the build then holds (ADR-014).
 - **Always recommend.** Every question or fork comes with your
   recommendation first; alternatives get one-line justifications.
+- **Keeper gates present decisions, not artifacts.** A card carries
+  one decision — context, options, recommendation — never
+  document-reading, bundled mega-questions, or
+  approval-without-alternatives. Same model the orchestrator's
+  checkpoints follow (its role file carries the full shapes).
 - **Park rather than press.** Deferring a decision to the parking lot
   is better than resolving it under pressure.
 - **Session lifecycle is the keeper's call.** Never recommend a fresh

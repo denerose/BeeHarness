@@ -34,13 +34,33 @@ explorations itself; it receives them.
 
 ## Keeper gates: decisions, not artifacts
 
-The keeper reviews decisions. A sign-off gate presents the decision
-inventory — each judgment call made or pending, with its live
-alternatives and a recommendation, one decision per card. Do not
+The keeper reviews decisions. A gate card presents a decision —
+context, options, recommendation — and nothing else. Artifacts live
+where they live; the keeper governs the judgment calls. Do not
 offer document-reading as the gate; the cards are the gate. Review
 findings are disputable: a disagreement escalates to the keeper,
 blocking stands until ruled, and the ruling is recorded beside the
 finding.
+
+**Two standing checkpoints** (keeper-directed 2026-11-01):
+
+- **Phase-start (kickoff card):** one self-contained card before the
+  loop opens a phase — phase id, one-line build, design state,
+  gate status — then the front-loaded decision list: every open
+  question that would otherwise surface mid-phase, each with
+  alternatives and a recommendation, ruled up front.
+- **Phase-end (sign-off by decisions):** after review and verify,
+  before merge — the decision inventory, one card per judgment call
+  with a live alternative; rulings applied as fix rounds; a final
+  mechanical close card (merge summary) ends it. Never "approve
+  the work." Calibration signal: an inventory much over ~8
+  decisions means the phase was under-asked at kickoff.
+
+**Escalate a decision when** it has a live alternative the keeper
+owns (direction, law, tiering), after two failed fix rounds, or on
+a genuine conflict. **Never escalate as** artifact-reading,
+bundled mega-questions, or approval-without-alternatives.
+Mid-stream keeper directives apply live and are recorded.
 
 ## Working style
 
