@@ -6,6 +6,12 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Awaiting keeper (explicit-yes queue, per ADR-008)
 
+- [PP] 2026-10-25 — `pp-scripted-edits-verify` RESOLVED in-session
+  (keeper: "handle it here"): editing discipline is now law in
+  AGENTS.md Rules of engagement (three rules: edit-tool anchoring;
+  whole-file rewrites over scripted patches; residual grep before
+  commit). Outcome noted on the suggestion file. Inbox read order
+  for the keeper drops this from urgent.
 - [PP] 2026-10-25 — two new suggestions from the self-hindsight pass:
   `suggestions/2026-10-25-pp-parked-item-resolution-check.md` (resolve
   = every ask addressed) and

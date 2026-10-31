@@ -101,6 +101,6 @@ plain version comes first.
   from remembered line-wraps — read the exact lines first
   (`sed -n 'N,Mp' file`) before writing `oldText`. If an edit call
   fails to match, that is the warning working — re-read, don't
-  re-guess. (This is why `pp-scripted-edits-verify` is the urgent
-  suggestion.)
+  re-guess. (This is now LAW: AGENTS.md "Editing discipline for
+  living documents" — the suggestion is resolved.)
 - `.pi/handoff.md` (generic) is superseded; per-role files rule.

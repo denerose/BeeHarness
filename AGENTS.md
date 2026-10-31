@@ -86,6 +86,21 @@ We are designing the harness before building it. Right now:
   dispatching subagents.
 - Evidence over assertion: no "done"/"works" claim without verification
   output. Reproduce bugs before fixing them.
+- **Editing discipline for living documents** (keeper direction
+  2026-10-25): three standing rules —
+  (1) the edit tool REPLACES text, it never inserts: when adding a
+  line or block near existing text, anchor the match on a unique
+  line that will remain (a section header, or the first line of the
+  following block) and repeat it inside the replacement — anchoring
+  on the target line's own text silently deletes it. Read the exact
+  lines before writing the match; a failed match is the warning
+  working — re-read, don't re-guess.
+  (2) Prefer whole-file rewrites over scripted patches (sed/python)
+  for session files, glossaries, and parking lots; script only for
+  many-file mechanical changes, and chain the verification grep in
+  the same command — output shown, not assumed.
+  (3) After any multi-file sweep, grep for residuals BEFORE
+  committing — not after.
 - Commit messages: short imperative, ≤10 words.
 - When context runs short, run a handoff (`handoff` skill); resume with
   `pickup-handoff`. A handoff ends with a memory sync (session state
