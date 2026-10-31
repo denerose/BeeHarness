@@ -66,6 +66,32 @@ reviews a skill for design soundness.
 - Whether the tier split stays logical (advertised vs dormant) or
   becomes physical (subdirectories, tiered registration) at P6.
 
+## Hardcoded global-skill references (2026-11-01 review)
+
+Behavior docs name three global instruments that will be replaced.
+None has a bee-native equivalent yet, so the references are not wrong
+ today — but each replacement build must also update its references;
+the build is not finished until they point at the new skill (keeper,
+2026-11-01).
+
+- **`plan-reviewer`** — AGENTS.md (plan review gate rule); bee-plan
+  SKILL (three mentions, plus the plan template's `Reviewed:` line,
+  which stamps the name into every plan); bee-review (two scope
+  notes); GLOSSARY (plan entry); bee-hindsight; bee-skill-tester.
+- **`adr` skill** — AGENTS.md (design-mode bullet); power-planner
+  role file; GLOSSARY (ADR entry). No bee-native ADR writer planned
+  yet — the replacement session decides its home.
+- **`handoff` / `pickup-handoff`** — AGENTS.md (handoff rule);
+  GLOSSARY (handoff entry). The handoff rituals are already
+  bee-native; only the scaffolding skill pair is global. No
+  bee-native pair planned yet — same session decides.
+- **`plan` skill** — bee-plan carries two "this is not the global
+  plan skill" notes; they go stale harmlessly when that skill is
+  replaced and update then.
+
+Existing plans and records keep their mentions — history stays as
+written.
+
 ## Feeds
 
 Keeper's list (superpowers + global skills replacement session); PO
