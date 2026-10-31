@@ -1,9 +1,9 @@
 # P4 inbox — design note (feeds the P4 bee-plan)
 
 **Date:** 2026-10-25
-**Status:** shape blessed by the keeper in session; this note is the
-design input P4's bee-plan consumes. Not yet built — P4 is in the
-phase queue.
+**Status:** shape blessed by the keeper in session; amended 2026-11-01
+(ADR-014 addendum below); this note is the design input P4's bee-plan
+consumes. Not yet built — P4 is in the phase queue.
 
 ## The problem
 
@@ -53,10 +53,23 @@ no new interim structures bolted onto it (keeper direction
 2026-10-25). Open cross-role items ride ambient pickup; a sunk item is
 cheap evidence for the inbox.
 
-## Open questions for the P4 session
+## Addendum — 2026-11-01 (ADR-014: determinism + AXI session)
 
-- Storage shape: one file vs a directory; whether suggestions merge
-  into the inbox as keeper-addressed items or stay a sibling.
+Open questions resolved by the keeper this session:
+
+- **Storage shape:** the inbox is born-TOON — an agent-primary store;
+  storage follows the primary reader.
+- **Suggestions:** they merge in — the awaiting-read state absorbs
+  into the inbox (one lean store of everything waiting on anyone).
+
+Scope grows with ADR-014: `bee verify` and script-owned work-item
+state moves land here; every new subcommand is AXI-compliant from
+birth (`AXI.md`); CLI-writing and AXI skills/rules are drafted in
+this phase. Human-facing surfaces unaffected: the report and status
+board stay rendered prose; relay prompts stay readable.
+
+Still open for the P4 session:
+
 - Aging and staleness: does an unacknowledged item escalate, expire,
   or just age visibly?
 - What `bee init` scaffolds in a fresh repo: an empty inbox from day
