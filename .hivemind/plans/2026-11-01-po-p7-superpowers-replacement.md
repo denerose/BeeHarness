@@ -66,7 +66,7 @@ design addendum landed after Tasks 1–3 built skills in the flat
 layout; one sweep moves everything)
 **Provides:** the folder layout all later tasks and references use
 
-- [ ] Move skills per the design note's "Skill organization"
+- [x] Move skills per the design note's "Skill organization"
   section: `skills/loop/` ← bee-loop, bee-plan, bee-verify,
   bee-review, bee-plan-review (the plan gate is a loop tool — the
   design's loop list predates its build; placement is the
@@ -76,24 +76,24 @@ layout; one sweep moves everything)
   that work ON the skill kit). Assets move with their skills.
   `skills/roles/` lands when its first skill does (no empty
   folders). Use `git mv` so history follows.
-- [ ] Add `kit:` front matter to every SKILL.md (values: loop,
+- [x] Add `kit:` front matter to every SKILL.md (values: loop,
   session, skilldev — the folder it lives in).
-- [ ] Namespace rule lands in GLOSSARY (vocabulary entry): the
+- [x] Namespace rule lands in GLOSSARY (vocabulary entry): the
   `bee-` prefix marks the shipped kit; ad-hoc and repo-local
   skills never take it.
-- [ ] Fix glossary pointers in moved skills: `../GLOSSARY.md` →
+- [x] Fix glossary pointers in moved skills: `../GLOSSARY.md` →
   `../../GLOSSARY.md` (every moved SKILL.md + any asset that
   references it).
-- [ ] Sweep doc references to moved skills (README, GLOSSARY
+- [x] Sweep doc references to moved skills (README, GLOSSARY
   entries, sibling skills, AGENTS.md path mentions EXCEPT the
   plan-gate rule — that law edit is PP's, already coordinated).
   Expected end state: `grep -rn "skills/bee-" README.md AGENTS.md
   docs/ skills/GLOSSARY.md` shows no stale flat paths.
-- [ ] Verify: `node --test tests/*.test.mjs` green; pi discovery
+- [x] Verify: `node --test tests/*.test.mjs` green; pi discovery
   is recursive (verified in the design note) — spot-check by
   listing kit folders; every SKILL.md carries `kit:`; no skill
   directory remains at `skills/` root beside GLOSSARY.md.
-- [ ] Commit: `organize skills into kit folders with front matter`
+- [x] Commit: `organize skills into kit folders with front matter`
 
 ## Task 1: bee-skill-write (build 1 of the meta pair)
 

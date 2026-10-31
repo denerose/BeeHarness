@@ -44,9 +44,11 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   tool agree at merge.
 - none
 - [PP] 2026-11-01 — SKILL ORGANIZATION DECIDED (keeper; kit note
-  "Skill organization" section): kit folders (loop/session/
+  "Skill organization" section): kit folders (loop/thinking/
   skilldev/roles — recursive discovery verified; skilldev holds
-  the write/review/tester trio that works ON the skill kit) + `kit:`
+  the write/review/tester trio that works ON the skill kit;
+  thinking = brainstorm/hindsight/argue, chosen via bee-argue's
+  first live run) + `kit:`
   front-matter field + bee- prefix = shipped kit only. Execute as
   P7's OPENING TASK: one sweep (moves, front matter, GLOSSARY
   sibling pointers → ../../, doc references). Repo-skill override
