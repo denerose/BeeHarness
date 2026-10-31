@@ -65,10 +65,10 @@ test sandboxes); git ops run in cwd. Reject a `<slug>` containing
 - Every error path: message to stderr, no partial cleanup left behind
   (if worktree removal succeeds but branch delete fails, say so).
 
-- [ ] Implement per contract; `chmod +x scripts/task.sh`.
-- [ ] Smoke: from a scratch repo (NOT this one), create → merge →
+- [x] Implement per contract; `chmod +x scripts/task.sh`.
+- [x] Smoke: from a scratch repo (NOT this one), create → merge →
   create → abandon cycles behave per contract.
-- [ ] Commit (with `Role: task-orc` trailer, per dispatch brief):
+- [x] Commit (with `Role: task-orc` trailer, per dispatch brief):
   `implement task worktree helper`
 
 ## Task 2: suite wrapper `tests/task-sh.test.mjs`
