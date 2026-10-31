@@ -24,11 +24,11 @@ targets:
   - skills/loop/bee-pickup-handoff/SKILL.md (create)
   - scripts/plan-checks.sh
   - tests/plan-checks.test.mjs
-  - skills/bee-loop/SKILL.md (modify)
-  - skills/bee-review/SKILL.md (modify)
-  - skills/bee-verify/SKILL.md (modify)
-  - skills/bee-plan/SKILL.md (modify)
-  - skills/bee-plan/assets/plan-template.md (modify)
+  - skills/loop/bee-loop/SKILL.md (modify)
+  - skills/loop/bee-review/SKILL.md (modify)
+  - skills/loop/bee-verify/SKILL.md (modify)
+  - skills/loop/bee-plan/SKILL.md (modify)
+  - skills/loop/bee-plan/assets/plan-template.md (modify)
   - skills/GLOSSARY.md (modify)
   - .hivemind/phases/BeeHarness.md (modify)
 suite: node --test tests/*.test.mjs
