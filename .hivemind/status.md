@@ -32,6 +32,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
+- [PP] 2026-11-01 — skill-authoring kit design note filed
+  (`designs/2026-11-01-pp-skill-authoring-kit.md`): bee-skill-write
+  + bee-skill-review are PO workplan deliverables (keeper-directed;
+  PP does not draft skills — role boundary corrected this session);
+  GLOSSARY frozen at cross-document law; tester stays
+  comprehension-only. Two-tier kit (core ships / meta dormant)
+  PROPOSED — pending the keeper's-list superpowers-replacement
+  session, which sorts the migration by tier. PO: build inputs and
+  open questions live in the note.
 - [PP] 2026-11-01 — ADR-014 PROPAGATION (d4e18b7): GLOSSARY gained
   the determinism-test entry + a writing-standard bullet (skills wrap
   judgment around deterministic cores; every skill names the judgment
