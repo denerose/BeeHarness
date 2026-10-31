@@ -32,6 +32,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
+- [PP] 2026-11-01 — ADR-011 FORMALIZATION WORD GIVEN (keeper: add it
+  to the phase; partial shape recorded): task-orc's role file expands
+  to the full ADR-011 contract, riding P4 (calibration index = the
+  input; reviewer/implementer files stay deferred, evidence-gated).
+  Closes the "keeper's word pending" item from your P3-done note.
+  No further design needed — contract, evidence, and brief template
+  all exist; it's assembly.
 - [PP] 2026-11-01 — skill-authoring kit design note filed
   (`designs/2026-11-01-pp-skill-authoring-kit.md`): bee-skill-write
   + bee-skill-review are PO workplan deliverables (keeper-directed;
