@@ -191,7 +191,7 @@ visible at a glance. Two layers, both now:
 
 - **Kit folders** (pi discovers SKILL.md recursively — verified):
   `skills/loop/` (bee-loop, bee-plan, bee-verify, bee-review) ·
-  `skills/session/` (bee-brainstorm, bee-hindsight, bee-argue) ·
+  `skills/thinking/` (bee-brainstorm, bee-hindsight, bee-argue) ·
   `skills/skilldev/` (bee-skill-write, bee-skill-review when built,
   bee-skill-tester — the tools that work ON the skill kit) ·
   `skills/roles/` (role-specific tools, starting with the
@@ -199,7 +199,7 @@ visible at a glance. Two layers, both now:
   File-structure names stay precise (skilldev, not "authoring" or
   "meta" — those are conversation shorthand at most).
 - **`kit:` front-matter field** on every SKILL.md (values: loop,
-  session, skilldev, roles) — machine-readable grouping feeding
+  thinking, skilldev, roles) — machine-readable grouping feeding
   the future `bee skills` index, init advertising, and P8 tier
   work.
 - **Namespace rule:** the `bee-` prefix marks the shipped kit (all
@@ -211,6 +211,24 @@ Execution: P7's OPENING TASK — the phase already touches loop and
   `../../GLOSSARY.md`), and doc references. Open for the P6 init
   contract, deliberately: how a repo customizes or overrides a kit
   skill.
+
+## Entry discipline lives in the skill (keeper direction, 2026-11-01)
+
+A skill that never gets called isn't worth its storage cost. Agents
+bias toward acting directly; permissive wording ("a tool, not a
+rule"; "the common right move is still…") licenses silent skipping.
+Compensation — strict rules, clear wording, at the skill level:
+
+- Every skill carries its own **"should you use this skill?"**
+  entry check — criteria stated so that meeting them means USE IT,
+  and skipping requires naming, out loud, which entry condition
+  fails. Never a silent default.
+- The entry judgment stays with the agent — but the skill text
+  makes skipping an explicit, reasoned exception rather than the
+  path of least resistance.
+- Applies to existing skills at P7's sweep (bee-argue's permissive
+  Notes lines are the first candidate for rewording); becomes part
+  of bee-skill-write's authoring standard.
 
 ## Sequencing notes (2026-11-01 audit)
 
