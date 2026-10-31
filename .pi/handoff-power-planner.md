@@ -92,4 +92,15 @@ plain version comes first.
 - Absolute paths to the keeper in chat/report (Paseo dot-dir links
   404); repo-relative inside files.
 - Corrections apply at the keeper's STATED scope, then stop.
+- **Known hazard — the edit tool replaces, it never inserts** (five
+  occurrences this session): when ADDING a line or block near
+  existing text, anchor `oldText` on a unique line that will REMAIN
+  (a section header, or the following block's first line) and repeat
+  it inside `newText` after your addition. Anchoring on the target
+  line's own head silently deletes it. Companion failure: editing
+  from remembered line-wraps — read the exact lines first
+  (`sed -n 'N,Mp' file`) before writing `oldText`. If an edit call
+  fails to match, that is the warning working — re-read, don't
+  re-guess. (This is why `pp-scripted-edits-verify` is the urgent
+  suggestion.)
 - `.pi/handoff.md` (generic) is superseded; per-role files rule.
