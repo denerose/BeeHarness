@@ -115,6 +115,32 @@ calibration index and its dispatch record):
 now," with hindsight reviews re-checking the arrangement
 (especially the nested-review split) if it isn't working.
 
+## `bee park` (added 2026-11-01 — keeper wants it early)
+
+The parking lot becomes a script-owned store — the first deliberate
+conversion under ADR-014 (stores go lean when their subcommand
+lands). A subcommand, matching siblings (`bee task`, `bee report`):
+
+- `bee park add "<item>" [--context …] [--unpark-when …]` —
+  appends the next `PL-<role>-NNN` with provenance (role, date);
+  open questions ride the context verbatim, never pre-answered.
+- `bee park list [--full]` — TOON view: id, one-line item, age,
+  unpark condition (truncated; `--full` for the rest); aggregate
+  header (n parked · oldest age).
+- `bee park show <id> [--full]`.
+- `bee park resolve <id>` — moves the item to resolved (date +
+  how). KEEPER-GATED BY LAW: any agent may propose adding or
+  resolving; only the keeper's word resolves — agents never run
+  `resolve` on their own authority (the file's rule, carried into
+  the command).
+- **Conversion rides the build:** the script migrates the existing
+  markdown lot (history preserved in git) to the lean store; views
+  render for humans; GLOSSARY/AGENTS references update in the same
+  phase — the build is not finished until they do.
+- **Relation:** first concrete instance of the memory patterns
+  (provenance-stamped, role-gated writes — PL-002's shape); does NOT
+  unpark PL-002; P5's memory system may absorb or sit beside it.
+
 ## Determinism build-out in P4 (ADR-014)
 
 The addendum names `bee verify` and `bee task`; the shape, so the
