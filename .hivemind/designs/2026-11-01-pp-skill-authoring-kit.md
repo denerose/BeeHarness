@@ -83,8 +83,12 @@ ephemeral global kit.
   which stamps the name into every plan); bee-review (two scope
   notes); GLOSSARY (plan entry); bee-hindsight; bee-skill-tester.
 - **`adr` skill** — AGENTS.md (design-mode bullet); power-planner
-  role file; GLOSSARY (ADR entry). No bee-native ADR writer planned
-  yet — the replacement session decides its home.
+  role file; GLOSSARY (ADR entry). DECIDED (2026-11-01): NOT a
+  replacement target — ADR-writing is harness-BUILD process tooling
+  on the keeper's kit; the loop never depends on it. These
+  references describe our construction process and stay. If shipped
+  users ever get decision-record guidance, it rides the PL-PP-006
+  distillation, not a shipped skill.
 - **`handoff` / `pickup-handoff`** — AGENTS.md (handoff rule);
   GLOSSARY (handoff entry). The handoff rituals are already
   bee-native; only the scaffolding skill pair is global. No
@@ -128,6 +132,17 @@ Recorded here so it outlives the status note that first carried it
   its own terms. Shipped skills point at the PROJECT's glossary,
   never ours. Produced in P8; scaffolding lands with the P6 init
   contract.
+
+## The shipping test (keeper, 2026-11-01 — governing rule for slice 2)
+
+A preferred behavior is replaced only when it lives in a SHIPPED
+component — skill text, guidance injection, template glossary,
+scaffolded rules. A rule that lives only in an ADR is not yet
+replaced. ADRs are build-time records; their content propagates to
+shipped homes before shipping, or the behavior is lost. Consequences:
+no shipped component cites our ADRs; shipped instruments carry their
+rules as self-contained text; ADR-writing itself is build-process
+tooling on the keeper's kit — nothing ships for it.
 
 ## Scope guard + bootstrap order (added 2026-11-01, pre-P7)
 
