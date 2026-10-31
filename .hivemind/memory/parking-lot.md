@@ -118,6 +118,19 @@ recommendations beyond what the keeper already directed).
   PL-PP-006, the `bee guidance` direction — unpark when the first
   product project needs orientation or the keeper wants the design
   session.
+- **PL-PP-008 — AI observability and agent hooks** — keeper
+  direction (2026-11-01): a discussion to have — observing agent
+  work (what events, what signals, what surfaces) and hooks (which
+  extension/session/dispatch events the harness can hang
+  observability on). Open for the unpark session, filed open: what
+  "observability" means for this hive (metrics from the structured
+  stores? logs? dashboards?); which hook points exist today (pi
+  extension hooks, session start/end, dispatch lifecycle) vs. which
+  we'd need; how it relates to the signals-and-guides thread
+  (PL-PP-004 topic 1, awaiting curated links) and to ADR-014's
+  machine-readable records making observation possible in the
+  first place — unpark when the keeper wants the conversation, or
+  alongside the signals/guides session.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any
