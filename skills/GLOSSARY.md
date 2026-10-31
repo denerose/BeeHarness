@@ -145,6 +145,19 @@ it as a term of art.
   (3) if a live file was touched by accident — `git restore` it
   immediately, verify porcelain clean, and disclose it in the report.
 
+- **TOON** — token-oriented notation: a token-lean, line-oriented
+  format for structured data exchanged with agents. In this harness it
+  is both the storage format for agent-primary stores and the emission
+  format for `bee`'s agent-facing output (ADR-014). Humans get
+  rendered views, not raw TOON.
+- **AXI** — the ten agent-first CLI principles (axi.md; the list lives
+  in `AXI.md` at the repo root): token-efficient output, minimal
+  schemas, truncation with `--full`, pre-computed aggregates,
+  definitive empty states, structured errors and idempotent mutations,
+  ambient context first, content-first bare calls, contextual
+  disclosure, consistent help. Binding on every `bee` command
+  (ADR-014).
+
 ## Writing standard
 
 How behavior documents are written — skills, rules, role files,
