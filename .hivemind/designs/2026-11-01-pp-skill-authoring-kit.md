@@ -118,4 +118,6 @@ Recorded here so it outlives the status note that first carried it
 
 Keeper's list (superpowers + global skills replacement session); PO
 workplan (the pair, then the migration); PL-PP-003 (the guidance
-injection that does the advertising).
+injection that does the advertising); P8 ship-tier cleanup (shipped
+skills must carry their own rule text — no references to our ADRs or
+working documents).
