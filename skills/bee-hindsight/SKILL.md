@@ -17,7 +17,7 @@ Don't trust recall over the record. Re-read, in this order:
 1. session memory `.hivemind/sessions/<role>.md` (what actually happened)
 2. the phase list (`.hivemind/phases/`)
 3. the plan and its check-boxes
-4. verify records and review reports in `.hivemind/records/`
+4. verify records and review reports in `.hivemind/logbook/`
 5. keeper corrections in the conversation you still have in context
 
 ## What to examine

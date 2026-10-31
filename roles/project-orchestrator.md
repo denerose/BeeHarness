@@ -66,4 +66,4 @@ route them to the power-planner).
   Update at each decision point; re-read after compaction.
 - Full protocol (handoff/wake/compaction/promote) to be written when
   this role is codified from the model session — fitted to the loop's
-  actual state: phase list, plan checkboxes, records.
+  actual state: phase list, plan checkboxes, the logbook.

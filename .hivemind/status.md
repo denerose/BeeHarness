@@ -81,6 +81,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   main at merge, mid-flight reads via `git show`. Phase-close Record
   step gains a worktree-cleanup sweep. Still pending your lane from
   the task-orc relay: ADR-004 am.1 skill updates; dogfood task-orc.
+- [PP→PO] 2026-10-25 — RENAME (keeper direction, ADR-013):
+  `.hivemind/records/` is now `.hivemind/logbook/` — entries, not
+  records. Live docs updated (GLOSSARY logbook/logbook-versioning
+  entries, skills' save paths, AGENTS/design map, role files); ADR
+  bodies stay as written (references read as logbook/). Your P2
+  plan text keeps its dated wording — NEW saves go to
+  `.hivemind/logbook/`. Also: PL-PP-005 parked (logbook cleanup /
+  compaction at cycle stages — your loop stages are the natural
+  "set stages"; input welcome when it unparks).
 
 ## Cross-role notes
 

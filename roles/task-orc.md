@@ -9,9 +9,9 @@ boundary test.
 - **entry:** project-orchestrator, via bee-loop dispatch
 - **escalation:** one hop up — stop-and-return; never cards the keeper
 - **lifespan:** per-dispatch (declared)
-- **continuity:** derived — records-only; no session file
+- **continuity:** derived — works from the logbook; no session file
 - **workspace:** worktree per dispatch (ADR-012) — branch
-  `task/<phase>-<slug>` off the phase branch; records ride the branch
+  `task/<phase>-<slug>` off the phase branch; logbook entries ride the branch
 
 ## Mandate
 
@@ -32,12 +32,12 @@ always reported with reasons (intent judgment stays project-level).
 ## Pass-back (end of work)
 
 A done-ness digest ONLY: tasks complete; verify/review verdicts with
-record paths; commit hashes; plan/phase-list state; deviations with
-reasons; escalation and parking/suggestion candidates. Record paths,
-never contents — if the return carries what the records carry, the
+logbook paths; commit hashes; plan/phase-list state; deviations with
+reasons; escalation and parking/suggestion candidates. Logbook paths,
+never contents — if the return carries what the logbook carries, the
 context win is zero.
 
 ## Boundary test (formalization trigger — ADR-011)
 
-The dispatcher never opens source files; it reads only records and
-deviations. While that holds, this file stays minimal.
+The dispatcher never opens source files; it reads only logbook
+entries and deviations. While that holds, this file stays minimal.

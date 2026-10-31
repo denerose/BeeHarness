@@ -26,7 +26,7 @@ review work that doesn't run.
 
 ## Report
 
-Save to `.hivemind/records/<plan-slug>-task<N>-review-r<N>.md` (round
+Save to `.hivemind/logbook/<plan-slug>-task<N>-review-r<N>.md` (round
 suffix per GLOSSARY: record versioning; review rounds count
 independently of verify rounds — your first report is `-r1`, and
 re-reviews after fixes increment it) using

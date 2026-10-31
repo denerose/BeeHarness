@@ -24,8 +24,9 @@ it as a term of art.
   First-class roles (power-planner, project-orchestrator) take keeper
   direction and keep session files; dispatched roles (task-orc,
   reviewer, implementer — minted in P3) are spawned by other roles,
-  escalate upward through their dispatcher, and remember via records
-  unless their file overrides. Not every role is first-class.
+  escalate upward through their dispatcher, and remember via their
+  work's logbook unless their file overrides. Not every role is
+  first-class.
 - **power-planner** — the shaping role: discussion, architecture,
   decisions, design docs; co-creates design docs with the keeper. See
   `roles/power-planner.md`.
@@ -35,7 +36,7 @@ it as a term of art.
   conflicts to the keeper. See `roles/project-orchestrator.md`.
 - **hivemind** — the `.hivemind/` folder in a repo. Holds all the
   working files the agents produce: `decisions/` (ADRs), `designs/`,
-  `plans/`, `phases/`, `suggestions/`, `memory/`, `records/`,
+  `plans/`, `phases/`, `suggestions/`, `memory/`, `logbook/`,
   `sessions/` (gitignored), `status.md` (cross-role surface), and
   `keeper-report.md` (the keeper's zoned digest).
 - **ADR** — architecture decision record, one file per decision, in
@@ -53,12 +54,14 @@ it as a term of art.
   `.hivemind/phases/<project>.md` (project = repo name unless the keeper
   says otherwise). The only file the loop updates to track its own
   progress.
-- **records** — `.hivemind/records/`. The evidence files: verify records
-  and review reports, named `<plan-slug>-task<N>-verify-r<N>.md` and
-  `<plan-slug>-task<N>-review-r<N>.md` (round suffix per ADR-007; review
-  rounds count independently of verify rounds). States move on these.
+- **logbook** — `.hivemind/logbook/`. The loop's written account of
+  its own work: verify entries and review reports, named
+  `<plan-slug>-task<N>-verify-r<N>.md` and
+  `<plan-slug>-task<N>-review-r<N>.md` (round suffix; review rounds
+  count independently of verify rounds). Claims don't move states —
+  these documents do (ADR-006; renamed from "records", ADR-013).
 - **bee-verify / bee-review** — sibling skills in this same folder.
-  bee-verify runs checks and writes a verify record; bee-review judges
+  bee-verify runs checks and writes a verify entry; bee-review judges
   quality and writes a review report. The loop calls them; they never
   call each other.
 - **parking lot** — `.hivemind/memory/parking-lot.md`. Deferred
@@ -70,9 +73,8 @@ it as a term of art.
   `release` (phase checks plus anything extra the plan demands).
   More risk, more checking.
 - **work-item states** — `draft → implemented → verified → reviewed →
-  done`. The loop moves items between states, using records in
-  `.hivemind/records/` as evidence; verify/review only produce the
-  records.
+  done`. The loop moves items between states, and each move needs its
+  document in `.hivemind/logbook/`; verify/review write the documents.
 - **escalate** — stop and ask the keeper (ask_user card, with a
   recommendation), then record the answer where it applies: in the plan
   (task-scoped) or the phase list (phase-scoped). Used for: plan/design
@@ -91,9 +93,9 @@ it as a term of art.
 - **status surface** — `.hivemind/status.md`: open escalations, ADRs
   awaiting the keeper's flip, cross-role notes. Both roles read it at
   session start; interim until the decisions inbox exists.
-- **record versioning** — verify/review records carry a round suffix
-  (`…-task3-verify-r2.md`); records made in worktrees always land in
-  the main checkout's `.hivemind/records/`.
+- **logbook versioning** — verify and review entries carry a round
+  suffix (`…-task3-verify-r2.md`); entries made in worktrees ride the
+  task branch and reach main at merge (ADR-007 amendment 2).
 - **thread-close** — the mid-session ritual when a thread of work
   completes but the session continues: update the session log, offer
   durable bits for promotion (offer-first), park any new deferrals,
@@ -119,7 +121,7 @@ it as a term of art.
   Two-size resets: task (delete branch + worktree) vs phase (abandon
   the branch; main untouched — keeper's word).
 - **task branch** — `task/<phase>-<slug>`: one worktree per task-orc
-  dispatch, off the phase branch. Records ride it; the diff is the
+  dispatch, off the phase branch. logbook entries ride it; the diff is the
   review artifact (ADR-012).
 - **dispatch brief, safety lines** — three standing lines every
   brief for a write-capable agent carries (P2 near-miss: a reviewer

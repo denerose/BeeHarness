@@ -31,7 +31,7 @@ inputs, same result — anyone running this should get the same answer.
 
 ## Output
 
-Save to `.hivemind/records/<plan-slug>-task<N>-verify-r<N>.md` (round
+Save to `.hivemind/logbook/<plan-slug>-task<N>-verify-r<N>.md` (round
 suffix per GLOSSARY: record versioning; the first run is `-r1`, fix
 rounds increment it — the dispatch states the round; if it doesn't,
 use the highest existing `-rN` for this task plus one) using

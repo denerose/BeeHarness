@@ -1,6 +1,6 @@
 # Review: [task/phase name]
 
-(Save as `.hivemind/records/<plan-slug>-task<N>-review-r<N>.md`)
+(Save as `.hivemind/logbook/<plan-slug>-task<N>-review-r<N>.md`)
 
 **Role:** [producing role — GLOSSARY: Role trailer]
 **Reviewer:** [role/session]

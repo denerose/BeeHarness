@@ -32,12 +32,12 @@ directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary,
    safety). Independent tasks may run in parallel as subagents; verify
    each result before using it.
 3. **Verify** — run the **bee-verify skill** (sibling skill, see
-   GLOSSARY) at the task level. Its record lands in
-   `.hivemind/records/`. State the round in the dispatch brief (first
+   GLOSSARY) at the task level. Its logbook entry lands in
+   `.hivemind/logbook/`. State the round in the dispatch brief (first
    run is `r1`).
 4. **Review** — dispatch the **bee-review skill** on the finished work
    (fresh subagent when available; hand it the plan path, task id,
-   changed files, and verify record path). Review rounds count
+   changed files, and logbook entry path). Review rounds count
    independently of verify rounds — the first review is `r1`. In a
    solo session with no separate reviewer, review the work yourself
    and say so in the review report — the evidence trail matters more
@@ -45,13 +45,13 @@ directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary,
 5. **Fix rounds** — if review or verify fails: fix, re-verify,
    re-review. A round is one fix attempt plus its re-runs; the initial
    failure is not a round. Maximum two rounds. Still failing?
-   Escalate. Re-runs write versioned records — the round suffix
-   increments (`-r2`, GLOSSARY: record versioning).
+   Escalate. Re-runs write versioned logbook entries — the round suffix
+   increments (`-r2`, GLOSSARY: logbook versioning).
 6. **Record** — check off the task in the plan, update the phase list,
    commit. Stage only the files this task touched — its code changes,
-   its records, the plan and phase-list updates; never `git add -A`.
+   its logbook entries, the plan and phase-list updates; never `git add -A`.
    Carry a `Role:` trailer (GLOSSARY). Records always land in the main
-   checkout's `.hivemind/records/`, even when work happened in a
+   checkout's `.hivemind/logbook/`, even when work happened in a
    worktree.
 7. Repeat until the plan is done, then run **bee-verify at the phase
    level** (GLOSSARY: validation level — the full suite the plan lists)
@@ -61,9 +61,9 @@ directed by the keeper) says to. Read `../GLOSSARY.md` (the shared bee glossary,
 
 Every task moves `draft → implemented → verified → reviewed → done`.
 You (the loop) move items between states, and each move needs its
-record in `.hivemind/records/`: a verify record to leave *implemented*,
+record in `.hivemind/logbook/`: a verify entry to leave *implemented*,
 a review report to leave *verified*. If you catch yourself advancing a
-state without the record, stop and go back.
+state without the entry, stop and go back.
 
 ## Escalate when
 

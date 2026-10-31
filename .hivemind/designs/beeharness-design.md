@@ -81,14 +81,18 @@ replaces these surfaces must preserve that.
 
 ## Artifacts map
 
-`.hivemind/`: `decisions/` (ADRs) · `designs/` (this doc and event
-designs) · `plans/` · `phases/` (phase lists) · `records/` (verify/
-review evidence) · `suggestions/` (hindsight inbox, any role) ·
-`memory/` (parking lot now; shards later) · `sessions/` (per-role,
-gitignored) · `status.md` (cross-role surface) · `keeper-report.md`
-(the keeper's zoned digest, ADR-008). Root: `SOUL.md`, `README.md`,
-`AGENTS.md`, `roles/`, `skills/`. Write ownership per ADR-007's table
-(+ Amendment 1: SOUL.md and README.md).
+`.hivemind/` — one purpose per class: `decisions/` (ADRs — *why it's
+this way*; keeper's voice) · `designs/` (*what to build*; this doc and
+event designs) · `plans/` (*how*; step-by-step, loop-executed) ·
+`phases/` (*when/next* — the queue and tracking) · `logbook/` (*what
+actually happened* — verify/review accounts; states move on these,
+ADR-006/013) · `suggestions/` (the hive's inbox — any role + keeper) ·
+`memory/` (parking lot; shards later) · `sessions/` (per-role live
+memory, gitignored) · `status.md` (cross-role surface) ·
+`keeper-report.md` (the keeper's zoned digest, ADR-008). Root:
+`SOUL.md`, `README.md`, `AGENTS.md`, `roles/`, `skills/`. Write
+ownership per ADR-007's table (+ amendments: root files, branch
+scope).
 
 ## Not built yet (bootstrap honest ledger)
 

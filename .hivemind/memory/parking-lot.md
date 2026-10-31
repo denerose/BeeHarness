@@ -69,8 +69,34 @@ recommendations beyond what the keeper already directed).
   the P4 CLI lane, alongside the capture tool (see keeper's
   suggestion `2026-10-25-keeper-quick-thoughts-capture.md`) — unpark
   when P4 opens or the keeper wants the design session.
+- **PL-PP-004 — conference notes awaiting Power Planner discussion** —
+  keeper took conference notes (2026-10-31); full per-topic detail in
+  `designs/2026-10-31-conference-notes-power-planner.md`. Topics:
+  agent signals/guides (backpressure; validation scripts, arch tests;
+  per-task tailoring; keeper to supply curated links), deterministic
+  over inference for BeeHarness, arch tests (Roslyn for C#, TS option
+  TBD; all/some/none question), OpenAPI-first + contract tests,
+  StackQL (research first), AXI principles (axi.md — maybe into
+  SOUL), Arazzo specs, auto-PR with human deployment audit — unpark
+  when the Power Planner session on these topics happens.
+- **PL-PP-005 — logbook & project-record lifecycle: cleanup and
+  compaction** — keeper direction (2026-10-25): when and how do
+  logbook entries (and related project records) get cleaned up or
+  compacted? Open question preserved for the unpark session: maybe a
+  skill or a role specifically for cleanup/compaction at set stages
+  in the cycle (the keeper's hypothesis — not settled) — unpark with
+  the P4 CLI design or productization (P6), or when the keeper wants
+  the conversation. Related: PL-002 (memory tooling), the capture
+  suggestion.
 ## Resolved
 
+- **PL-PP-002 — artifact taxonomy: records vs designs vs decisions**
+  — resolved 2026-10-25 (keeper session): purposes now written per
+  class in the design doc's artifacts map and AGENTS.md (why / what /
+  how / when / what-happened / inbox / deferred / live / surface /
+  digest); `records/` renamed `logbook/` (ADR-013) — the class is the
+  loop's written account of its own work; the ADR =
+  "decision-record" collision dissolved.
 - **PL-004 — global AGENTS.md overreach cleanup** — resolved 2026-10-25
   (keeper picked "strip both" via routing card): ask_user-first
   questioning and the plan-review gate removed from the global file;
