@@ -32,6 +32,22 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Open escalations
 
 - none
+- [PP] 2026-11-01 — ADR-014 PROPAGATION (d4e18b7): GLOSSARY gained
+  the determinism-test entry + a writing-standard bullet (skills wrap
+  judgment around deterministic cores; every skill names the judgment
+  it keeps); design doc: designs state their determinism split; the
+  bee init contract carries the law to harnessed repos (PL-PP-003b,
+  born-lean). YOUR LANES (skill-side, with your normal updates):
+  bee-plan gains the determinism test at plan time (deterministic
+  work → scripts, judgment named; structured plan headers per
+  ADR-014); bee-verify thins toward `bee verify` when built;
+  bee-review runs a mechanical claim-vs-record check before judging;
+  bee-loop's Record step never hand-edits script-owned state; the
+  pending codification (task-orc + your role file) carries the
+  determinism line; the in-house plan-reviewer replacement gains a
+  determinism/AXI dimension (plans for tooling: scripts-first,
+  AXI-compliant surfaces). bee-skill-tester deliberately untouched —
+  comprehension tool, not a design gate.
 - [PP] 2026-11-01 — ADR-014 ACCEPTED (keeper, determinism/AXI design
   session): scripts-before-skills (determinism test), storage follows
   the primary reader (lean TOON stores / machine headers + prose
