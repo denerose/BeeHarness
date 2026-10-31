@@ -44,7 +44,7 @@ We are designing the harness before building it. Right now:
 ## Rules of engagement
 
 - **Behavior documents stay generic** (keeper direction 2026-10-25;
-  the writing standard in `WRITING-STANDARD.md` carries the full
+  the writing standard in `docs/WRITING-STANDARD.md` carries the full
   text): skills,
   rules, role files, and templates contain NO task-specific
   examples, dated stories, or current-work narratives — placeholders
@@ -130,6 +130,10 @@ We are designing the harness before building it. Right now:
   decisions: the parking lot) · `sessions/` (live role memory,
   gitignored) · `status.md` (cross-role surface) · `keeper-report.md`
   (keeper's zoned digest, ADR-008).
+- Repo documentation: `AGENTS.md`, `README.md`, `SOUL.md` stay at
+  the root; every other standalone document lives in `docs/`
+  (currently `docs/AXI.md`, `docs/WRITING-STANDARD.md` — new
+  standards and guides go there, not the root).
 - Session memory: `.hivemind/sessions/<role>.md` — one file per
   active role (role name in the filename), updated at each decision
   point; re-read yours after compaction/fork/new session.
@@ -152,7 +156,7 @@ We are designing the harness before building it. Right now:
   AGENTS.md; those are the keeper's ephemeral personal kit. A fresh
   checkout plus the default setup must basically run the harness.
 - **Agent-first CLI (ADR-014):** the `bee` CLI and every agent-facing
-  surface follows the ten AXI principles (`AXI.md`) — and prefer
+  surface follows the ten AXI principles (`docs/AXI.md`) — and prefer
   scripts over skills for deterministic work: if two careful people
   following the same rules produce the same result, it is a script.
   Storage follows the primary reader: agent-primary stores go TOON,

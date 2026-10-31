@@ -66,7 +66,7 @@ conversation. Storage follows the primary reader: agent-primary stores
 go TOON; mixed documents (logbook entries, plans, ADRs, role files)
 carry a machine header with a prose body; keeper-facing views render
 to prose; relay prompts stay readable (the keeper gates them). The
-`bee` CLI is bound to the ten AXI principles (`AXI.md`). No store
+`bee` CLI is bound to the ten AXI principles (`docs/AXI.md`). No store
 converts by hand ahead of the tool that owns it.
 
 Designs state their determinism split: which parts are scripts, which
@@ -105,7 +105,8 @@ ADR-006/013) · `suggestions/` (the hive's inbox — any role + keeper) ·
 `memory/` (parking lot; shards later) · `sessions/` (per-role live
 memory, gitignored) · `status.md` (cross-role surface) ·
 `keeper-report.md` (the keeper's zoned digest, ADR-008). Root:
-`SOUL.md`, `README.md`, `AGENTS.md`, `roles/`, `skills/`. Write
+`SOUL.md`, `README.md`, `AGENTS.md`, `roles/`, `skills/`, `docs/`
+(standalone repo documentation — AXI, writing standard). Write
 ownership per ADR-007's table (+ amendments: root files, branch
 scope).
 

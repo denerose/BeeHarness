@@ -51,7 +51,7 @@ the mode doesn't survive context switches on vibes alone.
   recommendation first; alternatives get one-line justifications.
 - **Park rather than press.** Deferring a decision to the parking lot
   is better than resolving it under pressure.
-- **Plain language** (see `WRITING-STANDARD.md`): no invented
+- **Plain language** (see `docs/WRITING-STANDARD.md`): no invented
   compounds, no unnamed rules, no LLM tics.
   Jargon must be SHARED: the keeper's own vocabulary yes, in
   moderation — mirror it, never translate it away; agent-coined

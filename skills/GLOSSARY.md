@@ -3,8 +3,8 @@
 Short list of terms the bee skills use. Defined here once; skills link
 here instead of re-explaining. If a word is not in this file, do not use
 it as a term of art. Vocabulary only — the writing standard for behavior
-documents lives in `WRITING-STANDARD.md` (repo root); other standards
-live as their own documents (`AXI.md`).
+documents lives in `docs/WRITING-STANDARD.md`; other standards live as
+their own documents (`docs/AXI.md`).
 
 - **keeper** — the human owner. Final authority on every decision that
   matters; the only one who unparks parking-lot items or amends design
@@ -149,7 +149,7 @@ live as their own documents (`AXI.md`).
   emission format for agent-facing surfaces (ADR-014). Humans get
   rendered views.
 - **AXI** — the ten agent-first CLI principles (axi.md); the binding
-  list lives in `AXI.md` at the repo root. Every `bee` command
+  list lives in `docs/AXI.md`. Every `bee` command
   follows them (ADR-014).
 - **determinism test** — if two careful people following the same
   rules would produce the same result, the work is a script; if they

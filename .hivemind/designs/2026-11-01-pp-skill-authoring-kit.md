@@ -32,8 +32,8 @@ reviews a skill for design soundness.
   Cold-dispatch pattern; reports findings, never fixes; tiered like
   ADR-004.
 - **GLOSSARY is vocabulary only** (cleaned 2026-11-01: the writing
-  standard moved to `WRITING-STANDARD.md` at the repo root; standards
-  live as their own documents); new authoring law lives in the skill.
+  standard moved to `docs/WRITING-STANDARD.md`; standards live as
+  their own documents); new authoring law lives in the skill.
 - **bee-skill-tester stays comprehension-only.**
 
 ## Proposed (input to the replacement session — not decided)

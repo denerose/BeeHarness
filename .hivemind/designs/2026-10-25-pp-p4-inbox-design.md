@@ -64,7 +64,7 @@ Open questions resolved by the keeper this session:
 
 Scope grows with ADR-014: `bee verify` and script-owned work-item
 state moves land here; every new subcommand is AXI-compliant from
-birth (`AXI.md`); CLI-writing and AXI skills/rules are drafted in
+birth (`docs/AXI.md`); CLI-writing and AXI skills/rules are drafted in
 this phase. Human-facing surfaces unaffected: the report and status
 board stay rendered prose; relay prompts stay readable.
 

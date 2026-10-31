@@ -48,7 +48,7 @@ and back up again as questions and results.
 - **Agent-first surfaces.** The `bee` CLI is built for its primary
   users — agents — to the AXI principles: deterministic scripts where
   rules suffice, inference only where judgment lives, token-lean
-  machine formats, rendered views for the human. (ADR-014, `AXI.md`)
+  machine formats, rendered views for the human. (ADR-014, `docs/AXI.md`)
 - **Focus discipline.** Planning stays on documents; implementation stays
   on code. We never drift between the two without saying so.
 - **Transparency.** Nothing silent: decisions carry reasons, work carries

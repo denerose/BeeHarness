@@ -77,7 +77,7 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   session.
 - [PP] 2026-11-01 — GLOSSARY CLEANUP (keeper direction): GLOSSARY is
   vocabulary only now — the writing standard moved to
-  `WRITING-STANDARD.md` (repo root, sibling of `AXI.md`: standards
+  `docs/WRITING-STANDARD.md` (standards
   are their own documents); TOON/AXI/determinism-test entries
   slimmed to definitions + pointers (law lives in ADR-014/AXI.md);
   duplicate `role` entries merged into the ADR-010 shape. References
@@ -87,7 +87,7 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   session): scripts-before-skills (determinism test), storage follows
   the primary reader (lean TOON stores / machine headers + prose
   bodies / rendered views; relay prompts stay readable), `bee` CLI
-  AXI-bound — `AXI.md` at repo root, linked from README, AGENTS.md,
+  AXI-bound — `docs/AXI.md`, linked from README, AGENTS.md,
   SOUL.md. Phase rows updated: P4 = inbox born-TOON absorbing
   suggestions + `bee task` + `bee verify` + AXI + CLI-writing/AXI
   skills drafted; P5 memory born-TOON; P6 AXI compliance pass. PO:
@@ -168,7 +168,7 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   stay GENERIC — no task-specific examples, dated stories, or
   current-work narratives in skills/rules/role files/GLOSSARY;
   placeholders and generic actors only (the writing standard, now
-  `WRITING-STANDARD.md`).
+  `docs/WRITING-STANDARD.md`).
   Your sweep: `roles/project-orchestrator.md` "First assigned tasks"
   section is a task record in a behavior doc — fold into records,
   genericize the role file. Applies to all your future skill edits
