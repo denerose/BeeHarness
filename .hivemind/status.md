@@ -56,6 +56,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   determinism/AXI dimension (plans for tooling: scripts-first,
   AXI-compliant surfaces). bee-skill-tester deliberately untouched —
   comprehension tool, not a design gate.
+- [PP] 2026-11-01 — ADR-015 ACCEPTED (keeper direction): the
+  bee-native boundary — anything the loop or bee-built work depends
+  on is bee-native (in this repo); foundations = Pi, Paseo,
+  subagents extension; global skills and global AGENTS.md are NEVER
+  dependencies (ephemeral, keeper's personal kit; fresh checkout +
+  default setup must basically run). The hardcode inventory is now a
+  list of boundary violations closing at P7; the git-identity rule
+  (currently global-only) is a known leak the replacement session
+  routes.
 - [PP] 2026-11-01 — GLOBAL-SKILL HARDCODE REVIEW filed into the
   skill-authoring-kit note (inventory + rule): plan-reviewer / adr /
   handoff-pair references live in AGENTS.md, skills, plan template,
