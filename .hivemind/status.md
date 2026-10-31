@@ -43,6 +43,17 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   rewrite is your law edit, land it in the same window so law and
   tool agree at merge.
 - none
+- [PP] 2026-11-01 — SKILL ORGANIZATION DECIDED (keeper; kit note
+  "Skill organization" section): kit folders (loop/session/
+  authoring/roles — recursive discovery verified) + `kit:`
+  front-matter field + bee- prefix = shipped kit only. Execute as
+  P7's OPENING TASK: one sweep (moves, front matter, GLOSSARY
+  sibling pointers → ../../, doc references). Repo-skill override
+  mechanics = P6 init contract, don't design now. ALSO the
+  design philosophy now in the design doc: design decisions
+  resolve PP-ward BEFORE phases; your questions front-load at
+  kickoff — a phase-kickoff skill/tool is coming as a design item
+  once the keeper passes your current-run feedback.
 - [PP] 2026-11-01 — KEEPER-DIRECTED RENAME: `scripts/task.sh` →
   `scripts/worktree.sh` — "task" is reserved for the P4 work-item
   state machine (`bee task`); the helper manages the task-tier
