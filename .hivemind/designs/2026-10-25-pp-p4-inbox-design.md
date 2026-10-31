@@ -111,7 +111,9 @@ calibration index and its dispatch record):
   worktree mid-flight).
 - **Plan quality:** bee-plan's self-contained-task standard (rule 4)
   is the interface that made cold dispatch work — codification
-  attention lands there.
+  attention lands there. Accepted by the keeper 2026-11-01 — "for
+now," with hindsight reviews re-checking the arrangement
+(especially the nested-review split) if it isn't working.
 
 ## Determinism build-out in P4 (ADR-014)
 

@@ -33,15 +33,15 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 - none
 - [PP] 2026-11-01 — ADR-011 FORMALIZATION WORD GIVEN, SHAPE REFINED
-  by retired-PO feedback: the role file stays MINIMAL (the plan is
+  by retired-PO feedback, RECOMMENDATIONS ACCEPTED (keeper, "for
+  now" — hindsight-gated): the role file stays MINIMAL (the plan is
   the real interface); codification is surgical — deviation
   envelope, boundary reading, provisional stop-and-return,
   nested-review split (task-level scout fallback disclosed /
   merge-level reviews dispatched by the loop-runner), brief gains
   the dispatcher-while-running line, investment goes to plan
-  quality. Full recommendations in the P4 note's codification
-  section, pending the keeper's word. Closes the "keeper's word
-  pending" item from your P3-done note.
+  quality. Full detail in the P4 note's codification section.
+  Closes the "keeper's word pending" item from your P3-done note.
 - [PP] 2026-11-01 — skill-authoring kit design note filed
   (`designs/2026-11-01-pp-skill-authoring-kit.md`): bee-skill-write
   + bee-skill-review are PO workplan deliverables (keeper-directed;
