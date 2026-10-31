@@ -27,7 +27,7 @@ Your own process, not the code (code quality was review's job):
 - What was slow or awkward that shouldn't have been?
 - Which decisions turned out wrong or dated badly? (Link the ADR.)
 - What did the keeper have to correct more than once?
-- What did the plan get wrong that the plan-reviewer gate should have
+- What did the plan get wrong that the bee-plan-review gate should have
   caught?
 - Did anything skip the states/evidence rules?
 - Did any work embed task-specific examples, dated stories, or

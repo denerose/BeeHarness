@@ -48,7 +48,7 @@ their own documents (`docs/AXI.md`).
 - **plan** — the step-by-step document a loop executes. Lives in
   `.hivemind/plans/`, named `YYYY-MM-DD-<pp|po>-<slug>.md` (role
   initials, ADR-007). Written by bee-plan,
-  reviewed by the global `plan-reviewer` skill before execution.
+  reviewed by `bee-plan-review` before execution.
 - **phase list** — the loop's one-line-per-phase tracking file,
   `.hivemind/phases/<project>.md` (project = repo name unless the keeper
   says otherwise). The only file the loop updates to track its own
@@ -108,6 +108,19 @@ their own documents (`docs/AXI.md`).
   sign-off lifecycle (same folder; comprehension testing is
   bee-skill-tester's); states whether the draft touches law, which
   decides if keeper sign-off applies.
+- **bee-plan-review** — the plan review gate: reviews a written plan
+  before the loop executes it. Two halves — a deterministic core
+  (`scripts/plan-checks.sh`: target existence, block tagging,
+  ephemeral prose in durable targets, and with `--run` the plan's
+  suite in a throwaway sandbox) and the reviewer's judgment on six
+  dimensions: accuracy, external reality, sandbox-run, ephemeral
+  prose, determinism/AXI, no-globals boundary. Cold-dispatched (the
+  reviewer never wrote the plan); reports tiered findings —
+  blocking, or should-fix where a waiver needs a one-line recorded
+  reason — and never fixes. Plans carry a machine header and
+  path-tagged verbatim blocks; those conventions are this gate's
+  input format. Finished work is bee-review's, skill documents
+  bee-skill-review's (same folder).
 - **cold read** — reading a document with no context beyond the
   document and its named references — no drafting conversation, no
   session memory. A cold reader is who skills are written for; a

@@ -32,7 +32,7 @@ small task the keeper wants planned. Output: one file in
    verification command. Repeat what matters; don't make anyone hunt.
 5. **Declare the validation level** (GLOSSARY) in the header. It comes
    from the design doc if it declares one; otherwise you recommend a
-   level with a one-line reason, and the keeper or plan-reviewer
+   level with a one-line reason, and the keeper or bee-plan-review
    confirms at review. Tasks inherit it unless they say otherwise.
 6. **Every task ends with a commit step** (short imperative message).
 7. **No ephemeral status prose in durable docs.** Plans must not
@@ -48,9 +48,9 @@ Use `assets/plan-template.md`. Save as
 `.hivemind/plans/YYYY-MM-DD-<pp|po>-<slug>.md` — your role's initials
 in the slug (ADR-007; pp = power-planner, po = project-orchestrator) —
 with `**Reviewed:** PENDING`.
-Then run the global `plan-reviewer` skill on it — the gate is not
+Then run the `bee-plan-review` skill on it — the gate is not
 optional. Fix the findings (the keeper may waive should-fix items —
-plan-reviewer's 🟡 tier — with a one-line recorded reason), re-run
+bee-plan-review's should-fix tier — with a one-line recorded reason), re-run
 until it passes, then stamp the date. A plan that never passes never
 gets implemented.
 

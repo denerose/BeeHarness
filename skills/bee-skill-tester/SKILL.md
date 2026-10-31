@@ -55,7 +55,7 @@ no context; note the rest and move on.
 ## Boundaries
 
 - Tests skill documents. Code and plans have their own reviewers
-  (bee-review, plan-reviewer).
+  (bee-review, bee-plan-review).
 - Testers report; the parent fixes.
 - Not part of the bee-loop states or gates. This is an authoring tool
   kept for skill work.

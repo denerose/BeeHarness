@@ -1,6 +1,6 @@
 ---
 name: bee-review
-description: Quality review of finished, verified work — does the implementation match the plan's intent, what would a careful developer flag. Runs after bee-verify. Reports findings; never fixes. Not for reviewing plans (global plan-reviewer does that).
+description: Quality review of finished, verified work — does the implementation match the plan's intent, what would a careful developer flag. Runs after bee-verify. Reports findings; never fixes. Not for reviewing plans (bee-plan-review does that).
 ---
 
 # bee-review
@@ -58,5 +58,5 @@ keeper's — currently undecided, so if asked, escalate.
 
 - Only post-verify work; only the changed files you were given.
 - Findings, not fixes.
-- Plans are out of scope (global `plan-reviewer`).
+- Plans are out of scope (`bee-plan-review`).
 - No merge approval; no state changes.

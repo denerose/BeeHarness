@@ -6,7 +6,7 @@
 **Detail:** full (verbatim file contents — subagents implement cold) |
 lean (detail worked out at implementation — name what covers the
 missing detail)
-**Reviewed:** plan-reviewer passed YYYY-MM-DD / PENDING
+**Reviewed:** bee-plan-review passed YYYY-MM-DD / PENDING
 
 ## Task N: [name]
 
