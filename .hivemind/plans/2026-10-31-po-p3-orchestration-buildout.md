@@ -100,31 +100,31 @@ task worktree (Task 3's plan governs its files)
 **Provides:** task-orc's first real run; helper shipped; pass-back
 digest; boundary-test evidence
 
-- [ ] Sync the phase branch with main first (the payload plan landed
+- [x] Sync the phase branch with main first (the payload plan landed
   on main after the spine was cut): `git -C ../BeeHarness-phase3
   merge --ff-only main` — valid while `phase/3` has no local commits.
-- [ ] Create the task worktree (raw git for this first one — the
+- [x] Create the task worktree (raw git for this first one — the
   helper doesn't exist yet): branch `task/3-task-worktree-helper` off
   `phase/3`.
-- [ ] Fill the dispatch brief from the Task-2 template. The brief's
+- [x] Fill the dispatch brief from the Task-2 template. The brief's
   plan path is the ABSOLUTE main-checkout path
   (`/home/saphron/BeeHarness/.hivemind/plans/2026-10-31-po-task-worktree-helper.md`)
   — readable from any worktree. Launch the subagent with its cwd =
   the task worktree.
-- [ ] Receive the pass-back digest. Do NOT open the dispatch's source
+- [x] Receive the pass-back digest. Do NOT open the dispatch's source
   files. Read: digest + logbook entries (`git show
   task/3-task-worktree-helper:.hivemind/logbook/…`) + `git
   log`/`--stat`.
-- [ ] If stop-and-return arrives (escalation package): adjudicate
+- [x] If stop-and-return arrives (escalation package): adjudicate
   within dispatcher authority or card the keeper — record either way.
-- [ ] If the dispatch dies or its output is unusable: task reset per
+- [x] If the dispatch dies or its output is unusable: task reset per
   ADR-012 (remove worktree + branch, PO's call, non-event), re-dispatch
   or card the keeper; logbook entry either way.
-- [ ] Merge the task branch into `phase/3` in the phase worktree (the
+- [x] Merge the task branch into `phase/3` in the phase worktree (the
   payload plan's `merge` step), at the plan-header validation level
   (`merge`). Conflicts at merge are the dispatcher's to resolve or
   bounce back as a stop-and-return (ADR-012).
-- [ ] Commit on main (main checkout, logbook/phase-list updates
+- [x] Commit on main (main checkout, logbook/phase-list updates
   only): `record first task-orc dispatch` — the logbook entry quotes
   the filled brief and the pass-back digest verbatim (they are the
   phase's calibration evidence and the keeper's sample).
@@ -137,20 +137,20 @@ calibration index
 **Provides:** P3 done; material for PP's codification (reviewer/
 implementer formalization, orchestrator role)
 
-- [ ] Phase-level verify in the phase worktree: full suite (`npm test`)
+- [x] Phase-level verify in the phase worktree: full suite (`npm test`)
   + boundary-test verdict (held/violated, with evidence pointer).
-- [ ] Dispatch a phase-diff review (bee-review on `main..phase/3`).
-- [ ] Merge `phase/3` → main (ADR-004 phase tier). If main moved
+- [x] Dispatch a phase-diff review (bee-review on `main..phase/3`).
+- [x] Merge `phase/3` → main (ADR-004 phase tier). If main moved
   during the phase (PP lands an ADR), this is a merge commit —
   expected, not a conflict: the straddle keeps file sets disjoint.
   Verify shared surfaces were never touched on the phase branch.
-- [ ] Cleanup ritual: `git worktree list` shows only the phase
+- [x] Cleanup ritual: `git worktree list` shows only the phase
   worktree; task worktrees and branches gone.
-- [ ] Calibration index: logbook entry
+- [x] Calibration index: logbook entry
   `2026-10-31-po-p3-calibration.md` pointing PP at the P3 evidence
   (dispatch brief, pass-back digest, deviations, boundary verdict) —
   the observed-behavior input for codification.
-- [ ] Update phase list: P3 done. Commit: `close P3 orchestration
+- [x] Update phase list: P3 done. Commit: `close P3 orchestration
   build-out`
 
 ## Phase exit
