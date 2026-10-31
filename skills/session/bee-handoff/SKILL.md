@@ -1,5 +1,5 @@
 ---
-kit: loop
+kit: session
 name: bee-handoff
 description: Compacts a role's session into its handoff file so the same role can resume in a fresh context — working mode first, then task state, boot sequence, environment notes, and a fenced wake prompt for the keeper to paste; ends with a memory sync. Use when a role's context runs short or its session ends with work in flight. Picking a handoff up is bee-pickup-handoff's. Never a parking-lot sweep.
 ---
@@ -11,15 +11,6 @@ from: same role, fresh context. The handoff file carries the
 content; the wake prompt is the pointer. Read `../../GLOSSARY.md`
 (the shared bee glossary, sibling of this kit folder) first —
 especially its handoff entry.
-
-## When to use
-
-A handoff is due when the role's context is running short, or the
-session is ending — wrapping up, switching context — with work in
-flight. Either means run the skill; skipping means naming, in
-your reply, which condition fails. A session whose work is all
-closed cleanly needs no handoff — closing work has its own
-rituals.
 
 ## The handoff file
 

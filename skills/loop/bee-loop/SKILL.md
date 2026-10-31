@@ -67,9 +67,10 @@ directed by the keeper) says to. Read `../../GLOSSARY.md` (the shared bee glossa
    Carry a `Role:` trailer (GLOSSARY). Never hand-edit state a script
    owns: when a script owns a piece of state (checkboxes it checks off,
    lists it generates, files it rewrites), you move it by running the
-   script — never by editing the state directly. Records always land
-   in the main checkout's `.hivemind/logbook/`, even when work happened
-   in a worktree.
+   script — never by editing the state directly. Records ride the
+   task branch with the task's diff and reach main at merge; from
+   other checkouts, mid-flight records read via
+   `git show <branch>:<path>`.
 7. Repeat until the plan is done, then run **bee-verify at the phase
    level** (GLOSSARY: validation level — the full suite the plan lists)
    and report to the keeper.

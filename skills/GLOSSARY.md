@@ -109,8 +109,8 @@ their own documents (`docs/AXI.md`).
   soundness, scripts-first compliance, duplication, the invariants
   (role-agnostic, ambient pickup, consistency with recorded
   decisions), scope. Cold-dispatched (the reviewer never wrote the
-  skill); reports tiered findings — blocking, or should-fix where a
-  waiver needs a one-line recorded reason — and never fixes. The
+  skill); every dimension failure blocks — findings and advisory
+  notes stay separate — and it never fixes. The
   review step of bee-skill-write's draft → cold-test → review →
   sign-off lifecycle (same kit; comprehension testing is
   bee-skill-tester's); states whether the draft touches law, which
@@ -166,7 +166,7 @@ their own documents (`docs/AXI.md`).
   the new context — but no parking-lot sweep: that is a work-close
   ritual, never part of a refresh.
 - **bee-handoff / bee-pickup-handoff** — the handoff pair, sibling
-  skills in the loop kit folder. bee-handoff writes a role's handoff
+  skills in the session kit folder. bee-handoff writes a role's handoff
   file — working mode first, then task state, boot sequence (what the
   successor reads, in order), environment notes, and the wake prompt
   as a fenced block — and ends with a memory sync. bee-pickup-handoff

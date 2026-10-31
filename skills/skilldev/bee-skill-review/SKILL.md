@@ -72,25 +72,21 @@ dimension, the file and line, and a concrete suggested fix.
 ## The report
 
 Report to whoever dispatched you, in the record the dispatch named.
-Findings come in two tiers:
+Every dimension failure is **blocking** — there is no lesser tier
+for a failed dimension:
 
-- **Blocking** — the draft fails a dimension in a way that would
-  stop or mislead anyone relying on the skill: an unsound
-  procedure, a broken invariant, scope mismatch, a contradiction
-  with a recorded decision. A lower-tier finding promotes to
-  blocking when it misleads — a restated script step that no
-  longer matches the script it restates, duplication that
-  contradicts its canonical text. Fix or escalate before the skill
-  is relied on; a blocking finding is never waived.
-- **Should fix** — a real problem, not fatal; fixing before relying
-  on the skill is the right call, but blocking is not the
-  reviewer's. Scripts-first restatements and duplication land here
-  unless they mislead (above). A should-fix may be waived instead
-  of fixed — the waiver is written by whoever received the
-  findings, one line beside the finding in this same report;
-  silence is not a waiver. A re-review is a fresh dispatch over
-  the fixed text; waived findings do not re-litigate — the record
-  carries them.
+- **Blocking** — the draft fails any dimension: an unsound
+  procedure, a scripts-first failure (restated script steps,
+  deterministic work buried in prose), duplication, a broken
+  invariant, scope mismatch, a contradiction with a recorded
+  decision. Fix or escalate before the skill is relied on; a
+  blocking finding is never waived.
+
+Beyond findings, the report may carry **advisory notes** —
+observations that are not dimension failures (a clearer phrasing,
+a tighter example). Notes are not findings: they carry no tier,
+no waiver, and never block. A re-review after fixes is a fresh
+dispatch over the fixed text.
 
 The report also states whether the draft touches law (creates,
 changes, or removes a standing rule other work follows). That

@@ -1,5 +1,5 @@
 ---
-kit: loop
+kit: session
 name: bee-pickup-handoff
 description: Resumes a role from its handoff file — reads it whole, follows its boot sequence, re-reads law files changed since it was written, verifies state against the repo, and announces the resumed role and first move in the first reply. Use when waking into a role whose predecessor left a handoff (the keeper's wake prompt points here). Writing one is bee-handoff's; the pickup never re-interviews the keeper.
 ---
@@ -10,17 +10,6 @@ Wake into a role from its handoff: same role, fresh context — you
 are the successor the handoff was written for. Read
 `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit
 folder) first — especially its handoff entry.
-
-## When to use
-
-A pickup is due when a fresh session starts and the keeper's wake
-prompt names a role's handoff — or when you already hold a role
-and its rules say where its handoff lives. Either means run the
-skill. The prompt's role is the role: if the handoff file names a
-different one, leave that file be — it belongs to another line.
-If no handoff file exists, say so plainly and ask for the wake
-prompt or the task — never improvise a role from the work's
-shape.
 
 ## Bring the repo current first
 
