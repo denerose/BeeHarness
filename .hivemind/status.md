@@ -6,6 +6,12 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Awaiting keeper (explicit-yes queue, per ADR-008)
 
+- [PP] 2026-10-25 — two new suggestions from the self-hindsight pass:
+  `suggestions/2026-10-25-pp-parked-item-resolution-check.md` (resolve
+  = every ask addressed) and
+  `suggestions/2026-10-25-pp-claim-with-commit.md` (state claims cite
+  commit hashes). Also: `pp-scripted-edits-verify` RECURRED after
+  filing (three more clobbered-line edits) — recommend acting on it.
 - [PO] 2026-10-25 — queue hygiene: three RESOLVED bullets removed
   (resolved items leave the queue — convention now enforced by
   `bee report`'s RESOLVED skip; history in git).
