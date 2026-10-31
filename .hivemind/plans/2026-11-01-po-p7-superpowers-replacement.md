@@ -9,7 +9,7 @@ law-touching skills)
 and sweep edit lists; lean for skill prose (drafted at implementation
 from the design note; coverage = design note + `docs/WRITING-STANDARD.md`
 + `skills/GLOSSARY.md`; the review gates check the result)
-**Reviewed:** plan-reviewer passed 2026-11-01 (round 1 FAIL: 2🔴 4🟡, all resolved at d0d525b; round 2 PASS — waiver recorded: status.md not machine-targeted, live surface)
+**Reviewed:** plan-reviewer passed 2026-11-01 (round 1 FAIL: 2🔴 4🟡, all resolved at d0d525b; round 2 PASS — waiver recorded: status.md not machine-targeted, live surface). REVISED 2026-11-01 (late design addendum, PP relay 09:49): Task 0 added — kit-folder organization per the design note's "Skill organization" section (decided in-session after this plan was gated; delta re-gated).
 **Phase:** P7 (spine `phase/7`; status surface: status.md)
 
 <!-- machine (ADR-014 mixed-document rule)
@@ -17,18 +17,18 @@ phase: P7
 validation: phase
 state-source: checkboxes below (script-owned when bee task lands)
 targets:
-  - skills/bee-skill-write/SKILL.md (create)
-  - skills/bee-skill-review/SKILL.md (create)
-  - skills/bee-plan-review/SKILL.md (create)
-  - skills/bee-handoff/SKILL.md (create)
-  - skills/bee-pickup-handoff/SKILL.md (create)
+  - skills/authoring/bee-skill-write/SKILL.md (create)
+  - skills/authoring/bee-skill-review/SKILL.md (create)
+  - skills/loop/bee-plan-review/SKILL.md (create)
+  - skills/loop/bee-handoff/SKILL.md (create)
+  - skills/loop/bee-pickup-handoff/SKILL.md (create)
   - scripts/plan-checks.sh (create)
   - tests/plan-checks.test.mjs (create)
-  - skills/bee-loop/SKILL.md (modify)
-  - skills/bee-review/SKILL.md (modify)
-  - skills/bee-verify/SKILL.md (modify)
-  - skills/bee-plan/SKILL.md (modify)
-  - skills/bee-plan/assets/plan-template.md (modify)
+  - skills/bee-loop/SKILL.md (modify → moves to skills/loop/)
+  - skills/bee-review/SKILL.md (modify → moves to skills/loop/)
+  - skills/bee-verify/SKILL.md (modify → moves to skills/loop/)
+  - skills/bee-plan/SKILL.md (modify → moves to skills/loop/)
+  - skills/bee-plan/assets/plan-template.md (modify → moves with bee-plan)
   - skills/GLOSSARY.md (modify)
   - .hivemind/phases/BeeHarness.md (modify)
 suite: node --test tests/*.test.mjs
@@ -55,6 +55,40 @@ suite: node --test tests/*.test.mjs
   (status.md, phases/, plans/) are edited from the main checkout.
 - Every task's finished-test includes its reference sweep — the build
   is not finished until no stale reference remains (grep shown).
+
+## Task 0: kit-folder organization (opening sweep — design addendum 2026-11-01)
+
+**Files:** moves every skill into its kit folder; `kit:` front-matter
+on every SKILL.md; pointer + reference fixes. GLOSSARY.md stays at
+`skills/` root.
+**Depends on:** nothing (runs next despite "opening" label — the
+design addendum landed after Tasks 1–3 built skills in the flat
+layout; one sweep moves everything)
+**Provides:** the folder layout all later tasks and references use
+
+- [ ] Move skills per the design note's "Skill organization"
+  section: `skills/loop/` ← bee-loop, bee-plan, bee-verify,
+  bee-review, bee-plan-review; `skills/session/` ← bee-brainstorm,
+  bee-hindsight, bee-argue, bee-skill-tester;
+  `skills/authoring/` ← bee-skill-write, bee-skill-review. Assets
+  move with their skills. `skills/roles/` lands when its first
+  skill does (no empty folders). Use `git mv` so history follows.
+- [ ] Add `kit:` front matter to every SKILL.md (values: loop,
+  session, authoring — the folder it lives in).
+- [ ] Fix glossary pointers in moved skills: `../GLOSSARY.md` →
+  `../../GLOSSARY.md` (every moved SKILL.md + any asset that
+  references it).
+- [ ] Sweep doc references to moved skills (README, GLOSSARY
+  entries, sibling skills, AGENTS.md path mentions EXCEPT the
+  plan-gate rule — that law edit is PP's, already coordinated).
+  Expected end state: `grep -rn "skills/bee-" README.md AGENTS.md
+  docs/ skills/GLOSSARY.md` shows only skills/GLOSSARY.md internal
+  sibling mentions, no stale flat paths.
+- [ ] Verify: `node --test tests/*.test.mjs` green (suites don't
+  touch skills paths, but run anyway); pi discovery is recursive
+  (verified in the design note) — spot-check by listing kit
+  folders; every SKILL.md carries `kit:`.
+- [ ] Commit: `organize skills into kit folders with front matter`
 
 ## Task 1: bee-skill-write (build 1 of the meta pair)
 
@@ -145,10 +179,11 @@ convention
 set -u
 PROG=$(basename "$0")
 
-usage() { echo "usage: $PROG [--run] <plan.md>" >&2; exit 2; }
+usage() { echo "usage: $PROG [--run | --extract] <plan.md>" >&2; exit 2; }
 
-RUN=0
-[[ "${1:-}" == "--run" ]] && { RUN=1; shift; }
+MODE=check
+[[ "${1:-}" == "--run" ]] && { MODE=run; shift; }
+[[ "${1:-}" == "--extract" ]] && { MODE=extract; shift; }
 [[ $# -eq 1 ]] || usage
 PLAN=$1
 [[ -f $PLAN ]] || { echo "error: no plan file: $PLAN" >&2; exit 2; }
@@ -241,7 +276,9 @@ echo "blocks: $n_tagged/$n_expected tagged, $n_untagged untagged"
 [[ $n_blocks -ge $n_expected ]] || note "finding blocks: extraction mismatch — $n_expected fenced block(s) in plan, $n_blocks extracted"
 
 # --run: execute the plan's declared suite in the sandbox.
-if [[ $RUN -eq 1 ]]; then
+# --extract: keep the sandbox, print its path (the reviewer runs
+# off-suite blocks there); cleanup is the caller's.
+if [[ $MODE == run ]]; then
   suite=$(grep -oE '^suite: .*' "$PLAN" | head -1 | cut -d' ' -f2-)
   if [[ -n $suite ]]; then
     echo "suite: $suite"
@@ -253,10 +290,12 @@ if [[ $RUN -eq 1 ]]; then
   else
     note "finding suite: no suite: line in machine block (--run given)"
   fi
+elif [[ $MODE == extract ]]; then
+  echo "sandbox: $SANDBOX"
 fi
 
 [[ $fail -eq 0 ]] && echo "checks: clean" || echo "checks: findings"
-rm -rf "$SANDBOX"
+[[ $MODE != extract ]] && rm -rf "$SANDBOX"
 exit $fail
 ```
 
@@ -266,7 +305,7 @@ exit $fail
 ```javascript path=tests/plan-checks.test.mjs
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, mkdirSync, chmodSync, existsSync, readFileSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, chmodSync, existsSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -338,6 +377,18 @@ test('--run executes the declared suite and passes', () => {
   const r = run(['--run', planPath], dir);
   assert.equal(r.code, 0);
   assert.match(r.out, /suite: pass/);
+});
+
+test('--extract keeps and reports the sandbox', () => {
+  const { planPath, dir } = fixture(
+    `${MACHINE}\n\n\`\`\`bash path=scripts/x.sh\necho hi\n\`\`\`\n`,
+    { 'exists.md': 'ok\n' });
+  const r = run(['--extract', planPath], dir);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /sandbox: \S/);
+  const m = r.out.match(/sandbox: (\S+)/);
+  assert.ok(existsSync(join(m[1], 'scripts', 'x.sh')), 'tagged block extracted into kept sandbox');
+  rmSync(m[1], { recursive: true, force: true });
 });
 
 test('usage errors exit 2', () => {
@@ -531,6 +582,10 @@ all bee-native)
   `.hivemind/phases/`) and the working GLOSSARY's ADR anchors are
   the decided exceptions (design note: two-glossaries section). The
   repo-wide ship-tier strip is P8's sweep, not this gate.
+- Kit conformance: every SKILL.md under `skills/` lives in a kit
+  folder, carries `kit:` front matter matching its folder; only
+  `GLOSSARY.md` sits at `skills/` root; moved skills' glossary
+  pointers read `../../GLOSSARY.md`.
 - Bee-native boundary: AGENTS.md gate + handoff rules name
   bee-native instruments; law and tool agree.
 - Keeper has signed off on the pair + reviewer texts; P8 remains
