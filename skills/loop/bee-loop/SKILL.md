@@ -38,22 +38,38 @@ directed by the keeper) says to. Read `../../GLOSSARY.md` (the shared bee glossa
    run is `r1`).
 4. **Review** — dispatch the **bee-review skill** on the finished work
    (fresh subagent when available; hand it the plan path, task id,
-   changed files, and logbook entry path). Review rounds count
-   independently of verify rounds — the first review is `r1`. In a
-   solo session with no separate reviewer, review the work yourself
-   and say so in the review report — the evidence trail matters more
-   than who wrote it.
-5. **Fix rounds** — if review or verify fails: fix, re-verify,
-   re-review. A round is one fix attempt plus its re-runs; the initial
-   failure is not a round. Maximum two rounds. Still failing?
-   Escalate. Re-runs write versioned logbook entries — the round suffix
-   increments (`-r2`, GLOSSARY: logbook versioning).
+   changed files, and logbook entry path). Reviewer briefs carry the
+   etiquette lines: findings cite evidence (file and line), no
+   re-design essays — a finding names the problem and a concrete
+   fix, not a preferred redesign — and tiered findings only
+   (bee-review's three tiers). Review rounds count independently of
+   verify rounds — the first review is `r1`. In a solo session with
+   no separate reviewer, review the work yourself and say so in the
+   review report — the evidence trail matters more than who wrote it.
+5. **Fix rounds** — if review or verify fails: reproduce the failure
+   first — run the failing check and see it fail; a fix proposed on
+   an unreproduced failure is a guess. Then fix, re-verify,
+   re-review. Evidence before assertions: no failure is cleared
+   without the re-run's output in the record. A round is one fix
+   attempt plus its re-runs; the initial failure is not a round.
+   Maximum two rounds. Still failing? Escalate. Re-runs write
+   versioned logbook entries — the round suffix increments (`-r2`,
+   GLOSSARY: logbook versioning). A post-fix confirmation re-review
+   may be waived when both hold: the fix is the reviewer's own
+   suggested change applied near-verbatim, and the fix-round verify
+   record replicates the reviewer's probe — it runs the check the
+   reviewer used to find the finding. Record a one-line waiver
+   reason in the plan's task notes. Blocking findings are always
+   re-reviewed — no waiver.
 6. **Record** — check off the task in the plan, update the phase list,
    commit. Stage only the files this task touched — its code changes,
    its logbook entries, the plan and phase-list updates; never `git add -A`.
-   Carry a `Role:` trailer (GLOSSARY). Records always land in the main
-   checkout's `.hivemind/logbook/`, even when work happened in a
-   worktree.
+   Carry a `Role:` trailer (GLOSSARY). Never hand-edit state a script
+   owns: when a script owns a piece of state (checkboxes it checks off,
+   lists it generates, files it rewrites), you move it by running the
+   script — never by editing the state directly. Records always land
+   in the main checkout's `.hivemind/logbook/`, even when work happened
+   in a worktree.
 7. Repeat until the plan is done, then run **bee-verify at the phase
    level** (GLOSSARY: validation level — the full suite the plan lists)
    and report to the keeper.

@@ -17,6 +17,16 @@ record path. If any is missing, return the review to whoever dispatched
 you — do not guess scope. If there is no verify record, same: do not
 review work that doesn't run.
 
+## First check: claim vs record
+
+Before judging quality, run the mechanical claim-vs-record check:
+every checked task box in the plan has its logbook entries behind it
+(a verify record, a review report), and every claimed state is backed
+by its evidence — checked boxes vs logbook entries, states vs
+evidence. A checked box with no record, or a state ahead of its
+evidence, is a **blocking** finding: this check runs before quality
+judgment, and its findings block on their own.
+
 ## What to judge
 
 - Does the work do what the plan meant, not just what it said?
@@ -44,6 +54,12 @@ and line and a concrete suggested fix:
   always this tier, never a note — it will go stale and mislead.
 - **Note** — worth saying, not worth a round.
 
+Review etiquette, every finding: cite the evidence — the file and
+line where the problem lives; no re-design essays — name the problem
+and a concrete fix, not the design you would have preferred; tiered
+findings only — everything lands in one of the three tiers, and
+commentary outside them is not a finding.
+
 If your reading of the plan's *intent* conflicts with its literal text,
 that's an escalation, not a finding — return it to whoever dispatched
 you; the loop takes it to the keeper and records the answer.
@@ -53,7 +69,7 @@ you; the loop takes it to the keeper and records the answer.
 You produce the report; the loop flips the work-item state from it and
 runs fix rounds. Fixes are not yours. Re-review (if asked after fixes)
 is a fresh dispatch against a new verify record. Merge approval is the
-keeper's — currently undecided, so if asked, escalate.
+keeper's — the keeper decides this; if asked, escalate.
 
 ## Boundaries
 
