@@ -303,7 +303,7 @@ live commit 65f77a9.
 **Depends on:** Task 1 (store patterns)
 **Provides:** `bee park add|list|show|resolve`; the converted lot
 
-- [ ] Implement per the design note's `bee park` section:
+- [x] Implement per the design note's `bee park` section:
   `add "<item>" [--context …] [--unpark-when …]` mints the next
   `PL-<role>-NNN` continuing the existing numbering (role from
   `--origin`, default `bee`; open questions ride context verbatim);
@@ -314,7 +314,7 @@ live commit 65f77a9.
   unpark-when, origin, opened, resolved, how). Resolve is
   keeper-gated by law (AGENTS/GLOSSARY carry it — no mechanical
   agent bypass exists, and none is added).
-- [ ] Implement `bee park migrate <md> [--check]` (the named
+- [x] Implement `bee park migrate <md> [--check]` (the named
   executor for the one-shot conversion; fixture-testable): parses
   every `PL-*` entry from the old markdown (open AND resolved —
   nothing leaves the views) into the store mechanically (id, item
@@ -328,19 +328,30 @@ live commit 65f77a9.
   `.hivemind/memory/parking-lot.md` body with a three-line pointer
   (store path + `bee park list` + keeper-gate line) — durable text,
   no narratives.
-- [ ] AGENTS.md + GLOSSARY parking-lot references point at the
+- [x] AGENTS.md + GLOSSARY parking-lot references point at the
   store and command (the memory-ownership law line itself is
   unchanged in meaning).
-- [ ] AXI compliance tests (`tests/bee-park.test.mjs`): same battery
+- [x] AXI compliance tests (`tests/bee-park.test.mjs`): same battery
   as Task 1 (empty state, unknown flag, `--check`, `--full`,
   aggregate, idempotent resolve) + migration test: run `bee park
   migrate` against a fixture copy of the old markdown — every id
   appears in the store exactly once with state preserved, and the
   three duplicate ids resolve per the collision rule (resolved
   wins, `how` notes the superseded duplicate).
-- [ ] Verify: full suite green; `bee park list` shows the migrated
+- [x] Verify: full suite green; `bee park list` shows the migrated
   open items with correct ages.
-- [ ] Commit: `convert parking lot to script-owned store`
+- [x] Commit: `convert parking lot to script-owned store`
+**Task notes (loop, 2026-11-01):** done — code half via task-orc
+(review r1 FIX-FIRST 1🔴: migration tests read the live md they
+stub → frozen fixture fix, blocking re-review r2 APPROVE; should-fix
+= PL-002 parked-by-section on main → runbook hand-move, done before
+the live run). LIVE half from main with spine code: PL-002 moved
+Parked→Resolved first (its body already recorded the keeper's
+resolution); migrate run — 19 items, 3 collisions resolved-wins,
+11 parked in the live store; md → pointer stub. Deviations accepted:
+migrated items carry opened:- (age ? — no fabricated timestamps);
+bare PL-NNN = bee series; how conditional; shared TOON store core;
+frozen fixture per plan's "fixture copy" letter. Live commit above.
 
 ## Task 4: `bee design` (CLI surface over the Task-0 core)
 
