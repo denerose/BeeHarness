@@ -239,10 +239,19 @@ test('missing files → FAIL lists paths + place-or-fix lines', () => {
 
 // ---- logbook emission ----
 
-test('passing run writes one clean entry per task (r1)', () => {
+test('unscoped run writes nothing by default (review r1 SF3 regression)', () => {
   const { plan } = fixtureHome();
   const lb = path.join(tmpDir(), 'lb');
   const r = run(['verify', '--plan', plan, '--logbook', lb]);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /logbook: not written \(unscoped run/);
+  assert.ok(!fs.existsSync(lb) || fs.readdirSync(lb).length === 0);
+});
+
+test('--record fans out one clean entry per task (r1)', () => {
+  const { plan } = fixtureHome();
+  const lb = path.join(tmpDir(), 'lb');
+  const r = run(['verify', '--plan', plan, '--logbook', lb, '--record']);
   assert.equal(r.code, 0, r.out);
   const e1 = path.join(lb, 'fixture-plan-task1-verify-r1.md');
   const e2 = path.join(lb, 'fixture-plan-task2-verify-r1.md');
@@ -308,7 +317,7 @@ test('FAIL writes nothing unless --record; --record captures the FAIL', () => {
 test('--check previews, writes nothing', () => {
   const { plan } = fixtureHome();
   const lb = path.join(tmpDir(), 'lb');
-  const r = run(['verify', '--plan', plan, '--check',
+  const r = run(['verify', '--plan', plan, '--task', '1', '--check',
     '--logbook', lb]);
   assert.equal(r.code, 0);
   assert.match(r.out, /--check: would write .*task1-verify-r1\.md/);
@@ -325,7 +334,7 @@ test('plan @ hash lands when the plan sits in a git repo', () => {
   git('add -A && git commit -qm base');
   git('checkout -q -b work');
   const r = run(['verify', '--plan', path.join(dir, 'plan.md'),
-    '--logbook', path.join(dir, 'out')]);
+    '--task', '1', '--logbook', path.join(dir, 'out')]);
   assert.equal(r.code, 0, r.out);
   const t = fs.readFileSync(
     path.join(dir, 'out', 'plan-task1-verify-r1.md'), 'utf8');
@@ -426,4 +435,35 @@ test('link FAIL feeds the entry verdict + anomalies (--record)', () => {
     path.join(lb, 'plan-task1-verify-r1.md'), 'utf8');
   assert.match(t, /verdict: FAIL/);
   assert.match(t, /doc\.md:3 → missing\.md/);
+});
+
+test('timeout lands in did-not-finish, not make-it-runnable (review r1 SF1 regression)', () => {
+  const dir = tmpDir();
+  const plan = writePlan(dir,
+    'phase: P1\nchecks:\n  - id: task-1\n    cmd: sleep 5');
+  const prev = process.env.BEE_VERIFY_TIMEOUT_MS;
+  process.env.BEE_VERIFY_TIMEOUT_MS = '300';
+  try {
+    const r = run(['verify', '--plan', plan, '--task', '1']);
+    assert.equal(r.code, 1);
+    assert.match(r.out, /FAIL · timeout SIGTERM/);
+    assert.match(r.out, /fix: 'sleep 5' did not finish/);
+    assert.ok(!r.out.includes('make \'sleep 5\' runnable'));
+  } finally {
+    if (prev === undefined) delete process.env.BEE_VERIFY_TIMEOUT_MS;
+    else process.env.BEE_VERIFY_TIMEOUT_MS = prev;
+  }
+});
+
+test('--full untruncates long cmds (review r1 SF2 regression)', () => {
+  const dir = tmpDir();
+  const long = 'echo ' + 'x'.repeat(120);
+  const plan = writePlan(dir,
+    `phase: P1\nchecks:\n  - id: task-1\n    cmd: ${long}`);
+  const r = run(['verify', '--plan', plan, '--task', '1']);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /\u2026 \(\+\d+ chars\)/); // truncated by default
+  const rf = run(['verify', '--plan', plan, '--task', '1', '--full']);
+  assert.equal(rf.code, 0, rf.err);
+  assert.ok(rf.out.includes(long)); // full cmd visible with --full
 });

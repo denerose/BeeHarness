@@ -1756,7 +1756,9 @@ export function parsePlanHeader(text, label = 'the plan') {
   return { header };
 }
 
-const VERIFY_CMD_TIMEOUT_MS = 600000;
+function verifyTimeoutMs() {
+  return Number(process.env.BEE_VERIFY_TIMEOUT_MS ?? 600000);
+}
 
 function firstOutputLine(r) {
   const src = (r.stderr || '') + '\n' + (r.stdout || '');
@@ -1766,25 +1768,29 @@ function firstOutputLine(r) {
   return '';
 }
 
-function runCheckEntry(ch, root) {
+function runCheckEntry(ch, root, full = false) {
   const notes = [];
   const fixes = [];
   let pass = true;
   if (ch.cmd !== undefined) {
     const r = spawnSync('sh', ['-c', ch.cmd], {
       cwd: root, encoding: 'utf8',
-      timeout: VERIFY_CMD_TIMEOUT_MS,
+      timeout: verifyTimeoutMs(),
     });
-    if (r.error) {
+    const timedOut = (r.signal === 'SIGTERM' && r.error !== undefined) ||
+      (r.error !== undefined && r.error.code === 'ETIMEDOUT');
+    if (timedOut || (r.signal && r.error === undefined)) {
+      // review r1 fix: timeout/signal checked FIRST — a hung command
+      // lands in "did not finish", not the misleading "make it runnable"
+      pass = false;
+      notes.push(`${timedOut ? 'timeout' : 'signal'} ${r.signal ?? ''}` +
+        ` (after ${verifyTimeoutMs() / 1000}s)`);
+      fixes.push(`fix: '${truncText(ch.cmd, 50)}' did not finish — ` +
+        'repair or shorten it');
+    } else if (r.error) {
       pass = false;
       notes.push(`cannot run: ${r.error.message}`);
       fixes.push(`fix: make '${truncText(ch.cmd, 50)}' runnable`);
-    } else if (r.signal) {
-      pass = false;
-      notes.push(`signal ${r.signal} (timeout after ` +
-        `${VERIFY_CMD_TIMEOUT_MS / 1000}s)`);
-      fixes.push(`fix: '${truncText(ch.cmd, 50)}' did not finish — ` +
-        'repair or shorten it');
     } else if (r.status === 0) {
       notes.push('exit 0');
     } else {
@@ -1810,8 +1816,9 @@ function runCheckEntry(ch, root) {
     }
   }
   const shown = ch.cmd !== undefined
-    ? truncText(ch.cmd, 60)
-    : `files: ${truncText(ch.filesList.join(', '), 40)}`;
+    ? (full ? ch.cmd : truncText(ch.cmd, 60))
+    : `files: ${full ? ch.filesList.join(', ')
+      : truncText(ch.filesList.join(', '), 40)}`;
   return { id: ch.id, n: ch.n, pass, note: notes.join(' · '), fixes,
     shown };
 }
@@ -1926,6 +1933,7 @@ function cmdVerify(rest) {
     check: { type: 'boolean' },
     role: { type: 'string' },
     logbook: { type: 'string' },
+    full: { type: 'boolean' },
   });
   if (f.error) return verifyUsageErr(f.error);
   if (f.values.plan === undefined) {
@@ -1970,7 +1978,8 @@ function cmdVerify(rest) {
   const planRoot = rootR.status === 0
     ? rootR.stdout.trim() : planDir;
 
-  const results = scope.map((ch) => runCheckEntry(ch, planRoot));
+  const results = scope.map((ch) =>
+    runCheckEntry(ch, planRoot, f.values.full === true));
 
   const base = f.values.base ?? 'main';
   const lc = changedDocsForLinks(planRoot, base);
@@ -2035,7 +2044,17 @@ function cmdVerify(rest) {
   if (f.values.record && checksRun === 0) {
     out += 'logbook: not written (0 checks ran — nothing to record)\n';
   }
-  if (checksRun > 0 && (nFail === 0 || f.values.record)) {
+  // review r1 fix: unscoped full runs write only with --record (a
+  // status-shaped sweep must not mint one entry per task); scoped
+  // --task runs keep writing on success as the loop's evidence.
+  const scoped = f.values.task !== undefined;
+  const willWrite = checksRun > 0 &&
+    (scoped ? (nFail === 0 || f.values.record) : f.values.record === true);
+  if (checksRun > 0 && nFail === 0 && !scoped && !f.values.record) {
+    out += 'logbook: not written (unscoped run — pass --task <n> or ' +
+      '--record to evidence)\n';
+  }
+  if (willWrite) {
     const byTask = new Map();
     for (const r of results) {
       if (!byTask.has(r.n)) byTask.set(r.n, []);
