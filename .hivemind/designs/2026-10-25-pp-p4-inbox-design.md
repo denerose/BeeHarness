@@ -152,9 +152,11 @@ recommendations; keeper rules at or before the kickoff card)
    topic files (how-to-be-a-bee, cli-writing, TDD, triage
    distinction) in P4; full guidance injection + session rules at
    the P6 init contract.
-3. Quick-thoughts capture (keeper suggestion): ABSORB minimal —
-   `bee capture` writes to the inbox store; routing stays
-   conversational.
+3. Quick-thoughts capture (keeper suggestion): ABSORB MINIMAL —
+   `bee capture "<thought>"` ONLY rides P4 (writes to the inbox
+   store; routing stays conversational). The secretary-role half
+   is PP+keeper design work (PL-PP-009), landing in the next
+   relevant phase once designed (keeper, 2026-11-01).
 4. PL-PP-001 (link hygiene): ABSORB the mechanical piece — `bee
    verify` link-checks changed docs; interim chat rule stays.
 5. PL-PP-005 (logbook compaction): DEFER to P6 — P4's machine

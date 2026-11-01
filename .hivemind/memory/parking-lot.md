@@ -148,8 +148,12 @@ recommendations beyond what the keeper already directed).
   keeper's interactive triage skill — terminology friction flagged
   2026-11-01, "routing" is the capture meaning from now on); what
   "keeps track" means — aging,
-  surfacing, the keeper's list — unpark when the keeper brings it
-  back, after parking/suggestions mechanics are proven.
+  surfacing, the keeper's list — KEEPER NOTE (2026-11-01): the
+  PP+keeper design session is wanted; sequence it after P4 works
+  out the parking/suggestions kinks (the live inbox + `bee
+  capture` are the secretary's substrate), then get the role into
+  the next relevant phase once designed — unpark when the keeper
+  brings it back, after parking/suggestions mechanics are proven.
 - **PL-PP-010 — a rubber-duck skill and a "do-I-need-the-keeper"
   skill** — keeper direction (2026-11-01): two candidate skills.
   Rubber-duck: externalize and examine one's own reasoning before
