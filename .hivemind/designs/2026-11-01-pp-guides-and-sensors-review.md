@@ -1,9 +1,16 @@
 # Guides and sensors review — design note
 
+<!-- machine
+status: live
+phase: -
+hash: -
+merge: -
+-->
+
 **Date:** 2026-11-01
 **Status:** live — conference-notes topic 1 (PL-PP-004) partially
 landed; feeds the guidance system (PL-PP-003), P4 validation work,
-and PL-PP-012 (references home).
+and PL-PP-012 (references home — now RESOLVED).
 
 **Source:** Böckeler, "Harness Engineering" (martinfowler.com,
 2026-04-02) + its follow-up "Sensors for Coding Agents" (2026-05-27),
@@ -75,5 +82,6 @@ backend vs frontend).
 
 PL-PP-003 (guidance system design — the bundles model); P4
 (validation output design, computational-feedforward commands);
-PL-PP-012 (where guiding references live); PL-PP-004 remainder
+PL-PP-012 RESOLVED — sources entry
+`docs/research/boeckeler-guides-and-sensors.md`; PL-PP-004 remainder
 (StackQL, Arazzo, auto-PR still parked).

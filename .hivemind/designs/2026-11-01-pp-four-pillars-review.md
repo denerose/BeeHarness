@@ -1,11 +1,19 @@
 # Four Pillars review — design note
 
+<!-- machine
+status: live
+phase: -
+hash: -
+merge: -
+-->
+
 **Date:** 2026-11-01
 **Status:** review lens, NOT law (keeper direction — unlike AXI,
 which binds the `bee` CLI). Source: keeper-provided excerpt, "The
 Four Pillars of a Harness" (article written for human audiences;
-drawing on OpenAI's framework). Reference held here until PL-PP-012
-gives references a home.
+drawing on OpenAI's framework). Reference entry:
+`docs/research/four-pillars-of-a-harness.md` (PL-PP-012,
+2026-11-01).
 
 ## The pillars, one line each
 
@@ -48,5 +56,6 @@ gives references a home.
 ## Feeds
 
 Pillar-2 gap → the structure-rules action (own repo first, then
-stack profiles); PL-PP-012 (references home); the guidance bundles
-model (guides-and-sensors note).
+stack profiles); PL-PP-012 RESOLVED — references home landed
+(`docs/research/` + design note `2026-11-01-pp-references-home.md`);
+the guidance bundles model (guides-and-sensors note).

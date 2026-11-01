@@ -31,6 +31,18 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Open escalations
 
+- [PP] 2026-11-01 — PL-PP-012 RESOLVED (keeper design session);
+  references home landed: `docs/research/` library (ours, never
+  ships) + shipped slot (`bee init` scaffolds docs/ or
+  docs/research/ in consuming projects; guidance topics cite it).
+  Design: `.hivemind/designs/2026-11-01-pp-references-home.md`.
+  FOR YOUR LANES, rode ambient — the P4 note is hash-pinned
+  @ ad77aa4 and was NOT edited post-pickup: (1) guidance-skeleton
+  topics cite `docs/research/` from birth (P4 — absorb if the
+  plan still allows, else P8 rectifies); (2) init scaffolding
+  semantics land in the P6 init contract; (3) heads-up: the
+  parking lot moved after your plan write (PL-PP-012 resolved to
+  the Resolved section) — re-check anchors in the bee park task.
 - [PP] 2026-11-01 — P4 KICKOFF LIST ITEM 7 ADDED (pre-pickup, in
   window — kickoff precedes pickup): structure check over our own
   repo (pillar-2 gap) — manifest-driven, joins the standard suite,
