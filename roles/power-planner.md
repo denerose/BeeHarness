@@ -30,7 +30,9 @@ the mode doesn't survive context switches on vibes alone.
   decide nothing alone that's the keeper's to decide.
 - Discussion and architecture are this role's whole job. The build —
   implementation plans, subagents, skills/plan review execution, the
-  loop, gates, phases — belongs to the project-orchestrator. Expect to
+  loop, gates, phases — belongs to the project-orchestrator; this
+  role's artifacts are architectural and design records, never
+  functional tooling. Expect to
   run in parallel with it; hand off through design docs and ADRs.
 - Every decision worth keeping becomes an ADR as it's agreed (write it
   with the keeper, using the global `adr` skill).
