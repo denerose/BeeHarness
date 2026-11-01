@@ -4,7 +4,7 @@
 **Design doc:** `.hivemind/designs/2026-10-25-pp-p4-inbox-design.md` @ ad77aa4 (note + 2026-11-01 addendum + kickoff decision list items 1–7 — all seven keeper-ruled at kickoff, 2026-11-01)
 **Validation level:** phase (recommended — multi-build phase with law-touching edits and a keeper sign-off gate; the design names keeper gates)
 **Detail:** mixed — verbatim contracts for stores, formats, and command grammars (the interfaces later tasks and the gate verify); lean for implementation code (each task names exact files, grammar, behavior, and its test list; implementer works in-repo with the design note, `docs/AXI.md`, and `bin/bee.js` house patterns — review gates check the result)
-**Reviewed:** PENDING
+**Reviewed:** bee-plan-review round 1 FAIL 2026-11-01 (2 blocking, 10 should-fix — `.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-plan-review-r1.md`); both blocking + 6 should-fix fixed in-plan, 4 should-fix waived with reasons beside their findings in the report; round 2 re-review pending
 
 **Phase:** P4 (spine `phase/4`, persistent worktree `/home/saphron/BeeHarness-phase3`)
 
@@ -43,6 +43,7 @@ targets:
   - roles/task-orc.md (modify)
   - skills/GLOSSARY.md (modify)
   - AGENTS.md (modify)
+  - README.md (modify)
   - .hivemind/status.md (modify)
   - .hivemind/keeper-report.md (modify)
   - .hivemind/phases/BeeHarness.md (modify)
@@ -232,7 +233,9 @@ done: -
 - [ ] Migration (one-shot, script-driven — mechanical, no judgment
   per item): status.md *Awaiting keeper* bullets →
   `add keeper <bullet> --origin status --ref <suggestion path if
-  cited>`; suggestions awaiting-read (each file in
+  cited>`, SKIPPING bullets marked RESOLVED (same convention as
+  `bee report`'s queue parsing — resolved items are history, not
+  asks); suggestions awaiting-read (each file in
   `.hivemind/suggestions/` not marked read/resolved in its body or
   the queue) → `add keeper <title line> --origin suggestion --ref
   <file>`. Then `render`. The old hand-written queue section is
@@ -275,10 +278,17 @@ done: -
   unpark-when, origin, opened, resolved, how). Resolve is
   keeper-gated by law (AGENTS/GLOSSARY carry it — no mechanical
   agent bypass exists, and none is added).
-- [ ] Migrate the existing markdown lot: every `PL-*` entry (open
-  AND resolved — nothing leaves the views) parsed into the store
-  mechanically (id, item text, context lines, unpark condition,
-  resolved date+how where present); history stays in git. Replace
+- [ ] Implement `bee park migrate <md> [--check]` (the named
+  executor for the one-shot conversion; fixture-testable): parses
+  every `PL-*` entry from the old markdown (open AND resolved —
+  nothing leaves the views) into the store mechanically (id, item
+  text, context lines, unpark condition, resolved date+how where
+  present); history stays in git. **Collision rule:** the store is
+  keyed by id; when an id appears in both Parked and Resolved
+  (two such exist today: PL-004, PL-PO-001 — stale parked
+  copies), the RESOLVED entry wins and the stale parked duplicate
+  is recorded in that entry's `how` line (`superseded stale parked
+  duplicate`). Replace
   `.hivemind/memory/parking-lot.md` body with a three-line pointer
   (store path + `bee park list` + keeper-gate line) — durable text,
   no narratives.
@@ -287,8 +297,11 @@ done: -
   unchanged in meaning).
 - [ ] AXI compliance tests (`tests/bee-park.test.mjs`): same battery
   as Task 1 (empty state, unknown flag, `--check`, `--full`,
-  aggregate, idempotent resolve) + migration test: every id in the
-  old markdown appears in the store with state preserved.
+  aggregate, idempotent resolve) + migration test: run `bee park
+  migrate` against a fixture copy of the old markdown — every id
+  appears in the store exactly once with state preserved, and the
+  two duplicate ids resolve per the collision rule (resolved wins,
+  `how` notes the superseded duplicate).
 - [ ] Verify: full suite green; `bee park list` shows the migrated
   open items with correct ages.
 - [ ] Commit: `convert parking lot to script-owned store`
@@ -330,15 +343,25 @@ header-driven checks + structured logbook entry emission
 
 - [ ] Settle the plan-header field contract (the design note's open
   question — this is the interface `bee-plan` writes and
-  `bee verify` reads). Add to the template's machine block, verbatim
-  shape:
+  `bee verify` reads). The template's machine block — the whole
+  `<!-- machine … -->` region — becomes exactly (replace, not
+  insert into; the rest of the template file is unchanged):
 
 ```text path=skills/loop/bee-plan/assets/plan-template.md
+<!-- machine
+phase: <phase id, e.g. P1>
+validation: task | merge | phase | release
+state-source: checkboxes below
+targets:
+  - exact/path/file.ext (create)
+  - exact/path/file.ext (modify)
 checks:
-  - id: <task-0>
-    cmd: <command proving the task's step>   # any shell command
+  - id: task-<n>
+    cmd: <command proving the task's step>
     expect: exit 0
-    files: [paths that must exist after the task]
+    files: [<path>, <path>]
+suite: <the command that proves the plan's work, e.g. node --test tests/*.test.mjs>
+-->
 ```
 
   One `checks:` entry per task (id = `task-<n>`); `cmd` and
@@ -471,14 +494,21 @@ modify `scripts/task.sh` (renamed — content moves),
 as a capability; the keeper-directed rename
 
 - [ ] `scripts/structure.map` — the allowed-structure manifest,
-  data not code (verbatim seed, extended deliberately via map
-  edits — exceptions are visible, never suppressions):
+  data not code (verbatim seed covering everything `git ls-files`
+  tracks today plus this phase's planned files; extended
+  deliberately via map edits — exceptions are visible, never
+  suppressions):
 
 ```text path=scripts/structure.map
-# allowed structure — one pattern per line; <x> = one segment
-root: README.md AGENTS.md SOUL.md LICENSE package.json bin docs skills scripts
+# allowed structure — one pattern per line; <x> = one segment.
+# <file> matches dotfiles too (.gitkeep, .gitignore); a segment
+# wildcard never crosses "/".
+root: .gitignore README.md AGENTS.md SOUL.md package.json bin docs roles skills scripts .pi
+bin: bin/<file>.js
+pi: .pi/handoff.md .pi/handoff-<role>.md
+roles: roles/<file>.md
 skills: skills/GLOSSARY.md skills/<kit>/<name>/SKILL.md skills/<kit>/<name>/assets/<file>
-hivemind: .hivemind/status.md .hivemind/keeper-report.md
+hivemind: .hivemind/status.md .hivemind/keeper-report.md .hivemind/inbox.toon
 hivemind: .hivemind/<class>/<file>  # class: decisions designs plans phases logbook suggestions memory sessions
 docs: docs/<file>.md docs/guidance/<file>.md
 scripts: scripts/<file>.sh scripts/structure.map
@@ -564,16 +594,23 @@ lesson + the filed suggestion) + the decision-count flag
   `bee park` (resolve stays keeper-only); the plan-review-gate
   rule gains the checks-contract mention (plans carry `checks:`
   headers; `bee verify` reads them); status-surface line for the
-  rendered region (Task 2). No narratives, no state prose.
+  rendered region (Task 2); the Layout section's `docs/`
+  enumeration generalizes — drop the exhaustive "currently"
+  parenthetical (standards and guides live in `docs/`, discoverable
+  there). No narratives, no state prose.
 - [ ] Reference sweep, grep shown: no stale `parking-lot.md`
   reads, no stale `task.sh` (already zero from Task 8 — re-grep),
   no skill text pointing at hand-run verify steps that `bee
-  verify` now owns, no shipped component citing `.hivemind/`
-  paths or our ADRs (boundary grep: `grep -rn "hivemind\|ADR-0"
-  skills/ bin scripts/` — hits allowed only in non-shipped
-  comments? No: zero hits in bin/scripts help text; code comments
-  in scripts may cite ADR numbers as provenance — GLOSSARY and
-  SKILL.md text carry none).
+  verify` now owns. Boundary grep with named hit classes:
+  `grep -rn "hivemind\|ADR-" skills/` → zero hits (shipped skill
+  text carries its own rules, cites nothing of ours — GLOSSARY
+  included); `grep -rn "hivemind\|ADR-" bin scripts` → hits
+  allowed ONLY as (a) functional default paths inside code
+  strings (e.g. `.hivemind/status.md` as `bee report`'s input —
+  functionality, not citation) or (b) provenance comments in code
+  (`# ADR-016 …`); usage/help text and error strings carry zero
+  hits. Every hit is classified (a)/(b) in the sweep's verify
+  entry; an unclassifiable hit is a finding, not a pass.
 - [ ] Full suite + structure check + `bee verify` over this plan's
   checks block: all green, evidence in the logbook.
 - [ ] Phase-end (orchestrator, from main checkout): decision
