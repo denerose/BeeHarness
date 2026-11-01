@@ -83,3 +83,15 @@ docs · PASS; structure · map · PASS · 0 findings); logbook confirmed
 Phase-end steps (decision inventory, keeper sign-off cards,
 `bee phase close 4`, `bee design implement`) are the loop's, from the
 main checkout after this branch merges — not in this entry's scope.
+
+## Class-C deviation — recorded by the loop (review r1 SF3)
+
+The plan's boundary letter says "Usage/help text and error strings
+carry zero hits"; the shipped CLI carries `.hivemind` hits in
+usage text (destination paths) and error fix-lines (self-correction
+examples) — all naming operating surfaces, zero authority
+citations. **Ruling recorded: ruling-4 fix lines and usage
+destination documentation naming default operating paths are class
+(a) functional references.** Rewording them would degrade
+self-correction output; the sweep's purpose (no authority
+citations) is met.
