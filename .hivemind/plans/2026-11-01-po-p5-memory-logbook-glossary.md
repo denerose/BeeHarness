@@ -147,6 +147,7 @@ links: <related entry paths, comma-separated, or ->
 - [x] Commit: `add idempotent bee logbook compact`
 
 Task notes: review r1 APPROVE, zero findings — no fix round, no waiver needed.
+Sign-off ruling (keeper, 2026-11-02): fail-loud-first KEPT — an unstamped logbook is a broken precondition, D4-loud beats no-op (decision 2 of 3).
 
 ## Task 4: glossary store + `bee glossary` (store + concurrent view)
 
@@ -162,6 +163,7 @@ Task notes: review r1 APPROVE, zero findings — no fix round, no waiver needed.
 - [x] Commit: `add glossary store, lookup, concurrent rendered view`
 
 Task notes: re-review waived — fix round c55eb34 applied the reviewer's two suggested fixes near-verbatim (live-view fence + split assertion); verify r2 replicates the probes; zero blocking findings (APPROVE r1).
+Sign-off rulings (keeper, 2026-11-02): FENCE KEPT — GLOSSARY.md is the human view kept current through the real store's write path, never the implicit CLI default of a partial override (decision 1). STORE INSERTION ORDER KEPT — the view is the alphabetical surface (decision 3).
 
 Store line format (design: `term :: gist :: see`; gist at most two lines, CLI adds are single-line):
 
