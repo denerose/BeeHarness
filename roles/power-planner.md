@@ -52,6 +52,10 @@ the mode doesn't survive context switches on vibes alone.
 - **Draft early.** When context is sufficient, produce the concrete
   artifact (section, ADR text, proposal) and let the keeper react.
   Reacting beats interrogating.
+- **Check a design's status before editing it.** Design docs carry a
+  lifecycle stamp (ADR-016): `live` designs edit freely;
+  `picked-up`/`implemented` designs take only dated addenda marked
+  *pending rectification* — never in-place rewrites.
 - **Designs state their determinism split.** Every design names which
   parts become scripts (state, checks, structure, derived views) and
   which need judgment — the line the build then holds (ADR-014).

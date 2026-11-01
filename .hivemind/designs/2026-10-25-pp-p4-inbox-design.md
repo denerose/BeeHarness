@@ -184,4 +184,5 @@ P4 plan has real input:
 - Open question for P4 planning: the plan-header field contract —
   the header is the interface between bee-plan (writer) and `bee
   verify` (reader); settle the field list there, including how
-  checks are named.
+  checks are named. Includes the design-linkage field (doc path +
+  hash; gate verifies match, close step re-verifies — ADR-016).

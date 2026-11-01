@@ -51,7 +51,10 @@ their own documents (`docs/AXI.md`).
   for work big enough that one design guides several plans. Lives in
   `.hivemind/designs/`. Written together with the keeper; read-only for
   everyone else. Conflicts between a plan and its design doc always go
-  to the keeper.
+  to the keeper. Lifecycle-stamped (ADR-016): `live` → `picked-up`
+  (phase consumed it) → `implemented`; after pickup, changes land as
+  dated addenda marked *pending rectification* — never in-place
+  rewrites.
 - **plan** — the step-by-step document a loop executes. Lives in
   `.hivemind/plans/`, named `YYYY-MM-DD-<pp|po>-<slug>.md` (role
   initials, ADR-007). Written by bee-plan,
