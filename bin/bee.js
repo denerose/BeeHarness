@@ -366,9 +366,8 @@ function cmdReport(rest) {
     };
   }
 
-  // Needs-the-keeper derivation: the inbox store when it carries
-  // open keeper items; status bullets otherwise (transition safety
-  // until the queues are migrated into the store).
+  // Needs-the-keeper derivation: the inbox store whenever it
+  // exists; status bullets only when the store is absent.
   const storePath = f.values.store
     ? path.resolve(f.values.store)
     : path.join(repoRoot, '.hivemind', 'inbox.toon');
