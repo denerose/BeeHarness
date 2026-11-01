@@ -1,10 +1,10 @@
 # Glossary store + `bee glossary` — design note
 
 <!-- machine
-status: live
-phase: -
-hash: -
-merge: -
+status: implemented
+phase: 5
+hash: 6dc0392
+merge: f0766ee
 -->
 
 **Date:** 2026-11-01
