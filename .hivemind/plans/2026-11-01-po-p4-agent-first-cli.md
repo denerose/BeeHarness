@@ -103,6 +103,10 @@ task-7: implemented 2026-11-01T15:19:43+11:00 by project-orchestrator
 task-7: verified 2026-11-01T15:19:43+11:00 by project-orchestrator
 task-7: reviewed 2026-11-01T15:19:43+11:00 by project-orchestrator
 task-7: done 2026-11-01T15:19:44+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task7-verify-r2.md
+task-8: implemented 2026-11-01T15:44:58+11:00 by project-orchestrator
+task-8: verified 2026-11-01T15:44:58+11:00 by project-orchestrator
+task-8: reviewed 2026-11-01T15:44:58+11:00 by project-orchestrator
+task-8: done 2026-11-01T15:44:58+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task8-verify-r2.md
 -->
 
 ## Kickoff rulings (keeper, 2026-11-01 — binding for every task)
@@ -636,7 +640,7 @@ modify `scripts/task.sh` (renamed — content moves),
 **Provides:** the pillar-2 structure rule over this repo, shipped
 as a capability; the keeper-directed rename
 
-- [ ] `scripts/structure.map` — the allowed-structure manifest,
+- [x] `scripts/structure.map` — the allowed-structure manifest,
   data not code (the seed below covers everything tracked at
   seed-writing time plus this phase's planned files — no more;
   coverage at execution time is the extension step's job, below):
@@ -665,28 +669,44 @@ tests: tests/<file>.test.mjs tests/fixtures/<file>
   tracked that misses (the map edit IS the recorded decision; a
   miss is never ignored, never suppressed).
 
-- [ ] `scripts/structure-check.sh <root>`: walks tracked files
+- [x] `scripts/structure-check.sh <root>`: walks tracked files
   (`git ls-files`), matches each against the map; every miss is a
   finding WITH a fix instruction (`place it in <class>, or extend
   the map deliberately`); output TOON `path · allowed-homes ·
   fix`; exit 1 on any miss; definitive `0 findings` when clean.
   Map misses (unparseable line) are findings too.
-- [ ] Wire into `bee verify` (runs it when a structure map exists;
+- [x] Wire into `bee verify` (runs it when a structure map exists;
   skips with a note when not — other repos adopt by adding a map)
   AND into the suite (`tests/structure-check.test.mjs`: fixture
   tree with a stray file → finding + fix line asserted; clean
   tree → `0 findings`).
-- [ ] Keeper-directed rename: `git mv scripts/task.sh
+- [x] Keeper-directed rename: `git mv scripts/task.sh
   scripts/worktree.sh`, update its self-references, the test file
   (`tests/task-sh.test.mjs` → `tests/worktree-sh.test.mjs` via git
   mv, path updates inside), and every living reference
   (`grep -rn "task.sh" bin scripts tests skills AGENTS.md docs
   README.md` → zero stale hits; records/ADRs keep the old name as
   history).
-- [ ] Verify: `bash scripts/structure-check.sh .` → `0 findings`
+- [x] Verify: `bash scripts/structure-check.sh .` → `0 findings`
   over this repo (the map covers everything tracked); full suite
   green including the renamed worktree tests.
-- [ ] Commit: `add structure check with manifest map, rename task.sh to worktree.sh`
+- [x] Commit: `add structure check with manifest map, rename task.sh to worktree.sh`
+
+**Task notes (loop, 2026-11-01):** closed via `bee task` (record r2 —
+first fully command-minted verify r1 PASS + prose body; review r1
+FIX-FIRST 0🔴 1🟡: structure-branch timeout shadowing → fixed
+near-verbatim from runCheckEntry's ordering, re-review waived).
+Rename was NOT pre-done (dispatch note's check proved out); executed
+here in full (git mv both files, 94%/98% similarity). Map extended
+deliberately: docs/research/<file>.md + .hivemind/suggestions/
+planned/<file> (16 tracked files covered — the map edit is the
+decision). Deviations accepted: frozen-fixture one-string edit
+(task.sh→worktree.sh in parking-lot-v1.md; parse-input only, no test
+asserts it, history in git); bee verify runs bee's own check script
+(map-only adoption); structure findings global fail state (mirrors
+links); .pi handoff names task.sh (out of sweep list, ephemeral).
+Note for Task 10: the plan's sweep grep as written (`task.sh`
+unescaped) matches `bee task show` any-dot — use `task\.sh`.
 
 ## Task 9: phase close + decision-count calibration
 
