@@ -259,9 +259,14 @@ post-pickup design sections below where they conflict)
   entry-discipline section below is design input to that fold, not
   live law). Mid-review directive: review findings are disputable;
   disputes escalate; blocking stands until ruled.
-- Folder name: PO built `skills/session/` from the design it had
-  absorbed; PP's later thinking/ rename never reached it. Which
-  name stands is OPEN for the keeper (P8 reconciles either way).
+- Folder name RULED (keeper, 2026-11-01): `thinking/` stands —
+  P8's sweep renames `skills/session/` → `skills/thinking/` with
+  references updated in the same sweep.
+- Plan-review tier RULED (keeper, 2026-11-01): both reviewers stay
+  AS BUILT — skill-review all-blocking, plan gate two-tiered — with
+  the escalate-to-keeper appeal confirmed as the release valve
+  (already live in both: plan gate fix-or-escalate; skill-review
+  dispute clause; blocking stands until ruled).
 
 ## Phase-kickoff skill — full design input arrived (2026-11-01, PO
 sign-off retrospective)
