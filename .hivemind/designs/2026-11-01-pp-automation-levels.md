@@ -77,7 +77,10 @@ existing shape.
 
 ## Feeds
 
-P6 (init scaffolds the level + gate list); the loop skills (hook
-points for the ask-check); PL-PP-010 (the do-I-need-the-keeper half
-is re-scoped to this skill+hook pattern; rubber-duck unchanged);
-the P4 inbox (the relay queue rides its machinery).
+P6 (pre-scaffolding ONLY: init scaffolds the level + gate list —
+nothing else before P11); the P11 build (the relay mechanics, the
+skill + hook pattern in the loop skills, L2 mode, judge, level
+tooling — keeper ruling 2026-11-01: its own phase, must not block
+getting to P8; the P4 inbox provides the queue shape); PL-PP-010
+(the do-I-need-the-keeper half
+is re-scoped to this skill+hook pattern; rubber-duck unchanged).
