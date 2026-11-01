@@ -175,6 +175,17 @@ test('origin defaults to bee (bare series); --origin picks the series', () => {
   assert.match(text, /id: PL-PP-001\n/);
 });
 
+test('full role names map to the role-initials series', () => {
+  const p = tmpStore();
+  add(p, 'pp one', '--origin', 'pp');                     // PL-PP-001
+  add(p, 'full name', '--origin', 'power-planner');      // PL-PP-002
+  add(p, 'po full', '--origin', 'project-orchestrator'); // PL-PO-001
+  const text = fs.readFileSync(p, 'utf8');
+  assert.match(text, /id: PL-PP-001\n/);
+  assert.match(text, /id: PL-PP-002\n/);
+  assert.match(text, /id: PL-PO-001\n/);
+});
+
 test('add continues each id series from the store', () => {
   const p = tmpStore();
   fs.writeFileSync(p, `${STORE_HEADER}
@@ -206,6 +217,23 @@ resolved: -
   assert.match(rb.out, /^PL-005 parked/);
   const rp = run(['park', 'add', 'next pp', '--origin', 'pp', '--store', p]);
   assert.match(rp.out, /^PL-PP-014 parked/);
+});
+
+test('full-name origin continues the short-code series (id-seam regression)', () => {
+  const p = tmpStore();
+  fs.writeFileSync(p, `${STORE_HEADER}
+id: PL-PP-013
+item: old pp
+context: -
+unpark-when: -
+origin: pp
+opened: -
+resolved: -
+`);
+  const r = run(['park', 'add', 'keeper todos', '--origin', 'power-planner',
+    '--store', p]);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /^PL-PP-014 parked/);
 });
 
 test('add rejects non-alphanumeric origins (they become id prefixes)', () => {

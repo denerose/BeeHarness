@@ -160,7 +160,7 @@ opened: -
 resolved: 2026-10-18
 how: via ADR-002: global identity is now `denerose-pi`; keeper authorship via explicit `--author`.
 
-id: PL-POWER-PLANNER-001
+id: PL-PP-014
 item: a doc or tool for tracking KEEPER TODOS across PP and KS
 context: keeper direction 2026-11-01: todos currently live in the stale report's Keeper's-list zone + KS routing conventions + the inbox origin=keeper class; question is whether PP and KS need a dedicated doc or tool. Related: the report repurpose (P9, KS tracker render).
 unpark-when: keeper and/or KS feedback from real use

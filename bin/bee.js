@@ -991,8 +991,9 @@ flags:
   --context <text>     background + open questions (ride verbatim,
                        never pre-answered)
   --unpark-when <text> the unpark condition (default: -)
-  --origin <role>      provenance; picks the id series
-                       (default bee → PL-NNN; po → PL-PO-NNN)
+  --origin <role>      provenance; picks the id series from role
+                       initials (power-planner → PL-PP-NNN;
+                       default bee → PL-NNN)
   --how <text>         how it was resolved (recorded on resolve)
   --full               all fields, no truncation
   --check              never write; report what would happen
@@ -1044,6 +1045,16 @@ function parkOldestAge(view) {
     : ageOf(new Date(min).toISOString());
 }
 
+// ADR-007 role-initials convention: a hyphenated role name maps
+// to the first letter of each word (power-planner → PP,
+// project-orchestrator → PO); short codes pass through (pp → PP).
+function parkOriginTag(origin) {
+  if (origin.includes('-')) {
+    return origin.split('-').map((w) => w[0] || '').join('').toUpperCase();
+  }
+  return origin.toUpperCase();
+}
+
 function nextParkId(items, origin) {
   if (origin === 'bee') {
     let max = 0;
@@ -1053,7 +1064,7 @@ function nextParkId(items, origin) {
     }
     return 'PL-' + String(max + 1).padStart(3, '0');
   }
-  const tag = origin.toUpperCase();
+  const tag = parkOriginTag(origin);
   const re = new RegExp('^PL-' + tag + '-(\\d+)$', 'i');
   let max = 0;
   for (const it of items) {
