@@ -164,6 +164,11 @@ recommendations; keeper rules at or before the kickoff card)
 6. PL-PO-002 (worktree-aware `bee init`): DEFER to P6 init
    contract; hazard noted (run init from the main checkout until
    then).
+7. Structure check over our own repo (pillar-2 gap, four-pillars
+   review): ABSORB — the "every new file in the predefined
+   structure" rule, built over BeeHarness first, shipped as a
+   capability with per-repo maps. See the determinism build-out
+   bullet for the shape.
 
 ## Determinism build-out in P4 (ADR-014)
 
@@ -211,6 +216,20 @@ P4 plan has real input:
   drift flags). Transitions are script edits — agents never
   hand-edit design machine blocks. Interim: a `scripts/` helper
   may precede the CLI (plan-checks.sh pattern).
+- **Structure check (pillar-2; kickoff item 7):** a manifest-driven
+  check — the allowed-structure map is data (the script's source of
+  truth, like plan-checks' marker list): skills live in
+  `skills/<kit>/<name>/SKILL.md` (kit folders as ruled; skills
+  root holds only GLOSSARY.md), `.hivemind/` files only in known
+  classes plus known root files, root holds only the known set,
+  `docs/` holds standards. A file outside the map is a finding with
+  a fix instruction ("place it in <class>, or extend the map
+  deliberately"). Exceptions = map edits — deliberate, visible,
+  reviewable (better than suppression). Agent-facing output;
+  joins the standard suite so `bee verify` runs it at merge/phase
+  automatically. Ships as a capability: user repos get their own
+  map from `bee init`; stack profiles extend it. Our map stays
+  ours (shipping test).
 - Open question for P4 planning: the plan-header field contract —
   the header is the interface between bee-plan (writer) and `bee
   verify` (reader); settle the field list there, including how
