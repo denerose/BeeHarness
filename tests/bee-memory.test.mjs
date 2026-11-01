@@ -180,8 +180,28 @@ test('supersede mints in the calling role\'s series (--origin)', () => {
   assert.match(r.out, /^ME-PO-001 added · supersedes ME-001/);
   const text = fs.readFileSync(p, 'utf8');
   assert.match(text, / :: superseded:ME-PO-001$/m); // cross-series link
-  // provenance origin rides as passed (plan: "origin as passed")
+  // provenance origin rides as passed (plan: "origin as passed") —
+  // pinned by the mixed-case test below; lowercase can't distinguish
   assert.match(text, /ME-PO-001 :: lesson :: po replacement :: project-orchestrator · /);
+});
+
+// The id series folds the origin to a tag; the stored provenance keeps
+// it verbatim (plan line 90: "origin as passed") — add and supersede alike.
+test('mixed-case origin: folded id tag, verbatim provenance', () => {
+  const p = tmpStore();
+  const r = add(p, 'mixed case', '--type', 'lesson',
+    '--origin', 'Power-Planner');
+  assert.match(r.out, /^ME-PP-001 added/); // tag folds, not provenance
+  const rs = run(['memory', 'supersede', 'ME-PP-001', 'better',
+    '--type', 'lesson', '--origin', 'Power-Planner', '--store', p]);
+  assert.equal(rs.code, 0, rs.err);
+  assert.match(rs.out, /^ME-PP-002 added · supersedes ME-PP-001/);
+  const text = fs.readFileSync(p, 'utf8');
+  assert.match(text,
+    /ME-PP-001 :: lesson :: mixed case :: Power-Planner · \d{4}-\d{2}-\d{2} · - :: superseded:ME-PP-002$/m);
+  assert.match(text,
+    /ME-PP-002 :: lesson :: better :: Power-Planner · \d{4}-\d{2}-\d{2} · - :: live$/m);
+  assert.ok(!text.includes('power-planner')); // no fold into the store
 });
 
 test('double-supersede fails loud (store unchanged)', () => {

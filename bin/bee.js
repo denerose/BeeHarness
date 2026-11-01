@@ -1620,7 +1620,7 @@ function memoryAdd(args) {
     id,
     type: f.values.type,
     gist: pos[0],
-    provenance: `${origin.toLowerCase()} · ${todayLocal()} · ` +
+    provenance: `${origin} · ${todayLocal()} · ` +
       (f.values.ref || '-'),
     state: 'live',
   };
@@ -1742,7 +1742,7 @@ function memorySupersede(args) {
     id: newId,
     type: f.values.type,
     gist,
-    provenance: `${origin.toLowerCase()} · ${todayLocal()} · ` +
+    provenance: `${origin} · ${todayLocal()} · ` +
       (f.values.ref || '-'),
     state: 'live',
   };
