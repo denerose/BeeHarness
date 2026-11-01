@@ -1,14 +1,16 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`.
+// `bee capture`, `bee park`, `bee design`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
-// (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI).
+// (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
+// ADR-016 (design state machine — delegated to scripts/design.sh).
 // Node >=20, stdlib only.
 
 import { parseArgs } from 'node:util';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const VERSION = '0.1.0';
@@ -35,6 +37,10 @@ usage:
                [--origin <role>]
              | show <id> [--full] | resolve <id> [--how <text>]
              | migrate <md>
+  bee design [status [--full]]
+             | new "<title>" [--check]
+             | pick-up <doc> --phase <n> [--check]
+             | implement <doc> --phase <n> --merge <hash> [--check]
   bee capture "<thought>"
   bee help | version
 
@@ -62,6 +68,9 @@ export function run(argv) {
   }
   if (cmd === 'park') {
     return cmdPark(rest);
+  }
+  if (cmd === 'design') {
+    return cmdDesign(rest);
   }
   if (cmd === 'capture') {
     return cmdCapture(rest);
@@ -1385,6 +1394,200 @@ function parkMigrate(args) {
   }
   return { code: 0, out: `bee park migrate: ${summary}\n` +
     `store: ${storePath}\n${mdPath} → pointer stub — bee park list to view\n`,
+    err: '' };
+}
+
+// ---- design (P4 Task 4 — CLI surface over scripts/design.sh) ----
+// The script is the mechanical core (determinism split): pick-up /
+// implement / status exec it and pass its TOON output through; the
+// machine block stays script-only territory (ADR-016). `new` is CLI
+// work (file creation from the template, never a block edit).
+
+const DESIGN_USAGE = `bee design — design docs (live → picked-up → implemented)
+
+usage:
+  bee design [status [--full]]
+  bee design new "<title>" [--check]
+  bee design pick-up <doc> --phase <n> [--check]
+  bee design implement <doc> --phase <n> --merge <hash> [--check]
+
+commands:
+  status [--full]   every doc: name · state · phase; flags drift
+                    (content changed after pick-up); --full adds
+                    hash + merge. Bare 'bee design' = status.
+  new "<title>"     copy the designs TEMPLATE to
+                    designs/YYYY-MM-DD-<slug>.md with title + date
+                    filled (machine block starts live); refuses to
+                    overwrite an existing doc
+  pick-up …         stamp picked-up + phase + frozen hash; only live
+  implement …       stamp implemented + merge hash; only picked-up
+
+flags:
+  --check           mutations (new/pick-up/implement): never write;
+                    report what would happen
+  --full            status: add hash + merge
+
+transitions + drift live in scripts/design.sh (the core); this CLI
+adds nothing on top of them. env BEE_DESIGN_DIR overrides the
+designs directory for every subcommand (test seam, shared with the
+script); the template for 'new' always comes from this repo's
+.hivemind/designs/TEMPLATE.md.
+`;
+
+function designUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + DESIGN_USAGE };
+}
+
+function designDirOf() {
+  return process.env.BEE_DESIGN_DIR
+    ? path.resolve(process.env.BEE_DESIGN_DIR.replace(/\/$/, ''))
+    : path.join(REPO_ROOT, '.hivemind', 'designs');
+}
+
+function designShown(p) {
+  const rel = path.relative(REPO_ROOT, p);
+  return rel.startsWith('..') ? p : rel;
+}
+
+function runDesignScript(args) {
+  const script = path.join(REPO_ROOT, 'scripts', 'design.sh');
+  if (!fs.existsSync(script)) {
+    return { code: 1, out: '',
+      err: `bee design: missing ${script} — check the checkout\n` };
+  }
+  const r = spawnSync('bash', [script, ...args], {
+    encoding: 'utf8',
+    env: { ...process.env, BEE_DESIGN_PROG: 'bee design' },
+  });
+  if (r.error) {
+    return { code: 1, out: '',
+      err: `bee design: cannot run ${script}: ${r.error.message}\n` };
+  }
+  return { code: r.status ?? 1, out: r.stdout ?? '', err: r.stderr ?? '' };
+}
+
+function cmdDesign(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'status' || sub.startsWith('--')) {
+    return designStatus(sub === 'status' ? rest.slice(1) : rest);
+  }
+  if (sub === 'new') return designNew(rest.slice(1));
+  if (sub === 'pick-up') {
+    return designDelegate('pick-up', rest.slice(1),
+      { phase: { type: 'string' }, check: { type: 'boolean' } });
+  }
+  if (sub === 'implement') {
+    return designDelegate('implement', rest.slice(1),
+      { phase: { type: 'string' }, merge: { type: 'string' },
+        check: { type: 'boolean' } });
+  }
+  if (sub === 'help') return { code: 0, out: DESIGN_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee design: unknown subcommand '${sub}'\n\n` + DESIGN_USAGE };
+}
+
+function designStatus(args) {
+  const f = flags(args, { full: { type: 'boolean' } }, true);
+  if (f.error) return designUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return designUsageErr(
+      `bee design status: unexpected argument '${f.positionals[0]}'`);
+  }
+  return runDesignScript(
+    f.values.full ? ['status', '--full'] : ['status']);
+}
+
+function designDelegate(sub, args, spec) {
+  const f = flags(args, spec, true);
+  if (f.error) return designUsageErr(f.error);
+  if (f.positionals.length !== 1) {
+    return designUsageErr(`bee design ${sub}: expected <doc>`);
+  }
+  const out = [];
+  if (f.values.phase !== undefined) out.push('--phase', f.values.phase);
+  if (f.values.merge !== undefined) out.push('--merge', f.values.merge);
+  if (f.values.check) out.push('--check');
+  return runDesignScript([sub, ...f.positionals, ...out]);
+}
+
+function designSlug(title) {
+  return title.toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 64)
+    .replace(/-+$/g, '');
+}
+
+function localDateStamp() {
+  const d = new Date();
+  const p = (n) => String(n).padStart(2, '0');
+  return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' +
+    p(d.getDate());
+}
+
+function designNew(args) {
+  const f = flags(args, { check: { type: 'boolean' } }, true);
+  if (f.error) return designUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0] === '') {
+    return designUsageErr('bee design new: expected "<title>"');
+  }
+  const title = pos[0];
+  if (title.includes('\n')) {
+    return { code: 1, out: '',
+      err: 'bee design: field values must be single-line\n' };
+  }
+  const slug = designSlug(title);
+  if (slug === '') {
+    return { code: 1, out: '',
+      err: `bee design new: title '${title}' yields an empty slug — ` +
+        'give it letters or digits\n' };
+  }
+  const template = path.join(REPO_ROOT, '.hivemind', 'designs',
+    'TEMPLATE.md');
+  let text;
+  try {
+    text = fs.readFileSync(template, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee design new: cannot read template ${template}: ` +
+        `${e.message}\n` };
+  }
+  const date = localDateStamp();
+  if (!text.includes('<Title>') ||
+      !text.includes('**Date:** YYYY-MM-DD')) {
+    return { code: 1, out: '',
+      err: `bee design new: template lost a placeholder (<Title> or ` +
+        `**Date:** YYYY-MM-DD) — hand-fix ${template}, then re-run\n` };
+  }
+  text = text.replace('<Title>', title)
+    .replace('**Date:** YYYY-MM-DD', `**Date:** ${date}`);
+  const file = path.join(designDirOf(), `${date}-${slug}.md`);
+  if (fs.existsSync(file)) {
+    return { code: 1, out: '',
+      err: `bee design new: ${designShown(file)} already exists — ` +
+        `refusing to overwrite\n` +
+        `fix: pick a different title, or continue the existing doc ` +
+        `— bee design status\n` };
+  }
+  if (f.values.check) {
+    return { code: 0, out: `--check: would create ${designShown(file)} ` +
+      `from ${designShown(template)}\n` +
+      `# ${title} — design note\n**Date:** ${date}\n`, err: '' };
+  }
+  try {
+    fs.mkdirSync(designDirOf(), { recursive: true });
+    atomicWrite(file, text);
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee design new: cannot write ${file}: ${e.message}\n` };
+  }
+  return { code: 0,
+    out: `created ${designShown(file)}\n` +
+      `next: fill the sections, get the keeper's blessing, then ` +
+      `bee design pick-up ${designShown(file)} --phase <n>\n`,
     err: '' };
 }
 

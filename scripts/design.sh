@@ -12,6 +12,9 @@
 # Repo context resolves from the CURRENT DIRECTORY. Bash + git only.
 # BEE_DESIGN_DIR overrides the designs directory (default
 # <repo>/.hivemind/designs) — test seam, mirrors bee's --store.
+# BEE_DESIGN_PROG renames the program in messages — the `bee design`
+# wrapper sets it so fix lines name the CLI surface; bare runs stay
+# design.sh. Mechanics are identical either way.
 #
 # Output: TOON-ish "key: value" / "a · b · c" lines; errors carry a
 # fix: line (agent-facing); exit 0 = ok, 1 = refusal or error.
@@ -19,7 +22,7 @@
 set -u
 export LC_ALL=C
 
-PROG=design.sh
+PROG=${BEE_DESIGN_PROG:-design.sh}
 REPO_ROOT=
 DESIGNS_DIR=
 DOC=
