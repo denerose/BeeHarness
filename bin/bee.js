@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
 // `bee capture`, `bee park`, `bee design`, `bee verify`, `bee task`,
-// `bee guidance`.
+// `bee guidance`, `bee phase`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -48,6 +48,9 @@ usage:
              | move <plan-path> <task-n> <state>
                [--origin <role>] [--record <path>] [--check]
   bee guidance [list [--full]] | show <topic>
+  bee phase  [list [--full]]
+             | inventory <phase-id> --decisions <file> [--origin <role>]
+             | close <phase-id> [--check]
   bee help | version
 
   --check   never write; report what would happen
@@ -89,6 +92,9 @@ export function run(argv) {
   }
   if (cmd === 'guidance') {
     return cmdGuidance(rest);
+  }
+  if (cmd === 'phase') {
+    return cmdPhase(rest);
   }
   return { code: 1, out: '', err: `bee: unknown command '${cmd}'\n\n` + USAGE };
 }
@@ -2688,6 +2694,601 @@ function guidanceShow(args) {
       err: `bee guidance: cannot read ${file}: ${e.message}\n` };
   }
   return { code: 0, out: text, err: '' };
+}
+
+// ---- phase (P4 Task 9 — decision inventory + scripted close) ----
+// The close is the loop's mechanical tail: gate (branch exists +
+// suite green at its tree), no-ff merge phase/<n> → main (the P3/P7
+// lesson — a phase is a real merge commit, never a fast-forward),
+// rest the persistent worktree detached at main, delete the phase
+// branch, emit the close card with the decision count (the P7
+// calibration signal; threshold calibratable later), push. The
+// decision inventory is agent-assembled content in a script-owned
+// format: one line per decision, id · one-line · source-record-path.
+
+const PHASE_FLAG_THRESHOLD = 8;
+
+const PHASE_USAGE = `bee phase — phase inventory + scripted close
+
+usage:
+  bee phase [list [--full]]
+  bee phase inventory <phase-id> --decisions <file> [--origin <role>] [--check]
+  bee phase close <phase-id> [--check]
+
+commands:
+  list [--full]   every phase with a plan: id · plan · title;
+                  bare 'bee phase' = list
+  inventory …     write the phase's decision inventory to
+                  .hivemind/logbook/<plan-slug>-decisions.toon;
+                  the decisions file is agent-assembled (the sign-off
+                  inventory is judgment) — one line per decision:
+                  id · one-line · source-record-path ('#' comments
+                  and blank lines skipped; lines ride verbatim;
+                  re-runs replace the file atomically)
+  close …         the scripted close; each step refuses with a fix
+                  line when its preconditions fail:
+                  1 gate    branch phase/<n> exists + its tree
+                            passes the plan's suite
+                  2 merge   --no-ff phase/<n> → main, from the main
+                            checkout on main, tree clean (the
+                            decision inventory itself is exempt —
+                            it is expected pre-close)
+                  3 rest    persistent worktree on phase/<n>
+                            detached at main (skipped when none)
+                  4 delete  branch phase/<n> (-d, merged only)
+                  5 card    decisions: <n> — the inventory's
+                            decision lines; flag 'under-asked
+                            kickoff — front-load harder next phase'
+                            when n > ${PHASE_FLAG_THRESHOLD} (threshold
+                            calibratable later; waivers count —
+                            a waiver is a decision)
+                  6 push    origin main (skipped with a note when
+                            no remote 'origin')
+
+flags:
+  --decisions <file>  inventory: the assembled decisions file
+  --origin <role>      inventory: provenance (default bee)
+  --full               list: untruncated plan titles
+  --check              close/inventory: never merge/push/write;
+                      close's gates still run (throwaway worktree
+                      when no clean persistent one holds the branch)
+  --root <path>        internal: repo root (default: git toplevel
+                       of the cwd)
+
+phase-id: <n>, P<n>, or phase/<n>. one plan per phase — the plan
+whose machine header carries 'phase: P<n>'; ambiguous → exit 1.
+`;
+
+function phaseUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + PHASE_USAGE };
+}
+
+function phaseGit(root, args) {
+  return spawnSync('git', args, { cwd: root, encoding: 'utf8' });
+}
+
+function phaseRootOf(p) {
+  if (p) return { root: path.resolve(p) };
+  const r = spawnSync('git', ['rev-parse', '--show-toplevel'],
+    { encoding: 'utf8' });
+  if (r.status !== 0) {
+    return { err: 'bee phase: no git repository at ' + process.cwd() +
+      ' — fix: run inside the repo or pass --root <path>\n' };
+  }
+  return { root: r.stdout.trim() };
+}
+
+// <n> | P<n> | phase/<n> → n (null when none parse)
+function phaseNormId(arg) {
+  const m = /^(?:phase\/)?[Pp]?(\d+)$/.exec(arg);
+  return m === null ? null : Number(m[1]);
+}
+
+// Every plan whose machine header names a phase. Plans without a
+// machine header (pre-contract) are skipped, not findings.
+function phasePlanMap(root) {
+  const plansDir = path.join(root, '.hivemind', 'plans');
+  let names;
+  try {
+    names = fs.readdirSync(plansDir);
+  } catch (e) {
+    if (e.code === 'ENOENT') return { phases: [] };
+    return { err: `bee phase: cannot read ${plansDir}: ${e.message}\n` };
+  }
+  const phases = [];
+  for (const name of names.filter((x) => x.endsWith('.md')).sort()) {
+    const file = path.join(plansDir, name);
+    let text;
+    try {
+      text = fs.readFileSync(file, 'utf8');
+    } catch (e) {
+      continue; // unreadable — not a phase-plan candidate
+    }
+    const parsed = parsePlanHeader(text, name);
+    if (parsed.err) continue; // no machine header — pre-contract plan
+    const pm = /^p(\d+)$/i.exec((parsed.header.phase || '').trim());
+    if (!pm) continue;
+    const h = text.split('\n').find((l) => l.startsWith('# '));
+    phases.push({ n: Number(pm[1]), file, header: parsed.header,
+      title: h !== undefined
+        ? h.slice(2).trim().replace(/^Plan:\s*/, '')
+        : '-' });
+  }
+  phases.sort((a, b) => a.n - b.n || a.file.localeCompare(b.file));
+  return { phases };
+}
+
+function phaseFindPlan(root, n) {
+  const r = phasePlanMap(root);
+  if (r.err) return r;
+  const hits = r.phases.filter((p) => p.n === n);
+  if (hits.length === 0) {
+    const known = [...new Set(r.phases.map((p) => 'P' + p.n))];
+    return { err: `bee phase: no plan for phase P${n} in ` +
+      `${path.join(root, '.hivemind', 'plans')}` +
+      (known.length > 0 ? ` — phases with plans here: ${known.join(', ')}`
+        : " — no plan here carries a phase header") +
+      `\nfix: check the phase id, or give the phase's plan a machine ` +
+      `header with 'phase: P${n}'\n` };
+  }
+  if (hits.length > 1) {
+    return { err: `bee phase: ${hits.length} plans claim P${n}: ` +
+      `${hits.map((h) => path.basename(h.file)).join(', ')}\n` +
+      'fix: a phase has one plan — archive or rename the stale one, ' +
+      'then re-run\n' };
+  }
+  return { plan: hits[0].file, header: hits[0].header };
+}
+
+// The worktree holding <branch> checked out (null when none) —
+// the same porcelain walk worktree.sh uses.
+function phaseWorktreeOf(root, branch) {
+  const r = phaseGit(root, ['worktree', 'list', '--porcelain']);
+  if (r.status !== 0) return null;
+  let wt = null;
+  for (const line of r.stdout.split('\n')) {
+    if (line.startsWith('worktree ')) wt = line.slice(9);
+    else if (line.startsWith(`branch refs/heads/${branch}`)) return wt;
+  }
+  return null;
+}
+
+function phaseMainCheckout(root) {
+  const r = phaseGit(root, ['worktree', 'list', '--porcelain']);
+  const line = r.stdout.split('\n').find((l) => l.startsWith('worktree '));
+  return line !== undefined ? line.slice(9) : root;
+}
+
+function cmdPhase(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'list' || sub.startsWith('--')) {
+    return phaseList(sub === 'list' ? rest.slice(1) : rest);
+  }
+  if (sub === 'inventory') return phaseInventory(rest.slice(1));
+  if (sub === 'close') return phaseClose(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: PHASE_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee phase: unknown subcommand '${sub}'\n\n` + PHASE_USAGE };
+}
+
+function phaseList(args) {
+  const f = flags(args, {
+    full: { type: 'boolean' },
+    root: { type: 'string' },
+  }, true);
+  if (f.error) return phaseUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return phaseUsageErr(
+      `bee phase list: unexpected argument '${f.positionals[0]}'`);
+  }
+  let root;
+  if (f.values.root !== undefined) {
+    root = path.resolve(f.values.root);
+  } else {
+    const r = spawnSync('git', ['rev-parse', '--show-toplevel'],
+      { encoding: 'utf8' });
+    root = r.status === 0 ? r.stdout.trim() : process.cwd();
+  }
+  const m = phasePlanMap(root);
+  if (m.err) return { code: 1, out: '', err: m.err };
+  if (m.phases.length === 0) {
+    return { code: 0, out: '0 phases\n' +
+      `fix: no plan in ${path.join(root, '.hivemind', 'plans')} carries ` +
+      "a machine header with 'phase:' — add one " +
+      '(skills/loop/bee-plan/assets/plan-template.md)\n', err: '' };
+  }
+  let out = `${m.phases.length} phase${m.phases.length === 1 ? '' : 's'}\n`;
+  for (const p of m.phases) {
+    const slug = path.basename(p.file, '.md');
+    const title = f.values.full ? p.title : truncText(p.title, 48);
+    out += `P${p.n} · ${slug} · ${title}\n`;
+  }
+  out += 'next: bee phase close <phase-id> --check\n';
+  return { code: 0, out, err: '' };
+}
+
+function phaseDecisionLines(text) {
+  // Decision lines carry the ' · ' separator; header fields
+  // (phase:, plan:, count:, assembled:) and '#' comments do not.
+  return text.split('\n')
+    .map((l) => l.replace(/\r$/, ''))
+    .filter((l) => l.trim() !== '' && !l.trim().startsWith('#'))
+    .filter((l) => l.includes(' · '));
+}
+
+function phaseInventory(args) {
+  const f = flags(args, {
+    decisions: { type: 'string' },
+    origin: { type: 'string' },
+    check: { type: 'boolean' },
+    root: { type: 'string' },
+  }, true);
+  if (f.error) return phaseUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return phaseUsageErr('bee phase inventory: expected <phase-id>');
+  }
+  const n = phaseNormId(pos[0]);
+  if (n === null) {
+    return phaseUsageErr(`bee phase inventory: <phase-id> expects a ` +
+      `phase number, got '${pos[0]}' (forms: 4, P4, phase/4)`);
+  }
+  if (f.values.decisions === undefined) {
+    return phaseUsageErr(
+      'bee phase inventory: --decisions <file> is required — fix: ' +
+      'point it at the assembled inventory (one line per decision: ' +
+      'id · one-line · source-record-path)');
+  }
+  const origin = f.values.origin || 'bee';
+  if (!/^[a-z][a-z0-9-]*$/i.test(origin)) {
+    return phaseUsageErr(`bee phase inventory: --origin '${origin}' ` +
+      'must be letters/digits/hyphens');
+  }
+  const rr = phaseRootOf(f.values.root);
+  if (rr.err) return { code: 1, out: '', err: rr.err };
+  const root = rr.root;
+  const found = phaseFindPlan(root, n);
+  if (found.err) return { code: 1, out: '', err: found.err };
+  const decPath = path.resolve(f.values.decisions);
+  let text;
+  try {
+    text = fs.readFileSync(decPath, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee phase inventory: cannot read ${decPath}: ${e.message}\n` +
+        'fix: point --decisions at the assembled inventory file\n' };
+  }
+  const lines = [];
+  const raw = text.split('\n');
+  for (let i = 0; i < raw.length; i++) {
+    const l = raw[i].replace(/\r$/, '');
+    if (l.trim() === '' || l.trim().startsWith('#')) continue;
+    const parts = l.split(' · ');
+    const oneLine = parts.slice(1, -1).join(' · ');
+    if (parts.length < 3 || parts[0].trim() === '' ||
+        oneLine.trim() === '' || parts[parts.length - 1].trim() === '') {
+      return { code: 1, out: '',
+        err: `bee phase inventory: ${designShown(decPath)} line ${i + 1} ` +
+          `is not 'id · one-line · source-record-path': ` +
+          `'${truncText(l, 50)}'\n` +
+          'fix: hand-fix the decisions file, then re-run\n' };
+    }
+    lines.push(l);
+  }
+  const slug = path.basename(found.plan, '.md');
+  const outFile = path.join(root, '.hivemind', 'logbook',
+    `${slug}-decisions.toon`);
+  const relPlan = path.relative(root, found.plan);
+  const body = [
+    `# decisions — P${n} close inventory (plan: ${slug})`,
+    '# one line per decision: id · one-line · source-record-path',
+    `phase: P${n}`,
+    `plan: ${relPlan}`,
+    `count: ${lines.length}`,
+    `assembled: ${isoStampLocal()} by ${origin}`,
+    '',
+    ...lines,
+  ].join('\n') + '\n';
+  if (f.values.check) {
+    return { code: 0, out: `--check: would write ${designShown(outFile)} ` +
+      `(${lines.length} decisions)\n${body}`, err: '' };
+  }
+  try {
+    fs.mkdirSync(path.dirname(outFile), { recursive: true });
+    atomicWrite(outFile, body);
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee phase inventory: cannot write ${outFile}: ${e.message}\n` };
+  }
+  return { code: 0,
+    out: `${lines.length} decisions · P${n} · ${slug}\n` +
+      `wrote: ${designShown(outFile)}\n` +
+      `next: bee phase close ${n} --check\n`, err: '' };
+}
+
+// The suite gate: run the plan's suite against the phase tree —
+// at the persistent worktree when it is clean, else a throwaway
+// detached worktree (added + removed; the honest branch tree, not
+// a possibly-dirty checkout).
+function phaseSuiteGate(root, branch, suite, pwt, pwtClean) {
+  let dir = null;
+  let tmp = null;
+  if (pwt !== null && pwtClean) {
+    dir = pwt;
+  } else {
+    const base = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-phase-suite-'));
+    tmp = path.join(base, 'tree');
+    dir = tmp;
+  }
+  let addErr = null;
+  if (tmp !== null) {
+    const add = phaseGit(root, ['worktree', 'add', '--detach', tmp, branch]);
+    if (add.status !== 0) {
+      addErr = firstOutputLine(add) || `git exit ${add.status}`;
+    }
+  }
+  let res = null;
+  if (addErr === null) {
+    // Strip the Node test-runner's child-mode marker: a `node
+    // --test` suite spawned from inside a test-runner process
+    // inherits NODE_TEST_CONTEXT and silently exits 0 on failure
+    // — the gate's verdict must be the suite's own.
+    const env = { ...process.env };
+    delete env.NODE_TEST_CONTEXT;
+    const sr = spawnSync('sh', ['-c', suite], {
+      cwd: dir, encoding: 'utf8', timeout: verifyTimeoutMs(), env,
+    });
+    const timedOut = (sr.signal === 'SIGTERM' && sr.error !== undefined) ||
+      (sr.error !== undefined && sr.error.code === 'ETIMEDOUT');
+    if (timedOut || (sr.signal && sr.error === undefined)) {
+      res = { pass: false,
+        note: `${timedOut ? 'timeout' : 'signal'} ${sr.signal ?? ''} ` +
+          `(after ${verifyTimeoutMs() / 1000}s)` };
+    } else if (sr.error) {
+      res = { pass: false, note: `cannot run: ${sr.error.message}` };
+    } else if (sr.status === 0) {
+      res = { pass: true, note: 'exit 0' };
+    } else {
+      res = { pass: false, note: `exit ${sr.status}` +
+        (firstOutputLine(sr) !== '' ? `: ${firstOutputLine(sr)}` : '') };
+    }
+  }
+  if (tmp !== null) {
+    const rm = phaseGit(root, ['worktree', 'remove', tmp]);
+    if (rm.status !== 0) {
+      phaseGit(root, ['worktree', 'remove', '--force', tmp]);
+    }
+    try {
+      fs.rmSync(path.dirname(tmp), { recursive: true, force: true });
+    } catch (e) { /* best-effort; the OS tmp cleaner retires it */ }
+  }
+  if (addErr !== null) return { err: addErr };
+  return res;
+}
+
+function phaseClose(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    root: { type: 'string' },
+  }, true);
+  if (f.error) return phaseUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return phaseUsageErr('bee phase close: expected <phase-id>');
+  }
+  const n = phaseNormId(pos[0]);
+  if (n === null) {
+    return phaseUsageErr(`bee phase close: <phase-id> expects a phase ` +
+      `number, got '${pos[0]}' (forms: 4, P4, phase/4)`);
+  }
+  const check = f.values.check === true;
+  const rr = phaseRootOf(f.values.root);
+  if (rr.err) return { code: 1, out: '', err: rr.err };
+  const root = rr.root;
+  const branch = `phase/${n}`;
+  const out = [];
+  out.push(`bee phase close ${n}${check ? ' --check' : ''} · P${n}\n`);
+  // step 1, first half — the branch exists (checked before the plan
+  // lookup: it needs no plan, and it is the most immediate finding)
+  if (phaseGit(root, ['show-ref', '--verify', '--quiet',
+      `refs/heads/${branch}`]).status !== 0) {
+    const br = phaseGit(root, ['for-each-ref', '--format=%(refname:short)',
+      'refs/heads/']);
+    const local = br.stdout.split('\n').filter(Boolean).join(', ');
+    out.push(`1 · gate · FAIL · no branch ${branch}` +
+      (local !== '' ? ` (local: ${local})` : '') + '\n');
+    out.push(`fix: create it, or close from the repo that holds it\n`);
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  const branchSha = phaseGit(root, ['rev-parse', '--short', branch])
+    .stdout.trim();
+  const found = phaseFindPlan(root, n);
+  if (found.err) return { code: 1, out: out.join(''), err: found.err };
+  const slug = path.basename(found.plan, '.md');
+  out.push(`plan: ${slug}\n`);
+  const suite = (found.header.suite || '').trim();
+  const decRel = path.join('.hivemind', 'logbook', `${slug}-decisions.toon`);
+
+  // step 1 — gate: the branch's tree passes the suite
+  if (suite === '') {
+    out.push(`1 · gate · FAIL · plan ${slug} names no suite\n`);
+    out.push(`fix: add 'suite: <cmd>' to the plan's machine header ` +
+      '(skills/loop/bee-plan/assets/plan-template.md), then re-run\n');
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  const pwt = phaseWorktreeOf(root, branch);
+  const pwtClean = pwt === null
+    ? true
+    : phaseGit(pwt, ['status', '--porcelain']).stdout.trim() === '';
+  const gate = phaseSuiteGate(root, branch, suite, pwt, pwtClean);
+  if (gate.err !== undefined) {
+    out.push(`1 · gate · FAIL · cannot materialize the ${branch} tree: ` +
+      `${gate.err}\n`);
+    out.push('fix: clear the worktree state it reports, then re-run\n');
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  if (!gate.pass) {
+    out.push(`1 · gate · FAIL · suite '${truncText(suite, 50)}' ` +
+      `${gate.note} (at the ${branch} tree)\n`);
+    out.push(`fix: run '${suite}' at the ${branch} tree and repair ` +
+      'until green, then re-run\n');
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  out.push(`1 · gate · ${branch} @ ${branchSha} · suite PASS\n`);
+
+  // step 2 preconditions — on main, main tree clean
+  const cur = phaseGit(root, ['branch', '--show-current']).stdout.trim();
+  if (cur !== 'main') {
+    out.push(`2 · merge · FAIL · close merges into main, but this ` +
+      `checkout is ${cur === '' ? 'detached' : `on '${cur}'`}\n`);
+    out.push(`fix: run from the main checkout on main — ` +
+      `${phaseMainCheckout(root)}\n`);
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  const dirty = phaseGit(root, ['status', '--porcelain',
+    '--untracked-files=all']).stdout
+    .split('\n').filter(Boolean)
+    .filter((l) => {
+      const p = l.slice(3);
+      return p !== decRel && !p.endsWith(' -> ' + decRel);
+    });
+  if (dirty.length > 0) {
+    out.push(`2 · merge · FAIL · uncommitted work in ${root} ` +
+      `(${dirty.length} path${dirty.length === 1 ? '' : 's'}: ` +
+      `${truncText(dirty.map((l) => l.slice(3)).join(', '), 60)})\n`);
+    out.push(`fix: commit or stash every uncommitted path first — the ` +
+      `decision inventory wants committing too (git add ${decRel})\n`);
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  const mainSha = phaseGit(root, ['rev-parse', '--short', 'main'])
+    .stdout.trim();
+
+  // step 3 precondition — persistent worktree clean
+  if (pwt !== null && !pwtClean) {
+    out.push(`3 · rest · FAIL · worktree ${pwt} (on ${branch}) has ` +
+      'uncommitted work\n');
+    out.push(`fix: commit or stash it — the persistent worktree must ` +
+      'be clean before it rests detached at main\n');
+    return { code: 1, out: out.join(''), err: '' };
+  }
+
+  // step 5 precondition — the decision inventory exists
+  let decText = null;
+  const decAbs = path.join(root, decRel);
+  if (fs.existsSync(decAbs)) {
+    try {
+      decText = fs.readFileSync(decAbs, 'utf8');
+    } catch (e) {
+      decText = null;
+    }
+  }
+  if (decText === null) {
+    const show = phaseGit(root, ['show', `${branch}:${decRel}`]);
+    if (show.status === 0) decText = show.stdout;
+  }
+  if (decText === null) {
+    out.push(`5 · card · FAIL · no decision inventory at ${decRel} ` +
+      `(worktree or ${branch} tree)\n`);
+    out.push(`fix: assemble the decisions file, then run ` +
+      `bee phase inventory ${n} --decisions <file>\n`);
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  const decCount = phaseDecisionLines(decText).length;
+  const hasOrigin = phaseGit(root, ['remote', 'get-url', 'origin'])
+    .status === 0;
+
+  // --check: the plan, nothing run
+  if (check) {
+    out.push(`2 · merge · would --no-ff ${branch} → main ` +
+      `(main @ ${mainSha})\n`);
+    out.push(pwt !== null
+      ? `3 · rest · would detach ${pwt} at main\n`
+      : `3 · rest · no worktree on ${branch} — would skip\n`);
+    out.push(`4 · branch · would delete ${branch}\n`);
+    out.push(`5 · close card · P${n} (preview)\n`);
+    out.push(`  decisions: ${decCount}\n`);
+    if (decCount > PHASE_FLAG_THRESHOLD) {
+      out.push('  flag: under-asked kickoff — front-load harder next phase\n');
+    }
+    out.push(hasOrigin
+      ? '6 · push · would push origin main\n'
+      : `6 · push · no remote 'origin' — would skip\n`);
+    return { code: 0, out: out.join(''), err: '' };
+  }
+
+  // step 2 — the real merge commit (never fast-forward: P3/P7)
+  const m = phaseGit(root, ['merge', '--no-ff', branch, '-m',
+    `merge ${branch} into main (P${n} close)`]);
+  if (m.status !== 0) {
+    const inMerge = phaseGit(root, ['rev-parse', '-q', '--verify',
+      'MERGE_HEAD']).status === 0;
+    if (inMerge) phaseGit(root, ['merge', '--abort']);
+    out.push(`2 · merge · FAIL · ${firstOutputLine(m) || `git exit ${m.status}`}\n`);
+    if (inMerge) {
+      out.push(`  merge aborted — main restored to ${mainSha}\n`);
+    }
+    out.push(`fix: the branches conflict — merge main into ${branch} by ` +
+      'hand, resolve, push nothing, then re-run\n');
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  const mergeSha = phaseGit(root, ['rev-parse', '--short', 'main'])
+    .stdout.trim();
+  const already = mergeSha === mainSha;
+  out.push(already
+    ? `2 · merge · already merged (no merge commit) · ${mergeSha}\n`
+    : `2 · merge · --no-ff ${branch} → main · ${mergeSha}\n`);
+
+  // step 3 — rest the persistent worktree detached at main
+  if (pwt === null) {
+    out.push(`3 · rest · no worktree on ${branch} — skipped\n`);
+  } else {
+    const c = phaseGit(pwt, ['checkout', '--detach', 'main']);
+    if (c.status !== 0) {
+      out.push(`3 · rest · FAIL · ${firstOutputLine(c) || `git exit ${c.status}`}\n`);
+      out.push(`fix: clean/rest ${pwt} by hand (git -C ${pwt} checkout ` +
+        '--detach main); the merge already landed — re-run after ' +
+        'fixing to finish\n');
+      return { code: 1, out: out.join(''), err: '' };
+    }
+    out.push(`3 · rest · ${pwt} detached at main\n`);
+  }
+
+  // step 4 — delete the phase branch (merged only)
+  const d = phaseGit(root, ['branch', '-d', branch]);
+  if (d.status !== 0) {
+    out.push(`4 · branch · FAIL · ${firstOutputLine(d) || `git exit ${d.status}`}\n`);
+    out.push(`fix: git branch -d refuses unmerged branches — the merge ` +
+      `landed; finish by hand (git branch -d ${branch})\n`);
+    return { code: 1, out: out.join(''), err: '' };
+  }
+  out.push(`4 · branch · deleted ${branch}\n`);
+
+  // step 5 — the close card
+  out.push(`5 · close card · P${n}\n`);
+  out.push(already
+    ? `  merge: ${mergeSha} (already merged)\n`
+    : `  merge: ${mergeSha} (${branch} → main, no-ff)\n`);
+  out.push(`  decisions: ${decCount}\n`);
+  if (decCount > PHASE_FLAG_THRESHOLD) {
+    out.push('  flag: under-asked kickoff — front-load harder next phase\n');
+  }
+
+  // step 6 — push
+  if (!hasOrigin) {
+    out.push(`6 · push · skipped — no remote 'origin'\n`);
+  } else {
+    const p = phaseGit(root, ['push', 'origin', 'main']);
+    if (p.status !== 0) {
+      out.push(`6 · push · FAIL · ${firstOutputLine(p) || `git exit ${p.status}`}\n`);
+      out.push('fix: the close landed locally — run ' +
+        "'git push origin main' by hand\n");
+      return { code: 1, out: out.join(''), err: '' };
+    }
+    out.push('6 · push · origin main · pushed\n');
+  }
+  return { code: 0, out: out.join(''), err: '' };
 }
 
 if (process.argv[1] &&
