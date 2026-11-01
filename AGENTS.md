@@ -79,7 +79,10 @@ We are designing the harness before building it. Right now:
   review. Depth scales with plan size — small plans get a single
   Accuracy + External-reality pass, large plans get all dimensions —
   but the gate is never skipped (not for detail, not for cost, not
-  for waiting humans: the P1 run shipped eight). Lives here since
+  for waiting humans: the P1 run shipped eight). Plans carry a
+  `checks:` contract in their machine header — the same checks
+  `bee verify` runs — so review-time claims and verify-time
+  evidence share one contract. Lives here since
   PL-004, not in global law.
 - Ask one question at a time, and **always recommend** — never a bare
   menu. Use the `ask_user` tool (Paseo card) for decisions.
@@ -138,14 +141,15 @@ We are designing the harness before building it. Right now:
   (*how*; bee-plan writes, reviewer gates) · `phases/` (*when/next* —
   the queue) · `logbook/` (*what actually happened* — the loop's
   verify/review accounts; claims don't move states, these do) ·
-  `suggestions/` (the inbox — any role + keeper) · `memory/` (deferred
+  `suggestions/` (improvement proposals — any role + keeper) · `memory/` (deferred
   decisions: the parking lot) · `sessions/` (live role memory,
-  gitignored) · `status.md` (cross-role surface) · `keeper-report.md`
-  (keeper's zoned digest, ADR-008).
+  gitignored) · `status.md` (cross-role surface; the awaiting-keeper
+  queue renders from `inbox.toon` via `bee inbox render`) ·
+  `keeper-report.md` (keeper's zoned digest, ADR-008).
 - Repo documentation: `AGENTS.md`, `README.md`, `SOUL.md` stay at
-  the root; every other standalone document lives in `docs/`
-  (currently `docs/AXI.md`, `docs/WRITING-STANDARD.md` — new
-  standards and guides go there, not the root). `docs/` is
+  the root; every other standalone document lives in `docs/` —
+  standards and guides go there, not the root, discoverable there.
+  `docs/` is
   PROJECT-specific; shipped hive materials live with their
   consumer — a skill's or role's `assets/`/adjacent files
   (`skills/`, `roles/`) — and artifact templates sit in the folder
@@ -155,9 +159,11 @@ We are designing the harness before building it. Right now:
 - Session memory: `.hivemind/sessions/<role>.md` — one file per
   active role (role name in the filename), updated at each decision
   point; re-read yours after compaction/fork/new session.
-- Parking lot: `.hivemind/memory/parking-lot.md` — any agent may
-  propose parking; ONLY the keeper unparks or resolves. Brainstorms end
-  with a loop-back gate over it.
+- Parking lot: `.hivemind/memory/parking-lot.toon` (script-owned
+  store — `bee park add|list|show`) — any agent may propose parking;
+  ONLY the keeper unparks or resolves (`bee park resolve` runs only
+  on the keeper's word). Brainstorms end with a loop-back gate over
+  `bee park list`.
 - Scrappy continuity is sanctioned (ADR-001 amendment): session memory
   may hold project knowledge until the harness lands. Nothing gets built
   with the harness before MVP.

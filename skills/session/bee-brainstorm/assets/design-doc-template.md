@@ -2,7 +2,7 @@
 
 **Date:** YYYY-MM-DD
 **Keeper:** approved in design session(s) on [dates]
-**Governed by ADRs:** [list, e.g. ADR-003, ADR-006]
+**Governed by ADRs:** [list, e.g. ADR-<n>, ADR-<m>]
 
 ## Purpose
 

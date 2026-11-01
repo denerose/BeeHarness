@@ -1,4 +1,4 @@
-// task-sh.test.mjs — suite wrapper for scripts/task.sh.
+// worktree-sh.test.mjs — suite wrapper for scripts/worktree.sh.
 // Each test builds a sandbox git repo in a mkdtemp dir and invokes
 // the real script by absolute path with cwd = sandbox. Derived
 // worktrees land OUTSIDE the sandbox (<sandbox-parent>/$(basename
@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const exec = promisify(execFile);
 const SCRIPT = path.resolve(path.dirname(fileURLToPath(import.meta.url)),
-  '..', 'scripts', 'task.sh');
+  '..', 'scripts', 'worktree.sh');
 
 async function sandbox() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-tasksh-'));

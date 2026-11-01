@@ -17,9 +17,12 @@ plan's scope, design questions>. Never card the keeper directly.
 
 **Workspace:** task worktree `<path>` on branch `task/<phase>-<slug>`,
 cut from the phase branch by the dispatcher before dispatch (e.g.
-`scripts/task.sh create <phase>-<slug>`). Logbook entries ride this
+`scripts/worktree.sh create <phase>-<slug>`). Logbook entries ride this
 branch and reach main at merge. Mid-flight reads from other checkouts
 use `git show <branch>:<path>`.
+
+While the dispatch runs, the dispatcher waits on the pass-back — it
+does not read the worktree mid-flight.
 
 **Safety lines:**
 1. Tool defaults may write to live files — always pass `--check` or

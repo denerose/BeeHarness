@@ -27,10 +27,15 @@ small task the keeper wants planned. Output: one file in
    the above" are plan failures. Write the real content, or mark a code
    block **shape-only** and include a step where the implementer checks
    the real API before using it.
-4. **Each task stands alone.** Anyone implementing task 4 should learn
-   everything they need from task 4 plus the plan header: exact file
-   paths, what earlier tasks provide (names, paths, signatures), the
-   verification command. Repeat what matters; don't make anyone hunt.
+4. **Each task stands alone — the self-contained-task standard.**
+   Every task carries **Files** (exact paths, create or modify),
+   **Depends on**, **Provides** (the names, paths, signatures later
+   tasks rely on), and a verification command. The test is
+   cold-dispatchability: a dispatched implementer holding only the
+   plan, the references it names, and a minimal role file can
+   execute the task cold — without asking the dispatcher anything
+   the plan could have said. Repeat what matters; don't make
+   anyone hunt.
 5. **Declare the validation level** (GLOSSARY) in the header. It comes
    from the design doc if it declares one; otherwise you recommend a
    level with a one-line reason, and the keeper or bee-plan-review
@@ -51,11 +56,13 @@ small task the keeper wants planned. Output: one file in
 
 ## Format
 
-Use `assets/plan-template.md`. Fill its machine header (phase,
-validation, state-source, targets, suite) — the mechanical checks
-and the plan reviewer's sandbox-run read it — and path-tag every
+Use `assets/plan-template.md`. Fill its machine header — phase,
+validation, state-source, targets, `checks:` (one entry per task:
+id, cmd and/or files, `expect: exit 0`; `bee verify` runs these as
+the loop's evidence at verify time), suite — and path-tag every
 verbatim code block (`path=exact/target.ext`) so blocks extract
-mechanically. Save as
+mechanically. The task's verification command (rule 4) is its
+`checks:` entry's `cmd` — one command, both homes. Save as
 `.hivemind/plans/YYYY-MM-DD-<pp|po>-<slug>.md` — your role's initials
 in the slug (pp = power-planner, po = project-orchestrator) —
 with `**Reviewed:** PENDING`.

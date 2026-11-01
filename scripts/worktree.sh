@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# task.sh — task-tier worktree helper (ADR-012: task branch mechanics).
+# worktree.sh — task-tier worktree helper (ADR-012: task branch mechanics).
 #
-#   task.sh create <phase>-<slug>   task branch + worktree off current phase branch
-#   task.sh merge <slug>            merge task branch into current phase branch, clean up
-#   task.sh abandon <slug>          remove task worktree + branch (merged only)
+#   worktree.sh create <phase>-<slug>   task branch + worktree off current phase branch
+#   worktree.sh merge <slug>            merge task branch into current phase branch, clean up
+#   worktree.sh abandon <slug>          remove task worktree + branch (merged only)
 #
 # Repo context resolves from the CURRENT DIRECTORY, never from this
 # script's location. Git ops run in cwd. Bash + git only.
 
 set -u
 
-PROG=task.sh
+PROG=worktree.sh
 RESOLVED=
 REPO_ROOT=
 PHASE_BRANCH=
