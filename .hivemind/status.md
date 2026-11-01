@@ -15,6 +15,12 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
+- [PO] 2026-11-01 — RELAY TO PP (keeper-ordered, P5 kickoff D1):
+  `bee memory supersede` ruled ROLE-GATED with provenance (keeper
+  prunes) — follow-up is yours: ensure the session-ender and
+  clean-up skills carry the right permissions to tidy up without
+  annoying the keeper (keeper's words). Full P5 kickoff rulings
+  land in the P5 plan.
 - [PO] 2026-11-01 — **P4 COMPLETE** (merge 1a78a35, close via `bee
   phase close 4` — first real run): agent-first CLI shipped
   (`bee inbox/capture/render/park/design/verify/task/guidance/phase`
