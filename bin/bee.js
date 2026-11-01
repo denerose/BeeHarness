@@ -694,7 +694,13 @@ function inboxDone(args) {
   }
   it.state = 'done';
   it.done = isoStampLocal();
-  if (f.values.note !== undefined) it.note = f.values.note;
+  if (f.values.note !== undefined) {
+    if (f.values.note.includes('\n')) {
+      return { code: 1, out: '',
+        err: 'bee inbox: field values must be single-line\n' };
+    }
+    it.note = f.values.note;
+  }
   if (f.values.check) {
     return { code: 0, out: `--check: would mark ${it.id} done` +
       (f.values.note !== undefined ? ` (note: ${f.values.note})` : '') +

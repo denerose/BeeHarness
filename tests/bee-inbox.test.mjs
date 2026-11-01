@@ -188,6 +188,19 @@ test('done item leaves the list; header count drops', () => {
   assert.match(r.out, /^1 open · oldest \d+[smhd]\n/);
 });
 
+// Regression (review r1 SF1): a newline in --note corrupts the store.
+test('done --note rejects embedded newlines (store stays parseable)', () => {
+  const p = tmpStore();
+  add(p, 'keeper', 'one');
+  const before = fs.readFileSync(p, 'utf8');
+  const r = run(['inbox', 'done', 'IN-001', '--note', 'a\nb', '--store', p]);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /single-line/);
+  assert.equal(fs.readFileSync(p, 'utf8'), before); // unchanged
+  const r2 = run(['inbox', 'list', '--store', p]); // still parseable
+  assert.equal(r2.code, 0);
+});
+
 // Structured errors with self-correction (agent-facing output).
 test('show unknown id → exit 1 + self-correction', () => {
   const p = tmpStore();
