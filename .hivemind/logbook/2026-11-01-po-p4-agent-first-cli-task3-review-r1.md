@@ -3,7 +3,7 @@
 **Role:** project-orchestrator (bee-review dispatch, review round r1)
 **Reviewer:** cold-dispatched reviewer (bee-review skill)
 **Plan section:** Task 3 — [`/home/saphron/BeeHarness/.hivemind/plans/2026-11-01-po-p4-agent-first-cli.md`](/home/saphron/BeeHarness/.hivemind/plans/2026-11-01-po-p4-agent-first-cli.md)
-**Verify record:** [`/home/saphron/BeeHarness-task-park-store/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task3-verify-r1.md`](_..) (task/4-park-store @ ef65f21)
+**Verify record:** [`/home/saphron/BeeHarness-task-park-store/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task3-verify-r1.md`](/home/saphron/BeeHarness-task-park-store/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task3-verify-r1.md) (task/4-park-store @ ef65f21) — link target `(_..)` repaired to the sibling convention when bee verify's link-check caught it (task 5, 2026-11-01)
 **Scope:** CODE half only — commits 1be4a9e (bin/bee.js, tests/bee-park.test.mjs) + ef65f21 (AGENTS.md, skills/GLOSSARY.md, verify record). The LIVE migration run (dispatcher's, from main, post-merge) is out of review scope; its preconditions are not.
 
 ## Claim vs record (first check)
