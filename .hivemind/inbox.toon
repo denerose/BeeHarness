@@ -1,0 +1,10 @@
+# inbox — items waiting on someone (agent store; views render from here)
+id: IN-001
+addressee: keeper
+origin: pp
+ref: .hivemind/status.md
+text: confirm the tier ruling: bee-plan-review stays TIERED (all-block is skill-review-specific) — PP's answer pending your confirmation
+state: open
+opened: 2026-11-01T13:24:12+11:00
+taken: -
+done: -

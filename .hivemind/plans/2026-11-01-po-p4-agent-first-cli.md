@@ -244,7 +244,7 @@ mind). Branch: task/4-inbox-store @ aa4ff59.
 **Provides:** `bee inbox render` (status.md derived section),
 `bee report` sourcing *Needs the keeper* from the store
 
-- [ ] Add `bee inbox render [--check]` to `bin/bee.js`: renders the
+- [x] Add `bee inbox render [--check]` to `bin/bee.js`: renders the
   open-items view (by addressee, oldest first, ages) into a marked
   region of `.hivemind/status.md` between `<!-- inbox:render -->`
   and `<!-- /inbox:render -->` (region created if absent, placed
@@ -252,7 +252,7 @@ mind). Branch: task/4-inbox-store @ aa4ff59.
   replacing the hand-written queue section); never touches text
   outside the region (concurrent-edit safety for the shared
   surface).
-- [ ] Migration (one-shot, script-driven — mechanical, no judgment
+- [x] Migration (one-shot, script-driven — mechanical, no judgment
   per item): status.md *Awaiting keeper* bullets →
   `add keeper <bullet> --origin status --ref <suggestion path if
   cited>`, SKIPPING bullets marked RESOLVED (same convention as
@@ -264,7 +264,7 @@ mind). Branch: task/4-inbox-store @ aa4ff59.
   replaced by the rendered region; the rest of status.md
   (escalations, notes) stays as-is — note traffic goes to the
   inbox going forward, history stays in git.
-- [ ] `bee report`: *Needs the keeper* derives from the store
+- [x] `bee report`: *Needs the keeper* derives from the store
   (open items addressed `keeper`, oldest-first, absolute paths per
   the report's header protocol — re-read the protocol in
   `.hivemind/keeper-report.md` before touching it) instead of
@@ -272,14 +272,28 @@ mind). Branch: task/4-inbox-store @ aa4ff59.
   keeper's list, merge both roles' asks) preserved. Run
   `bee report --check` in the task; the real regen happens from
   the main checkout at merge per the standing protocol.
-- [ ] AGENTS.md: the status-surface description line for the
+- [x] AGENTS.md: the status-surface description line for the
   awaiting-keeper queue points at the rendered region (durable
   content only — no narratives).
-- [ ] Verify: migration idempotent (re-run adds nothing — dedupe on
+- [x] Verify: migration idempotent (re-run adds nothing — dedupe on
   same normalized text); render twice = identical output (diff
   shown); `bee report --check` output carries every migrated ask;
   full suite green.
-- [ ] Commit: `migrate queues into inbox store, render status and report views`
+- [x] Commit: `migrate queues into inbox store, render status and report views`
+**Task notes (loop, 2026-11-01):** done — code half via task-orc
+(verify r1 PASS, review r1 FIX-FIRST 1🔴 1🟡, verify r2 PASS,
+review r2 APPROVE; the r2 🟡 stale-comment fix applied with
+re-review waived — comment-only, reviewer's own suggested change).
+Deviation recorded: `fromStore` = store EXISTS (not "has ≥1 keeper
+ask") — r1's blocking finding; regression-pinned. LIVE half run
+from main with spine code: queues were EMPTY by then (keeper-
+approved suggestions graduation pass landed mid-flight — PP;
+awaiting-keeper queue "none pending", all suggestions graduated),
+so the store was born with the one genuinely-pending ask (PP's
+tier-confirmation escalation note → IN-001), status region
+rendered, report regenerated from the store (stale "- None."
+placeholder hand-removed, disclosed). Branch merged @ 3276b4f;
+live commit 65f77a9.
 
 ## Task 3: `bee park` (parking lot becomes a script-owned store)
 
