@@ -53,7 +53,8 @@ machine. See `SOUL.md`.
 - `AGENTS.md` — always-applicable rules for any agent in this repo
 - `docs/` — repo documentation: `AXI.md` (agent-first CLI principles,
   binding for `bee`), `WRITING-STANDARD.md` (how behavior documents
-  are written)
+  are written), `guidance/` (working-discipline how-tos, read via
+  `bee guidance`)
 - `roles/` — role specs (power-planner, project-orchestrator, task-orc)
 - `.hivemind/` — the hive's working space; purposes per class live in
   the design doc's artifacts map

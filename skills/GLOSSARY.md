@@ -34,8 +34,18 @@ entry is law looking for a different home.
 - **hivemind** — the `.hivemind/` folder in a repo. Holds all the
   working files the agents produce: `decisions/` (ADRs), `designs/`,
   `plans/`, `phases/`, `suggestions/`, `memory/`, `logbook/`,
-  `sessions/` (gitignored), `status.md` (cross-role surface), and
-  `keeper-report.md` (the keeper's zoned digest).
+  `sessions/` (gitignored), `inbox.toon` (the inbox store),
+  `status.md` (cross-role surface), and `keeper-report.md` (the
+  keeper's zoned digest).
+- **inbox** — `.hivemind/inbox.toon`, the script-owned store of items
+  waiting on someone (`bee inbox add|list|show|done`). One addressee
+  per item, open → taken → done. The status surface's awaiting-keeper
+  queue and the keeper report's keeper asks render from it; new
+  note traffic and awaiting-read suggestions ride it instead of
+  hand-written queues.
+- **bee capture** — `bee capture "<thought>"`: file a thought to the
+  keeper's inbox without leaving the thread. Sugar for an inbox add;
+  routing stays conversational.
 - **ADR** — architecture decision record, one file per decision, in
   `.hivemind/decisions/`. Written with the global `adr` skill.
 - **design doc** — what we're building and why, for work big enough
@@ -43,6 +53,9 @@ entry is law looking for a different home.
   co-authored with the keeper, read-only below; plan/design conflicts
   go to the keeper. Lifecycle-stamped (ADR-016): `live` → `picked-up`
   → `implemented`; after pickup, dated addenda only.
+- **bee design** — `bee design new|pick-up|implement|status`: the
+  design-doc lifecycle as CLI (ADR-016's transitions). Machine
+  blocks are script territory; the CLI never edits them by hand.
 - **plan** — the step-by-step document a loop executes. Lives in
   `.hivemind/plans/`, named `YYYY-MM-DD-<pp|po>-<slug>.md` (ADR-007).
   Written by bee-plan, reviewed by bee-plan-review before execution.
@@ -60,8 +73,9 @@ entry is law looking for a different home.
   folder. bee-verify runs checks and writes a verify entry; bee-review
   judges quality and writes a review report. The loop calls them; they
   never call each other.
-- **parking lot** — `.hivemind/memory/parking-lot.toon` (`bee park`).
-  Deferred decisions with an unpark condition. Any agent may propose
+- **parking lot** — `.hivemind/memory/parking-lot.toon`
+  (`bee park add|list|show|resolve`). Deferred decisions with an
+  unpark condition. Any agent may propose
   adding an item; only the keeper resolves one (`bee park resolve`
   is keeper-gated by law).
 - **validation level** — how much checking a stage gets, set in the
@@ -70,6 +84,12 @@ entry is law looking for a different home.
 - **work-item states** — `draft → implemented → verified → reviewed →
   done`. The loop moves items between states, each move needing its
   evidence in `.hivemind/logbook/`.
+- **bee verify** — the scripted half of verification: runs the plan
+  header's `checks:` contract and mints the logbook entry. Whether
+  the output is sane stays agent judgment.
+- **bee task** — the scripted half of state-keeping: moves work items
+  between states with provenance, refusing a move that lacks its
+  evidence record.
 - **escalate** — stop and ask the keeper (ask_user card, with a
   recommendation), then record the answer where it applies: the plan
   (task-scoped) or the phase list (phase-scoped). Used for plan/design
@@ -97,9 +117,11 @@ entry is law looking for a different home.
 - **escalation envelope** — every ask_user card states: role, context
   (plan/phase), the question, and where the answer will be recorded.
   One decision per card, recommendation first (ADR-009).
-- **status surface** — `.hivemind/status.md`: open escalations, ADRs
-  awaiting the keeper's flip, cross-role notes. Both roles read it at
-  session start; interim until the decisions inbox exists.
+- **status surface** — `.hivemind/status.md`. The awaiting-keeper
+  queue renders from the inbox (`bee inbox render` writes a marked
+  region); open escalations and cross-role notes remain its prose.
+  Both roles read it at session start; interim until the decisions
+  inbox replaces the whole surface.
 - **logbook versioning** — verify and review entries carry a round
   suffix (`…-task3-verify-r2.md`); entries made in worktrees ride the
   task branch and reach main at merge (ADR-007 amendment 2).
@@ -150,6 +172,11 @@ entry is law looking for a different home.
 - **determinism test** — if two careful people following the same
   rules would produce the same result, the work is a script; if they
   would differ, it needs an agent (ADR-014).
+- **structure check** — `scripts/structure-check.sh`: every tracked
+  file must match `scripts/structure.map`, the allowed-structure
+  manifest (data, not code — one pattern per line); misses are
+  findings with fix lines. Per-repo capability: a repo adopts it by
+  adding a map; `bee verify` runs it when one exists.
 - **bee-native** — lives in the BeeHarness repo and ships with it.
   The loop and bee-built work may depend only on bee-native
   instruments plus the foundations (Pi, Paseo, subagents extension;

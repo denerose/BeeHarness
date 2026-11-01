@@ -45,8 +45,8 @@ Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) f
    (template in `assets/design-doc-template.md`). Design docs are
    written together with the keeper, section by section. Never write one
    alone.
-6. **Close the session with the parking lot.** Read
-   `.hivemind/memory/parking-lot.md` with the keeper. You propose
+6. **Close the session with the parking lot.** Walk
+   `bee park list` with the keeper. You propose
    additions and resolutions; the keeper decides. This loop-back is a
    required step, even when nothing was parked.
 7. **Hand off clearly.** Say which: bee-plan when the loop will

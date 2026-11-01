@@ -1230,7 +1230,7 @@ function parkResolve(args) {
 }
 
 // migrate: the named one-shot executor converting the markdown
-// lot into the store. The md file's own shape (from the live
+// lot into the store. The md file's own shape (from the legacy
 // .hivemind/memory/parking-lot.md):
 //   ## Parked / ## Resolved sections; one bullet per entry —
 //   - **PL-<id> — title** — body…  with hard-wrapped
