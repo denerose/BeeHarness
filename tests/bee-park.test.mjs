@@ -13,10 +13,22 @@ import { run } from '../bin/bee.js';
 const STORE_HEADER =
   '# parking lot — deferred decisions (agent store; views render from here)';
 
-// The repo's own lot, read at test time (never hardcoded — the
-// fixture stays current as the live lot changes).
+// Frozen snapshot of the markdown lot at the store conversion
+// (review r1 blocking fix): the live migration replaces the repo's
+// parking-lot.md with a pointer stub, so reading the repo file at
+// test time would break the suite the moment the migration lands.
+// The fixture is the migration's frozen input; the canary below
+// pins the repo file's shape (lot or stub) instead.
 const LOT_MD = fs.readFileSync(
-  new URL('../.hivemind/memory/parking-lot.md', import.meta.url), 'utf8');
+  new URL('../tests/fixtures/parking-lot-v1.md', import.meta.url), 'utf8');
+
+test('repo parking-lot.md is a lot or the pointer stub (canary)', () => {
+  const repo = fs.readFileSync(
+    new URL('../.hivemind/memory/parking-lot.md', import.meta.url), 'utf8');
+  assert.ok(repo.includes('## Parked') ||
+    repo.includes('moved to the script-owned store'),
+  'repo lot is neither markdown lot nor stub — hand-check');
+});
 
 function tmpStore() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-park-'));
