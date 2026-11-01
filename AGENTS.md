@@ -156,9 +156,11 @@ We are designing the harness before building it. Right now:
 - Session memory: `.hivemind/sessions/<role>.md` — one file per
   active role (role name in the filename), updated at each decision
   point; re-read yours after compaction/fork/new session.
-- Parking lot: `.hivemind/memory/parking-lot.md` — any agent may
-  propose parking; ONLY the keeper unparks or resolves. Brainstorms end
-  with a loop-back gate over it.
+- Parking lot: `.hivemind/memory/parking-lot.toon` (script-owned
+  store — `bee park add|list|show`) — any agent may propose parking;
+  ONLY the keeper unparks or resolves (`bee park resolve` runs only
+  on the keeper's word). Brainstorms end with a loop-back gate over
+  `bee park list`.
 - Scrappy continuity is sanctioned (ADR-001 amendment): session memory
   may hold project knowledge until the harness lands. Nothing gets built
   with the harness before MVP.
