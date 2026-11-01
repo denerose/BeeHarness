@@ -1,6 +1,0 @@
-**Date:** 2026-11-01
-**Project:** BeeHarness
-**Role:** project-orchestrator
-**Scope:** harness
-**What happened:** P4's 15 decisions >> the 8 threshold — the calibration flag fired (under-asked kickoff). The five kickoff cards covered the design's open questions well, but ten more judgment calls surfaced mid-phase: drift semantics, report source trigger, link-check matcher, error-string boundary (class-C), NODE_TEST_CONTEXT. Most were review-gated but not front-loaded. The pattern: the kickoff card asks "what does the design leave open?" but not "where will the build hit plan-letter vs intent tensions?"
-**Suggestion:** The kickoff card should include an execution-seams section: the places where the implementation will hit plan-letter vs intent tensions (error/usage boundary rules, fallback semantics, naming collisions, environmental hazards). bee-plan or the phase-kickoff skill could name this as a category alongside design questions. Concrete input: the P4 plan's "Execution decisions (made at planning, reviewed as decisions)" section was this — but it was written during planning, not from the previous phase's hit list. The calibration flag's output (the decisions that fired) is exactly the input for the next phase's execution-seams section.

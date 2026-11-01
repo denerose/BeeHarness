@@ -48,12 +48,17 @@ finding.
   loop opens a phase — phase id, one-line build, design state,
   gate status — then the front-loaded decision list: every open
   question that would otherwise surface mid-phase, each with
-  alternatives and a recommendation, ruled up front.
+  alternatives and a recommendation, ruled up front. Includes a
+  named **execution-seams section**: where the build is likely to
+  hit plan-letter vs intent tensions, fed by the previous phase's
+  decision inventory.
 - **Phase-end (sign-off by decisions):** after review and verify,
   before merge — the decision inventory, one card per judgment call
   with a live alternative; rulings applied as fix rounds; a final
   mechanical close card (merge summary) ends it. Never "approve
-  the work." Calibration signal: an inventory much over ~8
+  the work." Never a bulk sign-off while disputes remain — card
+  each dispute individually before the close card. Calibration
+  signal: an inventory much over ~8
   decisions means the phase was under-asked at kickoff.
 
 **Escalate a decision when** it has a live alternative the keeper

@@ -68,6 +68,16 @@ suggestion file carries its Outcome pointing here):**
     (derive from the test's own location); consider a worktree
     suite run at merge level in `bee verify`. File:
     `planned/2026-10-31-po-no-hardcoded-checkout-paths-in-tests.md`.
+13. Gate budget (P4 hindsight): cold-dispatched gate reviews get
+    900s + "write the report even if incomplete" as the default —
+    dispatch-brief template line. File:
+    `planned/2026-11-01-po-p4-hindsight-gate-budget.md` (or its
+    slug).
+14. Plan-size guard (P4 hindsight): non-blocking size note in
+    plan-checks.sh output above ~500 lines so the dispatcher sees
+    the gate cost. File:
+    `planned/2026-11-01-po-p4-hindsight-plan-size-guard.md` (or
+    its slug).
 
 **Design input:**
 13. Design-note consolidation at rectification boundaries —
