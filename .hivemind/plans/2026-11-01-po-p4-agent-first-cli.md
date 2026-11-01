@@ -4,7 +4,7 @@
 **Design doc:** `.hivemind/designs/2026-10-25-pp-p4-inbox-design.md` @ ad77aa4 (note + 2026-11-01 addendum + kickoff decision list items 1–7 — all seven keeper-ruled at kickoff, 2026-11-01)
 **Validation level:** phase (recommended — multi-build phase with law-touching edits and a keeper sign-off gate; the design names keeper gates)
 **Detail:** mixed — verbatim contracts for stores, formats, and command grammars (the interfaces later tasks and the gate verify); lean for implementation code (each task names exact files, grammar, behavior, and its test list; implementer works in-repo with the design note, `docs/AXI.md`, and `bin/bee.js` house patterns — review gates check the result)
-**Reviewed:** bee-plan-review round 1 FAIL 2026-11-01 (2 blocking, 10 should-fix — `.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-plan-review-r1.md`); both blocking + 6 should-fix fixed in-plan, 4 should-fix waived with reasons beside their findings in the report. Round-2 dispatch TIMED OUT before writing its report; its six verified findings (docs/research map miss; phase/4 behind main; skills/ sweep unreachable as written; bee.js:158 outside named classes; three lot duplicates not two; two sweep-modified files missing from targets) were recovered from its transcript, re-verified by the planner, and fixed in-plan; fresh round-2 dispatch pending
+**Reviewed:** bee-plan-review round 1 FAIL 2026-11-01 (2 blocking, 10 should-fix — `.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-plan-review-r1.md`; both blocking + 6 should-fix fixed in-plan, 4 waived with recorded reasons). Round-2 dispatch TIMED OUT pre-report; its six verified findings were recovered from its transcript, re-verified by the planner, and fixed in-plan (356d6f8). Fresh round 2 **PASS** 2026-11-01 (0 blocking, 1 should-fix — `.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-plan-review-r2.md`); the should-fix (R1, Task 8 seed-coverage prose contradiction) fixed post-PASS, non-verbatim, this commit
 
 **Phase:** P4 (spine `phase/4`, persistent worktree `/home/saphron/BeeHarness-phase3`)
 
@@ -500,10 +500,9 @@ modify `scripts/task.sh` (renamed — content moves),
 as a capability; the keeper-directed rename
 
 - [ ] `scripts/structure.map` — the allowed-structure manifest,
-  data not code (verbatim seed covering everything `git ls-files`
-  tracks today plus this phase's planned files; extended
-  deliberately via map edits — exceptions are visible, never
-  suppressions):
+  data not code (the seed below covers everything tracked at
+  seed-writing time plus this phase's planned files — no more;
+  coverage at execution time is the extension step's job, below):
 
 ```text path=scripts/structure.map
 # allowed structure — one pattern per line; <x> = one segment.
@@ -521,13 +520,13 @@ scripts: scripts/<file>.sh scripts/structure.map
 tests: tests/<file>.test.mjs tests/fixtures/<file>
 ```
 
-  The seed covers everything tracked at plan-gate time plus this
-  phase's planned files. Structure is living: new trees land
-  mid-flight (they did during this plan's own gating) — Task 8's
-  build step includes running the check over the repo and
-  extending the map deliberately for anything tracked that misses
-  (the map edit IS the recorded decision; a miss is never
-  ignored, never suppressed).
+  The seed covers what was tracked when it was written, plus this
+  phase's planned files — nothing stronger. Structure is living:
+  new trees land mid-flight (they did during this plan's own
+  gating) — Task 8's build step includes running the check over
+  the repo and extending the map deliberately for anything
+  tracked that misses (the map edit IS the recorded decision; a
+  miss is never ignored, never suppressed).
 
 - [ ] `scripts/structure-check.sh <root>`: walks tracked files
   (`git ls-files`), matches each against the map; every miss is a
