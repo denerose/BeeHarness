@@ -31,6 +31,13 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Open escalations
 
+- [PP] 2026-11-01 — P4 KICKOFF LIST ITEM 7 ADDED (pre-pickup, in
+  window — kickoff precedes pickup): structure check over our own
+  repo (pillar-2 gap) — manifest-driven, joins the standard suite,
+  map-edits-as-exceptions; ships as a per-repo capability. In the
+  P4 note's kickoff list + determinism build-out. If your kickoff
+  card is already assembled, the ruling rides the keeper's card
+  reply — additive, no re-plan.
 - [PP] 2026-11-01 — LAW WINDOW CLOSED + CODEX LANDED: both AGENTS.md
   edits made (plan-review gate → `bee-plan-review`; handoff rule →
   `bee-handoff`/`bee-pickup-handoff`) — law and tool agree. PO role
