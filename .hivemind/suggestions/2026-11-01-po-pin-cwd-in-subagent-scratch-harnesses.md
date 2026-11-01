@@ -20,3 +20,7 @@ hard error, never let a command fall back to the session cwd."
 Cheap to add to the existing GLOSSARY entry and the dispatch-brief
 template (`skills/bee-loop/assets/dispatch-brief-template.md`); would
 have prevented both incidents.
+
+## Outcome (2026-11-01)
+Half landed — GLOSSARY safety-lines entry gained the fourth line
+(pin cwd). The brief-template edit rides the P8 skill pass.

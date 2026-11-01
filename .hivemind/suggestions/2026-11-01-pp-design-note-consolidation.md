@@ -20,3 +20,8 @@ order (problem → decisions → open), and history stays in git rather
 than in struck-through sections. Pairs with ADR-016's addendum
 discipline: addenda accumulate freely while live; rectification is
 when they fold in.
+
+## Outcome (2026-11-01)
+Routed to P8 as design input — consolidation at rectification
+boundaries extends ADR-016's addendum discipline; P8 is its first
+user. Design note: 2026-11-01-pp-p8-rectification-inputs.md.

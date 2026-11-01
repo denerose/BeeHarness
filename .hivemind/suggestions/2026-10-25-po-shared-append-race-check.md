@@ -14,3 +14,8 @@ committing an append to a shared-write file (parking lot, status.md),
 pull --rebase once more and verify your entry appears exactly once."
 Cheap habit; catches the replay-duplication class the 8501118 incident
 proved live.
+
+## Outcome (2026-11-01)
+Law — AGENTS.md commit-discipline bullet (pull --rebase and verify
+the entry appears exactly once before committing a shared-file
+append). Approved in the 2026-11-01 graduation pass.

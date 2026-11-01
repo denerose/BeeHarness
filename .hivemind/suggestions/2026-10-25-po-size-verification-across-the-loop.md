@@ -25,3 +25,8 @@ loop):
    verbatim, and (b) the fix-round verify record replicates the
    reviewer's probe method — record a one-line reason in the verify
    record. Blocking-tier findings always get a real re-review.
+
+## Outcome (2026-11-01)
+Resolved: the improvised front-end check became standard — ADR-004
+amendment 1 (sandbox-run) and plan-checks.sh --run (P7). Round
+calibration rides the existing bounded-fix-rounds + waive-tier law.

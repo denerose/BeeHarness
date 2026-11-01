@@ -77,3 +77,8 @@ alternatives. Mid-stream directives apply live and get recorded.
 PP codification (role file: mandate boundary, continuity, the two
 checkpoints, escalation section); the phase-kickoff design item;
 GLOSSARY/codification of "decision inventory" if PP wants the term.
+
+## Outcome (2026-11-01)
+Landed 79ba574: both role files carry the two standing checkpoints
+in full; GLOSSARY escalate entry carries the decision-card shape;
+PL-PP-010 annotated with the escalation decision table.

@@ -24,3 +24,9 @@ remembered content; (b) when wrapping/indentation is involved, verify
 exact bytes with grep/sed first; (c) scripted multi-file edits
 collect failures, apply the rest, and report all — never abort
 mid-list.
+
+## Outcome (2026-11-01)
+Law — extends the AGENTS.md editing-discipline block (rules 4 and 5:
+fresh re-read before multi-line edits, real bytes not reconstructed
+display; batch scripts continue-and-report). Approved in the
+2026-11-01 graduation pass, same day as a fourth live instance.

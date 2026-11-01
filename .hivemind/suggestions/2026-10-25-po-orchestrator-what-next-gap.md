@@ -33,3 +33,7 @@ through together:
    recommendation; option sets that span different kinds of work
    (wrap vs build vs test) return the decision load to the keeper,
    which the digest model exists to avoid.
+
+## Outcome (2026-11-01)
+Resolved by ADR-009 (2026-10-25): propose-next rule, forward phase
+queue, ask hygiene — all landed in role files and practice.

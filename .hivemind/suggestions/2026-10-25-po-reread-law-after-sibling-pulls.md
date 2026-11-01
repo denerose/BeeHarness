@@ -13,3 +13,8 @@ AGENTS.md: "After a pull that lands sibling commits, re-read the
 changed law files (AGENTS.md, roles/, skills/GLOSSARY.md) before
 acting on anything they govern." Mirrors the existing discipline lines;
 no new machinery.
+
+## Outcome (2026-11-01)
+Law — AGENTS.md commit-discipline bullet (re-read changed law files
+after a pull lands sibling commits). Approved in the 2026-11-01
+graduation pass.

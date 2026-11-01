@@ -102,7 +102,19 @@ We are designing the harness before building it. Right now:
   the same command — output shown, not assumed.
   (3) After any multi-file sweep, grep for residuals BEFORE
   committing — not after.
-- Commit messages: short imperative, ≤10 words.
+  (4) Re-read the target region immediately before any multi-line
+  edit — never edit from memory or from a rendered display (the
+  display flattens continuation-line indentation); take the exact
+  bytes from the file (grep/sed), not a reconstruction.
+  (5) A batch script that asserts-and-aborts mid-list leaves every
+  later file silently unpatched — such scripts continue-and-report
+  instead, or the abort is reported as "later files unpatched".
+- Commit discipline: messages short imperative, ≤10 words; stage
+  owned files by name; after a pull lands sibling commits, re-read
+  the changed law files (AGENTS.md, roles/, skills/GLOSSARY.md)
+  before acting on anything they govern; before committing an
+  append to a shared-write file, pull --rebase once more and verify
+  the entry appears exactly once.
 - When context runs short, run a handoff (`bee-handoff` skill); resume with
   `bee-pickup-handoff`. A handoff ends with a memory sync (session state
   current) — NOT a parking-lot sweep. Sweeps belong to closing work

@@ -208,6 +208,10 @@ their own documents (`docs/AXI.md`).
   them, leave others' modifications untouched;
   (3) if a live file was touched by accident — `git restore` it
   immediately, verify porcelain clean, and disclose it in the report.
+  (4) Pin the working directory of every command in a scratch
+  harness — pass an absolute `cwd`/`-C <path>` explicitly; an
+  empty path variable means the command runs in the session's
+  default checkout, which is live.
 
 - **TOON** — token-oriented notation: the token-lean, line-oriented
   format for structured data exchanged with agents; the storage and

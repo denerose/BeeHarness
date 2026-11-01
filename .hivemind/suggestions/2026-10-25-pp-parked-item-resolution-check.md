@@ -18,3 +18,8 @@ asks — a resolution is every ask addressed, or explicitly deferred
 with the keeper's word, with the how/why recorded in the resolution
 note when the item asked for it. Cheap test: "can I point at where
 each sentence of this item got handled?"
+
+## Outcome (2026-11-01)
+Law — the parking lot's format block carries the resolution check
+(re-read the full item; a resolution addresses every ask or names
+what remains). Approved in the 2026-11-01 graduation pass.

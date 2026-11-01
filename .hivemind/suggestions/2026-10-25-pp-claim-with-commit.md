@@ -17,3 +17,8 @@ isn't ready to make. Belongs in the power-planner and
 project-orchestrator role files (working style) and the escalation/
 report conventions. Complements, not replaces, evidence-over-assertion:
 this is the pointer that makes assertion checkable.
+
+## Outcome (2026-11-01)
+Law — both role files' continuity protocols carry claim-with-commit
+(hash in the same breath, or the claim is not ready). Approved in
+the 2026-11-01 graduation pass after a third recurrence.

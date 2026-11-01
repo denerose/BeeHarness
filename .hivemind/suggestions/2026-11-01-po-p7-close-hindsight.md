@@ -40,3 +40,9 @@ because the tree had the content). The loop caught it by checking
 verifies `git status` clean + claimed hashes exist in the task
 branch log before `task.sh merge` runs — evidence over assertion,
 applied to dispatch returns.
+
+## Outcome (2026-11-01)
+Split: (2) keeper gates as decision lists — landed 79ba574 (both
+role files + GLOSSARY). (1) plan-checks create-targets on completed
+plans — routed to the P8 script pass (design note:
+2026-11-01-pp-p8-rectification-inputs.md).

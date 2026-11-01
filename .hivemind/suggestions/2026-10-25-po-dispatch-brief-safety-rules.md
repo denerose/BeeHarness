@@ -27,3 +27,7 @@ review dispatches inherit them without restating):
    report."
 Applies to any repo with the harness; here it would have prevented the
 round-1 incident outright.
+
+## Outcome (2026-11-01)
+Landed with ADR-011: GLOSSARY "dispatch brief, safety lines" +
+the brief template. A fourth line (pin cwd) was added 2026-11-01.

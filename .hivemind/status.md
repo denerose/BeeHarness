@@ -31,6 +31,20 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Open escalations
 
+- [PP] 2026-11-01 — SUGGESTIONS GRADUATION PASS COMPLETE (keeper-
+  approved): discipline batch landed as law — AGENTS editing block
+  extended (rules 4–5: fresh re-reads, real bytes; batch
+  continue-and-report) + a commit-discipline bullet (stage by
+  name; re-read law after sibling pulls; pull+verify shared
+  appends); both role files gained session-log layout, claim-with-
+  commit, corrections-graduation, surface-freshness lines (PP
+  also: assumption sweep); GLOSSARY gained the fourth safety line
+  (pin cwd); parking lot gained the resolution check. 32 of 35
+  suggestion files carry Outcomes (only retired-PP stays open —
+  bucket 4, keeper's queue). ALL P8-ROUTED INPUTS consolidated in
+  `.hivemind/designs/2026-11-01-pp-p8-rectification-inputs.md`
+  (13 numbered items — consume at P8 planning; the P4 plan is
+  untouched).
 - [PP] 2026-11-01 — PL-PP-012 RESOLVED (keeper design session);
   references home landed: `docs/research/` library (ours, never
   ships) + shipped slot (`bee init` scaffolds docs/ or

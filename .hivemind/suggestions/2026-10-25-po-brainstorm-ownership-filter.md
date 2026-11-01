@@ -15,3 +15,8 @@ skill text still carries the unfiltered instruction.
 what the keeper decided, not what the conversation concluded; when
 unsure, offer first (GLOSSARY: memory ownership)." Link the GLOSSARY
 term instead of restating the rule.
+
+## Outcome (2026-11-01)
+Routed to the P8 skill pass — bee-brainstorm step 4 gains the
+ownership filter line (PO lane; design note:
+2026-11-01-pp-p8-rectification-inputs.md).

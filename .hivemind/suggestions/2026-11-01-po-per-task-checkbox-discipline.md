@@ -18,3 +18,8 @@ task's boxes at its commit — never batch-edit checkboxes across task
 or section boundaries (partition slices are the trap: they sweep
 everything downstream). Checked boxes are state claims (ADR-006);
 each claim should land with its own evidence in the same commit.
+
+## Outcome (2026-11-01)
+Closed structurally by P4 Task 6 (`bee task` — script-owned state
+moves; the checkbox bug class dies with hand-editing). An interim
+rule line for bee-loop's Record step rides the P8 skill pass.

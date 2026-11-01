@@ -15,3 +15,8 @@ return contract: "Return the FINISHED brief only — omit working
 notes, transcripts, and process narration." Cheap at dispatch time,
 saves context at receipt. Applies to task-orc brief guidance and the
 dispatch templates when next touched.
+
+## Outcome (2026-11-01)
+Routed to the P8 skill pass — the return-contract line lands in the
+dispatch-brief template (and bee-argue's brief guidance) at next
+touch. Design note: 2026-11-01-pp-p8-rectification-inputs.md.

@@ -13,3 +13,8 @@ every path surfaced to the keeper must be verified openable in the
 surface that renders it — absolute paths, or link forms tested against
 Paseo's resolver. Until then, both roles quote absolute paths in chat
 (status.md note stands).
+
+## Outcome (2026-11-01)
+Law since 2026-10-25 — AGENTS.md Rules of engagement carries the
+absolute-path rule on all keeper-facing surfaces; the P4 inbox plan
+(Task 2) renders views with it as a standing constraint.

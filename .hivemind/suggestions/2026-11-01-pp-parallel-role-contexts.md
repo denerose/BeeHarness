@@ -19,3 +19,8 @@ append-only, never insert, and number entries from the highest seen
 +1 after re-reading. Longer term this belongs to the session-context
 tooling (PL-PP-003 lane): context manifests so instances can see
 each other.
+
+## Outcome (2026-11-01)
+Landed as the interim convention in both role files (keeper names a
+parallel context; both append-only from highest-seen +1); the
+context-manifest tooling stays pointed at the PL-PP-003 lane.

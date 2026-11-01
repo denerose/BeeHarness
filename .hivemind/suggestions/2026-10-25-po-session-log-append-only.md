@@ -14,3 +14,8 @@ or AGENTS.md session-memory rule), state: session-log entries are
 append-only IDs — never renumber, never insert between; cite entries
 as number + date; duplicates from a split stay (note the collision in
 prose) rather than being renumbered. Removes the whole repair class.
+
+## Outcome (2026-11-01)
+Law — folded into the shared session-log layout convention in both
+role files (append-only IDs, never renumber). Approved in the
+2026-11-01 graduation pass.

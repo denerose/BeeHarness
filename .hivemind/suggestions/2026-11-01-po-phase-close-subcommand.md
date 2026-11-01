@@ -38,3 +38,7 @@ prose. The agent keeps only the judgment: is the phase actually done.
 
 P4+ phase closes (first user: P4). Adjacent: PL-PO-002 (bee init
 worktree registration — same file, worktree mechanics).
+
+## Outcome (2026-11-01)
+Absorbed as P4 kickoff item 1 (ruled at kickoff, 5 cards): scripted
+phase close folds with decision-count calibration.

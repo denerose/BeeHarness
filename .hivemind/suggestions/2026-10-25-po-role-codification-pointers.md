@@ -20,3 +20,7 @@ refresh (continue).
 style section from these entries (session log 19–38 spans both the
 founding run and the P2 successor — the founding run ends at entry 32)
 rather than from speculation, per roles/README's own rule.
+
+## Outcome (2026-11-01)
+Consumed: PO role file codified 2026-11-01 (P7 close) from the
+founding-run evidence, including the succession-rename distinction.

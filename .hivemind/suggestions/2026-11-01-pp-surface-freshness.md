@@ -18,3 +18,8 @@ resolved lines leave at the next sweep (extends PO's existing
 convention). (b) Inter-role relays carry an as-of stamp — "state
 true as of commit <hash>" — so staleness is detectable instead of
 misleading. Both dissolve when the decisions inbox lands (P4).
+
+## Outcome (2026-11-01)
+Law — both role files carry surface-freshness lines (one note per
+thread updated in place; as-of commit stamps on relays). Approved
+in the 2026-11-01 graduation pass.

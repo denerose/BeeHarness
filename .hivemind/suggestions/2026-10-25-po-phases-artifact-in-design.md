@@ -23,3 +23,8 @@ early brainstorming and project design, maintained as phases complete:
 3. **Maintenance rule** — completing a phase (the loop's Record step)
    re-checks the decomposition against the design's ledger: new phases
    appended, spent ones marked done, drift escalated to the keeper.
+
+## Outcome (2026-11-01)
+Resolved by ADR-009: planned rows appended at design ratification,
+PP drafts/appends, PO owns transitions; the loop's Record step
+re-checks the queue against the design ledger.

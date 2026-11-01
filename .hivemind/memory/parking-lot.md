@@ -11,6 +11,10 @@ Parked items may carry open questions — discussing them is the unpark
 work; filing roles keep them open (no inline answers, no pre-tilting
 recommendations beyond what the keeper already directed).
 
+Resolution check: before resolving any item, re-read its full text
+and enumerate its asks — a resolution addresses every ask or names
+what remains open.
+
 ## Parked
 
 - **PL-002 — memory tooling specifics** — target recorded in ADR-001

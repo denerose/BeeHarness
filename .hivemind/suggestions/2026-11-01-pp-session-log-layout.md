@@ -20,3 +20,8 @@ is the truth when they diverge — note it once, don't backfill).
 Prevents mid-file insertion errors and gives parallel contexts a
 collision-free append zone. Cheap to adopt at each role's next file
 touch; no retrofit needed.
+
+## Outcome (2026-11-01)
+Law — both role files' continuity protocols carry the shared
+convention (sections top, log appends at end-of-file, entries are
+append-only IDs). Approved in the 2026-11-01 graduation pass.
