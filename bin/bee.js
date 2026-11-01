@@ -1441,9 +1441,19 @@ function designUsageErr(e) {
 }
 
 function designDirOf() {
-  return process.env.BEE_DESIGN_DIR
-    ? path.resolve(process.env.BEE_DESIGN_DIR.replace(/\/$/, ''))
-    : path.join(REPO_ROOT, '.hivemind', 'designs');
+  if (process.env.BEE_DESIGN_DIR) {
+    return path.resolve(process.env.BEE_DESIGN_DIR.replace(/\/$/, ''));
+  }
+  // Match the delegated core (scripts/design.sh repo_root): the
+  // designs dir follows the CWD's git toplevel, not bee.js's repo
+  // (review r1 SF2 — the family must agree wherever it runs).
+  const r = spawnSync('git', ['rev-parse', '--show-toplevel'],
+    { encoding: 'utf8' });
+  if (r.status !== 0) {
+    return { err: 'bee design: no git repository at ' + process.cwd() +
+      ' — run inside a repo (or set BEE_DESIGN_DIR)\n' };
+  }
+  return path.join(r.stdout.trim(), '.hivemind', 'designs');
 }
 
 function designShown(p) {
@@ -1562,9 +1572,11 @@ function designNew(args) {
       err: `bee design new: template lost a placeholder (<Title> or ` +
         `**Date:** YYYY-MM-DD) — hand-fix ${template}, then re-run\n` };
   }
-  text = text.replace('<Title>', title)
+  text = text.replace('<Title>', () => title) // replacer fn: $-sequences in titles stay literal (review r1 SF1)
     .replace('**Date:** YYYY-MM-DD', `**Date:** ${date}`);
-  const file = path.join(designDirOf(), `${date}-${slug}.md`);
+  const dir = designDirOf();
+  if (dir.err) return { code: 1, out: '', err: dir.err };
+  const file = path.join(dir, `${date}-${slug}.md`);
   if (fs.existsSync(file)) {
     return { code: 1, out: '',
       err: `bee design new: ${designShown(file)} already exists — ` +
@@ -1578,7 +1590,7 @@ function designNew(args) {
       `# ${title} — design note\n**Date:** ${date}\n`, err: '' };
   }
   try {
-    fs.mkdirSync(designDirOf(), { recursive: true });
+    fs.mkdirSync(dir, { recursive: true });
     atomicWrite(file, text);
   } catch (e) {
     return { code: 1, out: '',

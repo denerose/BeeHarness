@@ -205,6 +205,54 @@ test('unknown subcommand → exit 1 + usage', () => {
   assert.match(r.err, /usage:/);
 });
 
+test('new keeps $-sequences in titles literal (review r1 SF1 regression)', () => {
+  const dir = tmpDir();
+  const prev = process.env.BEE_DESIGN_DIR;
+  process.env.BEE_DESIGN_DIR = dir;
+  try {
+    const r = run(['design', 'new', "Costs $& and $'x"]);
+    assert.equal(r.code, 0, r.err);
+    const files = fs.readdirSync(dir);
+    assert.equal(files.length, 1);
+    const text = fs.readFileSync(path.join(dir, files[0]), 'utf8');
+    assert.ok(text.includes("# Costs $& and $'x \u2014 design note"),
+      'title must stay literal');
+  } finally {
+    if (prev === undefined) delete process.env.BEE_DESIGN_DIR;
+    else process.env.BEE_DESIGN_DIR = prev;
+  }
+});
+
+test('new default dir follows cwd git toplevel; refuses outside a repo (review r1 SF2 regression)', () => {
+  const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-design-r'));
+  const prev = process.env.BEE_DESIGN_DIR;
+  delete process.env.BEE_DESIGN_DIR;
+  const prevCwd = process.cwd();
+  try {
+    process.chdir(repo);
+    execSync('git init -q -b main');
+    execSync('git config user.email t@t');
+    execSync('git config user.name t');
+    const n = run(['design', 'new', 'Consumer repo doc', '--check']);
+    assert.equal(n.code, 0, n.err);
+    assert.ok(n.out.includes(path.join(repo, '.hivemind', 'designs')),
+      'new must target the cwd repo, not the harness repo');
+  } finally {
+    process.chdir(prevCwd);
+    if (prev !== undefined) process.env.BEE_DESIGN_DIR = prev;
+  }
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'norepo-'));
+  try {
+    process.chdir(tmp);
+    const r = run(['design', 'new', 'No repo']);
+    assert.equal(r.code, 1);
+    assert.match(r.err, /no git repository/);
+    assert.match(r.err, /BEE_DESIGN_DIR/);
+  } finally {
+    process.chdir(prevCwd);
+  }
+});
+
 test('help exits 0 with usage; new refuses empty slug + newlines', () => {
   const h = run(['design', 'help']);
   assert.equal(h.code, 0);
