@@ -2042,15 +2042,20 @@ function cmdVerify(rest) {
       { cwd: planRoot, encoding: 'utf8', timeout: verifyTimeoutMs() });
     const sLines = (sr.stdout ?? '').split('\n')
       .map((l) => l.trimEnd()).filter((l) => l !== '');
-    if (sr.error) {
+    const sTimedOut = (sr.signal === 'SIGTERM' && sr.error !== undefined) ||
+      (sr.error !== undefined && sr.error.code === 'ETIMEDOUT');
+    if (sTimedOut || (sr.signal && sr.error === undefined)) {
+      // review r1 fix: timeout/signal checked FIRST (the task-5
+      // lesson) — a hung check lands in "did not finish"
+      structureLine = 'structure · FAIL · ' +
+        (sTimedOut ? 'timeout' : 'signal') + ' ' + (sr.signal ?? '');
+      structureFindings.push('fix: structure-check.sh did not ' +
+        'finish — repair or shorten it');
+    } else if (sr.error) {
       structureLine = 'structure · FAIL · cannot run: ' + sr.error.message;
       structureFindings.push('fix: bee needs scripts/' +
         'structure-check.sh beside bin/bee.js — restore it or drop ' +
         'the map');
-    } else if (sr.signal) {
-      structureLine = `structure · FAIL · signal ${sr.signal}`;
-      structureFindings.push('fix: structure-check.sh did not ' +
-        'finish — repair or shorten it');
     } else if (sr.status === 0) {
       structureLine = 'structure · map · PASS · ' +
         (sLines[0] ?? '0 findings');
