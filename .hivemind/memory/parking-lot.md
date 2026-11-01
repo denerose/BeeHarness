@@ -95,8 +95,11 @@ what remains open.
   over inference for BeeHarness, arch tests (Roslyn for C#, TS option
   TBD; all/some/none question), OpenAPI-first + contract tests,
   StackQL (research first), AXI principles (axi.md — maybe into
-  SOUL), Arazzo specs, auto-PR with human deployment audit — unpark
-  when the Power Planner session on these topics happens.
+  SOUL), Arazzo specs, auto-PR with human deployment audit —
+  REMAINDER HAS A PHASE HOME (keeper, 2026-11-01): P10, work-type
+  guidance absorbs the curated links, arch tests, StackQL, Arazzo,
+  auto-PR. Unpark when the Power Planner session on these topics
+  happens.
 - **PL-PP-005 — logbook & project-record lifecycle: cleanup and
   compaction** — keeper direction (2026-10-25, extended 2026-11-01):
   when and how do logbook entries (and related project records) get
@@ -176,8 +179,10 @@ what remains open.
   PP+keeper design session is wanted; sequence it after P4 works
   out the parking/suggestions kinks (the live inbox + `bee
   capture` are the secretary's substrate), then get the role into
-  the next relevant phase once designed — unpark when the keeper
-  brings it back, after parking/suggestions mechanics are proven.
+  the next relevant phase once designed — PHASE HOME (keeper,
+  2026-11-01): P9, design session first then the build. Unpark
+  when the keeper brings it back, after parking/suggestions
+  mechanics are proven.
 - **PL-PP-010 — a rubber-duck skill and a "do-I-need-the-keeper"
   skill** — keeper direction (2026-11-01): two candidate skills.
   Rubber-duck: externalize and examine one's own reasoning before
