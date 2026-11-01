@@ -437,6 +437,57 @@ test('link FAIL feeds the entry verdict + anomalies (--record)', () => {
   assert.match(t, /doc\.md:3 → missing\.md/);
 });
 
+// ---- task-6 deviation regressions (task-5 review latent edges) ----
+// The task-5 review record documents the matcher's edges with
+// inline-code examples — and every P4 branch verify then flagged
+// its own record's examples (records ride branches; the phase
+// review doc sits in the main..HEAD diff). Prescribed fix applied;
+// probes replicated verbatim.
+
+test('inline-code link examples are not checked (task6 deviation)', () => {
+  const { dir } = linkRepo({
+    'doc.md': [
+      '# doc',
+      '',
+      'Edges: `[x](y)`, `![x](y.png)`, and `` `[x](<a b.md>)` ``',
+      'are examples in backticks, never links to check.',
+      '',
+    ].join('\n'),
+  });
+  const r = run(['verify', '--plan', path.join(dir, 'plan.md')]);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /links · 1 docs · PASS · 0 links checked/);
+});
+
+test('angle-bracketed spaced destinations capture whole (task6 deviation)', () => {
+  const { dir } = linkRepo({
+    'doc.md': '# doc\n\nReal link: [spaced](<a b.md>) target.\n',
+    'a b.md': '# spaced\n',
+  });
+  const plan = path.join(dir, 'plan.md');
+  const ok = run(['verify', '--plan', plan]);
+  assert.equal(ok.code, 0, ok.out);
+  assert.match(ok.out, /1 links checked/); // the whole target, once
+  const { dir: d2 } = linkRepo({
+    'doc.md': '# doc\n\nReal link: [spaced](<a b.md>) target.\n',
+  });
+  const bad = run(['verify', '--plan', path.join(d2, 'plan.md')]);
+  assert.equal(bad.code, 1);
+  assert.match(bad.out, /doc\.md:3 → a b\.md/); // not truncated to 'a'
+});
+
+test('scoped link-FAIL writes nothing without --record (task6 deviation)', () => {
+  const { dir } = linkRepo({
+    'doc.md': '# doc\n\n[x](missing.md)\n',
+  });
+  const lb = path.join(dir, 'out');
+  const r = run(['verify', '--plan', path.join(dir, 'plan.md'),
+    '--task', '1', '--logbook', lb]);
+  assert.equal(r.code, 1);
+  assert.match(r.out, /logbook: not written \(FAIL — pass --record/);
+  assert.ok(!fs.existsSync(lb), 'no entry without --record');
+});
+
 test('timeout lands in did-not-finish, not make-it-runnable (review r1 SF1 regression)', () => {
   const dir = tmpDir();
   const plan = writePlan(dir,

@@ -1851,14 +1851,22 @@ function docLinkFindings(root, doc) {
   for (let i = 0; i < lines.length; i++) {
     if (/^\s*(```|~~~)/.test(lines[i])) { inFence = !inFence; continue; }
     if (inFence) continue;
+    // Inline-code spans are skipped the way fences are: docs show
+    // link EXAMPLES in backticks, not links to check (task-6
+    // deviation fix — the task-5 review's latent-edge note (c),
+    // applied after its own examples bit for real).
+    const bare = lines[i].replace(/``.*?``/g, '')
+      .replace(/`[^`]*`/g, '');
     const targets = [];
-    for (const m of lines[i]
-      .matchAll(/\[[^\]]*\]\(\s*<?([^)\s<>]+)>?[^)]*\)/g)) {
-      targets.push(m[1]);
+    // Angle-bracketed destinations get their own branch so spaced
+    // targets (<a b.md>) capture whole (same note, edge (a)).
+    for (const m of bare
+      .matchAll(/\[[^\]]*\]\(\s*(?:<([^<>]*)>|<?([^)\s<>]+)>?[^)]*\))/g)) {
+      targets.push(m[1] ?? m[2]);
     }
-    for (const m of lines[i]
-      .matchAll(/^\s{0,3}\[[^\]]+\]:\s+<?([^\s<>]+)>?/g)) {
-      targets.push(m[1]);
+    for (const m of bare
+      .matchAll(/^\s{0,3}\[[^\]]+\]:\s*(?:<([^<>]*)>|([^\s<>]+))/g)) {
+      targets.push(m[1] ?? m[2]);
     }
     for (const t of targets) {
       const clean = t.split('#')[0];
@@ -2053,12 +2061,21 @@ function cmdVerify(rest) {
   // review r1 fix: unscoped full runs write only with --record (a
   // status-shaped sweep must not mint one entry per task); scoped
   // --task runs keep writing on success as the loop's evidence.
+  // task-6 deviation fix: link findings fail the run too — any
+  // FAIL (checks OR links) records nothing without --record, per
+  // the documented contract (a scoped link-FAIL used to mint an
+  // unintended entry).
   const scoped = f.values.task !== undefined;
   const willWrite = checksRun > 0 &&
-    (scoped ? (nFail === 0 || f.values.record) : f.values.record === true);
+    (scoped ? (!anyFail || f.values.record === true)
+      : f.values.record === true);
   if (checksRun > 0 && nFail === 0 && !scoped && !f.values.record) {
     out += 'logbook: not written (unscoped run — pass --task <n> or ' +
       '--record to evidence)\n';
+  }
+  if (scoped && anyFail && !f.values.record) {
+    out += 'logbook: not written (FAIL — pass --record to capture ' +
+      'this round)\n';
   }
   if (willWrite) {
     const byTask = new Map();
