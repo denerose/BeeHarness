@@ -75,9 +75,10 @@ their own documents (`docs/AXI.md`).
   folder. bee-verify runs checks and writes a verify entry; bee-review
   judges quality and writes a review report. The loop calls them; they
   never call each other.
-- **parking lot** — `.hivemind/memory/parking-lot.md`. Deferred
-  decisions with an unpark condition. Any agent may propose adding an
-  item; only the keeper removes or resolves one.
+- **parking lot** — `.hivemind/memory/parking-lot.toon` (`bee park`).
+  Deferred decisions with an unpark condition. Any agent may propose
+  adding an item; only the keeper resolves one (`bee park resolve`
+  is keeper-gated by law).
 - **validation level** — how much checking a stage gets, set in the
   plan: `task` (run what changed), `merge` (task checks plus the
   project's standard suite), `phase` (the full suite the plan lists),
