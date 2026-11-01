@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`, `bee design`, `bee verify`, `bee task`.
+// `bee capture`, `bee park`, `bee design`, `bee verify`, `bee task`,
+// `bee guidance`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -46,6 +47,7 @@ usage:
   bee task   show <plan-path> [--full]
              | move <plan-path> <task-n> <state>
                [--origin <role>] [--record <path>] [--check]
+  bee guidance [list [--full]] | show <topic>
   bee help | version
 
   --check   never write; report what would happen
@@ -84,6 +86,9 @@ export function run(argv) {
   }
   if (cmd === 'task') {
     return cmdTask(rest);
+  }
+  if (cmd === 'guidance') {
+    return cmdGuidance(rest);
   }
   return { code: 1, out: '', err: `bee: unknown command '${cmd}'\n\n` + USAGE };
 }
@@ -2482,6 +2487,146 @@ function taskMove(args) {
   }
   return { code: 0, out: `task-${n} ${stateArg} · ${ts} by ${origin}\n` +
     `plan: ${r.planPath}\n`, err: '' };
+}
+
+// ---- guidance (P4 Task 7 — docs/guidance topics, read-only) ----
+// Minimal skeleton per the plan: list/show over docs/guidance/*.md
+// (topic = filename stem). No injection machinery — that is the
+// init contract's (P6). Read-only family: no store, no mutations,
+// no --check; the --dir seam mirrors inbox's --store.
+
+const GUIDANCE_USAGE = `bee guidance — guidance topics (docs/guidance/*.md)
+
+usage:
+  bee guidance [list] [--full]
+  bee guidance show <topic>
+
+commands:
+  list [--full]   every topic: stem · one-line purpose, sorted;
+                  the purpose is the file's first non-heading line,
+                  truncated ~60 cols with a size hint (--full
+                  untruncates). Bare 'bee guidance' = list.
+  show <topic>    print the topic's markdown (topic = filename
+                  stem; unknown topic → exit 1 + the list fix line)
+
+flags:
+  --full          list: untruncated purpose lines
+  --dir <path>    internal: guidance directory
+                  (default docs/guidance)
+
+read-only — topics are markdown files; this command never writes.
+`;
+
+function guidanceUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + GUIDANCE_USAGE };
+}
+
+function guidanceDirOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, 'docs', 'guidance');
+}
+
+function guidanceTopics(dir) {
+  let names;
+  try {
+    names = fs.readdirSync(dir);
+  } catch (e) {
+    if (e.code === 'ENOENT') return { topics: [] };
+    return { err: `bee guidance: cannot read ${dir}: ${e.message}\n` };
+  }
+  const topics = names.filter((n) => n.endsWith('.md'))
+    .sort((a, b) => a.toLowerCase() < b.toLowerCase() ? -1 :
+      a.toLowerCase() > b.toLowerCase() ? 1 : 0);
+  return { topics };
+}
+
+// One-line purpose: the file's first non-empty non-heading line;
+// a file with none shows '-'.
+function guidanceOneLiner(text) {
+  for (const line of text.split('\n')) {
+    const t = line.trim();
+    if (t === '' || t.startsWith('#')) continue;
+    return t;
+  }
+  return '-';
+}
+
+function cmdGuidance(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'list' || sub.startsWith('--')) {
+    return guidanceList(sub === 'list' ? rest.slice(1) : rest);
+  }
+  if (sub === 'show') return guidanceShow(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: GUIDANCE_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee guidance: unknown subcommand '${sub}'\n\n` + GUIDANCE_USAGE };
+}
+
+function guidanceList(args) {
+  const f = flags(args, {
+    full: { type: 'boolean' },
+    dir: { type: 'string' },
+  }, true);
+  if (f.error) return guidanceUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return guidanceUsageErr(
+      `bee guidance list: unexpected argument '${f.positionals[0]}'`);
+  }
+  const dir = guidanceDirOf(f.values.dir);
+  const r = guidanceTopics(dir);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  if (r.topics.length === 0) {
+    return { code: 0, out: '0 topics\n' +
+      `add one: ${designShown(path.join(dir, '<topic>.md'))}\n`, err: '' };
+  }
+  let out = `${r.topics.length} topics\n`;
+  for (const name of r.topics) {
+    const stem = name.slice(0, -3);
+    let text;
+    try {
+      text = fs.readFileSync(path.join(dir, name), 'utf8');
+    } catch (e) {
+      return { code: 1, out: '',
+        err: `bee guidance: cannot read ${path.join(dir, name)}: ` +
+          `${e.message}\n` };
+    }
+    const line = guidanceOneLiner(text);
+    out += `${stem} · ${f.values.full ? line : truncText(line)}\n`;
+  }
+  out += 'show one: bee guidance show <topic>\n';
+  return { code: 0, out, err: '' };
+}
+
+function guidanceShow(args) {
+  const f = flags(args, {
+    dir: { type: 'string' },
+  }, true);
+  if (f.error) return guidanceUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return guidanceUsageErr('bee guidance show: expected <topic>');
+  }
+  const topic = pos[0];
+  if (/[/\\]/.test(topic)) {
+    return guidanceUsageErr(
+      `bee guidance show: <topic> is a filename stem, got '${topic}'`);
+  }
+  const dir = guidanceDirOf(f.values.dir);
+  const file = path.join(dir, `${topic}.md`);
+  if (!fs.existsSync(file)) {
+    return { code: 1, out: '',
+      err: `bee guidance: no topic ${topic} — bee guidance list\n` };
+  }
+  let text;
+  try {
+    text = fs.readFileSync(file, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee guidance: cannot read ${file}: ${e.message}\n` };
+  }
+  return { code: 0, out: text, err: '' };
 }
 
 if (process.argv[1] &&

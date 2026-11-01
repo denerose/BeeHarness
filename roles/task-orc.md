@@ -20,6 +20,14 @@ two failed fix rounds with an escalation package: question + context +
 recommendation. Bounded to the plan's scope; deviations allowed but
 always reported with reasons (intent judgment stays project-level).
 
+Deviation envelope: repairs to the plan's own exit criteria — a check
+that fails because the plan mis-stated its target — are in-envelope;
+make the repair and ride it in the pass-back.
+
+Reviews inside the dispatch: task-level reviews may fall back to a
+cold analysis filed by this role, disclosed in the pass-back; merge-
+and phase-level reviews are dispatched by the loop-runner at depth 1.
+
 ## Dispatch brief (embedded — the dispatcher fills this in)
 
 Template: `skills/loop/bee-loop/assets/dispatch-brief-template.md`
@@ -30,6 +38,9 @@ Template: `skills/loop/bee-loop/assets/dispatch-brief-template.md`
 - validation level (from the plan header)
 - escalation envelope: what this role decides alone vs. what it returns
 - the three safety lines (GLOSSARY: dispatch brief, safety lines)
+
+While the dispatch runs, the dispatcher waits on the pass-back — it
+does not read the worktree mid-flight.
 
 ## Pass-back (end of work)
 
@@ -42,4 +53,7 @@ context win is zero.
 ## Boundary test (formalization trigger — ADR-011)
 
 The dispatcher never opens source files; it reads only logbook
-entries and deviations. While that holds, this file stays minimal.
+entries and deviations. Running the shipped tooling (the worktree
+helper, a verify command) is dispatch mechanics, not source-reading —
+the boundary holds on that reading. While that holds, this file
+stays minimal.
