@@ -63,6 +63,22 @@ replies. When pi gains MCP support, the daemon's send_agent_prompt
 (finish-notifications, steer-default) becomes the native upgrade.
 A pi-extension file-inbox watcher is the Paseo-free alternative.
 
+**Handoff variants (keeper ruling, 2026-11-01):** the handoff
+pair is SPECIFIC to same-agent-role sessions — one mechanic
+(compact → file → boot), three possible gate-sets, and the gates
+are policy: (1) keeper-triggered (the bee pair as built — prompt
+delivered in-chat, keeper pastes); (2) subagent spin-up is NOT a
+handoff case — dispatched contexts boot from the dispatch brief
+(ADR-011); any subagent refinement lands as separate DISPATCH
+guidance, never as a pair retrofit; (3) self-triggered (P11
+variant): same-role refresh without the keeper pass — delivery
+via `paseo run` of the wake prompt, entry declared by the handoff
+file; law gaps: the role exception (delegate harder first;
+self-handoff only when delegation cannot save the context,
+  disclosed, once) and a spiral guard. The global kit's ungated
+pair is the reminder that the core mechanic is scenario-agnostic
+— the gates are ours to layer.
+
 **The stop-and-ask behavior (keeper ruling 2026-11-01 — NOT a
 consulted instrument):** "do I need to stop and ask" is EMBEDDED IN
 THE LOOPS — a **skill + hook pattern**: the reasoning lives in a
