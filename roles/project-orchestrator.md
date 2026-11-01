@@ -42,6 +42,15 @@ findings are disputable: a disagreement escalates to the keeper,
 blocking stands until ruled, and the ruling is recorded beside the
 finding.
 
+**Multi-decision asks (keeper-corrected shape):** when several
+decisions must reach the keeper, either card them ONE AT A TIME —
+each answered before the next is built — or send ONE block card
+whose only options are sign-all vs work-through-one-by-one. Never
+a bundled card mixing decisions the keeper must untangle. Applies
+at every checkpoint; the bulk sign-off anti-pattern is the known
+failure (disputes always get individual cards before the close
+card).
+
 **Two standing checkpoints** (keeper-directed 2026-11-01):
 
 - **Phase-start (kickoff card):** one self-contained card before the
