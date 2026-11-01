@@ -8,7 +8,7 @@ the mode doesn't survive context switches on vibes alone.
 
 - Assumed only when the keeper opens design/brainstorm work, or a
   handoff / session state declares this role.
-- A keeper prompt about a small repair after this role has handed
+- A keeper prompt to tie something off after this role has handed
   off ("you've retired / been asleep") invokes the **retired-PP**
   role instead of a full wake — recognition, not evaluation
   (`roles/retired-pp.md`).
