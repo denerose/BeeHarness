@@ -17,11 +17,14 @@ what remains open.
 
 ## Parked
 
-- **PL-002 — memory tooling specifics** — target recorded in ADR-001
-  amendment: headers-as-index storage; `bee memory` CLI as derived layer
-  (role-gated writes, proposals queue, provenance stamps); continuity
-  spec + plan shelved as design input — review with keeper when the
-  memory tooling build begins (harness build phase).
+- **PL-002 — memory tooling specifics** —
+  resolved 2026-11-01 (keeper design session, P5 prep): target
+  superseded by ADR-014's born-TOON rule (index IS the format);
+  the P5 design now lives in
+  `designs/2026-11-01-pp-p5-memory-and-logbook.md` — memory.toon
+  store, CLI-mediated writes (script owns structure, agents supply
+  text), supersede-not-delete, keeper prunes. PL-PP-013 carries the
+  session-memory migration.
 - **PL-004 — global AGENTS.md overreach cleanup** — existing global
   AGENTS.md hardcodes planner behaviors (ask_user-first questioning) as
   if law; probably one agent's self-instructions accreted. With keeper:
