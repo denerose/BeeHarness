@@ -99,6 +99,10 @@ task-6: implemented 2026-11-01T14:56:36+11:00 by project-orchestrator
 task-6: verified 2026-11-01T14:56:36+11:00 by project-orchestrator
 task-6: reviewed 2026-11-01T14:56:36+11:00 by project-orchestrator
 task-6: done 2026-11-01T14:56:36+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task6-verify-r3.md
+task-7: implemented 2026-11-01T15:19:43+11:00 by project-orchestrator
+task-7: verified 2026-11-01T15:19:43+11:00 by project-orchestrator
+task-7: reviewed 2026-11-01T15:19:43+11:00 by project-orchestrator
+task-7: done 2026-11-01T15:19:44+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task7-verify-r2.md
 -->
 
 ## Kickoff rulings (keeper, 2026-11-01 — binding for every task)
@@ -568,12 +572,12 @@ phase end)
 **Provides:** `bee guidance list|show`, the four topic skeletons,
 the P7-directed folds, surgical task-orc additions
 
-- [ ] `bee guidance list` / `bee guidance show <topic>` reading
+- [x] `bee guidance list` / `bee guidance show <topic>` reading
   `docs/guidance/*.md` (topic = filename stem); AXI battery same
   as siblings (empty state over a temp dir, unknown topic → exit 1
   + `bee guidance list` fix line, bare call lists). Minimal — no
   injection machinery (that is P6's init contract).
-- [ ] Four topic skeletons, lean (this phase grows the skeleton,
+- [x] Four topic skeletons, lean (this phase grows the skeleton,
   later phases grow content — each file: purpose, when to use,
   core rules, pointers). `how-to-be-a-bee` (session rituals:
   wake, status read, thread-close, handoff — the GLOSSARY terms,
@@ -584,14 +588,14 @@ the P7-directed folds, surgical task-orc additions
   `triage-distinction` (reproduce-then-fix vs feature work; when
   debugging skill applies). Generic actors only; no ADR citations
   (shipping test applies — these ship).
-- [ ] bee-verify skill thins toward `bee verify` (P7 fold-order
+- [x] bee-verify skill thins toward `bee verify` (P7 fold-order
   note: mechanical steps point at the command; the judgment lines
   SURVIVE — "is this output sane" stays agent text). bee-plan
   gains the rule-4 strengthening (self-contained-task standard:
   every task carries files/depends/provides + verification
   command; cold-dispatchability is the test) and the
   checks-contract pointer (its template changed in Task 5).
-- [ ] `roles/task-orc.md` surgical additions per the design note's
+- [x] `roles/task-orc.md` surgical additions per the design note's
   codification section (keeper-accepted 2026-11-01, hindsight-
   gated): deviation envelope (repairs to the plan's own exit
   criteria are in-envelope and ride the pass-back); boundary
@@ -601,14 +605,26 @@ the P7-directed folds, surgical task-orc additions
   loop-runner at depth 1); brief-template line (what the
   dispatcher does while the dispatch runs). Role file stays
   MINIMAL — no expansions beyond these.
-- [ ] Skill revisions run the bee-skill-review gate (cold dispatch)
+- [x] Skill revisions run the bee-skill-review gate (cold dispatch)
   before this task's commit; findings fixed or escalated per the
   review skill's rules. Role-file changes are phase-review
   territory (keeper sign-off).
-- [ ] Verify: `bee guidance list` shows four topics; full suite
+- [x] Verify: `bee guidance list` shows four topics; full suite
   green; grep shows no stale references to the thinned
   bee-verify steps.
-- [ ] Commit: `add guidance skeleton, fold verify/plan skills, codify task-orc`
+- [x] Commit: `add guidance skeleton, fold verify/plan skills, codify task-orc`
+
+**Task notes (loop, 2026-11-01):** closed via `bee task` (record r2 —
+verify r1 PASS; review r1 FIX-FIRST 0🔴 1🟡: gate evidence had no
+durable home → skill-review gate entry filed; re-review waived,
+bookkeeping-only). Deviations accepted: brief-template line in BOTH
+role file (plan bullet) and template (design note + header target);
+traversal guard; --full on list only; scout-typed skill-review gate
+(the codified fallback's exact case, disclosed); stale
+verify-record-template deleted (fold). Notes standing: one-liner =
+first physical line (hard-wrap fragments); rule-4 cmd identity gap;
+backtick pointers escape the link-check (systemic); r1 was the last
+hand-written verify record — task 8 on, command-minted.
 
 ## Task 8: structure check (manifest map) + worktree.sh rename
 
