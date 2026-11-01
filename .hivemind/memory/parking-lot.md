@@ -216,6 +216,16 @@ what remains open.
   `bee init` resolve the main checkout via `--git-common-dir` like
   `scripts/task.sh` does? — unpark when the keeper rules on
   worktree-aware registration (natural home: a later `bee` CLI phase).
+- **PL-PP-013 — power-planner session-memory sweep at the post-P8
+  fresh start** — keeper direction (2026-11-01): after P8, the
+  role starts NEW session memory; before that, sweep the current
+  memory (decision log, board, threads) and capture anything not
+  yet resolved into durable homes or new deferrals — open: what
+  counts as unresolved (a kernel carries vs full distillation),
+  and how the existing promotion split (keeper decisions → ADRs,
+  agent lessons → memory class, pointers → discard) applies at
+  sweep scale — unpark with the post-P8 session start or the
+  keeper's word.
 
 ## Resolved
 
