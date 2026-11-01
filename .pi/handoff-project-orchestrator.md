@@ -1,116 +1,140 @@
 # Handoff — project-orchestrator
 
-**Updated:** 2026-11-01 (late) · **Mode:** refresh handoff, threads
-open — no parking sweep.
+**Updated:** 2026-11-01 (evening) · **Mode:** refresh handoff, phase
+closed — no parking sweep (the phase close was the closing work).
 
 ## Working mode, read first
 
 You are the **project-orchestrator** (mandate:
-`roles/project-orchestrator.md`; FORMING — you are the model the
-role gets codified from). You run the build track: bee-plan, the
-loop, task-orc dispatches, verify/review gates, phases. Design
-decisions are NOT yours — but inside a directed phase, execution
-judgment is yours, made and recorded, then reviewed as decisions.
+`roles/project-orchestrator.md`). You run the build track:
+bee-plan, the loop, task-orc dispatches, verify/review gates,
+phases. Design decisions are NOT yours — but inside a directed
+phase, execution judgment is yours: made, recorded, then reviewed
+as decisions.
 
-**First action: open P4 with the PHASE-START KICKOFF CARD** — its
-first use (session entry 53): one self-contained card (phase id,
-one-line build, design state hash, gate status) + the front-loaded
-decision list, each with alternatives + recommendation. Do not
-re-interview the keeper beyond it. Then bee-plan → bee-plan-review
-gate (the in-house reviewer — its first gated plan) → loop to
-PHASE COMPLETION. Stops only at keeper decision points or genuine
-end.
+**First action: propose-next.** P4 closed cleanly; the board is
+empty of directed work. Your move is the empty-board move: one
+recommendation, never a menu (ADR-009). P5 is the queue's next
+(gated on PL-002 unpark — the keeper's word); P8's gate is
+satisfied. Do not open P5 without the keeper's direction.
 
-**Standing escalation rules** (entry 53): escalate decisions with
-live keeper-owned alternatives, two failed fix rounds, genuine
-conflicts. Never artifact-reading, never bundled, never approval-
-without-alternatives. Directives apply live + recorded.
+**Standing escalation rules** (adopted 2026-11-01, session entry
+53): escalate decisions with live keeper-owned alternatives, two
+failed fix rounds, genuine conflicts. Never artifact-reading, never
+bundled, never approval-without-alternatives. **One card per
+judgment call with a live alternative — never a bulk sign-off**
+(keeper correction, P4 close). Directives apply live + recorded.
 
 ## Task state
 
-- **P7 DONE** (merge 46d406a, close 5ca8599; hindsight ×2 filed:
-  `suggestions/2026-11-01-po-p7-close-hindsight.md`,
-  `suggestions/2026-11-01-po-session-hindsight-signoff.md`).
-  Bee-native boundary closed: skilldev/loop/session kits,
-  bee-plan-review + plan-checks.sh (--run/--extract), handoff
-  pair, folds, namespace. **You are using its outputs right now.**
-- **P4 NEXT — decisions inbox.** Design:
-  `.hivemind/designs/2026-10-25-pp-p4-inbox-design.md` + its
-  2026-11-01 addendum (consume BOTH at planning: born-TOON,
-  absorbs status queues + suggestions awaiting-read, `bee task` +
-  `bee verify` CLI, ADR-014 storage rules; NO hand conversions
-  ahead of tooling). Kickoff decisions to front-load: storage
-  shape (one file vs dir; suggestions merge vs sibling), aging/
-  staleness, what `bee init` scaffolds — plus the P7 direction's
-  fold-order note (thin-verify judgment lines survive; goes in
-  P4's plan).
-- **Standing rulings from P7 that bind:** all skill-review
-  dimension failures BLOCK (does bee-plan-review generalize?
-  PP's tier-mapping thread — don't decide unilaterally);
-  near-verbatim fix-round waiver; task-branch logbook routing;
-  sync-last-write/prompt-last-act; entry checks fold later via
-  bee-skill-write (not piecemeal).
-- **Open waits:** PP's two AGENTS.md law edits (gate rule →
-  bee-plan-review; handoff rule → bee pair — window note on
-  status.md stands; if landed, verify law-and-tool agree);
-  PL-002 gates P5; P8 gated on P7's tier sort (done — P8 can
-  queue after P4-P6 per the phase list).
+- **P4 DONE** (close merge `1a78a35`, design stamp `4de5126`,
+  row flip `828ff09`, status note `6bb7b06`). All 11 tasks shipped
+  through the full cycle (task-orc dispatch → cold review → fix
+  rounds → near-verbatim re-review waivers). First real
+  `bee phase close 4` run — mechanical close worked end to end.
+  Dogfood 11/11, suite 238/238, structure 0 findings. 15 decisions
+  (under-asked signal: front-load harder next kickoff).
+- **Shipped in P4:** `bee inbox/capture/render`, `bee park`
+  (parking lot migrated live to `.hivemind/memory/parking-lot.toon`),
+  `bee design` (P4 design stamped picked-up → implemented),
+  `bee verify` (checks contract + link-check + structure-check),
+  `bee task` (state moves with provenance + gated done), `bee
+  guidance` (4 topics in `docs/guidance/`), `bee phase`
+  (inventory + scripted close), `scripts/structure.map` +
+  `scripts/structure-check.sh`, task.sh → worktree.sh rename.
+  Stores live: `.hivemind/inbox.toon` (IN-001 open), parking lot
+  in `.hivemind/memory/parking-lot.toon`. Status renders from the
+  inbox; `bee report` derives from the store.
+- **Keeper rulings at close:** class-C accepted + **fed back to PP**
+  (may revisit — status surface carries it); task-orc codification
+  accepted as written (four surgical lines).
+- **Board:** P5 gated on PL-002 (memory system — keeper unparks).
+  P8 gate satisfied (P7 done). Phase list carries queue order
+  (`.hivemind/phases/BeeHarness.md`).
+- **Open waits:** none that gate PO. PP landed several designs
+  during P4 (P5 memory, P8 inputs, glossary store, automation
+  levels, secretary, feedback channel — all status: live in
+  `.hivemind/designs/`). PL-005 keeper-secretary direction is PP's
+  lane.
 
 ## Boot sequence
 
 1. This file
 2. `git pull --rebase --autostash`; re-read changed law files
-   (AGENTS.md, roles/, GLOSSARY) before acting — PP lands mid-
-   flight; design moved TWICE during P7 (lesson, entry 50)
-3. `.hivemind/sessions/project-orchestrator.md` — entries 43–54
-   are the live ones
-4. `.hivemind/status.md`, then the P4 design note + addendum
+   (AGENTS.md, roles/, GLOSSARY) before acting — PP lands
+   mid-flight (this happened repeatedly during P4)
+3. `.hivemind/sessions/project-orchestrator.md` — entries 55-59 are
+   the P4 ones; entry 59 has the close account
+4. `.hivemind/status.md` — cross-role surface + your P4-done note
+5. `.hivemind/phases/BeeHarness.md` — the board (P5 gated, P8
+   ready)
 
-## Mechanics (hard-won)
+## Mechanics (hard-won, updated for P4's tools)
 
-- Spine: persistent worktree `/home/saphron/BeeHarness-phase3`
-  (detached at main — cut `phase/4` there when P4 opens:
-  commit-first-then-branch from main). Tasks: `scripts/task.sh`
-  FROM the phase worktree; **create takes `<phase>-<slug>`, merge
-  takes SLUG ONLY**. Close: REAL merge commit → detach worktree
-  at main → `branch -d` (the P3 lesson; scripted close suggestion
-  filed).
-- Plans carry machine headers + path-tagged verbatim blocks
-  (column-0 fences); plan-checks validates them; `--run` for
-  suites, `--extract` for off-suite blocks. Machine targets =
-  final-state paths.
-- Verify worker commit claims (`git log`) BEFORE task.sh merge —
-  one dispatch lied by accident (entry 50d).
-- Records ride task branches (keeper decision). Shared surfaces
-  from main checkout, atomic commits, push promptly. Role trailer
-  on every commit. Absolute paths to the keeper in chat.
+- **Spine:** the persistent worktree is `/home/saphron/BeeHarness-phase3`
+  (currently detached at main — rest state). When a phase opens:
+  `git switch -c phase/<n> main` there, commit-first-then-branch.
+  Tasks: `bash scripts/worktree.sh create <phase>-<slug>` FROM the
+  phase worktree; **create takes `<phase>-<slug>`, merge takes
+  SLUG ONLY**. Close: `bee phase close <n> --root /home/saphron/BeeHarness`
+  from the main checkout (the command does: gate → no-ff merge →
+  rest → delete → card → push). Sync the spine with main before
+  every dispatch (the P4 plan made this a standing rule).
+- **State moves:** `bee task move <plan> <n> <state> --origin
+  project-orchestrator` — intermediate states need no record; done
+  requires `--record <verify-entry>` (existence-checked). The
+  checkbox rewrite + ledger lines are script-owned — never hand-edit.
+- **Verify records are command-minted from Task 8 on:**
+  `node bin/bee.js verify --plan <plan> --task <n> --role
+  project-orchestrator` (scoped success writes; append prose
+  evidence to the entry body). Unscoped dogfood writes nothing.
+- **Verify worker commit claims (`git log`) BEFORE worktree.sh
+  merge** — one dispatch lied by accident (P7 lesson).
+- **All bee commands take `--check`** — use it for real-tree
+  probing. `--root <path>` is the internal seam for running
+  against the real repo from a worktree.
+- **NODE_TEST_CONTEXT hazard:** bee's check runners strip it
+  (a `node --test` child under a test-runner parent silently
+  exits 0 red — P9 discovery, now covered in both verify and
+  phase-suite paths).
+- Machine headers + path-tagged blocks validated by
+  `scripts/plan-checks.sh`; `--run` for suites, `--extract` for
+  off-suite blocks.
+- Role trailer on every commit. Absolute paths to the keeper in
+  chat. Shared surfaces from main checkout, atomic, push promptly.
 
 ## Environment notes
 
-denerose-pi identity; Node 24 (`node --test tests/*.test.mjs`,
-34 tests green at handoff); git 2.47.3; PP may be live in the
-shared checkout — status.md edits commit immediately; keeper
-report regen: re-read its header protocol first, and skip while
-PP is mid-session unless needed.
+- Node 24 (`node --test tests/*.test.mjs`, 238 tests green at
+  close); git 2.47.3; bash 5.2.
+- The spine worktree `/home/saphron/BeeHarness-phase3` is detached
+  at `1a78a35` (the P4 close merge). When the next phase opens,
+  cut `phase/<n>` from main (the worktree will need `git switch -c
+  phase/<n> main` — it's at the close merge, same commit as main).
+- PP may be live in the shared checkout — status.md edits commit
+  immediately; keeper report regen: re-read its header protocol
+  first, skip while PP mid-session unless needed.
+- `bee report --check` for the keeper report; the real regen is
+  gated on the keeper's word per ADR-008 (P2 stub note still
+  stands — first REAL run gated).
 
 ## Wake prompt — paste into the new context
 
 ```markdown
 You are the project-orchestrator for BeeHarness, fresh context,
-same role (mandate: roles/project-orchestrator.md; FORMING). Repo:
+same role (mandate: roles/project-orchestrator.md). Repo:
 /home/saphron/BeeHarness — pull --rebase --autostash first.
 
 Pick up in order:
-1. .pi/handoff-project-orchestrator.md — P7 done; P4 ready
-2. .hivemind/sessions/project-orchestrator.md — entries 43-54
-3. .hivemind/status.md — cross-role surface + PP law-edit window
+1. .pi/handoff-project-orchestrator.md — P4 done; board empty
+2. .hivemind/sessions/project-orchestrator.md — entries 55-59 (P4)
+3. .hivemind/status.md — cross-role surface + P4-done note
+4. .hivemind/phases/BeeHarness.md — the board (P5 gated on
+   PL-002, P8 ready)
 
-Then announce the role and open P4 with the PHASE-START KICKOFF
-CARD (first use of the standing checkpoint — the handoff's
-Working-mode section carries the card shape and the escalation
-rules; the design note + addendum carry the decisions to
-front-load). The keeper has already directed P4; do not re-ask
-whether to start. Run to phase completion.
-
-The files carry the content; this prompt is the pointer.
+Then announce the role and propose-next: the board is empty — one
+recommendation, never a menu (ADR-009). P5 is the queue's next but
+gated on the keeper's PL-002 unpark; P8's gate is satisfied. Your
+first card asks which. Do not open a phase without the keeper's
+direction. The files carry the content; this prompt is the pointer.
 ```
