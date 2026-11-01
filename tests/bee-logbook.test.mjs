@@ -173,6 +173,40 @@ test('stamped entry missing task/links → topped up from filename', () => {
   assert.ok(t.endsWith('body prose stays\n'));
 });
 
+test('quoted machine block inside a fence is not the file\'s own', () => {
+  const s = sandbox();
+  const name = '2026-11-02-x-demo-task4-verify-r1.md';
+  // complete machine block QUOTED as evidence: task:/links: and
+  // all — a naive scan would read it as the file's own and skip
+  // the file as complete; the fence makes it a quote, so the
+  // file is legacy and gets stamped.
+  entry(s.lb, name, '# Verify record — fixture\n\n' +
+    '**Role:** bee\n\nquoted block as evidence:\n\n' +
+    '```markdown\n' +
+    '<!-- machine\n' +
+    'role: bee\n' +
+    'date: 2026-11-01T09:00:00+11:00\n' +
+    'verdict: PASS\n' +
+    'checks-run: 1\n' +
+    'plan: .hivemind/plans/2026-11-02-x-demo.md @ abc1234\n' +
+    'task: task-4\n' +
+    'links: -\n' +
+    '-->\n' +
+    '```\n\n' +
+    '**Verdict:** PASS\n');
+  s.git('add', '.');
+  s.git('commit', '-m', 'seed');
+  const r = stamp(s.lb);
+  assert.equal(r.code, 0, r.out);
+  // treated as legacy — stamped, not skipped as complete
+  assert.match(r.out, /stamped: 2026-11-02-x-demo-task4-verify-r1\.md/);
+  const t = read(s.lb, name);
+  // fresh block minted at the top; the quote stays in the body
+  assert.match(t, /^<!-- machine\n/);
+  assert.equal((t.match(/<!-- machine/g) ?? []).length, 2);
+  assert.match(t, /quoted block as evidence:/);
+});
+
 test('non-matching filenames skipped + reported; exit unaffected', () => {
   const s = sandbox();
   entry(s.lb, '2026-11-02-x-demo-task1-2-verify-r1.md',
@@ -239,4 +273,32 @@ test('stamp is idempotent: second run has nothing to do', () => {
   assert.equal(r2.code, 0, r2.out);
   assert.match(r2.out, /0 stamped · 0 topped-up · 0 hand-fix/);
   assert.deepEqual(snapshot(s.lb), after1); // nothing rewritten
+});
+
+test('stamp --check: same counts, writes nothing', () => {
+  const s = sandbox();
+  // one stampable (legacy, every field derivable) + one
+  // top-up-able (block present, task:/links: missing)
+  entry(s.lb, '2026-11-02-x-demo-task1-verify-r1.md',
+    legacyBody('**Role:** bee'));
+  entry(s.lb, '2026-11-02-x-demo-task2-verify-r1.md',
+    '# Verify — fixture\n\n<!-- machine\n' +
+    'role: bee\n' +
+    'date: 2026-11-01T09:00:00+11:00\n' +
+    'verdict: PASS\n' +
+    'checks-run: 1\n' +
+    'plan: .hivemind/plans/2026-11-02-x-demo.md @ abc1234\n' +
+    '-->\n\nbody prose stays\n');
+  s.git('add', '.');
+  s.git('commit', '-m', 'seed');
+  const before = snapshot(s.lb);
+  const r = stamp(s.lb, '--check');
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out,
+    /1 stamped · 1 topped-up · 0 hand-fix · 0 out-of-scope/);
+  assert.match(r.out, /stamped: 2026-11-02-x-demo-task1-verify-r1\.md/);
+  assert.match(r.out,
+    /topped-up: 2026-11-02-x-demo-task2-verify-r1\.md \+ task, links/);
+  // never writes: every file byte-identical
+  assert.deepEqual(snapshot(s.lb), before);
 });

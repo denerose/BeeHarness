@@ -2239,7 +2239,7 @@ usage:
 flags:
   --logbook <dir>  internal: logbook directory
                    (default <repo-root>/.hivemind/logbook)
-  --check          never write; report what would happen
+  --check (stamp)  never write; report what would happen
 
 index (default): one TOON line per task-tier entry, derived from
 its machine block — file :: role :: date :: task :: verdict,
@@ -2296,12 +2296,19 @@ function cmdLogbook(rest) {
 // parsed top-level key: value lines — or null when the file
 // carries no block. An unterminated block reads as none (the
 // stamp pass mints a fresh one at the top; the stray fragment
-// stays in the body).
+// stays in the body). Marker matches inside a fenced code
+// block don't count — a quoted block is evidence, not the
+// file's own (fence state toggles on every ``` line).
 function entryBlockOf(text) {
   const lines = text.split('\n');
   let start = -1;
+  let fenced = false;
   for (let i = 0; i < lines.length; i++) {
-    if (/<!--\s*machine/.test(lines[i])) { start = i; break; }
+    const t = lines[i].trim();
+    if (t.startsWith('```')) { fenced = !fenced; continue; }
+    if (!fenced && /<!--\s*machine/.test(lines[i])) {
+      start = i; break;
+    }
   }
   if (start === -1) return null;
   let end = -1;
