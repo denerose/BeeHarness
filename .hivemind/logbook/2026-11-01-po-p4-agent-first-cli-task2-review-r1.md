@@ -1,29 +1,11 @@
-# Review: P4 Task 2 — migration + rendered views (code half: dispatcher split)
+<!-- machine
+role: project-orchestrator
+date: 2026-11-01T13:16:31+11:00
+verdict: FIX
+checks-run: -
+plan: .hivemind/plans/2026-11-01-po-p4-agent-first-cli.md @ 5e1784a
+task: task-2
+links: -
+-->
 
-**Role:** project-orchestrator (dispatching loop role per GLOSSARY: Role trailer)
-**Reviewer:** reviewer (cold dispatch; did not write this work)
-**Plan section:** `.hivemind/plans/2026-11-01-po-p4-agent-first-cli.md` — Task 2, code half only (live migration adds, live render, live regen are the dispatcher's, not reviewed)
-**Verify record:** `.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task2-verify-r1.md` (branch commit 7c97a6e)
-**Scope:** commits 164d109 (`bin/bee.js` + `tests/bee-render.test.mjs`) + 31a4178 (`AGENTS.md` one line) on `task/4-migrate-views`
-
-## Verdict
-
-Fix first — one blocking finding: the report derivation's fallback trigger (store present but no open keeper items) makes `bee report` parse the *rendered* status region once the keeper's queue drains, leaking other roles' open items into *Needs the keeper* as keeper asks (reproduced against a temp store/status; details below).
-
-Claim-vs-record check (ran first): clean. All six Task 2 checkboxes unchecked (correct — the loop's to flip); verify record present on the branch and backed: both recorded runs reproduced here (`node --test tests/bee-render.test.mjs` → 16 pass; full suite → 75 pass, 59 baseline + 16 new); the removed throwaway driver's essential assertions all live on in the suite's migration-driver test. Worktree clean before and after this review; only this report was written.
-
-## Blocking
-
-- `bin/bee.js:381-384` (with `queueBullets` at `:222-245`) — the fallback trigger `fromStore = storeAsks.length > 0` is wrong once the migration has replaced the hand-written queue with the rendered region. When the store exists but has zero open keeper items (keeper queue drained) while other addressees have open items, `bee report` falls back to parsing status bullets — but the queue section now contains the rendered view, whose `- IN-001 · 4d — …` lines parse as bullets. Reproduced (temp store/status only): a store holding one open `po` item + a rendered status region produced `1. IN-001 · 4d — po task: draft the frobnicator spec` as the first line of *Needs the keeper*, with `**Source:**` flipping to `.hivemind/status.md`. This is a steady post-migration state, not a transient: every regen after the keeper's asks are done re-derives other roles' items as keeper asks — contradicting the plan's intent ("*Needs the keeper* derives from the store … instead of parsing status bullets"). The deviation's claimed mid-migration window does not need this trigger: the migration's adds land in the store *before* render/regen, so during that window the store does carry open keeper items and derivation is already correct. Suggested fix: make the trigger file existence, not item count — `const fromStore = fs.existsSync(storePath)` (readInbox returns `{items: []}` both for an absent file and an empty one, so the existence check is explicit); bullet fallback then fires only pre-migration (store absent), where the hand-written bullets are the real source. Note for the fix round: the test `report: store with no open keeper items → fallback` (`tests/bee-render.test.mjs:292`) asserts the behavior being corrected and flips with it; the HTML-comment skip in `queueBullets` (`:231`) is sound but does not cover this (view bullets are not comments) — with the existence trigger it becomes belt-and-braces.
-
-## Should fix
-
-- `bin/bee.js:797-806` and `:868-870` — an item whose text embeds a render marker breaks region isolation and idempotency. Reproduced: `bee inbox add keeper 'tricky ask <!-- /inbox:render --> embedded'` then render twice — the update path's `indexOf(RENDER_CLOSE)` (`:799`) finds the embedded marker first, slices "outside" text from inside the region, and leaves marker residue outside the region (`idempotent: false` between consecutive renders). `bee inbox add` rejects newlines but not marker substrings, so the store can carry this. Suggested fix: after building the view (or per item text in `inboxRender`), refuse with a hand-fix instruction when it contains `RENDER_OPEN`/`RENDER_CLOSE` — same refusal style as the unbalanced-marker guard at `:800-806`. One line plus one test.
-
-## Notes
-
-- `bin/bee.js:797-799` — two complete marker pairs (a hand-pasted duplicate region) are not detected: the first region updates, the second silently persists stale content (reproduced; both renders exit 0, no warning). Suggested hardening: refuse when `RENDER_OPEN` occurs more than once (hand-fix instruction), consistent with the unbalanced case. Contrived state; note tier.
-- `bin/bee.js:284-291` — adjudicating the `normItem` strips (deviation 1): acceptable, purpose is load-bearing. Without the strips every migrated ask duplicates its old report-zone line after the derivation switch; with them the `[status] <date> — [PP] <text>` double-tag shape still dedupes against an old `[PP] <date> — <text>` line via `sameAsk` containment (traced; the suite covers the single-tag variant at `tests/bee-render.test.mjs:349`). Residual false-positive risk: an old zone line whose leading bracket carries meaning beyond attribution (`[URGENT]`, `[blocked]`) merges with its tag-less store equivalent, losing only the marker word — and `sameAsk`'s containment semantics already merged aggressively before this task. Optional tightening if it ever bites: strip only role-like tags (short lowercase-ish tokens), not any bracket.
-- `tests/bee-render.test.mjs:381-476` — the migration driver test faithfully covers the plan's bullets half (RESOLVED skip, wrapped continuations, cited-suggestion ref, idempotent re-run byte-exact, render replacement, report derivation). The suggestions-awaiting-read half of the migration rule (`add keeper <title> --origin suggestion --ref <file>`) is exercised by no suite test; it is the dispatcher's live half and `add` with `--origin`/`--ref` is Task-1-tested generically, so no round is demanded — recorded so the dispatcher knows the suite does not prove that half.
-- `AGENTS.md:130-132` — the one-line durable edit is accurate and narrative-free. Transient window: from branch merge until the live render runs, AGENTS.md says the queue renders from the store while the live status queue is still hand-written; the dispatcher owns that ordering at merge — no action here.
-- Deviations 3 (Source parameterization; zone-rules prose untouched — confirmed in diff), 4 (render ordering/empty state; tested at `tests/bee-render.test.mjs:196`), 5 (report line format; ids and absolute refs asserted at `:263-267`), and 6 (worktree AGENTS.md edit per dispatcher ruling): sound, no findings.
+compacted at phase close; full text in git history

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`, `bee design`, `bee verify`, `bee task`,
-// `bee guidance`, `bee phase`.
+// `bee capture`, `bee park`, `bee memory`, `bee design`, `bee verify`,
+// `bee logbook`, `bee glossary`, `bee task`, `bee guidance`, `bee phase`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -38,11 +38,21 @@ usage:
                [--origin <role>]
              | show <id> [--full] | resolve <id> [--how <text>]
              | migrate <md>
+  bee memory [list [--type lesson|fact] [--full]]
+             | add "<gist>" --type lesson|fact [--ref <path>] [--origin <role>]
+             | show <id> [--full]
+             | supersede <id> "<gist>" --type lesson|fact [--ref <path>] [--origin <role>]
   bee design [status [--full]]
              | new "<title>" [--check]
              | pick-up <doc> --phase <n> [--check]
              | implement <doc> --phase <n> --merge <hash> [--check]
   bee capture "<thought>"
+  bee logbook [index [--logbook <dir>]]
+             | stamp [--logbook <dir>]
+             | compact <phase> [--logbook <dir>]
+  bee glossary [<term>] [--markdown]
+               | add <term> "<gist>" [--see <path>]
+               | convert <md>
   bee verify --plan <path> [--task <n>] [--base <ref>] [--record] [--check]
   bee task   show <plan-path> [--full]
              | move <plan-path> <task-n> <state>
@@ -78,11 +88,20 @@ export function run(argv) {
   if (cmd === 'park') {
     return cmdPark(rest);
   }
+  if (cmd === 'memory') {
+    return cmdMemory(rest);
+  }
   if (cmd === 'design') {
     return cmdDesign(rest);
   }
   if (cmd === 'capture') {
     return cmdCapture(rest);
+  }
+  if (cmd === 'logbook') {
+    return cmdLogbook(rest);
+  }
+  if (cmd === 'glossary') {
+    return cmdGlossary(rest);
   }
   if (cmd === 'verify') {
     return cmdVerify(rest);
@@ -1048,7 +1067,8 @@ function parkOldestAge(view) {
 // ADR-007 role-initials convention: a hyphenated role name maps
 // to the first letter of each word (power-planner → PP,
 // project-orchestrator → PO); short codes pass through (pp → PP).
-function parkOriginTag(origin) {
+// Shared id-seam helper: park PL-<tag>-NNN and memory ME-<tag>-NNN.
+function originTag(origin) {
   if (origin.includes('-')) {
     return origin.split('-').map((w) => w[0] || '').join('').toUpperCase();
   }
@@ -1064,7 +1084,7 @@ function nextParkId(items, origin) {
     }
     return 'PL-' + String(max + 1).padStart(3, '0');
   }
-  const tag = parkOriginTag(origin);
+  const tag = originTag(origin);
   const re = new RegExp('^PL-' + tag + '-(\\d+)$', 'i');
   let max = 0;
   for (const it of items) {
@@ -1429,6 +1449,331 @@ function parkMigrate(args) {
     err: '' };
 }
 
+// ---- memory (P5 Task 1 — .hivemind/memory/memory.toon) ----
+// Line-based TOON (unlike park/inbox blocks): one entry per line,
+// ' :: ' separated. Supersede, never delete — a retired entry
+// names its successor; git holds history, reads stay cheap.
+
+const MEMORY_HEADER =
+  '# memory — durable lessons and facts (agent store; supersede, never delete)';
+
+const MEMORY_USAGE = `bee memory — durable lessons and facts (a store, not a document)
+
+usage:
+  bee memory list [--type lesson|fact] [--full]
+  bee memory add "<gist>" --type lesson|fact [--ref <path>] [--origin <role>] [--check]
+  bee memory show <id> [--full]
+  bee memory supersede <id> "<gist>" --type lesson|fact [--ref <path>] [--origin <role>] [--check]
+
+flags:
+  --type lesson|fact  entry type — ALWAYS explicit (D3): a lesson is
+                       agent-learned, a fact is project knowledge
+  --ref <path>        source pointer riding provenance (default: -)
+  --origin <role>     provenance; picks the id series from role
+                       initials (power-planner → ME-PP-NNN;
+                       default bee → ME-NNN)
+  --full              all fields, no truncation; list includes
+                       superseded entries
+  --check             never write; report what would happen
+  --store <path>      internal: store path
+                       (default .hivemind/memory/memory.toon)
+
+store: TOON — one entry per line, ' :: ' separated:
+id :: type :: gist :: provenance :: state. Ids ME-<role>-NNN
+(origin bee = bare ME-NNN), monotonic per series, never reused;
+provenance origin · date · ref stamped by the CLI; state live or
+superseded:<id> — list shows live only, --full shows all.
+
+supersede: role-gated (D1) — any origin may run it; the CLI
+stamps provenance and that is the audit trail. The successor
+mints in the calling role's series (--origin); the old entry's
+state rewrites to superseded:<new-id> in place. Never supersedes
+an already-superseded id.`;
+
+function memoryUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + MEMORY_USAGE };
+}
+
+function memoryStorePathOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'memory', 'memory.toon');
+}
+
+// Provenance dates are day-granular (YYYY-MM-DD), not ISO stamps.
+function todayLocal() {
+  return isoStampLocal().slice(0, 10);
+}
+
+function readMemoryStore(storePath) {
+  let text;
+  try {
+    text = fs.readFileSync(storePath, 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') return { items: [] };
+    return { err: `bee memory: cannot read ${storePath}: ${e.message}\n` };
+  }
+  const items = [];
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('#') || line.trim() === '') continue;
+    const parts = line.split(' :: ');
+    if (parts.length !== 5 || !parts[0].startsWith('ME-')) {
+      return { err: `bee memory: cannot parse ${storePath}: ` +
+        `line ${i + 1} is not an entry — hand-fix the store, then retry\n` };
+    }
+    items.push({ id: parts[0], type: parts[1], gist: parts[2],
+      provenance: parts[3], state: parts[4] });
+  }
+  return { items };
+}
+
+function memoryEntryLine(e) {
+  return [e.id, e.type, e.gist, e.provenance, e.state].join(' :: ');
+}
+
+function renderMemoryStore(items) {
+  return MEMORY_HEADER + '\n' +
+    items.map(memoryEntryLine).join('\n') + '\n';
+}
+
+function writeMemoryStore(storePath, items) {
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    atomicWrite(storePath, renderMemoryStore(items));
+    return null;
+  } catch (e) {
+    return `bee memory: cannot write ${storePath}: ${e.message}\n`;
+  }
+}
+
+function nextMemoryId(items, origin) {
+  if (origin === 'bee') {
+    let max = 0;
+    for (const it of items) {
+      const m = /^ME-(\d+)$/.exec(it.id || '');
+      if (m) max = Math.max(max, Number(m[1]));
+    }
+    return 'ME-' + String(max + 1).padStart(3, '0');
+  }
+  const tag = originTag(origin);
+  const re = new RegExp('^ME-' + tag + '-(\\d+)$', 'i');
+  let max = 0;
+  for (const it of items) {
+    const m = re.exec(it.id || '');
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return 'ME-' + tag + '-' + String(max + 1).padStart(3, '0');
+}
+
+function memoryAbsentErr(id, storePath, exists) {
+  return `bee memory: no entry ${id} — store ${storePath}` +
+    (exists ? '' : ' (absent)') + ' — bee memory list\n';
+}
+
+// Shared arg validation for add/supersede (both mint an entry).
+function memoryMintErrs(type, gist, ref, origin) {
+  if (type === undefined) {
+    return `bee memory: --type is required (lesson|fact) — ` +
+      'explicit, always (D3)';
+  }
+  if (type !== 'lesson' && type !== 'fact') {
+    return `bee memory: --type '${type}' must be lesson or fact`;
+  }
+  if (!/^[a-z][a-z0-9-]*$/i.test(origin)) {
+    return `bee memory: --origin '${origin}' must be letters/digits/hyphens`;
+  }
+  for (const v of [gist, ref]) {
+    if (v !== undefined &&
+      (v.includes('\n') || v.includes(' :: '))) {
+      return `bee memory: field values must be single-line ` +
+        `and must not contain ' :: '`;
+    }
+  }
+  return null;
+}
+
+function cmdMemory(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'list' || sub.startsWith('--')) {
+    return memoryList(sub === 'list' ? rest.slice(1) : rest);
+  }
+  if (sub === 'add') return memoryAdd(rest.slice(1));
+  if (sub === 'show') return memoryShow(rest.slice(1));
+  if (sub === 'supersede') return memorySupersede(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: MEMORY_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee memory: unknown subcommand '${sub}'\n\n` + MEMORY_USAGE };
+}
+
+function memoryAdd(args) {
+  const f = flags(args, {
+    type: { type: 'string' },
+    ref: { type: 'string' },
+    origin: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0] === '') {
+    return memoryUsageErr('bee memory add: expected "<gist>"');
+  }
+  const origin = f.values.origin || 'bee';
+  const err = memoryMintErrs(f.values.type, pos[0], f.values.ref, origin);
+  if (err) return memoryUsageErr(err);
+  const storePath = memoryStorePathOf(f.values.store);
+  const r = readMemoryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const id = nextMemoryId(r.items, origin.toLowerCase());
+  const entry = {
+    id,
+    type: f.values.type,
+    gist: pos[0],
+    provenance: `${origin} · ${todayLocal()} · ` +
+      (f.values.ref || '-'),
+    state: 'live',
+  };
+  if (f.values.check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      memoryEntryLine(entry) + '\n', err: '' };
+  }
+  const w = writeMemoryStore(storePath, [...r.items, entry]);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0,
+    out: `${id} added · ${truncText(pos[0])} — bee memory show ${id}\n`,
+    err: '' };
+}
+
+function memoryList(args) {
+  const f = flags(args, {
+    type: { type: 'string' },
+    full: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return memoryUsageErr(
+      `bee memory list: unexpected argument '${f.positionals[0]}'`);
+  }
+  if (f.values.type !== undefined &&
+    f.values.type !== 'lesson' && f.values.type !== 'fact') {
+    return memoryUsageErr(
+      `bee memory list: --type '${f.values.type}' must be lesson or fact`);
+  }
+  const r = readMemoryStore(memoryStorePathOf(f.values.store));
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const all = f.values.type === undefined ? r.items
+    : r.items.filter((e) => e.type === f.values.type);
+  const live = all.filter((e) => e.state === 'live');
+  if (f.values.full) {
+    if (all.length === 0) {
+      return { code: 0, out: '0 entries\n' +
+        'add one: bee memory add "<gist>" --type lesson|fact\n', err: '' };
+    }
+    let out = `${all.length} entries · ${live.length} live · ` +
+      `${all.length - live.length} superseded\n`;
+    for (const e of all) {
+      out += `${e.id} · ${e.type} · ${e.state}\n` +
+        `  gist: ${e.gist}\n  provenance: ${e.provenance}\n`;
+    }
+    return { code: 0, out, err: '' };
+  }
+  if (live.length === 0) {
+    return { code: 0, out: '0 entries\n' +
+      'add one: bee memory add "<gist>" --type lesson|fact\n', err: '' };
+  }
+  let out = `${live.length} live entries\n`;
+  for (const e of live) {
+    out += `${e.id} · ${e.type} · ${truncText(e.gist)}\n`;
+  }
+  return { code: 0, out, err: '' };
+}
+
+function memoryShow(args) {
+  const f = flags(args, {
+    full: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return memoryUsageErr('bee memory show: expected <id>');
+  }
+  const storePath = memoryStorePathOf(f.values.store);
+  const r = readMemoryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const e = r.items.find((i) => i.id === pos[0]);
+  if (!e) {
+    return { code: 1, out: '',
+      err: memoryAbsentErr(pos[0], storePath,
+        fs.existsSync(storePath)) };
+  }
+  let out = `${e.id} · ${e.type} · ${e.state}\ngist: ${e.gist}\n`;
+  if (f.values.full) out += `provenance: ${e.provenance}\n`;
+  return { code: 0, out, err: '' };
+}
+
+function memorySupersede(args) {
+  const f = flags(args, {
+    type: { type: 'string' },
+    ref: { type: 'string' },
+    origin: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 2 || pos[1] === '') {
+    return memoryUsageErr('bee memory supersede: expected <id> "<gist>"');
+  }
+  const [oldId, gist] = pos;
+  const origin = f.values.origin || 'bee';
+  const err = memoryMintErrs(f.values.type, gist, f.values.ref, origin);
+  if (err) return memoryUsageErr(err);
+  const storePath = memoryStorePathOf(f.values.store);
+  const r = readMemoryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const old = r.items.find((i) => i.id === oldId);
+  if (!old) {
+    return { code: 1, out: '',
+      err: memoryAbsentErr(oldId, storePath, fs.existsSync(storePath)) };
+  }
+  if (old.state !== 'live') {
+    const succ = /^superseded:(.+)$/.exec(old.state);
+    const why = succ
+      ? `bee memory: ${oldId} is already superseded ` +
+        `(state: ${old.state}) — supersede ${succ[1]} instead\n`
+      : `bee memory: ${oldId} is not live (state: ${old.state})\n`;
+    return { code: 1, out: '', err: why };
+  }
+  const newId = nextMemoryId(r.items, origin.toLowerCase());
+  const entry = {
+    id: newId,
+    type: f.values.type,
+    gist,
+    provenance: `${origin} · ${todayLocal()} · ` +
+      (f.values.ref || '-'),
+    state: 'live',
+  };
+  const items = r.items.map((e) =>
+    e.id === oldId ? { ...e, state: `superseded:${newId}` } : e);
+  items.push(entry); // successor appends; the old line rewrites in place
+  if (f.values.check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      memoryEntryLine(entry) + '\n' +
+      `--check: would mark ${oldId} superseded:${newId} ` +
+      '(state rewrite in place)\n', err: '' };
+  }
+  const w = writeMemoryStore(storePath, items);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0,
+    out: `${newId} added · supersedes ${oldId} — bee memory show ${newId}\n`,
+    err: '' };
+}
+
 // ---- design (P4 Task 4 — CLI surface over scripts/design.sh) ----
 // The script is the mechanical core (determinism split): pick-up /
 // implement / status exec it and pass its TOON output through; the
@@ -1676,8 +2021,8 @@ CLI) against the plan root when it carries scripts/structure.map;
 skips with a note otherwise (other repos adopt by adding a map).
 logbook entry <plan-slug>-task<n>-verify-<rN>.md (one per
 task checked; next free rN): machine header (role, date, verdict,
-checks-run, plan path + hash); prose body only for anomalies
-(empty body = clean run).
+checks-run, plan path + hash, task, links); prose body only for
+anomalies (empty body = clean run).
 `;
 
 function verifyUsageErr(e) {
@@ -1953,13 +2298,17 @@ function nextVerifyRound(logbookDir, stem, taskN) {
 }
 
 function verifyEntryText(role, verdict, checksRun, planShown, planHash,
-  anomalies) {
+  taskN, anomalies) {
   let e = '<!-- machine\n' +
     `role: ${role}\n` +
     `date: ${isoStampLocal()}\n` +
     `verdict: ${verdict}\n` +
     `checks-run: ${checksRun}\n` +
     `plan: ${planShown} @ ${planHash}\n` +
+    `task: task-${taskN}\n` +
+    // links: the cross-link slot from birth — related entry paths,
+    // comma-separated, '-' while none exist (P5 Task 2)
+    'links: -\n' +
     '-->\n';
   if (anomalies && anomalies.trim() !== '') {
     e += '\n' + anomalies.trimEnd() + '\n';
@@ -2191,7 +2540,7 @@ function cmdVerify(rest) {
       const file = path.join(logbookDir,
         `${stem}-task${n}-verify-r${round}.md`);
       const entry = verifyEntryText(role, verdict, trs.length,
-        planShown, planHash, anomalies);
+        planShown, planHash, n, anomalies);
       if (f.values.check) {
         out += `--check: would write ${designShown(file)}\n${entry}`;
       } else {
@@ -2207,6 +2556,839 @@ function cmdVerify(rest) {
     }
   }
   return { code: anyFail ? 1 : 0, out, err: '' };
+}
+
+// ---- logbook (P5 Task 2 — headers from birth, stamp, index) ----
+// Entries born under this CLI carry the full machine header
+// (verifyEntryText); `stamp` mints the same shape onto the legacy
+// corpus in one scripted pass, and `index` derives from headers —
+// no regex over prose. Field order everywhere: role, date,
+// verdict, checks-run, plan, task, links.
+
+const LOGBOOK_TASK_RE = /^(.+)-task(\d+)-(verify|review)-r(\d+)\.md$/;
+
+const LOGBOOK_USAGE = `bee logbook — entry headers: derived index, legacy stamp
+
+usage:
+  bee logbook [index] [--logbook <dir>]
+  bee logbook stamp [--logbook <dir>] [--check]
+  bee logbook compact <phase> [--logbook <dir>]
+
+flags:
+  --logbook <dir>  internal: logbook directory
+                   (default <repo-root>/.hivemind/logbook)
+  --phases <dir>   internal: phase-list directory (compact)
+                   (default <repo-root>/.hivemind/phases)
+  --check          never write; report what would happen
+                   (stamp, compact)
+
+index (default): one TOON line per task-tier entry, derived from
+its machine block — file :: role :: date :: task :: verdict,
+sorted by filename; any missing field renders '-'. Task-tier
+entries match <plan-slug>-task<n>-verify|review-r<N>.md; every
+other file is out of scope. Derived on demand; writes nothing.
+
+stamp: one scripted pass over the logbook dir. Legacy task-tier
+entries gain a machine block — role from the body's Role: line
+(bold or plain), date from the file's last-commit committer date
+(git %cI), verdict from the body's '**Verdict:**' line,
+checks-run: - (no countable source for past runs), plan path from
+the filename stem with the plan's last-commit hash ('-' when the
+plan has no history). Entries already carrying a block but
+missing task:/links: are topped up from their filename, inserted
+after plan: (header field order). A field that cannot be derived
+lands on the hand-fix list with the file named and its missing
+fields — hand-add the machine lines, re-run; the pass exits 1
+while any remain. Non-matching files are skipped and reported as
+out-of-scope (not errors). Idempotent: nothing to stamp → exit 0.
+
+compact <phase>: rewrite the phase's entries to their machine
+block + one marker line ('compacted at phase close; full text in
+git history'). An entry belongs to <phase> when its machine
+plan: path equals a plan linked in the phase's row of the phase
+list (<repo-root>/.hivemind/phases/<project>.md) — the list is
+the plan↔phase source of truth; plan files need no headers.
+Rows with plan — match nothing: 0 entries, exit 0. A missing
+phase list or row fails loud naming it. Task-tier files only;
+a task-tier file with no machine block fails loud (run
+bee logbook stamp first). Entries whose body is already only
+the marker line are skipped — idempotent. --check lists what
+would compact, writes nothing.
+`;
+
+function logbookUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + LOGBOOK_USAGE };
+}
+
+function logbookDirOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'logbook');
+}
+
+function cmdLogbook(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'index' || sub.startsWith('--')) {
+    return logbookIndex(sub === 'index' ? rest.slice(1) : rest);
+  }
+  if (sub === 'stamp') return logbookStamp(rest.slice(1));
+  if (sub === 'compact') return logbookCompact(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: LOGBOOK_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee logbook: unknown subcommand '${sub}'\n\n` +
+      LOGBOOK_USAGE };
+}
+
+// First <!-- machine … --> block of a logbook entry. Returns
+// { start, end, fields } — line indexes into split('\n') plus the
+// parsed top-level key: value lines — or null when the file
+// carries no block. An unterminated block reads as none (the
+// stamp pass mints a fresh one at the top; the stray fragment
+// stays in the body). Marker matches inside a fenced code
+// block don't count — a quoted block is evidence, not the
+// file's own (fence state toggles on every ``` line).
+function entryBlockOf(text) {
+  const lines = text.split('\n');
+  let start = -1;
+  let fenced = false;
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (t.startsWith('```')) { fenced = !fenced; continue; }
+    if (!fenced && /<!--\s*machine/.test(lines[i])) {
+      start = i; break;
+    }
+  }
+  if (start === -1) return null;
+  let end = -1;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].trim().startsWith('-->')) { end = i; break; }
+  }
+  if (end === -1) return null;
+  const fields = {};
+  for (let i = start + 1; i < end; i++) {
+    const m = /^([A-Za-z-]+):\s*(.*)$/.exec(lines[i]);
+    if (m) fields[m[1]] = m[2].trim();
+  }
+  return { start, end, fields };
+}
+
+// git output or null (non-repo, git error, empty) — the stamp
+// pass treats null as "no source", never as a crash.
+function gitOut(cwd, args) {
+  const r = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  if (r.error || r.status !== 0) return null;
+  const t = r.stdout.trim();
+  return t === '' ? null : t;
+}
+
+function logbookStamp(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    logbook: { type: 'string' },
+  });
+  if (f.error) return logbookUsageErr(f.error);
+  const dir = logbookDirOf(f.values.logbook);
+  let names;
+  try {
+    names = fs.readdirSync(dir).sort();
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      return { code: 0, out: `0 entries · nothing to stamp\n` +
+        `logbook: ${dir}\n`, err: '' };
+    }
+    return { code: 1, out: '',
+      err: `bee logbook stamp: cannot read ${dir}: ${e.message}\n` };
+  }
+  const gitRoot = gitOut(dir, ['rev-parse', '--show-toplevel']);
+  const stamped = [];
+  const topped = [];
+  const hand = [];
+  const oos = [];
+  for (const name of names) {
+    const m = LOGBOOK_TASK_RE.exec(name);
+    if (!m) { oos.push(name); continue; }
+    const stem = m[1];
+    const taskN = m[2];
+    const file = path.join(dir, name);
+    let text;
+    try {
+      text = fs.readFileSync(file, 'utf8');
+    } catch (e) {
+      hand.push({ name, missing: [`unreadable: ${e.message}`] });
+      continue;
+    }
+    const block = entryBlockOf(text);
+    if (block) {
+      const add = [];
+      if (block.fields.task === undefined) {
+        add.push(`task: task-${taskN}`);
+      }
+      if (block.fields.links === undefined) add.push('links: -');
+      if (add.length === 0) continue; // complete — nothing to do
+      const lines = text.split('\n');
+      // insert after plan: when present (header field order),
+      // else just before the closing -->
+      let at = block.end;
+      for (let i = block.start + 1; i < block.end; i++) {
+        if (/^plan:/.test(lines[i])) { at = i + 1; break; }
+      }
+      lines.splice(at, 0, ...add);
+      if (!f.values.check) atomicWrite(file, lines.join('\n'));
+      topped.push(`${name} + ${add.map((a) => a.split(':')[0]).join(', ')}`);
+      continue;
+    }
+    // legacy entry: derive every field from body + git + filename
+    const missing = [];
+    let role = null;
+    for (const line of text.split('\n')) {
+      const rm = /^\*{0,2}Role:\*{0,2} ([A-Za-z][A-Za-z0-9-]*)/.exec(line);
+      if (rm) { role = rm[1]; break; }
+    }
+    if (role === null) missing.push('role');
+    let date = null;
+    if (gitRoot) {
+      date = gitOut(gitRoot,
+        ['log', '--format=%cI', '-1', '--', path.relative(gitRoot, file)]);
+    }
+    if (date === null) missing.push('date');
+    let verdict = null;
+    for (const line of text.split('\n')) {
+      const vm = /^\*\*Verdict:\*\* (\w+)/.exec(line);
+      if (vm) { verdict = vm[1]; break; }
+    }
+    if (verdict === null) missing.push('verdict');
+    if (missing.length > 0) { hand.push({ name, missing }); continue; }
+    const planRel = `.hivemind/plans/${stem}.md`;
+    const hash = gitRoot
+      ? (gitOut(gitRoot, ['log', '-1', '--format=%h', '--', planRel]) ?? '-')
+      : '-';
+    const header = '<!-- machine\n' +
+      `role: ${role}\n` +
+      `date: ${date}\n` +
+      `verdict: ${verdict}\n` +
+      'checks-run: -\n' +
+      `plan: ${planRel} @ ${hash}\n` +
+      `task: task-${taskN}\n` +
+      'links: -\n' +
+      '-->\n\n';
+    if (!f.values.check) atomicWrite(file, header + text);
+    stamped.push(name);
+  }
+  let out = `${stamped.length} stamped · ${topped.length} topped-up · ` +
+    `${hand.length} hand-fix · ${oos.length} out-of-scope\n`;
+  for (const s of stamped) out += `stamped: ${s}\n`;
+  for (const t of topped) out += `topped-up: ${t}\n`;
+  for (const h of hand) {
+    out += `hand-fix: ${h.name} — missing ${h.missing.join(', ')}\n`;
+  }
+  for (const o of oos) out += `out-of-scope: ${o}\n`;
+  if (hand.length > 0) {
+    out += 'fix: hand-add the missing machine lines to each named ' +
+      'file, then re-run bee logbook stamp\n';
+    return { code: 1, out, err: '' };
+  }
+  return { code: 0, out, err: '' };
+}
+
+function logbookIndex(args) {
+  const f = flags(args, {
+    logbook: { type: 'string' },
+  });
+  if (f.error) return logbookUsageErr(f.error);
+  const dir = logbookDirOf(f.values.logbook);
+  let names;
+  try {
+    names = fs.readdirSync(dir).sort();
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      return { code: 0, out: `0 entries\nlogbook: ${dir}\n`, err: '' };
+    }
+    return { code: 1, out: '',
+      err: `bee logbook index: cannot read ${dir}: ${e.message}\n` };
+  }
+  const rows = [];
+  for (const name of names) {
+    if (!LOGBOOK_TASK_RE.test(name)) continue;
+    let fields = {};
+    try {
+      const b = entryBlockOf(
+        fs.readFileSync(path.join(dir, name), 'utf8'));
+      if (b) fields = b.fields;
+    } catch (e) { /* unreadable — every field renders '-' */ }
+    rows.push([name, fields.role ?? '-', fields.date ?? '-',
+      fields.task ?? '-', fields.verdict ?? '-'].join(' :: '));
+  }
+  let out = `${rows.length} entries\n`;
+  for (const r of rows) out += r + '\n';
+  return { code: 0, out, err: '' };
+}
+
+const LOGBOOK_COMPACT_MARKER =
+  'compacted at phase close; full text in git history';
+
+// Plan paths linked in a phase's row of the phase list. The
+// list is the plan↔phase source of truth — plan files
+// themselves are never read. Returns { plans, file } or
+// { err }. A row with plan — yields plans: [] (matches
+// nothing — a clean no-op for compact).
+function phaseRowPlans(phasesDir, phase) {
+  let names;
+  try {
+    names = fs.readdirSync(phasesDir).sort();
+  } catch (e) {
+    return { err: `bee logbook compact: cannot read phase list ` +
+      `${phasesDir}: ${e.message}\n` };
+  }
+  const files = names.filter((n) => n.endsWith('.md') &&
+    n !== 'TEMPLATE.md');
+  if (files.length === 0) {
+    return { err: `bee logbook compact: no phase list in ` +
+      `${phasesDir} (expected <project>.md)\n` };
+  }
+  const hits = [];
+  const known = [];
+  for (const name of files) {
+    let text;
+    try {
+      text = fs.readFileSync(path.join(phasesDir, name), 'utf8');
+    } catch (e) {
+      return { err: `bee logbook compact: cannot read ` +
+        `${path.join(phasesDir, name)}: ${e.message}\n` };
+    }
+    for (const line of text.split('\n')) {
+      if (!line.startsWith('|')) continue;
+      const cells = line.split('|').map((c) => c.trim());
+      // | id | description | status | designs | plan | owner | …
+      // (7 columns → 9 cells after the split; shorter rows are
+      // malformed — skipped, so the phase reads as row-less)
+      if (cells.length < 9) continue;
+      const id = cells[1];
+      if (id === undefined || id === '' || id === 'id' ||
+          id.startsWith('---')) continue;
+      known.push(id);
+      if (id !== phase) continue;
+      const plans = [...cells[5].matchAll(/\.hivemind\/plans\/[^\s`|]+/g)]
+        .map((m) => m[0]);
+      hits.push({ name, plans });
+      break;
+    }
+  }
+  if (hits.length === 0) {
+    return { err: `bee logbook compact: no row for phase ${phase} ` +
+      `in ${phasesDir}` +
+      (known.length > 0 ? ` — phases with rows: ` +
+        `${[...new Set(known)].join(', ')}` : '') + '\n' };
+  }
+  if (hits.length > 1) {
+    return { err: `bee logbook compact: phase ${phase} has rows ` +
+      `in ${hits.length} lists: ${hits.map((h) => h.name).join(', ')}\n` };
+  }
+  return { plans: hits[0].plans, file: hits[0].name };
+}
+
+function logbookCompact(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    logbook: { type: 'string' },
+    phases: { type: 'string' },
+  }, true);
+  if (f.error) return logbookUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return logbookUsageErr('bee logbook compact: expected <phase>');
+  }
+  const dir = logbookDirOf(f.values.logbook);
+  const phasesDir = f.values.phases !== undefined
+    ? path.resolve(f.values.phases)
+    : path.join(REPO_ROOT, '.hivemind', 'phases');
+  const row = phaseRowPlans(phasesDir, pos[0]);
+  if (row.err) return { code: 1, out: '', err: row.err };
+  const plans = new Set(row.plans);
+  let names;
+  try {
+    names = fs.readdirSync(dir).sort();
+  } catch (e) {
+    if (e.code === 'ENOENT') return { code: 0, out: `0 entries\n`, err: '' };
+    return { code: 1, out: '',
+      err: `bee logbook compact: cannot read ${dir}: ${e.message}\n` };
+  }
+  // pass 1: classify every task-tier entry; any unstamped one
+  // fails loud BEFORE a single file is rewritten
+  const compacted = [];
+  const already = [];
+  let other = 0;
+  for (const name of names) {
+    if (!LOGBOOK_TASK_RE.test(name)) continue; // out of scope
+    let text;
+    try {
+      text = fs.readFileSync(path.join(dir, name), 'utf8');
+    } catch (e) {
+      return { code: 1, out: '',
+        err: `bee logbook compact: cannot read ` +
+        `${name}: ${e.message}\n` };
+    }
+    const block = entryBlockOf(text);
+    if (!block) {
+      return { code: 1, out: '',
+        err: `bee logbook compact: ${name} has no machine block ` +
+        '— run `bee logbook stamp` first\n' };
+    }
+    if (block.fields.plan === undefined) {
+      return { code: 1, out: '',
+        err: `bee logbook compact: ${name} has no plan: field ` +
+        '— run `bee logbook stamp` first\n' };
+    }
+    const planPath = block.fields.plan.split(' @ ')[0].trim();
+    if (!plans.has(planPath)) { other++; continue; }
+    const lines = text.split('\n');
+    const body = lines.slice(block.end + 1)
+      .filter((l) => l.trim() !== '');
+    if (body.length === 1 &&
+        body[0].trim() === LOGBOOK_COMPACT_MARKER) {
+      already.push(name);
+      continue;
+    }
+    compacted.push({ name, keep:
+      lines.slice(block.start, block.end + 1).join('\n') });
+  }
+  // pass 2: rewrite members (never under --check)
+  if (!f.values.check) {
+    for (const c of compacted) {
+      atomicWrite(path.join(dir, c.name),
+        c.keep + '\n\n' + LOGBOOK_COMPACT_MARKER + '\n');
+    }
+  }
+  const total = compacted.length + already.length;
+  if (total === 0) return { code: 0, out: `0 entries\n`, err: '' };
+  const verb = f.values.check ? 'to compact' : 'compacted';
+  let out = `${total} entries · ${compacted.length} ${verb} · ` +
+    `${already.length} already` +
+    (other > 0 ? ` · ${other} other-phase` : '') + '\n';
+  for (const c of compacted) {
+    out += (f.values.check ? 'would compact: ' : 'compacted: ') +
+      c.name + '\n';
+  }
+  for (const a of already) out += `already compacted: ${a}\n`;
+  return { code: 0, out, err: '' };
+}
+
+// ---- glossary (P5 Task 4 — .hivemind/glossary.toon) ----
+// Shared vocabulary, one line per term (line-based TOON like
+// memory): term :: gist :: see. Supply, never update — no edit
+// path; a conflicting gist resolves by hand on the spot (D4
+// spirit), not by CLI. Every store write regenerates the rendered
+// markdown view (D5: the view is KEPT, script-owned, concurrent
+// with the write); read-only lookups never touch it.
+
+const GLOSSARY_HEADER =
+  '# glossary — shared vocabulary (term :: gist :: see; supply, never update)';
+
+const GLOSSARY_VIEW_MARKER = '<!-- glossary view — script-owned: ' +
+  'bee glossary regenerates this file on every store write; ' +
+  'hand edits are overwritten -->';
+
+const GLOSSARY_USAGE = `bee glossary — shared vocabulary (a store, not a document)
+
+usage:
+  bee glossary [<term>] [--markdown]
+  bee glossary add <term> "<gist>" [--see <path>] [--check]
+  bee glossary convert <md> [--check]
+
+commands:
+  [<term>]          lookup: exact match prints the entry; else a
+                    unique prefix match prints it; multiple prefix
+                    matches print all (exit 0); zero exit 1 with
+                    nearest matches (substring hits). Bare
+                    'bee glossary' lists terms (content first).
+  add …             supply a new term; fails loud when the term
+                    already exists — supply, not update (no edit
+                    path; hand-fix the store line if a gist changes)
+  convert <md>      one-shot conversion of a hand-written glossary
+                    (the '- **term** — gist' bullet shape): wrapped
+                    continuation lines join space-joined into the
+                    single-line gist; a trailing 'See \`<path>\`.'
+                    sentence moves to the see field; gists ride
+                    as-is (conversion never editorializes).
+                    Headings and prose outside bullets are skipped
+                    and reported. Duplicate terms and unparseable
+                    bullet lines land on the hand-fix list (exit 1,
+                    nothing written). Tests-only until phase close
+                    (D6).
+
+flags:
+  --markdown        lookup/list output as markdown lines
+                    ('**term** — gist' + indented see: pointer)
+                    instead of TOON — on demand; the committed view
+                    file is a separate, script-owned artifact
+  --see <path>      add: pointer to the term's law (default: -)
+  --check           mutations (add/convert): never write; report
+                    what would happen
+  --store <path>    internal: store path
+                    (default .hivemind/glossary.toon)
+  --view <path>     internal: rendered-view path
+                    (default skills/GLOSSARY.md when it exists,
+                    else GLOSSARY.md at the repo root)
+
+store: TOON — one term per line, ' :: ' separated:
+term :: gist :: see. Every store write regenerates the view
+atomically (D5): marker line, then '**term** — gist' lines with
+indented 'see: <path>' pointers, alphabetical. Read-only
+lookups never touch the view.`;
+
+function glossaryUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + GLOSSARY_USAGE };
+}
+
+function glossaryStorePathOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'glossary.toon');
+}
+
+function glossaryViewPathOf(p) {
+  if (p) return path.resolve(p);
+  const skills = path.join(REPO_ROOT, 'skills', 'GLOSSARY.md');
+  return fs.existsSync(skills) ? skills
+    : path.join(REPO_ROOT, 'GLOSSARY.md');
+}
+
+// A --store override without --view would regenerate the
+// repo-default view (the live skills/GLOSSARY.md) from the
+// overridden store — fail loud instead. Write paths only
+// (add/convert); lookups never resolve the view.
+function glossaryStoreWithoutView(storeArg, viewArg) {
+  if (storeArg && !viewArg) return { code: 1, out: '',
+    err: 'bee glossary: --store given without --view — pass ' +
+      '--view too, or drop both\n' };
+  return null;
+}
+
+function readGlossaryStore(storePath) {
+  let text;
+  try {
+    text = fs.readFileSync(storePath, 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') return { items: [] };
+    return { err: `bee glossary: cannot read ${storePath}: ${e.message}\n` };
+  }
+  const items = [];
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('#') || line.trim() === '') continue;
+    const parts = line.split(' :: ');
+    if (parts.length !== 3 || parts.some((p) => p === '')) {
+      return { err: `bee glossary: cannot parse ${storePath}: ` +
+        `line ${i + 1} is not an entry — hand-fix the store, ` +
+        'then retry\n' };
+    }
+    items.push({ term: parts[0], gist: parts[1], see: parts[2] });
+  }
+  return { items };
+}
+
+function glossaryEntryLine(e) {
+  return [e.term, e.gist, e.see ?? '-'].join(' :: ');
+}
+
+function renderGlossaryStore(items) {
+  return GLOSSARY_HEADER + '\n' +
+    items.map(glossaryEntryLine).join('\n') + '\n';
+}
+
+// One rendered entry: '**term** — gist' plus an indented see:
+// pointer when one exists (markdown lines, also the --markdown
+// output shape).
+function glossaryMarkdownLines(e) {
+  const lines = [`**${e.term}** — ${e.gist}`];
+  if (e.see && e.see !== '-') lines.push(`  see: \`${e.see}\``);
+  return lines;
+}
+
+function glossaryTermCmp(a, b) {
+  return a.term.toLowerCase() < b.term.toLowerCase() ? -1
+    : a.term.toLowerCase() > b.term.toLowerCase() ? 1 : 0;
+}
+
+function glossaryViewText(items) {
+  const sorted = [...items].sort(glossaryTermCmp);
+  return GLOSSARY_VIEW_MARKER + '\n\n' +
+    sorted.map((e) => glossaryMarkdownLines(e).join('\n'))
+      .join('\n\n') + '\n';
+}
+
+// Store write + concurrent view regeneration (D5). The store
+// lands first; a view failure is reported with the partial state
+// named (never silent).
+function writeGlossary(storePath, viewPath, items) {
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    atomicWrite(storePath, renderGlossaryStore(items));
+  } catch (e) {
+    return { err: `bee glossary: cannot write ${storePath}: ` +
+      `${e.message}\n` };
+  }
+  try {
+    fs.mkdirSync(path.dirname(viewPath), { recursive: true });
+    atomicWrite(viewPath, glossaryViewText(items));
+  } catch (e) {
+    return { err: `bee glossary: store written (${storePath}) but ` +
+      `cannot write the view ${viewPath}: ${e.message}\n` };
+  }
+  return {};
+}
+
+function cmdGlossary(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub.startsWith('--')) {
+    return glossaryLookup(rest);
+  }
+  if (sub === 'add') return glossaryAdd(rest.slice(1));
+  if (sub === 'convert') return glossaryConvert(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: GLOSSARY_USAGE, err: '' };
+  // no named subcommands beyond add/convert/help — a positional
+  // is a term (the [<term>] grammar), so anything else is a lookup
+  return glossaryLookup(rest);
+}
+
+function glossaryLookup(args) {
+  const f = flags(args, {
+    markdown: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return glossaryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length > 1) {
+    return glossaryUsageErr(
+      `bee glossary: unexpected argument '${pos[1]}'`);
+  }
+  const storePath = glossaryStorePathOf(f.values.store);
+  const r = readGlossaryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const items = r.items;
+  const md = f.values.markdown;
+  if (pos.length === 0) {
+    if (items.length === 0) {
+      return { code: 0, out: '0 terms\n' +
+        'add one: bee glossary add <term> "<gist>"\n', err: '' };
+    }
+    let out = `${items.length} terms\n`;
+    out += md
+      ? items.map((e) => glossaryMarkdownLines(e).join('\n'))
+          .join('\n\n') + '\n'
+      : items.map((e) => `${e.term} · ${truncText(e.gist)}`)
+          .join('\n') + '\n';
+    return { code: 0, out, err: '' };
+  }
+  const q = pos[0];
+  const exact = items.find((e) => e.term === q);
+  const hits = exact ? [exact]
+    : items.filter((e) => e.term.startsWith(q));
+  if (hits.length > 0) {
+    const out = md
+      ? hits.map((e) => glossaryMarkdownLines(e).join('\n'))
+          .join('\n\n') + '\n'
+      : hits.map(glossaryEntryLine).join('\n') + '\n';
+    return { code: 0, out, err: '' };
+  }
+  const near = items.filter((e) =>
+    e.term.toLowerCase().includes(q.toLowerCase()));
+  let err = `bee glossary: no term '${q}' — store ${storePath}` +
+    (fs.existsSync(storePath) ? '' : ' (absent)');
+  err += near.length > 0
+    ? ` — nearest: ${near.map((e) => e.term).join(', ')}`
+    : ' — no near matches';
+  err += ' — bee glossary (bare) lists terms\n';
+  return { code: 1, out: '', err };
+}
+
+function glossaryAdd(args) {
+  const f = flags(args, {
+    see: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+    view: { type: 'string' },
+  }, true);
+  if (f.error) return glossaryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 2 || pos[0] === '' || pos[1] === '') {
+    return glossaryUsageErr(
+      'bee glossary add: expected <term> "<gist>"');
+  }
+  const [term, gist] = pos;
+  const see = f.values.see || '-';
+  for (const v of [term, gist, see]) {
+    if (v.includes('\n') || v.includes(' :: ')) {
+      return glossaryUsageErr('bee glossary: field values must be ' +
+        `single-line and must not contain ' :: '`);
+    }
+  }
+  const guard = glossaryStoreWithoutView(f.values.store, f.values.view);
+  if (guard) return guard;
+  const storePath = glossaryStorePathOf(f.values.store);
+  const viewPath = glossaryViewPathOf(f.values.view);
+  const r = readGlossaryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const dup = r.items.find((e) => e.term === term);
+  if (dup) {
+    return { code: 1, out: '', err:
+      `bee glossary: term '${term}' already exists — supply, ` +
+      'not update\n' +
+      `existing: ${truncText(dup.gist)}\n` +
+      'fix: hand-fix the store line if the gist must change ' +
+      '(there is no edit path)\n' };
+  }
+  const entry = { term, gist, see };
+  const items = [...r.items, entry];
+  if (f.values.check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      glossaryEntryLine(entry) + '\n' +
+      `--check: would regenerate the view ${viewPath}\n`, err: '' };
+  }
+  const w = writeGlossary(storePath, viewPath, items);
+  if (w.err) return { code: 1, out: '', err: w.err };
+  return { code: 0,
+    out: `${term} added · ${truncText(gist)} — bee glossary ${term}\n`,
+    err: '' };
+}
+
+// Parse a hand-written glossary: '- **term** — gist' bullets,
+// wrapped continuation lines join space-joined into the gist
+// until the next bullet; a trailing 'See `<path>`.' sentence
+// moves to the see field. Headings and prose outside bullets are
+// skipped (counted for the report); bullet lines that do not
+// parse land on the hand-fix list with their line number.
+function glossaryConvertParse(text) {
+  const entries = [];
+  const hand = [];
+  const headings = [];
+  let prose = 0;
+  let cur = null;
+  const seen = new Set();
+  const flush = () => {
+    if (cur === null) return;
+    const joined = cur.parts.map((p) => p.trim())
+      .filter((p) => p !== '').join(' ');
+    const sm = /\s*See `([^`]+)`\.$/.exec(joined);
+    let gist = joined;
+    let see = '-';
+    if (sm) {
+      gist = joined.slice(0, sm.index).trim();
+      see = sm[1];
+    }
+    const problems = [];
+    if (gist === '') problems.push('empty gist');
+    if (cur.term.includes(' :: ') || gist.includes(' :: ')) {
+      problems.push("contains ' :: '");
+    }
+    if (seen.has(cur.term)) problems.push('duplicate term');
+    if (problems.length > 0) {
+      hand.push({ line: cur.line, term: cur.term,
+        why: problems.join(', ') });
+    } else {
+      seen.add(cur.term);
+      entries.push({ term: cur.term, gist, see });
+    }
+    cur = null;
+  };
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^#{1,6} /.test(line) || line.trim() === '') {
+      if (/^#{1,6} /.test(line)) headings.push(line.replace(/^#+ /, ''));
+      flush();
+      continue;
+    }
+    if (line.startsWith('- ')) {
+      flush();
+      const m = /^- \*\*(.+?)\*\* — (.*)$/.exec(line);
+      if (!m) {
+        hand.push({ line: i + 1, term: truncText(line, 40),
+          why: "expected '- **term** — gist'" });
+        continue;
+      }
+      cur = { term: m[1], parts: [m[2]], line: i + 1 };
+      continue;
+    }
+    if (cur !== null) {
+      cur.parts.push(line); // continuation of the current bullet
+    } else {
+      prose++; // prose outside bullets — skipped and reported
+    }
+  }
+  flush();
+  return { entries, hand, headings, prose };
+}
+
+function glossaryConvert(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+    view: { type: 'string' },
+  }, true);
+  if (f.error) return glossaryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0] === '') {
+    return glossaryUsageErr('bee glossary convert: expected <md>');
+  }
+  const mdPath = path.resolve(pos[0]);
+  let text;
+  try {
+    text = fs.readFileSync(mdPath, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee glossary convert: cannot read ${mdPath}: ` +
+        `${e.message}\n` };
+  }
+  const guard = glossaryStoreWithoutView(f.values.store, f.values.view);
+  if (guard) return guard;
+  const storePath = glossaryStorePathOf(f.values.store);
+  const viewPath = glossaryViewPathOf(f.values.view);
+  const r = readGlossaryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const parsed = glossaryConvertParse(text);
+  // collisions with the existing store count as duplicates too
+  for (const e of parsed.entries) {
+    if (r.items.some((it) => it.term === e.term)) {
+      parsed.hand.push({ line: '-', term: e.term,
+        why: 'duplicate term (already in the store)' });
+    }
+  }
+  if (parsed.hand.length > 0) {
+    let err = `bee glossary convert: ${parsed.hand.length} hand-fix — ` +
+      `nothing written (store ${storePath}, view ${viewPath})\n`;
+    for (const h of parsed.hand) {
+      err += `hand-fix: ${mdPath}:${h.line} — ${h.why}` +
+        ` — ${truncText(String(h.term), 50)}\n`;
+    }
+    err += 'fix: hand-fix each named line (or the store), then ' +
+      're-run bee glossary convert\n';
+    return { code: 1, out: '', err };
+  }
+  if (parsed.entries.length === 0) {
+    return { code: 1, out: '',
+      err: `bee glossary convert: no '- **term** — gist' bullets ` +
+        `found in ${mdPath} — already converted, or not a ` +
+        'glossary file\n' };
+  }
+  const items = [...r.items, ...parsed.entries];
+  let out = `${parsed.entries.length} terms converted`;
+  if (parsed.headings.length > 0) {
+    out += ` · skipped headings: ${parsed.headings.join(' · ')}`;
+  }
+  if (parsed.prose > 0) {
+    out += ` · skipped prose lines outside bullets: ${parsed.prose}`;
+  }
+  out += `\nstore: ${storePath}\nview: ${viewPath} (regenerated)\n`;
+  if (f.values.check) {
+    return { code: 0, out: '--check: would write — nothing written\n' +
+      out, err: '' };
+  }
+  const w = writeGlossary(storePath, viewPath, items);
+  if (w.err) return { code: 1, out: '', err: w.err };
+  return { code: 0, out, err: '' };
 }
 
 // ---- task (P4 Task 6 — work-item state moves, script-owned) ----

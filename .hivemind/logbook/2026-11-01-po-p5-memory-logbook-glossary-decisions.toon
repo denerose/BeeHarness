@@ -1,0 +1,18 @@
+# decisions — P5 close inventory (plan: 2026-11-01-po-p5-memory-logbook-glossary)
+# one line per decision: id · one-line · source-record-path
+phase: P5
+plan: .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+count: 11
+assembled: 2026-11-02T10:15:23+11:00 by project-orchestrator
+
+D1 · kickoff: supersede role-gated w/ provenance (keeper prunes) · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D2 · kickoff: memory ids per-role ME-<role>-NNN · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D3 · kickoff: --type always explicit · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D4 · kickoff: stamping fail-loud + hand-fix list · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D5 · kickoff: glossary rendered view KEPT, script-owned, concurrent regeneration · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D6 · kickoff: conversions tests-only until phase close · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D7 · kickoff: first compact covers ALL closed phases (P0-P4, P7) · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D8 · kickoff: tidy pass = close-time step on keeper's word · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
+D9 · review-driven: provenance origin stored verbatim as passed (fix round b89feb5) · .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task1-review-r1.md
+D10 · review-driven: live-view fence — GLOSSARY.md is the human view via the real store path, never implicit default of partial overrides (keeper sign-off) · .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task4-review-r1.md
+D11 · sign-off (keeper): fail-loud-first compact + store insertion order kept · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
