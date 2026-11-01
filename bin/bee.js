@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-// bee — BeeHarness CLI stub (P2). `bee report` + `bee init`.
+// bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
+// `bee capture`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
-// (plugin registration). Node >=20, stdlib only.
+// (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI).
+// Node >=20, stdlib only.
 
 import { parseArgs } from 'node:util';
 import fs from 'node:fs';
@@ -19,14 +21,20 @@ function atomicWrite(file, data) {
   fs.renameSync(tmp, file);
 }
 
-const USAGE = `bee ${VERSION} — BeeHarness CLI stub
+const USAGE = `bee ${VERSION} — BeeHarness CLI
 
 usage:
   bee report [--check] [--status <path>] [--report <path>]
   bee init   [--check] [--settings <path>]
+  bee inbox  [list [--for <addressee>] [--full]]
+             | add <addressee> <text> [--origin <role>] [--ref <path>]
+             | show <id> [--full] | done <id> [--note <how>]
+  bee capture "<thought>"
   bee help | version
 
   --check   never write; report what would happen
+
+per-subcommand reference: bee inbox help
 `;
 
 export function run(argv) {
@@ -43,12 +51,19 @@ export function run(argv) {
   if (cmd === 'report') {
     return cmdReport(rest);
   }
+  if (cmd === 'inbox') {
+    return cmdInbox(rest);
+  }
+  if (cmd === 'capture') {
+    return cmdCapture(rest);
+  }
   return { code: 1, out: '', err: `bee: unknown command '${cmd}'\n\n` + USAGE };
 }
 
-function flags(rest, spec) {
+function flags(rest, spec, allowPositionals) {
   try {
-    return parseArgs({ args: rest, options: spec, strict: true });
+    return parseArgs({ args: rest, options: spec, strict: true,
+      allowPositionals: !!allowPositionals });
   } catch (e) {
     return { error: e };
   }
@@ -356,6 +371,363 @@ function cmdReport(rest) {
     out: `bee report: wrote ${reportPath}\n`,
     err: '',
   };
+}
+
+// ---- inbox (P4 — .hivemind/inbox.toon, agent-primary TOON store) ----
+
+const INBOX_HEADER =
+  '# inbox — items waiting on someone (agent store; views render from here)';
+
+const INBOX_FIELDS = ['id', 'addressee', 'origin', 'ref', 'text', 'state',
+  'opened', 'taken', 'done', 'note'];
+
+const INBOX_USAGE = `bee inbox — items waiting on someone (a queue, not a document)
+
+usage:
+  bee inbox list [--for <addressee>] [--full] [--check]
+  bee inbox add <addressee> <text> [--origin <role>] [--ref <path>] [--check]
+  bee inbox show <id> [--full]
+  bee inbox done <id> [--note <how>] [--check]
+  bee capture "<thought>" [--check]
+
+flags:
+  --for <addressee>  filter by addressee; a --for read marks matching
+                     open items taken (no claim command this phase)
+  --origin <role>    provenance on add (default: bee; capture: capture)
+  --ref <path>       optional pointer riding the item (default: -)
+  --note <how>       how it was resolved (recorded on done)
+  --full             all fields, no truncation
+  --check            never write; report what would happen
+  --store <path>     internal: store path (default .hivemind/inbox.toon)
+
+store: TOON — one item per block, blank line between; ids IN-NNN
+(monotonic, never reused); state open → taken → done; list counts
+not-done items as open; ages from ISO opened timestamps.
+`;
+
+const CAPTURE_USAGE = `bee capture "<thought>" — quick thought into the keeper's inbox
+(routing stays conversational; this only records the thought)
+
+usage: bee capture "<thought>" [--check] [--store <path>]
+`;
+
+function inboxUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + INBOX_USAGE };
+}
+
+function storePathOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'inbox.toon');
+}
+
+function isoStampLocal() {
+  const d = new Date();
+  const off = -d.getTimezoneOffset();
+  const sign = off >= 0 ? '+' : '-';
+  const a = Math.abs(off);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
+    '-' + String(d.getDate()).padStart(2, '0') + 'T' +
+    String(d.getHours()).padStart(2, '0') + ':' +
+    String(d.getMinutes()).padStart(2, '0') + ':' +
+    String(d.getSeconds()).padStart(2, '0') + sign +
+    String(Math.floor(a / 60)).padStart(2, '0') + ':' +
+    String(a % 60).padStart(2, '0');
+}
+
+function readInbox(storePath) {
+  let text;
+  try {
+    text = fs.readFileSync(storePath, 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') return { items: [] };
+    return { err: `bee inbox: cannot read ${storePath}: ${e.message}\n` };
+  }
+  const items = [];
+  let cur = null;
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('#')) continue; // header/comment lines
+    if (line.trim() === '') {
+      if (cur !== null) { items.push(cur); cur = null; }
+      continue;
+    }
+    const at = line.indexOf(': ');
+    if (at < 0) {
+      return { err: `bee inbox: cannot parse ${storePath}: ` +
+        `line ${i + 1} is not a field — hand-fix the store, then retry\n` };
+    }
+    cur = cur ?? {};
+    cur[line.slice(0, at)] = line.slice(at + 2);
+  }
+  if (cur !== null) items.push(cur);
+  return { items };
+}
+
+function renderInboxStore(items) {
+  const blocks = items.map((it) => {
+    const known = Object.keys(it).filter((k) => INBOX_FIELDS.includes(k));
+    const extra = Object.keys(it).filter((k) => !INBOX_FIELDS.includes(k));
+    return [...known, ...extra].map((k) => `${k}: ${it[k]}`).join('\n');
+  });
+  return INBOX_HEADER + '\n' + blocks.join('\n\n') + '\n';
+}
+
+function writeInbox(storePath, items) {
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    atomicWrite(storePath, renderInboxStore(items));
+    return null;
+  } catch (e) {
+    return `bee inbox: cannot write ${storePath}: ${e.message}\n`;
+  }
+}
+
+function nextInboxId(items) {
+  let max = 0;
+  for (const it of items) {
+    const m = /^IN-(\d+)$/.exec(it.id || '');
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return 'IN-' + String(max + 1).padStart(3, '0');
+}
+
+function ageOf(iso) {
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return '?';
+  const s = Math.max(0, Math.floor((Date.now() - t) / 1000));
+  if (s < 60) return s + 's';
+  const m = Math.floor(s / 60);
+  if (m < 60) return m + 'm';
+  const h = Math.floor(m / 60);
+  if (h < 24) return h + 'h';
+  return Math.floor(h / 24) + 'd';
+}
+
+function truncText(s, cols = 60) {
+  return s.length <= cols ? s
+    : s.slice(0, cols) + `… (+${s.length - cols} chars)`;
+}
+
+function cmdInbox(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'list' || sub.startsWith('--')) {
+    return inboxList(sub === 'list' ? rest.slice(1) : rest);
+  }
+  if (sub === 'add') return inboxAdd(rest.slice(1));
+  if (sub === 'show') return inboxShow(rest.slice(1));
+  if (sub === 'done') return inboxDone(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: INBOX_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee inbox: unknown subcommand '${sub}'\n\n` + INBOX_USAGE };
+}
+
+function inboxAddItem({ storePath, addressee, text, origin, ref, check,
+  verb }) {
+  for (const v of [addressee, text, origin, ref]) {
+    if (v !== undefined && v.includes('\n')) {
+      return { code: 1, out: '',
+        err: 'bee inbox: field values must be single-line\n' };
+    }
+  }
+  const r = readInbox(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const id = nextInboxId(r.items);
+  const item = {
+    id,
+    addressee,
+    origin: origin || 'bee',
+    ref: ref || '-',
+    text,
+    state: 'open',
+    opened: isoStampLocal(),
+    taken: '-',
+    done: '-',
+  };
+  if (check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      renderInboxStore([item]).replace(INBOX_HEADER + '\n', ''), err: '' };
+  }
+  const w = writeInbox(storePath, [...r.items, item]);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0, out: `${id} ${verb} · ${addressee} — bee inbox show ${id}\n`,
+    err: '' };
+}
+
+function inboxAdd(args) {
+  const f = flags(args, {
+    origin: { type: 'string' },
+    ref: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return inboxUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 2) {
+    return inboxUsageErr('bee inbox add: expected <addressee> <text>');
+  }
+  const [addressee, text] = pos;
+  if (addressee === '' || text === '') {
+    return inboxUsageErr(
+      'bee inbox add: <addressee> and <text> must not be empty');
+  }
+  return inboxAddItem({
+    storePath: storePathOf(f.values.store),
+    addressee,
+    text,
+    origin: f.values.origin,
+    ref: f.values.ref,
+    check: f.values.check,
+    verb: 'added',
+  });
+}
+
+function inboxList(args) {
+  const f = flags(args, {
+    for: { type: 'string' },
+    full: { type: 'boolean' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return inboxUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return inboxUsageErr(
+      `bee inbox list: unexpected argument '${f.positionals[0]}'`);
+  }
+  const storePath = storePathOf(f.values.store);
+  const r = readInbox(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const items = r.items;
+  const isFor = f.values.for !== undefined;
+  const toStamp = isFor
+    ? items.filter((it) => it.state === 'open' &&
+        it.addressee === f.values.for)
+    : [];
+  const view = items.filter((it) => it.state !== 'done' &&
+    (!isFor || it.addressee === f.values.for));
+  if (view.length === 0) {
+    const hint = isFor && items.some((it) => it.state !== 'done')
+      ? '0 items — bee inbox list\n'
+      : '0 items\nadd one: bee inbox add <addressee> "<text>"\n';
+    return { code: 0, out: hint, err: '' };
+  }
+  const oldest = view.reduce((a, b) =>
+    Date.parse(a.opened) <= Date.parse(b.opened) ? a : b);
+  let out = `${view.length} open · oldest ${ageOf(oldest.opened)}\n`;
+  if (toStamp.length > 0) {
+    out += (f.values.check ? '--check: would mark taken: '
+      : 'marked taken: ') + toStamp.map((i) => i.id).join(', ') + '\n';
+  }
+  for (const it of view) {
+    if (f.values.full) {
+      out += `${it.id} · ${it.addressee} · ${it.state} · ` +
+        `${ageOf(it.opened)} · ${it.text}\n` +
+        `  origin: ${it.origin} · ref: ${it.ref} · ` +
+        `opened: ${it.opened} · taken: ${it.taken} · done: ${it.done}` +
+        (it.note !== undefined ? ` · note: ${it.note}` : '') + '\n';
+    } else {
+      out += `${it.id} · ${it.addressee} · ${ageOf(it.opened)} · ` +
+        `${truncText(it.text)}\n`;
+    }
+  }
+  if (toStamp.length > 0 && !f.values.check) {
+    for (const it of toStamp) {
+      it.state = 'taken';
+      it.taken = isoStampLocal();
+    }
+    const w = writeInbox(storePath, items);
+    if (w) return { code: 1, out: '', err: w };
+  }
+  return { code: 0, out, err: '' };
+}
+
+function inboxShow(args) {
+  const f = flags(args, {
+    full: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return inboxUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return inboxUsageErr('bee inbox show: expected <id>');
+  }
+  const r = readInbox(storePathOf(f.values.store));
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const it = r.items.find((i) => i.id === pos[0]);
+  if (!it) {
+    return { code: 1, out: '',
+      err: `bee inbox: no item ${pos[0]} — bee inbox list\n` };
+  }
+  let out = `${it.id} · ${it.addressee} · ${it.state} · ${ageOf(it.opened)}\n` +
+    `text: ${it.text}\n`;
+  if (f.values.full) {
+    out += `origin: ${it.origin}\nref: ${it.ref}\n` +
+      `opened: ${it.opened}\ntaken: ${it.taken}\ndone: ${it.done}\n`;
+    if (it.note !== undefined) out += `note: ${it.note}\n`;
+  }
+  return { code: 0, out, err: '' };
+}
+
+function inboxDone(args) {
+  const f = flags(args, {
+    note: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return inboxUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return inboxUsageErr('bee inbox done: expected <id>');
+  }
+  const storePath = storePathOf(f.values.store);
+  const r = readInbox(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const it = r.items.find((i) => i.id === pos[0]);
+  if (!it) {
+    return { code: 1, out: '',
+      err: `bee inbox: no item ${pos[0]} — bee inbox list\n` };
+  }
+  if (it.state === 'done') {
+    return { code: 0, out: `${it.id} already done\n`, err: '' };
+  }
+  it.state = 'done';
+  it.done = isoStampLocal();
+  if (f.values.note !== undefined) it.note = f.values.note;
+  if (f.values.check) {
+    return { code: 0, out: `--check: would mark ${it.id} done` +
+      (f.values.note !== undefined ? ` (note: ${f.values.note})` : '') +
+      '\n', err: '' };
+  }
+  const w = writeInbox(storePath, r.items);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0, out: `${it.id} done\n`, err: '' };
+}
+
+function cmdCapture(rest) {
+  const f = flags(rest, {
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) {
+    const msg = f.error.message ? f.error.message
+      : String(f.error).replace(/^Error: /, '');
+    return { code: 1, out: '', err: msg + '\n\n' + CAPTURE_USAGE };
+  }
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0] === '') {
+    return { code: 1, out: '',
+      err: 'bee capture: expected "<thought>"\n\n' + CAPTURE_USAGE };
+  }
+  return inboxAddItem({
+    storePath: storePathOf(f.values.store),
+    addressee: 'keeper',
+    text: pos[0],
+    origin: 'capture',
+    check: f.values.check,
+    verb: 'captured',
+  });
 }
 
 if (process.argv[1] &&
