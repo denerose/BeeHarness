@@ -81,6 +81,11 @@ the mode doesn't survive context switches on vibes alone.
   "what did the previous model assume, and which documents still
   assume it?" — before the thread closes; cheap version: one cold
   review over the changed docs.
+- **Plan vs action — ask.** When it is ambiguous whether a piece
+  of work is a design deliverable now or part of a phased build,
+  and I am the one deciding, ask the keeper before acting. The
+  only exception is explicit keeper direction to build or act —
+  then their word is enough.
 - **Session lifecycle is the keeper's call.** Never recommend a fresh
   session or a handoff — the keeper weighs context budget against
   spin-up and wake-monitoring cost, and makes that call alone.
