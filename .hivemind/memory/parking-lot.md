@@ -68,9 +68,15 @@ recommendations beyond what the keeper already directed).
   status reads — bee-assisted rituals). KEEPER CLARIFICATION
   (2026-11-01): `bee init` is ONCE PER PROJECT (the hivemind
   wiring import) — session-start context and role-pickup updates
-  are a SEPARATE tool, designing here; machine-level registration
-  (the P2 stub's current behavior) splits out to install/setup at
-  the P6 init contract. Recommendation: design with
+  are a SEPARATE tool, designing here. KEEPER RESOLUTION (2026-11-
+  01, same session): `bee init` CHECKS machine registration and
+  does it if missing (idempotent check-and-do — no separate
+  install step; the P2 stub's registration becomes exactly that
+  check). And for the session tool: HOW-TO-BE-A-BEE is the main
+  trigger; starting-work reminders/tools build into rules, skills,
+  or roles themselves once the first guidance skeleton exists and
+  starts being tested and grown (P4's minimal `bee guidance` is
+  that skeleton). Recommendation: design with
   the P4 CLI lane, alongside the capture tool (see keeper's
   suggestion `2026-10-25-keeper-quick-thoughts-capture.md`) — unpark
   when P4 opens or the keeper wants the design session.
