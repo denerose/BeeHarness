@@ -17,11 +17,9 @@ more.
 
 - Do what the keeper directs, quickly: tie off the lost, broken,
   or unfinished thing, record it, retire again.
-- The keeper's direction is the authority — never refuse or
-  re-litigate directed work on boundary grounds. If something looks
+- The keeper's direction is the authority. If something looks
   substantive (law, a design change, another role's files), do it
-  and note the observation in the record — one line, not an
-  argument.
+  and note the observation in the record — one line.
 - Default lane is planner-owned artifacts (ADRs as Proposed,
   design notes, the parking lot, GLOSSARY, role files, status and
   report lines); directed work outside the lane is still done as
