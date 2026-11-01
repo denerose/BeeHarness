@@ -1,4 +1,4 @@
-# Glossary store + `bee define` — design note
+# Glossary store + `bee glossary` — design note
 
 <!-- machine
 status: live
@@ -15,8 +15,9 @@ conversation, 2026-11-01, with the GLOSSARY slimming.
 
 The glossary is agent-looked-up vocabulary, but it lives as prose
 markdown — regex-fragile for tools, and welcoming to creeping law
-(twice now). A future `bee define <term>` needs a script-navigable
-source, and the shipped template glossary (P8) needs the same shape.
+(twice now). A vocabulary-lookup command needs a script-navigable
+source, and the shipped template glossary (P8) needs the same
+shape.
 
 ## The design
 
@@ -34,17 +35,23 @@ glossary). One line per term:
   anti-bloat gate — the same discipline the 2026-11-01 slimming
   enforced by hand.
 
-**Command — `bee define`** (AXI-bound, like every `bee` command):
+**Command — `bee glossary`** (AXI-bound; noun-grammar like every
+`bee` command — keeper ruling 2026-11-01: `glossary` over `define`):
 
-- `bee define <term>` — exact match, then prefix match; TOON output.
-- bare `bee define` — lists terms (content-first).
+- `bee glossary <term>` — exact match, then prefix match; TOON
+  output.
+- bare `bee glossary` — lists terms (content-first).
 - unknown term — structured error with nearest matches, exit 1,
   fail loud.
+- `bee glossary add <term> "<gist>" [--see <path>]` — CLI-mediated
+  write per the standing write model (script stamps; agent
+  supplies text).
 - `--markdown` — renders a human-readable view on demand.
-- Read-only, idempotent, no prompts.
+- Read-mostly: add/supersede is the whole write path — supply, not
+  update; no state machine, nothing compacts.
 
-**Conversion** — scripted one-shot at the build phase (P6), same
-pattern as parking-lot.toon at P4: no hand conversion ahead of
+**Conversion** — scripted one-shot at P5 (with the other stores),
+same pattern as parking-lot.toon at P4: no hand conversion ahead of
 tools. The markdown file retires at conversion; views render on
 demand thereafter.
 
@@ -55,11 +62,12 @@ are judgment.
 ## Open questions
 
 None blocking. (Whether the rendered markdown view is ever
-committed anywhere, or purely on-demand, settles in use at P6.)
+committed anywhere, or purely on-demand, settles in use at P5.)
 
 ## Feeds
 
-P6 (`bee define` + the conversion; init seeds consumer stores in
-the same format); P8 item 4 (template glossary distills from the
-store, ships the same format); PL-PP-003 (the queryable-vocabulary
-half of help surfaces).
+P5 (the command + the conversion — the stores phase; keeper ruling
+2026-11-01: glossary tooling rides with memory/logbook); P6 (init
+seeds consumer stores in the same format); P8 item 4 (template
+glossary distills from the store, ships the same format);
+PL-PP-003 (the queryable-vocabulary half of help surfaces).
