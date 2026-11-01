@@ -362,7 +362,7 @@ them)
 **Provides:** `bee design new|pick-up|implement|status` — ADR-016's
 transitions as CLI
 
-- [ ] Thin CLI wrappers in `bin/bee.js` over `scripts/design.sh`
+- [x] Thin CLI wrappers in `bin/bee.js` over `scripts/design.sh`
   (the script stays the mechanical core — determinism split; the
   CLI adds `bee design new "<title>"` = copy
   `.hivemind/designs/TEMPLATE.md` to
@@ -370,14 +370,22 @@ transitions as CLI
   refusing to overwrite). Machine blocks remain script-only
   territory — the CLI never edits them directly, only via the
   script.
-- [ ] AXI compliance tests: `bee design status` lists with state
+- [x] AXI compliance tests: `bee design status` lists with state
   + drift flags (definitive empty state over an empty temp dir);
   `new` refuses existing path; unknown flag exits 1; mutations
   `--check`.
-- [ ] Verify: `bee design status` flags nothing on a clean clone of
+- [x] Verify: `bee design status` flags nothing on a clean clone of
   this repo (the P4 design shows `picked-up · phase 4`); full
   suite green.
-- [ ] Commit: `add bee design CLI over design.sh core`
+- [x] Commit: `add bee design CLI over design.sh core`
+**Task notes (loop, 2026-11-01):** done — verify r1 PASS, review r1
+FIX-FIRST (0🔴 2🟡: title $-sequence corruption; new-vs-core root
+divergence), fix round applied near-verbatim with probe-replicating
+regression tests, re-review waived per the standing rule. Deviations
+accepted: spawnSync delegation with TOON pass-through; BEE_DESIGN_PROG
+seam (script messages name the bee design surface); `new` node-side
+(template copy, machine block verbatim). Design's own dogfood step
+(bee design implement at close) rides Task 9/10.
 
 ## Task 5: plan-header check contract + `bee verify`
 
