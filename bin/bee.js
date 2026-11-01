@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
 // `bee capture`, `bee park`, `bee memory`, `bee design`, `bee verify`,
-// `bee logbook`, `bee task`, `bee guidance`, `bee phase`.
+// `bee logbook`, `bee glossary`, `bee task`, `bee guidance`, `bee phase`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -50,6 +50,9 @@ usage:
   bee logbook [index [--logbook <dir>]]
              | stamp [--logbook <dir>]
              | compact <phase> [--logbook <dir>]
+  bee glossary [<term>] [--markdown]
+               | add <term> "<gist>" [--see <path>]
+               | convert <md>
   bee verify --plan <path> [--task <n>] [--base <ref>] [--record] [--check]
   bee task   show <plan-path> [--full]
              | move <plan-path> <task-n> <state>
@@ -96,6 +99,9 @@ export function run(argv) {
   }
   if (cmd === 'logbook') {
     return cmdLogbook(rest);
+  }
+  if (cmd === 'glossary') {
+    return cmdGlossary(rest);
   }
   if (cmd === 'verify') {
     return cmdVerify(rest);
@@ -2964,6 +2970,424 @@ function logbookCompact(args) {
       c.name + '\n';
   }
   for (const a of already) out += `already compacted: ${a}\n`;
+  return { code: 0, out, err: '' };
+}
+
+// ---- glossary (P5 Task 4 — .hivemind/glossary.toon) ----
+// Shared vocabulary, one line per term (line-based TOON like
+// memory): term :: gist :: see. Supply, never update — no edit
+// path; a conflicting gist resolves by hand on the spot (D4
+// spirit), not by CLI. Every store write regenerates the rendered
+// markdown view (D5: the view is KEPT, script-owned, concurrent
+// with the write); read-only lookups never touch it.
+
+const GLOSSARY_HEADER =
+  '# glossary — shared vocabulary (term :: gist :: see; supply, never update)';
+
+const GLOSSARY_VIEW_MARKER = '<!-- glossary view — script-owned: ' +
+  'bee glossary regenerates this file on every store write; ' +
+  'hand edits are overwritten -->';
+
+const GLOSSARY_USAGE = `bee glossary — shared vocabulary (a store, not a document)
+
+usage:
+  bee glossary [<term>] [--markdown]
+  bee glossary add <term> "<gist>" [--see <path>] [--check]
+  bee glossary convert <md> [--check]
+
+commands:
+  [<term>]          lookup: exact match prints the entry; else a
+                    unique prefix match prints it; multiple prefix
+                    matches print all (exit 0); zero exit 1 with
+                    nearest matches (substring hits). Bare
+                    'bee glossary' lists terms (content first).
+  add …             supply a new term; fails loud when the term
+                    already exists — supply, not update (no edit
+                    path; hand-fix the store line if a gist changes)
+  convert <md>      one-shot conversion of a hand-written glossary
+                    (the '- **term** — gist' bullet shape): wrapped
+                    continuation lines join space-joined into the
+                    single-line gist; a trailing 'See \`<path>\`.'
+                    sentence moves to the see field; gists ride
+                    as-is (conversion never editorializes).
+                    Headings and prose outside bullets are skipped
+                    and reported. Duplicate terms and unparseable
+                    bullet lines land on the hand-fix list (exit 1,
+                    nothing written). Tests-only until phase close
+                    (D6).
+
+flags:
+  --markdown        lookup/list output as markdown lines
+                    ('**term** — gist' + indented see: pointer)
+                    instead of TOON — on demand; the committed view
+                    file is a separate, script-owned artifact
+  --see <path>      add: pointer to the term's law (default: -)
+  --check           mutations (add/convert): never write; report
+                    what would happen
+  --store <path>    internal: store path
+                    (default .hivemind/glossary.toon)
+  --view <path>     internal: rendered-view path
+                    (default skills/GLOSSARY.md when it exists,
+                    else GLOSSARY.md at the repo root)
+
+store: TOON — one term per line, ' :: ' separated:
+term :: gist :: see. Every store write regenerates the view
+atomically (D5): marker line, then '**term** — gist' lines with
+indented 'see: <path>' pointers, alphabetical. Read-only
+lookups never touch the view.`;
+
+function glossaryUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + GLOSSARY_USAGE };
+}
+
+function glossaryStorePathOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'glossary.toon');
+}
+
+function glossaryViewPathOf(p) {
+  if (p) return path.resolve(p);
+  const skills = path.join(REPO_ROOT, 'skills', 'GLOSSARY.md');
+  return fs.existsSync(skills) ? skills
+    : path.join(REPO_ROOT, 'GLOSSARY.md');
+}
+
+// A --store override without --view would regenerate the
+// repo-default view (the live skills/GLOSSARY.md) from the
+// overridden store — fail loud instead. Write paths only
+// (add/convert); lookups never resolve the view.
+function glossaryStoreWithoutView(storeArg, viewArg) {
+  if (storeArg && !viewArg) return { code: 1, out: '',
+    err: 'bee glossary: --store given without --view — pass ' +
+      '--view too, or drop both\n' };
+  return null;
+}
+
+function readGlossaryStore(storePath) {
+  let text;
+  try {
+    text = fs.readFileSync(storePath, 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') return { items: [] };
+    return { err: `bee glossary: cannot read ${storePath}: ${e.message}\n` };
+  }
+  const items = [];
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('#') || line.trim() === '') continue;
+    const parts = line.split(' :: ');
+    if (parts.length !== 3 || parts.some((p) => p === '')) {
+      return { err: `bee glossary: cannot parse ${storePath}: ` +
+        `line ${i + 1} is not an entry — hand-fix the store, ` +
+        'then retry\n' };
+    }
+    items.push({ term: parts[0], gist: parts[1], see: parts[2] });
+  }
+  return { items };
+}
+
+function glossaryEntryLine(e) {
+  return [e.term, e.gist, e.see ?? '-'].join(' :: ');
+}
+
+function renderGlossaryStore(items) {
+  return GLOSSARY_HEADER + '\n' +
+    items.map(glossaryEntryLine).join('\n') + '\n';
+}
+
+// One rendered entry: '**term** — gist' plus an indented see:
+// pointer when one exists (markdown lines, also the --markdown
+// output shape).
+function glossaryMarkdownLines(e) {
+  const lines = [`**${e.term}** — ${e.gist}`];
+  if (e.see && e.see !== '-') lines.push(`  see: \`${e.see}\``);
+  return lines;
+}
+
+function glossaryTermCmp(a, b) {
+  return a.term.toLowerCase() < b.term.toLowerCase() ? -1
+    : a.term.toLowerCase() > b.term.toLowerCase() ? 1 : 0;
+}
+
+function glossaryViewText(items) {
+  const sorted = [...items].sort(glossaryTermCmp);
+  return GLOSSARY_VIEW_MARKER + '\n\n' +
+    sorted.map((e) => glossaryMarkdownLines(e).join('\n'))
+      .join('\n\n') + '\n';
+}
+
+// Store write + concurrent view regeneration (D5). The store
+// lands first; a view failure is reported with the partial state
+// named (never silent).
+function writeGlossary(storePath, viewPath, items) {
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    atomicWrite(storePath, renderGlossaryStore(items));
+  } catch (e) {
+    return { err: `bee glossary: cannot write ${storePath}: ` +
+      `${e.message}\n` };
+  }
+  try {
+    fs.mkdirSync(path.dirname(viewPath), { recursive: true });
+    atomicWrite(viewPath, glossaryViewText(items));
+  } catch (e) {
+    return { err: `bee glossary: store written (${storePath}) but ` +
+      `cannot write the view ${viewPath}: ${e.message}\n` };
+  }
+  return {};
+}
+
+function cmdGlossary(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub.startsWith('--')) {
+    return glossaryLookup(rest);
+  }
+  if (sub === 'add') return glossaryAdd(rest.slice(1));
+  if (sub === 'convert') return glossaryConvert(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: GLOSSARY_USAGE, err: '' };
+  // no named subcommands beyond add/convert/help — a positional
+  // is a term (the [<term>] grammar), so anything else is a lookup
+  return glossaryLookup(rest);
+}
+
+function glossaryLookup(args) {
+  const f = flags(args, {
+    markdown: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return glossaryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length > 1) {
+    return glossaryUsageErr(
+      `bee glossary: unexpected argument '${pos[1]}'`);
+  }
+  const storePath = glossaryStorePathOf(f.values.store);
+  const r = readGlossaryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const items = r.items;
+  const md = f.values.markdown;
+  if (pos.length === 0) {
+    if (items.length === 0) {
+      return { code: 0, out: '0 terms\n' +
+        'add one: bee glossary add <term> "<gist>"\n', err: '' };
+    }
+    let out = `${items.length} terms\n`;
+    out += md
+      ? items.map((e) => glossaryMarkdownLines(e).join('\n'))
+          .join('\n\n') + '\n'
+      : items.map((e) => `${e.term} · ${truncText(e.gist)}`)
+          .join('\n') + '\n';
+    return { code: 0, out, err: '' };
+  }
+  const q = pos[0];
+  const exact = items.find((e) => e.term === q);
+  const hits = exact ? [exact]
+    : items.filter((e) => e.term.startsWith(q));
+  if (hits.length > 0) {
+    const out = md
+      ? hits.map((e) => glossaryMarkdownLines(e).join('\n'))
+          .join('\n\n') + '\n'
+      : hits.map(glossaryEntryLine).join('\n') + '\n';
+    return { code: 0, out, err: '' };
+  }
+  const near = items.filter((e) =>
+    e.term.toLowerCase().includes(q.toLowerCase()));
+  let err = `bee glossary: no term '${q}' — store ${storePath}` +
+    (fs.existsSync(storePath) ? '' : ' (absent)');
+  err += near.length > 0
+    ? ` — nearest: ${near.map((e) => e.term).join(', ')}`
+    : ' — no near matches';
+  err += ' — bee glossary (bare) lists terms\n';
+  return { code: 1, out: '', err };
+}
+
+function glossaryAdd(args) {
+  const f = flags(args, {
+    see: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+    view: { type: 'string' },
+  }, true);
+  if (f.error) return glossaryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 2 || pos[0] === '' || pos[1] === '') {
+    return glossaryUsageErr(
+      'bee glossary add: expected <term> "<gist>"');
+  }
+  const [term, gist] = pos;
+  const see = f.values.see || '-';
+  for (const v of [term, gist, see]) {
+    if (v.includes('\n') || v.includes(' :: ')) {
+      return glossaryUsageErr('bee glossary: field values must be ' +
+        `single-line and must not contain ' :: '`);
+    }
+  }
+  const guard = glossaryStoreWithoutView(f.values.store, f.values.view);
+  if (guard) return guard;
+  const storePath = glossaryStorePathOf(f.values.store);
+  const viewPath = glossaryViewPathOf(f.values.view);
+  const r = readGlossaryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const dup = r.items.find((e) => e.term === term);
+  if (dup) {
+    return { code: 1, out: '', err:
+      `bee glossary: term '${term}' already exists — supply, ` +
+      'not update\n' +
+      `existing: ${truncText(dup.gist)}\n` +
+      'fix: hand-fix the store line if the gist must change ' +
+      '(there is no edit path)\n' };
+  }
+  const entry = { term, gist, see };
+  const items = [...r.items, entry];
+  if (f.values.check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      glossaryEntryLine(entry) + '\n' +
+      `--check: would regenerate the view ${viewPath}\n`, err: '' };
+  }
+  const w = writeGlossary(storePath, viewPath, items);
+  if (w.err) return { code: 1, out: '', err: w.err };
+  return { code: 0,
+    out: `${term} added · ${truncText(gist)} — bee glossary ${term}\n`,
+    err: '' };
+}
+
+// Parse a hand-written glossary: '- **term** — gist' bullets,
+// wrapped continuation lines join space-joined into the gist
+// until the next bullet; a trailing 'See `<path>`.' sentence
+// moves to the see field. Headings and prose outside bullets are
+// skipped (counted for the report); bullet lines that do not
+// parse land on the hand-fix list with their line number.
+function glossaryConvertParse(text) {
+  const entries = [];
+  const hand = [];
+  const headings = [];
+  let prose = 0;
+  let cur = null;
+  const seen = new Set();
+  const flush = () => {
+    if (cur === null) return;
+    const joined = cur.parts.map((p) => p.trim())
+      .filter((p) => p !== '').join(' ');
+    const sm = /\s*See `([^`]+)`\.$/.exec(joined);
+    let gist = joined;
+    let see = '-';
+    if (sm) {
+      gist = joined.slice(0, sm.index).trim();
+      see = sm[1];
+    }
+    const problems = [];
+    if (gist === '') problems.push('empty gist');
+    if (cur.term.includes(' :: ') || gist.includes(' :: ')) {
+      problems.push("contains ' :: '");
+    }
+    if (seen.has(cur.term)) problems.push('duplicate term');
+    if (problems.length > 0) {
+      hand.push({ line: cur.line, term: cur.term,
+        why: problems.join(', ') });
+    } else {
+      seen.add(cur.term);
+      entries.push({ term: cur.term, gist, see });
+    }
+    cur = null;
+  };
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^#{1,6} /.test(line) || line.trim() === '') {
+      if (/^#{1,6} /.test(line)) headings.push(line.replace(/^#+ /, ''));
+      flush();
+      continue;
+    }
+    if (line.startsWith('- ')) {
+      flush();
+      const m = /^- \*\*(.+?)\*\* — (.*)$/.exec(line);
+      if (!m) {
+        hand.push({ line: i + 1, term: truncText(line, 40),
+          why: "expected '- **term** — gist'" });
+        continue;
+      }
+      cur = { term: m[1], parts: [m[2]], line: i + 1 };
+      continue;
+    }
+    if (cur !== null) {
+      cur.parts.push(line); // continuation of the current bullet
+    } else {
+      prose++; // prose outside bullets — skipped and reported
+    }
+  }
+  flush();
+  return { entries, hand, headings, prose };
+}
+
+function glossaryConvert(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+    view: { type: 'string' },
+  }, true);
+  if (f.error) return glossaryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0] === '') {
+    return glossaryUsageErr('bee glossary convert: expected <md>');
+  }
+  const mdPath = path.resolve(pos[0]);
+  let text;
+  try {
+    text = fs.readFileSync(mdPath, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee glossary convert: cannot read ${mdPath}: ` +
+        `${e.message}\n` };
+  }
+  const guard = glossaryStoreWithoutView(f.values.store, f.values.view);
+  if (guard) return guard;
+  const storePath = glossaryStorePathOf(f.values.store);
+  const viewPath = glossaryViewPathOf(f.values.view);
+  const r = readGlossaryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const parsed = glossaryConvertParse(text);
+  // collisions with the existing store count as duplicates too
+  for (const e of parsed.entries) {
+    if (r.items.some((it) => it.term === e.term)) {
+      parsed.hand.push({ line: '-', term: e.term,
+        why: 'duplicate term (already in the store)' });
+    }
+  }
+  if (parsed.hand.length > 0) {
+    let err = `bee glossary convert: ${parsed.hand.length} hand-fix — ` +
+      `nothing written (store ${storePath}, view ${viewPath})\n`;
+    for (const h of parsed.hand) {
+      err += `hand-fix: ${mdPath}:${h.line} — ${h.why}` +
+        ` — ${truncText(String(h.term), 50)}\n`;
+    }
+    err += 'fix: hand-fix each named line (or the store), then ' +
+      're-run bee glossary convert\n';
+    return { code: 1, out: '', err };
+  }
+  if (parsed.entries.length === 0) {
+    return { code: 1, out: '',
+      err: `bee glossary convert: no '- **term** — gist' bullets ` +
+        `found in ${mdPath} — already converted, or not a ` +
+        'glossary file\n' };
+  }
+  const items = [...r.items, ...parsed.entries];
+  let out = `${parsed.entries.length} terms converted`;
+  if (parsed.headings.length > 0) {
+    out += ` · skipped headings: ${parsed.headings.join(' · ')}`;
+  }
+  if (parsed.prose > 0) {
+    out += ` · skipped prose lines outside bullets: ${parsed.prose}`;
+  }
+  out += `\nstore: ${storePath}\nview: ${viewPath} (regenerated)\n`;
+  if (f.values.check) {
+    return { code: 0, out: '--check: would write — nothing written\n' +
+      out, err: '' };
+  }
+  const w = writeGlossary(storePath, viewPath, items);
+  if (w.err) return { code: 1, out: '', err: w.err };
   return { code: 0, out, err: '' };
 }
 
