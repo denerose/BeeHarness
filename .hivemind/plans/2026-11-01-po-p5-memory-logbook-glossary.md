@@ -1,7 +1,7 @@
 # Plan: P5 — memory system + logbook hygiene + glossary store
 
 **Date:** 2026-11-01
-**Design docs:** `.hivemind/designs/2026-11-01-pp-p5-memory-and-logbook.md` @ 6dc0392 · `.hivemind/designs/2026-11-01-pp-glossary-store.md` @ 6dc0392 — all eight kickoff decisions keeper-ruled one-by-one, 2026-11-01: D1 supersede role-gated w/ provenance · D2 memory ids per-role `ME-<role>-NNN` · D3 `--type` always explicit · D4 stamping fail-loud + hand-fix list · D5 glossary rendered view KEPT, script-owned, regenerated concurrently on every write · D6 conversions tests-only until phase close · D7 first compact covers all closed phases · D8 tidy pass = close-time step on the keeper's word (NOT a plan task)
+**Design docs:** `.hivemind/designs/2026-11-01-pp-p5-memory-and-logbook.md` @ 6dc0392 · `.hivemind/designs/2026-11-01-pp-glossary-store.md` @ 6dc0392 — all eight kickoff decisions keeper-ruled one-by-one, 2026-11-01: D1 supersede role-gated w/ provenance · D2 memory ids per-role `ME-<role>-NNN` · D3 `--type` always explicit · D4 stamping fail-loud + hand-fix list · D5 glossary rendered view KEPT, script-owned, regenerated concurrently on every write · D6 conversions tests-only until phase close · D7 first compact covers all closed phases · D8 tidy pass = close-time step on the keeper's word (NOT a plan task). D4's durable record: this header until the p5 design addendum's rectification records it — relayed to PP.
 **Validation level:** phase (store-ownership changes — GLOSSARY.md becomes script-owned; keeper sign-off at phase end; matches P4 precedent)
 **Detail:** mixed — verbatim contracts for store formats, command grammars, and the header/compaction rules (the interfaces tasks and the gate verify); lean for implementation code (each task names exact files, grammar, behavior, test list; implementer works in-repo with `bin/bee.js` house patterns — four command families `cmdInbox`/`cmdPark`/`cmdDesign`/`cmdVerify` are the patterns to follow)
 **Reviewed:** PENDING
@@ -51,15 +51,15 @@ suite: node --test tests/*.test.mjs
 
 ## Shared contract: command grammar (USAGE additions)
 
-One verbatim block, three stanzas — each task adds its stanza to the top-level `USAGE` string in `bin/bee.js` exactly as written here (Task 1: memory · Tasks 2/3: logbook · Task 4: glossary):
+One verbatim block, three stanzas — each task adds its stanza to the top-level `USAGE` string in `bin/bee.js` exactly as written here (Task 1: memory · Tasks 2/3: logbook · Task 4: glossary; bare `bee logbook` = `index`, content-first):
 
 ```text path=bin/bee.js
 bee memory [list [--type lesson|fact] [--full]]
            | add "<gist>" --type lesson|fact [--ref <path>] [--origin <role>]
            | show <id> [--full]
            | supersede <id> "<gist>" --type lesson|fact [--ref <path>] [--origin <role>]
-bee logbook [stamp [--logbook <dir>]]
-           | index [--logbook <dir>]
+bee logbook [index [--logbook <dir>]]
+           | stamp [--logbook <dir>]
            | compact <phase> [--logbook <dir>]
 bee glossary [<term>] [--markdown]
              | add <term> "<gist>" [--see <path>]
@@ -73,7 +73,7 @@ bee glossary [<term>] [--markdown]
 **Provides:** store `.hivemind/memory/memory.toon` (line format below); command `bee memory add|list|show|supersede`; shared helper `originTag(role)` (generalized from `parkOriginTag`, used by park `PL-<tag>-NNN` and memory `ME-<tag>-NNN`)
 
 - [ ] Step: generalize `parkOriginTag` → `originTag` (same body: hyphenated names map to word-initial tags, `power-planner` → `PP`; short codes pass through). Park's behavior is unchanged — existing park tests must stay green.
-- [ ] Step: implement the store + command per the contracts below (grammar: the `bee memory` stanza of the shared USAGE block at the top of this plan, verbatim). Absent store: `list` reports `0 entries` (exit 0); `show` fails loud with the store path. Write commands take `--check` and never write without it. Newline guard on gist/ref (house rule). Fail loud on superseding an already-superseded id or an unknown id.
+- [ ] Step: implement the store + command per the contracts below (grammar: the `bee memory` stanza of the shared USAGE block at the top of this plan, verbatim). Absent store: `list` reports `0 entries` (exit 0); `show` fails loud with the store path. Write commands accept `--check` (preview; never writes — house semantics). Newline guard on gist/ref (house rule). Fail loud on superseding an already-superseded id or an unknown id.
 - [ ] Step: supersede semantics: new entry gets a fresh id in the CALLING role's series (per `--origin`), `--type` explicit (D3), provenance stamped; the OLD entry's state rewrites to `superseded:<new-id>` in place (atomic write, whole store). Role-gated per D1: any origin may run it; the CLI stamps provenance and that is the audit trail — no extra gate.
 - [ ] Step: tests — mirror `tests/bee-park.test.mjs` structure (tmp store via `--store`): default bare series; per-role series via full and short origin; explicit `--type` required (omitting exits 1); field order + zero-padded ids; series continuation from seeded store; supersede rewrites state and mints successor; double-supersede fails; `--check` writes nothing; unknown id fails loud.
 - [ ] Step: run `node --test tests/bee-memory.test.mjs` — all pass.
@@ -99,24 +99,24 @@ Usage grammar: the `bee memory` stanza of the shared USAGE block (top of this pl
 **Depends on:** nothing (independent of Task 1)
 **Provides:** machine headers on every new verify entry (`task:` + `links:` added to the existing block); `bee logbook stamp` (fail-loud legacy stamping, D4); `bee logbook index` (header-derived TOON index)
 
-- [ ] Step: extend `verifyEntryText` — existing fields (`role`, `date`, `verdict`, `plan: <path> @ <hash>`, `checks-run`) stay; add `task: task-<n>` and `links:` (default `-`; the field exists so review/verify cross-links have a slot from birth). No existing test may change its meaning — extend, don't rewrite.
-- [ ] Step: implement `bee logbook stamp` per the contract below. The pass runs over a logbook dir (`--logbook <dir>`, default `.hivemind/logbook/`): filename regex `^(.+)-task(\d+)-(verify|review)-r(\d+)\.md$` yields plan stem, task n, kind, round; `Role: <role>` line in the body yields role; date from `git log --format=%as -1 -- <file>` (absent git history → hand-fix list); verdict from existing machine block (skip: already stamped) or from a body line matching `^\*\*Verdict:\*\* (\w+)` → hand-fix list when absent. Entries on the hand-fix list are reported with file + missing fields and the pass exits 1 (D4). Idempotent: stamped entries are skipped, exit 0.
-- [ ] Step: implement `bee logbook index`: reads every entry's machine block, outputs one TOON line per entry `file :: role :: date :: task :: verdict`, sorted by filename. Derived on demand — writes nothing.
-- [ ] Step: tests — fixture logbook dir (tmp): filename parse; skip-if-stamped; Role:-line stamping; git-dated entry (create fixture via a real `git init` tmp repo or commit — follow `tests/worktree-sh.test.mjs` patterns for git-in-test); hand-fix list on missing verdict/role (exit 1, names files); index output; stamp idempotence (second run exit 0).
+- [ ] Step: extend `verifyEntryText` — existing fields and their order stay exactly (`role`, `date`, `verdict`, `checks-run`, `plan: <path> @ <hash>`); `task: task-<n>` and `links:` (default `-`, the cross-link slot from birth) APPEND after `plan:`. One named test change: the anchored entry-shape regex at `tests/bee-verify.test.mjs:259` gains the two appended fields — its meaning (minted entries carry exactly these fields, in this order) is preserved, its text extends. Every other existing test keeps its meaning untouched.
+- [ ] Step: implement `bee logbook stamp` per the contract below. The pass runs over a logbook dir (`--logbook <dir>`, default `.hivemind/logbook/`). Task-tier files — matching `^(.+)-task(\d+)-(verify|review)-r(\d+)\.md$` (53 of 70 today) — are the stamping targets: the regex yields plan stem, task n, kind, round; role parses from EITHER corpus form (`^\*{0,2}Role:\*{0,2} <role>` — 61 of 70 use bold `**Role:**`, 4 plain; no match → hand-fix list); date from `git log --format=%cI -1 -- <file>` (strict ISO datetime, the emitter's shape; absent git history → hand-fix list); verdict from an existing machine block or a body line `^\*\*Verdict:\*\* (\w+)` (absent → hand-fix list). Already-stamped entries missing `task:`/`links:` are TOPPED UP from their filename (the five minted P4 entries gain both). Files NOT matching the regex (17 today: multi-task ranges, phase-level entries, plan/skill-review reports, calibration/dispatch records, the decisions .toon, round-less P1 names) are skipped and reported as out-of-scope — not errors, not hand-fixes; the index covers task-tier entries only. Hand-fix entries are reported with file + missing fields; the pass exits 1 while any remain (D4). Idempotent: nothing to stamp → exit 0.
+- [ ] Step: implement `bee logbook index`: reads every entry's machine block, outputs one TOON line per entry `file :: role :: date :: task :: verdict`, sorted by filename. Missing `task:` renders as `-` (top-up makes it rare). Derived on demand — writes nothing.
+- [ ] Step: tests — fixture logbook dir (tmp): filename parse; role stamping from BOTH `Role:` forms (plain + bold); git-dated entry (real `git init` tmp repo — follow `tests/worktree-sh.test.mjs` patterns for git-in-test); hand-fix list on missing role/verdict (exit 1, names files); top-up of a stamped entry missing task/links; non-matching filename skipped and reported (exit unaffected); index output incl. missing-task `-`; stamp idempotence (second run exit 0).
 - [ ] Step: run `node --test tests/bee-logbook.test.mjs` — all pass.
 - [ ] Commit: `add logbook stamp and index, headers from birth`
 
-Header contract (the six design fields; the filename below is the extraction target — the contract applies to every entry file, named `<plan-slug>-task<n>-<kind>-r<N>.md`; `plan` keeps its hash suffix, `checks-run` stays as a verify-specific extra):
+Header contract (the six design fields plus verify-specific `checks-run`; the filename below is the extraction target — the contract applies to every TASK-TIER entry file, named `<plan-slug>-task<n>-<kind>-r<N>.md`). Field order matches the existing emitter; the two new fields append after `plan:`; `date:` is an ISO datetime (emitter's `isoStampLocal`; stamp mints the same shape from git `%cI`):
 
 ```text path=.hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task2-verify-r1.md
 <!-- machine
 role: <role>
-date: <YYYY-MM-DD>
-task: task-<n>
-plan: .hivemind/plans/<slug>.md @ <hash>
+date: <ISO datetime>
 verdict: <PASS|FAIL|APPROVE|FIX|...>
-links: <related entry paths, comma-separated, or ->
 checks-run: <n>
+plan: .hivemind/plans/<slug>.md @ <hash>
+task: task-<n>
+links: <related entry paths, comma-separated, or ->
 -->
 ```
 
@@ -124,7 +124,7 @@ checks-run: <n>
 
 **Files:** modify `bin/bee.js` · modify `tests/bee-logbook.test.mjs`
 **Depends on:** task-2 (headers are what entries compact TO)
-**Provides:** scripted, idempotent compaction; used at close (Task 5) over P0–P4 per D7
+**Provides:** scripted, idempotent compaction; used at close (Task 5) over every phase closed at close time, per D7 (today: P0–P4 and P7)
 
 - [ ] Step: implement per contract: an entry belongs to `<phase>` when its machine block's `plan:` path resolves to a plan whose machine header `phase:` equals `<phase>` (read the plan file; missing plan file → fail loud naming it). Target entries rewrite to: machine block + blank line + one marker line `compacted at phase close; full text in git history`. Idempotent: an entry whose body is only the marker line is skipped. Any target lacking a machine block → fail loud, "run `bee logbook stamp` first". `--check` lists what would compact, writes nothing.
 - [ ] Step: tests: compact a fixture phase (entries + their plan files in tmp root); marker-only second run exits 0 unchanged; unstamped target fails loud; `--check` writes nothing; entries of other phases untouched.
@@ -139,7 +139,7 @@ checks-run: <n>
 
 - [ ] Step: implement per contracts below. Lookup: exact match → print the line; else unique prefix match → print it; else multiple prefix matches → print all, exit 0; else zero → structured error listing nearest matches (substring hits), exit 1. `add` fails loud when the term exists (supply, not update — no update path). Absent store: bare call reports `0 terms`, lookup fails loud.
 - [ ] Step: view regeneration (D5): every store write (`add`, and Task 5's `convert`) regenerates the rendered markdown view atomically — header marker + one `**term** — gist` line + indented `see:` pointers, alphabetical. View path: `--view <path>` overrides; default `<root>/skills/GLOSSARY.md` when `skills/GLOSSARY.md` exists, else `<root>/GLOSSARY.md`. Read-only lookups never touch the view.
-- [ ] Step: `bee glossary convert <md>`: scripted one-shot from the current `skills/GLOSSARY.md` shape — `- **term** — gist` bullets (46 today), where a bullet's continuation lines (the wrapped prose after the `—`) join into the single-line gist, space-joined, until the next bullet; `see` pointers where a bullet names one (the current file names none — `see` defaults `-`). Converted gists ride as-is even when long — conversion never editorializes (the P8 template distillation trims later). Fail loud on: duplicate term, unparseable line inside a bullet (hand-fix list, D4 pattern). Headings and prose outside bullets are skipped and reported. Runs against OUR real file only in Task 5 (D6) — tests use fixtures.
+- [ ] Step: `bee glossary convert <md>`: scripted one-shot from the current `skills/GLOSSARY.md` shape — `- **term** — gist` bullets (46 today), where a bullet's continuation lines (the wrapped prose after the `—`) join into the single-line gist, space-joined, until the next bullet; `see` pointer detection: a trailing `See \`<path>\`.` sentence at the end of the joined gist moves to the `see` field (two bullets carry one today — power-planner, project-orchestrator); all others default `see: -`. Converted gists ride as-is even when long — conversion never editorializes (the P8 template distillation trims later). Fail loud on: duplicate term, unparseable line inside a bullet (hand-fix list, D4 pattern). Headings and prose outside bullets are skipped and reported. Runs against OUR real file only in Task 5 (D6) — tests use fixtures.
 - [ ] Step: tests: lookup exact/prefix/multi/miss; add duplicate fails; view regenerated on add (content + marker) and not on lookup; convert fixture (clean + duplicate + malformed); `--check` writes nothing; store+view land where expected with `--store`/`--view` overrides.
 - [ ] Step: run `node --test tests/bee-glossary.test.mjs` — all pass.
 - [ ] Commit: `add glossary store, lookup, concurrent rendered view`
@@ -155,15 +155,15 @@ Usage grammar: the `bee glossary` stanza of the shared USAGE block.
 
 ## Task 5: close-time — real conversions, stamp pass, first compact (D6, D7)
 
-**Files:** create `.hivemind/memory/memory.toon` (empty-store header line only if the format needs one — otherwise no file until first add) · create `.hivemind/glossary.toon` (converted) · modify `.hivemind/logbook/*` (stamped; P0–P4 compacted) · modify `skills/GLOSSARY.md` (regenerated view + script-owned marker)
+**Files:** create `.hivemind/memory/memory.toon` (empty-store header line only if the format needs one — otherwise no file until first add) · create `.hivemind/glossary.toon` (converted) · modify `.hivemind/logbook/*` (stamped; closed phases compacted) · modify `skills/GLOSSARY.md` (regenerated view + script-owned marker)
 **Depends on:** task-1, task-2, task-3, task-4
 **Provides:** our real stores live; the repo runs on its own P5 tooling
 
 **Runs at phase close — AFTER the keeper's phase-end sign-off, BEFORE `bee phase close 5`, on the phase branch.** Until then our real files stay untouched (D6).
 
-- [ ] Step: `bee logbook stamp` over the real logbook (70 entries; ~64 lack machine blocks). Expect a hand-fix list (D4): hand-fix each named file's missing fields, re-run until exit 0. Hand-fixes are additive machine blocks only — prose bodies unchanged.
+- [ ] Step: `bee logbook stamp` over the real logbook (70 entries; 64 lack machine blocks; 53 task-tier targets, 17 skip-and-report). Expect a GENUINE hand-fix list (D4) of roughly 30 files (7 carry no role in any form, 25 lack a verdict line): hand-fix each named file's missing fields, re-run until exit 0. Hand-fixes are additive machine blocks only — prose bodies unchanged.
 - [ ] Step: `bee glossary convert skills/GLOSSARY.md` — real conversion; resolve the hand-fix list (duplicate/odd bullets) by hand-deciding the surviving gist (judgment, keeper-adjacent: when two gists conflict, keep the one matching current law and note the conflict in the task's logbook entry). View regenerates; verify the marker line landed and the view is alphabetical.
-- [ ] Step: `bee logbook compact <n>` for each closed phase P0–P4 (D7) — `--check` first, then run; verify second runs exit 0 (idempotence on real data).
+- [ ] Step: `bee logbook compact <n>` for every phase closed at close time — P0–P4 and P7 today (D7: ALL closed phases) — `--check` first, then run; verify second runs exit 0 (idempotence on real data).
 - [ ] Step: run `bash scripts/structure-check.sh .` (0 findings — proves the map line from Task 4 covers the real files) and `node --test tests/*.test.mjs` — all pass.
 - [ ] Step: dogfood the reads once on real stores: `bee logbook index`, `bee glossary keeper` — both exit 0 with sane output.
 - [ ] Commit: `convert real stores, stamp logbook, compact closed phases`
