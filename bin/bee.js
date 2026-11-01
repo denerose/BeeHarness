@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`, `bee design`, `bee verify`.
+// `bee capture`, `bee park`, `bee design`, `bee verify`, `bee task`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -43,6 +43,9 @@ usage:
              | implement <doc> --phase <n> --merge <hash> [--check]
   bee capture "<thought>"
   bee verify --plan <path> [--task <n>] [--base <ref>] [--record] [--check]
+  bee task   show <plan-path> [--full]
+             | move <plan-path> <task-n> <state>
+               [--origin <role>] [--record <path>] [--check]
   bee help | version
 
   --check   never write; report what would happen
@@ -78,6 +81,9 @@ export function run(argv) {
   }
   if (cmd === 'verify') {
     return cmdVerify(rest);
+  }
+  if (cmd === 'task') {
+    return cmdTask(rest);
   }
   return { code: 1, out: '', err: `bee: unknown command '${cmd}'\n\n` + USAGE };
 }
@@ -2095,6 +2101,360 @@ function cmdVerify(rest) {
     }
   }
   return { code: anyFail ? 1 : 0, out, err: '' };
+}
+
+// ---- task (P4 Task 6 — work-item state moves, script-owned) ----
+// The work-item state (GLOSSARY: work-item states) lives in the
+// plan itself: the task's checkboxes (done ⇄ all ticked) + a
+// state ledger inside the machine block (intermediate states;
+// provenance on every line). Header parsing is parsePlanHeader's,
+// reused — its checks list is the task universe, and it ignores
+// the ledger's task-<n>: keys (forward-compatible); the ledger
+// lines are parsed here.
+
+const TASK_STATES = ['draft', 'implemented', 'verified', 'reviewed',
+  'done'];
+
+const TASK_USAGE = `bee task — work-item states of a plan (script-owned)
+
+usage:
+  bee task show <plan-path> [--full]
+  bee task move <plan-path> <task-n> <state>
+                [--origin <role>] [--record <path>] [--check]
+
+states (forward only): draft → implemented → verified → reviewed → done
+  done   every checkbox of the task's section ticks '- [x]'
+  draft  the section's checkboxes untick to '- [ ]'
+  other  intermediate states ride the ledger only; the body is
+         never touched (checkbox rewrites are byte-exact: only
+         the '- [ ]'/'- [x]' marker changes)
+
+the ledger — one line per move, appended inside the plan's
+machine block before '-->' (script territory):
+  task-<n>: <state> <ISO-8601> by <role>[ record: <verify entry>]
+the last ledger line for a task is its state; with no lines the
+state derives from the boxes (all ticked → done, else draft).
+
+move rules:
+  unknown task number      exit 1 + the tasks the plan declares
+  backwards move           exit 1 + fix (moves go forward only;
+                           undo = hand-correct the ledger line)
+  same state               no-op note, exit 0
+  done without --record    exit 1 + fix — done needs the verify
+                           entry path (existence-checked; judging
+                           the entry's content stays with the loop)
+  --record elsewhere       usage error (it evidences done moves)
+
+flags:
+  --origin <role>  provenance on the ledger line (default bee)
+  --record <path>  verify entry path, required for done
+  --full           show: the last ledger line per task
+  --check          move: never write; report what would happen
+
+<task-n> accepts 6 or task-6. bee verify parses plans with
+parsePlanHeader, which ignores the ledger lines — the header
+contract is unaffected.
+`;
+
+function taskUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + TASK_USAGE };
+}
+
+// The FIRST machine block's line range — the same first-only
+// rule parsePlanHeader applies (fenced copies inside the plan
+// body are not the header). Called after parsePlanHeader has
+// already accepted the plan, so null is defensive only.
+function machineRange(lines) {
+  let start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/<!--\s*machine/.test(lines[i])) { start = i; break; }
+  }
+  if (start === -1) return null;
+  let end = -1;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].trim().startsWith('-->')) { end = i; break; }
+  }
+  return end === -1 ? null : { start, end };
+}
+
+// Ledger lines: 'task-<n>: <state> <ISO-timestamp> by <role>
+// [record: <path>]' at the machine block's top level. A line
+// that starts like one but does not parse is a hand-fix finding.
+const TASK_LEDGER_RE =
+  /^task-(\d+):\s+(\S+)\s+(\S+)\s+by\s+(\S+)(?:\s+record:\s+(\S+))?$/;
+
+function parseTaskLedger(lines, range, label) {
+  const byTask = new Map();
+  for (let i = range.start + 1; i < range.end; i++) {
+    const line = lines[i];
+    if (!/^task-\d+\s*:/.test(line)) continue;
+    const m = TASK_LEDGER_RE.exec(line);
+    if (!m || !TASK_STATES.includes(m[2])) {
+      return { err: `bee task: cannot parse ledger line ${i + 1} of ` +
+        `${label}: '${truncText(line, 60)}' — expected 'task-<n>: ` +
+        `<state> <ISO-timestamp> by <role>[ record: <path>]'\n` +
+        'fix: hand-correct the ledger line in the machine block, ' +
+        'then re-run\n' };
+    }
+    const n = Number(m[1]);
+    if (!byTask.has(n)) byTask.set(n, []);
+    byTask.get(n).push(
+      { state: m[2], ts: m[3], role: m[4], record: m[5] });
+  }
+  return { byTask };
+}
+
+// The task's body region: from its '## Task <n>:' heading to
+// the next '## ' heading (a following task or '## Phase exit').
+function taskSectionRange(lines, n) {
+  const re = new RegExp(`^## Task ${n}:`);
+  let start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (re.test(lines[i])) { start = i; break; }
+  }
+  if (start === -1) return null;
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^## /.test(lines[i])) { end = i; break; }
+  }
+  return { start, end };
+}
+
+function taskCheckboxStats(lines, range) {
+  let total = 0;
+  let checked = 0;
+  for (let i = range.start + 1; i < range.end; i++) {
+    const m = /^(\s*)- \[( |x)\]/.exec(lines[i]);
+    if (m) { total++; if (m[2] === 'x') checked++; }
+  }
+  return { total, checked };
+}
+
+function taskCurrentState(entries, stats) {
+  if (entries.length > 0) return entries[entries.length - 1].state;
+  return stats.total > 0 && stats.checked === stats.total
+    ? 'done' : 'draft';
+}
+
+// Ledger record paths display repo-relative inside the plan's
+// repo (house convention), absolute outside it.
+function taskRecordShown(absRecord, planPath) {
+  const rootR = spawnSync('git', ['rev-parse', '--show-toplevel'],
+    { cwd: path.dirname(planPath), encoding: 'utf8' });
+  if (rootR.status === 0) {
+    const rel = path.relative(rootR.stdout.trim(), absRecord);
+    if (!rel.startsWith('..')) return rel;
+  }
+  return absRecord;
+}
+
+function cmdTask(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'show' || sub.startsWith('--')) {
+    return taskShow(sub === 'show' ? rest.slice(1) : rest);
+  }
+  if (sub === 'move') return taskMove(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: TASK_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee task: unknown subcommand '${sub}'\n\n` + TASK_USAGE };
+}
+
+function readPlanFor(cmd, planArg) {
+  const planPath = path.resolve(planArg);
+  let text;
+  try {
+    text = fs.readFileSync(planPath, 'utf8');
+  } catch (e) {
+    return { err: `bee ${cmd}: cannot read ${planPath}: ${e.message}` +
+      ' — fix: point at an existing plan\n' };
+  }
+  const parsed = parsePlanHeader(text, planPath);
+  if (parsed.err) return { err: parsed.err };
+  const lines = text.split('\n');
+  const range = machineRange(lines);
+  if (!range) {
+    return { err: `bee ${cmd}: ${planPath} machine header never ` +
+      'closes (missing -->)\n' };
+  }
+  return { planPath, text, lines, range, header: parsed.header };
+}
+
+function taskShow(args) {
+  const f = flags(args, { full: { type: 'boolean' } }, true);
+  if (f.error) return taskUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return taskUsageErr('bee task show: expected <plan-path> — ' +
+      'fix: e.g. bee task show .hivemind/plans/<slug>.md');
+  }
+  const r = readPlanFor('task show', pos[0]);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const ledger = parseTaskLedger(r.lines, r.range, r.planPath);
+  if (ledger.err) return { code: 1, out: '', err: ledger.err };
+  const checks = r.header.checks;
+  if (checks.length === 0) {
+    return { code: 0, out: '0 tasks\n' +
+      'fix: add a checks: block to the plan machine header — one ' +
+      'entry per task (skills/loop/bee-plan/assets/plan-template.md)\n',
+      err: '' };
+  }
+  const rows = checks.map((ch) => {
+    const section = taskSectionRange(r.lines, ch.n);
+    const stats = section
+      ? taskCheckboxStats(r.lines, section) : { total: 0, checked: 0 };
+    const entries = ledger.byTask.get(ch.n) ?? [];
+    const state = taskCurrentState(entries, stats);
+    const title = section
+      ? truncText(
+          (/^## Task \d+: ?(.*)$/.exec(r.lines[section.start])?.[1] ?? '')
+            .trim(), 48)
+      : 'no task section in body';
+    return { ch, state, stats, entries, title };
+  });
+  const nDone = rows.filter((x) => x.state === 'done').length;
+  let out = `${rows.length} tasks · ${nDone} done\n`;
+  for (const x of rows) {
+    out += `${x.ch.id} · ${x.state} · ${x.stats.checked}/${x.stats.total}` +
+      ` steps · ${x.title}\n`;
+    if (f.values.full && x.entries.length > 0) {
+      const e = x.entries[x.entries.length - 1];
+      out += `  last: ${e.state} ${e.ts} by ${e.role}` +
+        (e.record !== undefined ? ` · record: ${e.record}` : '') + '\n';
+    }
+  }
+  return { code: 0, out, err: '' };
+}
+
+function taskMove(args) {
+  const f = flags(args, {
+    origin: { type: 'string' },
+    record: { type: 'string' },
+    check: { type: 'boolean' },
+  }, true);
+  if (f.error) return taskUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 3) {
+    return taskUsageErr(
+      'bee task move: expected <plan-path> <task-n> <state>');
+  }
+  const [planArg, nArg, stateArg] = pos;
+  const nm = /^(?:task-)?(\d+)$/.exec(nArg);
+  if (!nm) {
+    return taskUsageErr(`bee task move: <task-n> expects a task ` +
+      `number, got '${nArg}'`);
+  }
+  const n = Number(nm[1]);
+  if (!TASK_STATES.includes(stateArg)) {
+    return taskUsageErr(`bee task move: unknown state '${stateArg}' — ` +
+      `states: ${TASK_STATES.join(' → ')}`);
+  }
+  const origin = (f.values.origin || 'bee').toLowerCase();
+  if (!/^[a-z][a-z0-9-]*$/i.test(f.values.origin || 'bee')) {
+    return taskUsageErr(`bee task move: --origin ` +
+      `'${f.values.origin}' must be letters/digits/hyphens`);
+  }
+  const r = readPlanFor('task move', planArg);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const ids = r.header.checks.map((c) => c.id);
+  if (!r.header.checks.some((c) => c.n === n)) {
+    return { code: 1, out: '',
+      err: `bee task move: no task ${n} in ${r.planPath} — ` +
+        (ids.length > 0 ? `tasks here: ${ids.join(', ')}`
+          : 'the plan declares no checks') +
+        '\nfix: move a task from the list (its \'## Task <n>:\' ' +
+        'section must exist too)\n' };
+  }
+  const ledger = parseTaskLedger(r.lines, r.range, r.planPath);
+  if (ledger.err) return { code: 1, out: '', err: ledger.err };
+  const section = taskSectionRange(r.lines, n);
+  if (!section) {
+    return { code: 1, out: '',
+      err: `bee task move: ${r.planPath} has no '## Task ${n}:' ` +
+        'section — the machine header declares the task but the ' +
+        'body does not\nfix: add the section (or fix the checks ' +
+        'id), then re-run\n' };
+  }
+  const stats = taskCheckboxStats(r.lines, section);
+  const entries = ledger.byTask.get(n) ?? [];
+  const cur = taskCurrentState(entries, stats);
+  const curIdx = TASK_STATES.indexOf(cur);
+  const newIdx = TASK_STATES.indexOf(stateArg);
+  if (newIdx === curIdx) {
+    return { code: 0, out: `task-${n} already ${cur} — nothing to do\n`,
+      err: '' };
+  }
+  if (newIdx < curIdx) {
+    return { code: 1, out: '',
+      err: `bee task move: task-${n} is ${cur}; moves go forward ` +
+        `only (${TASK_STATES.join(' → ')}) — '${stateArg}' is ` +
+        'backwards\nfix: if the recorded state is wrong, ' +
+        `hand-correct the task-${n} ledger line in the plan's ` +
+        'machine block (the last line wins), then re-run\n' };
+  }
+  // done requires its evidence: the verify entry path. The
+  // script checks existence only — judging the entry's content
+  // stays with the loop (it reads the entry before the move).
+  let record = null;
+  if (stateArg === 'done') {
+    if (f.values.record === undefined) {
+      return { code: 1, out: '',
+        err: `bee task move: task-${n} → done requires --record ` +
+          '<path> — the verify entry evidencing it\nfix: run ' +
+          `bee verify --task ${n} first, then pass its logbook ` +
+          `entry (e.g. .hivemind/logbook/<plan-slug>-task${n}-verify-rN.md)\n` };
+    }
+  } else if (f.values.record !== undefined) {
+    return taskUsageErr('bee task move: --record belongs to done ' +
+      `moves (got state '${stateArg}')`);
+  }
+  if (f.values.record !== undefined) {
+    if (f.values.record === '' || /\s/.test(f.values.record)) {
+      return taskUsageErr('bee task move: --record expects a ' +
+        'space-free path (ledger lines are single-token fields)');
+    }
+    const recAbs = path.resolve(f.values.record);
+    if (!fs.existsSync(recAbs)) {
+      return { code: 1, out: '',
+        err: `bee task move: --record path does not exist: ` +
+          `${f.values.record}\nfix: pass the entry bee verify ` +
+          `wrote — e.g. .hivemind/logbook/<plan-slug>-task${n}-verify-rN.md\n` };
+    }
+    record = recAbs;
+  }
+  // Rewrite: checkboxes (done ticks, draft unticks; byte-exact —
+  // only the leading marker changes) + the ledger line inserted
+  // before the machine block's '-->'.
+  const newLines = [...r.lines];
+  for (let i = section.start + 1; i < section.end; i++) {
+    if (stateArg === 'done') {
+      newLines[i] = newLines[i].replace(/^(\s*- \[) \]/, '$1x]');
+    } else if (stateArg === 'draft') {
+      newLines[i] = newLines[i].replace(/^(\s*- \[)x\]/, '$1 ]');
+    }
+  }
+  const ts = isoStampLocal();
+  let ledgerLine = `task-${n}: ${stateArg} ${ts} by ${origin}`;
+  if (record !== null) {
+    ledgerLine += ` record: ${taskRecordShown(record, r.planPath)}`;
+  }
+  newLines.splice(r.range.end, 0, ledgerLine);
+  if (f.values.check) {
+    return { code: 0, out: `--check: would move task-${n} ${cur} → ` +
+      `${stateArg} in ${r.planPath}\n${ledgerLine}\n` +
+      (stateArg === 'done' && stats.checked < stats.total
+        ? `${stats.total - stats.checked} checkbox(es) would tick\n`
+        : ''), err: '' };
+  }
+  try {
+    atomicWrite(r.planPath, newLines.join('\n'));
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee task move: cannot write ${r.planPath}: ${e.message}\n` };
+  }
+  return { code: 0, out: `task-${n} ${stateArg} · ${ts} by ${origin}\n` +
+    `plan: ${r.planPath}\n`, err: '' };
 }
 
 if (process.argv[1] &&
