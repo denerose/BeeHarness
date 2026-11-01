@@ -20,7 +20,6 @@ targets:
   - tests/bee-logbook.test.mjs (create)
   - tests/bee-glossary.test.mjs (create)
   - scripts/structure.map (modify)
-  - .hivemind/memory/memory.toon (create)
   - .hivemind/glossary.toon (create)
   - .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task2-verify-r1.md (create)
   - skills/GLOSSARY.md (modify)
@@ -45,13 +44,13 @@ checks:
   - id: task-5
     cmd: bash scripts/structure-check.sh .
     expect: exit 0
-    files: [.hivemind/memory/memory.toon, .hivemind/glossary.toon, skills/GLOSSARY.md]
+    files: [.hivemind/glossary.toon, skills/GLOSSARY.md]
 suite: node --test tests/*.test.mjs
 -->
 
 ## Shared contract: command grammar (USAGE additions)
 
-One verbatim block, three stanzas — each task adds its stanza to the top-level `USAGE` string in `bin/bee.js` exactly as written here (Task 1: memory · Tasks 2/3: logbook · Task 4: glossary; bare `bee logbook` = `index`, content-first):
+One verbatim block, three stanzas — each task adds its stanza to the top-level `USAGE` string in `bin/bee.js` exactly as written here (Task 1: memory · Tasks 2/3: logbook · Task 4: glossary; bare `bee logbook` = `index`, content-first. Note the deliberate seam-flag split: `--logbook` rides in the stanza because all three logbook subcommands share it; `--store`/`--view` stay in per-subcommand help per the park/inbox pattern):
 
 ```text path=bin/bee.js
 bee memory [list [--type lesson|fact] [--full]]
@@ -126,8 +125,8 @@ links: <related entry paths, comma-separated, or ->
 **Depends on:** task-2 (headers are what entries compact TO)
 **Provides:** scripted, idempotent compaction; used at close (Task 5) over every phase closed at close time, per D7 (today: P0–P4 and P7)
 
-- [ ] Step: implement per contract: an entry belongs to `<phase>` when its machine block's `plan:` path equals a plan path linked in that phase's row of `.hivemind/phases/<project>.md` — the phase list is the plan↔phase source of truth, so plan files themselves need no machine headers (the six pre-convention P2 entries resolve via their row's plan link). Rows with plan `—` match nothing → compact reports `0 entries`, exit 0 (clean no-op). Missing phase list or row → fail loud naming it. Target entries rewrite to: machine block + blank line + one marker line `compacted at phase close; full text in git history`. Idempotent: an entry whose body is only the marker line is skipped. Any target lacking a machine block → fail loud, "run `bee logbook stamp` first" (all task-tier files carry blocks after stamp). `--check` lists what would compact, writes nothing.
-- [ ] Step: tests: compact a fixture phase (entries + phase list + plan-linked rows in tmp root — including a HEADERLESS plan file, proving membership comes from the list, not the plan); marker-only second run exits 0 unchanged; unstamped target fails loud; `--check` writes nothing; entries of other phases untouched; plan-`—` row reports `0 entries`, exit 0.
+- [ ] Step: implement per contract: an entry belongs to `<phase>` when its machine block's `plan:` path equals a plan path linked in that phase's row of `.hivemind/phases/<project>.md` — the phase list is the plan↔phase source of truth, so plan files themselves need no machine headers (the six pre-convention P2 entries resolve via their row's plan link). Rows with plan `—` match nothing → compact reports `0 entries`, exit 0 (clean no-op). Missing phase list or row → fail loud naming it. Target entries rewrite to: machine block + blank line + one marker line `compacted at phase close; full text in git history`. Idempotent: an entry whose body is only the marker line is skipped. Compact scans task-tier files (the Task 2 filename regex) — out-of-scope files (phase/plan-review reports, calibration records, round-less names) are never scanned; a scanned task-tier file with no machine block → fail loud, "run `bee logbook stamp` first" (all task-tier files carry blocks after stamp). `--check` lists what would compact, writes nothing.
+- [ ] Step: tests: compact a fixture phase (entries + phase list + plan-linked rows in tmp root — including a HEADERLESS plan file, proving membership comes from the list, not the plan, and a blockless out-of-scope file proving it is never scanned); marker-only second run exits 0 unchanged; unstamped task-tier file fails loud; `--check` writes nothing; entries of other phases untouched; plan-`—` row reports `0 entries`, exit 0.
 - [ ] Step: run `node --test tests/bee-logbook.test.mjs` — all pass.
 - [ ] Commit: `add idempotent bee logbook compact`
 
@@ -155,17 +154,17 @@ Usage grammar: the `bee glossary` stanza of the shared USAGE block.
 
 ## Task 5: close-time — real conversions, stamp pass, first compact (D6, D7)
 
-**Files:** create `.hivemind/memory/memory.toon` (empty-store header line only if the format needs one — otherwise no file until first add) · create `.hivemind/glossary.toon` (converted) · modify `.hivemind/logbook/*` (stamped; closed phases compacted) · modify `skills/GLOSSARY.md` (regenerated view + script-owned marker)
+**Files:** create `.hivemind/glossary.toon` (converted) · modify `.hivemind/logbook/*` (stamped; closed phases compacted) · modify `skills/GLOSSARY.md` (regenerated view + script-owned marker). The memory store ships at FIRST REAL ADD — no empty file is minted at close (absent store is a designed state: `list` reports `0 entries`).
 **Depends on:** task-1, task-2, task-3, task-4
 **Provides:** our real stores live; the repo runs on its own P5 tooling
 
 **Runs at phase close — AFTER the keeper's phase-end sign-off, BEFORE `bee phase close 5`, on the phase branch.** Until then our real files stay untouched (D6).
 
-- [ ] Step: `bee logbook stamp` over the real logbook (roughly 70 entries; ~65 lack machine blocks; 53 task-tier targets, 17 skip-and-report). Expect a GENUINE hand-fix list (D4) of ~25 files, all verdict-line-missing (role parses on every stampable target — the 7 role-less corpus files never reach the hand-fix list: 3 are machine-block top-ups, 4 out-of-scope): hand-fix each named file's missing fields, re-run until exit 0. Hand-fixes are additive machine blocks only — prose bodies unchanged.
+- [ ] Step: `bee logbook stamp` over the real logbook (roughly 70 entries; ~65 lack machine blocks; 53 task-tier targets, 17 skip-and-report). Expect a GENUINE hand-fix list (D4) of ~25 files, all verdict-line-missing (role parses on every stampable target — the 7 role-less corpus files never reach the hand-fix list: 3 are machine-block top-ups, 4 out-of-scope): hand-fix each named file's missing fields, re-run until exit 0. Hand-fixes are additive machine blocks only — prose bodies unchanged, and hand-fixed blocks follow the same two mint rules as stamped entries (`checks-run: -`; plan hash from the house git source).
 - [ ] Step: `bee glossary convert skills/GLOSSARY.md` — real conversion; resolve the hand-fix list (duplicate/odd bullets) by hand-deciding the surviving gist (judgment, keeper-adjacent: when two gists conflict, keep the one matching current law and note the conflict in the task's logbook entry). View regenerates; verify the marker line landed and the view is alphabetical.
-- [ ] Step: `bee logbook compact <n>` for every phase closed at close time — P0–P4 and P7 today (D7: ALL closed phases) — `--check` first, then run; verify second runs exit 0 (idempotence on real data).
+- [ ] Step: `bee logbook compact <P-n>` — the phase id exactly as the phase list's id column shows it (`P2`, `P7`, …) — for every phase closed at close time: P0–P4 and P7 today (D7: ALL closed phases). `--check` first, then run; verify second runs exit 0 (idempotence on real data).
 - [ ] Step: run `bash scripts/structure-check.sh .` (0 findings — proves the map line from Task 4 covers the real files) and `node --test tests/*.test.mjs` — all pass.
-- [ ] Step: dogfood the reads once on real stores: `bee logbook index`, `bee glossary keeper` — both exit 0 with sane output.
+- [ ] Step: dogfood the reads once on real stores: `bee logbook index`, `bee glossary keeper`, `bee memory list` (proves the designed absent-store path live: `0 entries`, exit 0) — all exit 0 with sane output.
 - [ ] Commit: `convert real stores, stamp logbook, compact closed phases`
 
 ## Phase exit
