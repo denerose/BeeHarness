@@ -214,7 +214,7 @@ what remains open.
   main checkout's. Behavior unchanged in P3 (only test expectations
   were made location-neutral). Open question for the keeper: should
   `bee init` resolve the main checkout via `--git-common-dir` like
-  `scripts/task.sh` does? — unpark when the keeper rules on
+  `scripts/worktree.sh` does? — unpark when the keeper rules on
   worktree-aware registration (natural home: a later `bee` CLI phase).
 - **PL-PP-013 — power-planner session-memory sweep at the post-P8
   fresh start** — keeper direction (2026-11-01): after P8, the

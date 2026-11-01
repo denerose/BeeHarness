@@ -1621,8 +1621,9 @@ function designNew(args) {
 // ---- verify (P4 Task 5 — plan-header checks + logbook evidence) ----
 // The plan's machine header names the checks (the contract in
 // skills/loop/bee-plan/assets/plan-template.md); bee verify runs
-// them, link-checks changed docs, and emits the logbook entry a
-// state move needs (ADR-006: the entry IS the evidence).
+// them, link-checks changed docs, structure-checks the repo map
+// (Task 8), and emits the logbook entry a state move needs
+// (ADR-006: the entry IS the evidence).
 
 const VERIFY_USAGE = `bee verify — run a plan's header checks, record the evidence
 
@@ -1653,7 +1654,10 @@ checks contract (plan machine header; one entry per task):
 
 output: TOON — task-<n> · cmd · PASS|FAIL · note; every FAIL carries
 a fix: line (ruling 4 — agent-facing self-correction); exit 1 on
-any FAIL. logbook entry <plan-slug>-task<n>-verify-<rN>.md (one per
+any FAIL. structure: runs scripts/structure-check.sh (beside this
+CLI) against the plan root when it carries scripts/structure.map;
+skips with a note otherwise (other repos adopt by adding a map).
+logbook entry <plan-slug>-task<n>-verify-<rN>.md (one per
 task checked; next free rN): machine header (role, date, verdict,
 checks-run, plan path + hash); prose body only for anomalies
 (empty body = clean run).
@@ -2021,9 +2025,50 @@ function cmdVerify(rest) {
         ? `, ${linkFindings.length} broken` : '');
   }
 
+  // Structure (Task 8 — manifest map): runs bee's own shipped
+  // scripts/structure-check.sh against the plan root whenever the
+  // repo carries scripts/structure.map (skips with a note when
+  // not — other repos adopt by adding a map). Findings fail the
+  // run like link findings do.
+  const mapPath = path.join(planRoot, 'scripts', 'structure.map');
+  let structureLine;
+  const structureFindings = [];
+  if (!fs.existsSync(mapPath)) {
+    structureLine = 'structure · skipped · no scripts/structure.map ' +
+      'at the plan root — add one to adopt the structure check';
+  } else {
+    const sr = spawnSync('bash',
+      [path.join(REPO_ROOT, 'scripts', 'structure-check.sh'), planRoot],
+      { cwd: planRoot, encoding: 'utf8', timeout: verifyTimeoutMs() });
+    const sLines = (sr.stdout ?? '').split('\n')
+      .map((l) => l.trimEnd()).filter((l) => l !== '');
+    if (sr.error) {
+      structureLine = 'structure · FAIL · cannot run: ' + sr.error.message;
+      structureFindings.push('fix: bee needs scripts/' +
+        'structure-check.sh beside bin/bee.js — restore it or drop ' +
+        'the map');
+    } else if (sr.signal) {
+      structureLine = `structure · FAIL · signal ${sr.signal}`;
+      structureFindings.push('fix: structure-check.sh did not ' +
+        'finish — repair or shorten it');
+    } else if (sr.status === 0) {
+      structureLine = 'structure · map · PASS · ' +
+        (sLines[0] ?? '0 findings');
+    } else {
+      structureLine = 'structure · map · FAIL · ' +
+        (sLines[0] ?? `exit ${sr.status}`);
+      structureFindings.push(...sLines.slice(1));
+      if (sLines.length <= 1) {
+        structureFindings.push('structure-check.sh: ' +
+          (firstOutputLine(sr) || `exit ${sr.status}`));
+      }
+    }
+  }
+
   const nPass = results.filter((r) => r.pass).length;
   const nFail = results.length - nPass;
-  const anyFail = nFail > 0 || linkFindings.length > 0;
+  const anyFail = nFail > 0 || linkFindings.length > 0 ||
+    structureFindings.length > 0;
   let out = '';
   if (results.length === 0) {
     out += '0 checks\n' +
@@ -2041,6 +2086,10 @@ function cmdVerify(rest) {
   for (const b of linkFindings) {
     out += `  ${b.doc}:${b.line} → ${b.target}\n`;
     out += `  fix: repair the link or the target (${b.target})\n`;
+  }
+  out += structureLine + '\n';
+  for (const l of structureFindings) {
+    out += `  ${l}\n`;
   }
 
   // Logbook emission: one entry per task checked; written when
@@ -2091,7 +2140,8 @@ function cmdVerify(rest) {
     for (const [n, trs] of byTask) {
       const taskFail = trs.filter((r) => !r.pass);
       const verdict = taskFail.length === 0 &&
-        linkFindings.length === 0 ? 'PASS' : 'FAIL';
+        linkFindings.length === 0 &&
+        structureFindings.length === 0 ? 'PASS' : 'FAIL';
       let anomalies = '';
       for (const r of taskFail) {
         anomalies += `${r.id} · ${r.shown} · FAIL · ${r.note}\n`;
@@ -2101,6 +2151,12 @@ function cmdVerify(rest) {
         anomalies += linksLine + '\n';
         for (const b of linkFindings) {
           anomalies += `${b.doc}:${b.line} → ${b.target}\n`;
+        }
+      }
+      if (structureFindings.length > 0) {
+        anomalies += structureLine + '\n';
+        for (const l of structureFindings) {
+          anomalies += `${l}\n`;
         }
       }
       const round = nextVerifyRound(logbookDir, stem, n);

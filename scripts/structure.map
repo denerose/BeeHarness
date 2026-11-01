@@ -1,0 +1,14 @@
+# allowed structure — one pattern per line; <x> = one segment.
+# <file> matches dotfiles too (.gitkeep, .gitignore); a segment
+# wildcard never crosses "/".
+root: .gitignore README.md AGENTS.md SOUL.md package.json bin docs roles skills scripts .pi
+bin: bin/<file>.js
+pi: .pi/handoff.md .pi/handoff-<role>.md
+roles: roles/<file>.md
+skills: skills/GLOSSARY.md skills/<kit>/<name>/SKILL.md skills/<kit>/<name>/assets/<file>
+hivemind: .hivemind/status.md .hivemind/keeper-report.md .hivemind/inbox.toon
+hivemind: .hivemind/<class>/<file>  # class: decisions designs plans phases logbook suggestions memory sessions
+hivemind: .hivemind/suggestions/planned/<file>
+docs: docs/<file>.md docs/guidance/<file>.md docs/research/<file>.md
+scripts: scripts/<file>.sh scripts/structure.map
+tests: tests/<file>.test.mjs tests/fixtures/<file>
