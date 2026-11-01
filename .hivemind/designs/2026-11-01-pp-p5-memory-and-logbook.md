@@ -96,3 +96,16 @@ settles in use — lean role-gated with provenance, keeper prunes.)
 P5 (the row links this note; PL-002's gate lifts); PL-PP-005
 (mechanics land here, pass at P5 close); PL-PP-013 (post-P8
 migration target); ADR-014 (the write model is its write-path face).
+
+## Addendum (2026-11-01, P5 kickoff rulings — pending rectification)
+
+- **D1:** `bee memory supersede` is ROLE-GATED with provenance
+  (keeper prunes) — settles the note's open question as leaned.
+  Follow-up (keeper): the session-ender and clean-up skills carry
+  the right permissions to tidy up without annoying the keeper
+  (P8 inputs, item 16).
+- **D2:** memory ids are per-role: `ME-<role>-NNN`.
+- **D3:** `bee memory add` takes `--type` ALWAYS explicit.
+- **D7:** the first `bee logbook compact` covers ALL closed phases.
+- **D8:** the tidy pass is a close-time step on the keeper's word,
+  not a plan task.

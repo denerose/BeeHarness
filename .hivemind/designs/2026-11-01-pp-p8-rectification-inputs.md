@@ -27,9 +27,14 @@ glossary. Consolidated inputs:
 2. Entry-discipline application to the meta pair (should-you-use
    gates for discretionary skills; skip = name the failed condition
    out loud).
-3. Ship-tier cleanup — shipped skills + GLOSSARY carry self-contained
-   rule text; zero references to our ADRs/designs/plans/.hivemind
-   paths (ADR-015's user-side face).
+3. Ship-tier cleanup — shipped skills + GLOSSARY carry
+   self-contained rule text; strip AUTHORITY CITATIONS (references
+   to our ADRs/designs/plans/.hivemind paths). Keep FUNCTIONAL
+   references — usage/help text naming destination paths, error
+   fix-lines naming operating surfaces — rewording them degrades
+   the tool (keeper Class-C ruling at P4 close, decision D14; the
+   ADR-015/boundary sweep wording may revisit to name the
+   distinction).
 4. Template glossary — bee init seeds the project's own glossary,
    self-contained core terms, user-extendable (two-glossaries rule).
 5. bee-handoff pair fix — wake prompt delivered IN CHAT as a fenced
@@ -80,11 +85,17 @@ suggestion file carries its Outcome pointing here):**
     its slug).
 
 **Design input:**
-13. Design-note consolidation at rectification boundaries —
+15. Design-note consolidation at rectification boundaries —
     superseded sections collapse into their successor; history
     stays in git. Extends ADR-016's addendum discipline; P8 is its
     first user (start with the skill-authoring-kit note). File:
     `planned/2026-11-01-pp-design-note-consolidation.md`.
+
+**Session instruments:**
+16. Session-ender and clean-up skills carry the right permissions
+    to tidy up without annoying the keeper (P5 kickoff D1
+    follow-up, keeper: supersede/write authority scoped so
+    close-time tidying needs no per-step ask).
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a

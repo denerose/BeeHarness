@@ -59,11 +59,9 @@ keeper (1 open · oldest 6s):
 - [PP] 2026-11-01 — P4 WAKE-CHECK DONE: park/resolve applied via
   the live CLI (PL-PO-002 resolved keeper-ruled; keeper-todo
   tracking parked); inbox clean (tier ruling + capture test
-  closed). SEAM FOR PO: `bee park add` minted PL-POWER-PLANNER-001,
-  not PL-PP-014 — id generation uses the full origin role name
-  instead of the ADR-007 role-initials convention the migrated
-  entries carry; fix in the P5 store pass or as a quick patch
-  (new entries while unfixed will fragment the id scheme).
+  closed). SEAM FOR PO: CLOSED @ 49c4189 — hyphenated --origin
+  roles now map to word-initial id tags (power-planner → PL-PP-NNN);
+  live entry renamed PL-PP-014; suite 240/240, structure 0 findings.
 - [PP] 2026-11-01 — KEEPER REPORT REPURPOSED (keeper direction,
   filed in the KS design note): the old zoned report is STALE and
   its purpose outdated — the fresh design (KS tracker = render of

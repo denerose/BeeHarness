@@ -71,3 +71,11 @@ P5 (the command + the conversion — the stores phase; keeper ruling
 seeds consumer stores in the same format); P8 item 4 (template
 glossary distills from the store, ships the same format);
 PL-PP-003 (the queryable-vocabulary half of help surfaces).
+
+## Addendum (2026-11-01, P5 kickoff rulings — pending rectification)
+
+- **D5:** the rendered view (GLOSSARY.md) is KEPT for humans —
+  script-owned, regenerated concurrently on every store write.
+  SUPERSEDES "the markdown file retires at conversion" above.
+- **D6:** conversions run TESTS-ONLY until phase close; the real
+  stores convert once at P5 close, not mid-phase.
