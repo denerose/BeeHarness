@@ -158,31 +158,6 @@ what remains open.
   machine-readable records making observation possible in the
   first place — unpark when the keeper wants the conversation, or
   alongside the signals/guides session.
-- **PL-PP-009 — a lightweight keeper-secretary role (capture and
-  track only)** — keeper direction (2026-11-01): a new top-level
-  role, much lighter than the existing two — literally takes short
-  directions and notes from the keeper and keeps track of them;
-  nothing else. Might be a shared parking-item type; might end up
-  using the same suggestions model internal agents use. Open for
-  the unpark session, filed open: the store (parking lot vs
-  suggestions vs its own — likely shaped by the P4 inbox + capture
-  tooling once their kinks are worked out); attributes per ADR-010
-  (standing vs on-call; continuity is probably records-only — the
-  store IS the memory); relation to the keeper's quick-thoughts
-  capture suggestion (the role may reduce to the capture skill +
-  simple routing — which bucket a note lands in — in a dedicated
-  context; note: "triage" in that suggestion means routing, NOT the
-  keeper's interactive triage skill — terminology friction flagged
-  2026-11-01, "routing" is the capture meaning from now on); what
-  "keeps track" means — aging,
-  surfacing, the keeper's list — KEEPER NOTE (2026-11-01): the
-  PP+keeper design session is wanted; sequence it after P4 works
-  out the parking/suggestions kinks (the live inbox + `bee
-  capture` are the secretary's substrate), then get the role into
-  the next relevant phase once designed — PHASE HOME (keeper,
-  2026-11-01): P9, design session first then the build. Unpark
-  when the keeper brings it back, after parking/suggestions
-  mechanics are proven.
 - **PL-PP-010 — a rubber-duck skill and a "do-I-need-the-keeper"
   skill** — keeper direction (2026-11-01): two candidate skills.
   Rubber-duck: externalize and examine one's own reasoning before
@@ -243,6 +218,16 @@ what remains open.
 
 ## Resolved
 
+- **PL-PP-009 — a lightweight keeper-secretary role (capture and
+  track only)** — resolved 2026-11-01 (keeper design session, run
+  early): KS IS a role — minimal wrapper, tab parity with PP and PO
+  in the keeper's workspace — minted at `roles/keeper-secretary.md`.
+  Substrate = the P4 inbox with origin=keeper + `bee capture`; the
+  weight is structural (pinned above agent items, never aged or
+  auto-resolved, keeper-only resolution); report *Keeper's notes*
+  zone + kickoff/session-start checks surface them as pending
+  direction. Build at P9; interim = keeper's-list conventions.
+  Design: `designs/2026-11-01-pp-keeper-secretary.md`.
 - **PL-PP-012 — a home for guiding research and references**
   — resolved 2026-11-01 (keeper design session): two layers per
   the shipping test — build-time library at `docs/research/`
