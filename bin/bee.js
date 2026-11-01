@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
 // `bee capture`, `bee park`, `bee memory`, `bee design`, `bee verify`,
-// `bee task`, `bee guidance`, `bee phase`.
+// `bee logbook`, `bee task`, `bee guidance`, `bee phase`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -47,6 +47,9 @@ usage:
              | pick-up <doc> --phase <n> [--check]
              | implement <doc> --phase <n> --merge <hash> [--check]
   bee capture "<thought>"
+  bee logbook [index [--logbook <dir>]]
+             | stamp [--logbook <dir>]
+             | compact <phase> [--logbook <dir>]
   bee verify --plan <path> [--task <n>] [--base <ref>] [--record] [--check]
   bee task   show <plan-path> [--full]
              | move <plan-path> <task-n> <state>
@@ -90,6 +93,9 @@ export function run(argv) {
   }
   if (cmd === 'capture') {
     return cmdCapture(rest);
+  }
+  if (cmd === 'logbook') {
+    return cmdLogbook(rest);
   }
   if (cmd === 'verify') {
     return cmdVerify(rest);
@@ -2009,8 +2015,8 @@ CLI) against the plan root when it carries scripts/structure.map;
 skips with a note otherwise (other repos adopt by adding a map).
 logbook entry <plan-slug>-task<n>-verify-<rN>.md (one per
 task checked; next free rN): machine header (role, date, verdict,
-checks-run, plan path + hash); prose body only for anomalies
-(empty body = clean run).
+checks-run, plan path + hash, task, links); prose body only for
+anomalies (empty body = clean run).
 `;
 
 function verifyUsageErr(e) {
@@ -2286,13 +2292,17 @@ function nextVerifyRound(logbookDir, stem, taskN) {
 }
 
 function verifyEntryText(role, verdict, checksRun, planShown, planHash,
-  anomalies) {
+  taskN, anomalies) {
   let e = '<!-- machine\n' +
     `role: ${role}\n` +
     `date: ${isoStampLocal()}\n` +
     `verdict: ${verdict}\n` +
     `checks-run: ${checksRun}\n` +
     `plan: ${planShown} @ ${planHash}\n` +
+    `task: task-${taskN}\n` +
+    // links: the cross-link slot from birth — related entry paths,
+    // comma-separated, '-' while none exist (P5 Task 2)
+    'links: -\n' +
     '-->\n';
   if (anomalies && anomalies.trim() !== '') {
     e += '\n' + anomalies.trimEnd() + '\n';
@@ -2524,7 +2534,7 @@ function cmdVerify(rest) {
       const file = path.join(logbookDir,
         `${stem}-task${n}-verify-r${round}.md`);
       const entry = verifyEntryText(role, verdict, trs.length,
-        planShown, planHash, anomalies);
+        planShown, planHash, n, anomalies);
       if (f.values.check) {
         out += `--check: would write ${designShown(file)}\n${entry}`;
       } else {
@@ -2540,6 +2550,261 @@ function cmdVerify(rest) {
     }
   }
   return { code: anyFail ? 1 : 0, out, err: '' };
+}
+
+// ---- logbook (P5 Task 2 — headers from birth, stamp, index) ----
+// Entries born under this CLI carry the full machine header
+// (verifyEntryText); `stamp` mints the same shape onto the legacy
+// corpus in one scripted pass, and `index` derives from headers —
+// no regex over prose. Field order everywhere: role, date,
+// verdict, checks-run, plan, task, links.
+
+const LOGBOOK_TASK_RE = /^(.+)-task(\d+)-(verify|review)-r(\d+)\.md$/;
+
+const LOGBOOK_USAGE = `bee logbook — entry headers: derived index, legacy stamp
+
+usage:
+  bee logbook [index] [--logbook <dir>]
+  bee logbook stamp [--logbook <dir>] [--check]
+  bee logbook compact <phase> [--logbook <dir>]
+
+flags:
+  --logbook <dir>  internal: logbook directory
+                   (default <repo-root>/.hivemind/logbook)
+  --check (stamp)  never write; report what would happen
+
+index (default): one TOON line per task-tier entry, derived from
+its machine block — file :: role :: date :: task :: verdict,
+sorted by filename; any missing field renders '-'. Task-tier
+entries match <plan-slug>-task<n>-verify|review-r<N>.md; every
+other file is out of scope. Derived on demand; writes nothing.
+
+stamp: one scripted pass over the logbook dir. Legacy task-tier
+entries gain a machine block — role from the body's Role: line
+(bold or plain), date from the file's last-commit committer date
+(git %cI), verdict from the body's '**Verdict:**' line,
+checks-run: - (no countable source for past runs), plan path from
+the filename stem with the plan's last-commit hash ('-' when the
+plan has no history). Entries already carrying a block but
+missing task:/links: are topped up from their filename, inserted
+after plan: (header field order). A field that cannot be derived
+lands on the hand-fix list with the file named and its missing
+fields — hand-add the machine lines, re-run; the pass exits 1
+while any remain. Non-matching files are skipped and reported as
+out-of-scope (not errors). Idempotent: nothing to stamp → exit 0.
+
+compact: not implemented yet.
+`;
+
+function logbookUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + LOGBOOK_USAGE };
+}
+
+function logbookDirOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'logbook');
+}
+
+function cmdLogbook(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'index' || sub.startsWith('--')) {
+    return logbookIndex(sub === 'index' ? rest.slice(1) : rest);
+  }
+  if (sub === 'stamp') return logbookStamp(rest.slice(1));
+  if (sub === 'compact') {
+    return { code: 1, out: '',
+      err: 'bee logbook compact: not implemented yet\n' };
+  }
+  if (sub === 'help') return { code: 0, out: LOGBOOK_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee logbook: unknown subcommand '${sub}'\n\n` +
+      LOGBOOK_USAGE };
+}
+
+// First <!-- machine … --> block of a logbook entry. Returns
+// { start, end, fields } — line indexes into split('\n') plus the
+// parsed top-level key: value lines — or null when the file
+// carries no block. An unterminated block reads as none (the
+// stamp pass mints a fresh one at the top; the stray fragment
+// stays in the body). Marker matches inside a fenced code
+// block don't count — a quoted block is evidence, not the
+// file's own (fence state toggles on every ``` line).
+function entryBlockOf(text) {
+  const lines = text.split('\n');
+  let start = -1;
+  let fenced = false;
+  for (let i = 0; i < lines.length; i++) {
+    const t = lines[i].trim();
+    if (t.startsWith('```')) { fenced = !fenced; continue; }
+    if (!fenced && /<!--\s*machine/.test(lines[i])) {
+      start = i; break;
+    }
+  }
+  if (start === -1) return null;
+  let end = -1;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].trim().startsWith('-->')) { end = i; break; }
+  }
+  if (end === -1) return null;
+  const fields = {};
+  for (let i = start + 1; i < end; i++) {
+    const m = /^([A-Za-z-]+):\s*(.*)$/.exec(lines[i]);
+    if (m) fields[m[1]] = m[2].trim();
+  }
+  return { start, end, fields };
+}
+
+// git output or null (non-repo, git error, empty) — the stamp
+// pass treats null as "no source", never as a crash.
+function gitOut(cwd, args) {
+  const r = spawnSync('git', args, { cwd, encoding: 'utf8' });
+  if (r.error || r.status !== 0) return null;
+  const t = r.stdout.trim();
+  return t === '' ? null : t;
+}
+
+function logbookStamp(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    logbook: { type: 'string' },
+  });
+  if (f.error) return logbookUsageErr(f.error);
+  const dir = logbookDirOf(f.values.logbook);
+  let names;
+  try {
+    names = fs.readdirSync(dir).sort();
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      return { code: 0, out: `0 entries · nothing to stamp\n` +
+        `logbook: ${dir}\n`, err: '' };
+    }
+    return { code: 1, out: '',
+      err: `bee logbook stamp: cannot read ${dir}: ${e.message}\n` };
+  }
+  const gitRoot = gitOut(dir, ['rev-parse', '--show-toplevel']);
+  const stamped = [];
+  const topped = [];
+  const hand = [];
+  const oos = [];
+  for (const name of names) {
+    const m = LOGBOOK_TASK_RE.exec(name);
+    if (!m) { oos.push(name); continue; }
+    const stem = m[1];
+    const taskN = m[2];
+    const file = path.join(dir, name);
+    let text;
+    try {
+      text = fs.readFileSync(file, 'utf8');
+    } catch (e) {
+      hand.push({ name, missing: [`unreadable: ${e.message}`] });
+      continue;
+    }
+    const block = entryBlockOf(text);
+    if (block) {
+      const add = [];
+      if (block.fields.task === undefined) {
+        add.push(`task: task-${taskN}`);
+      }
+      if (block.fields.links === undefined) add.push('links: -');
+      if (add.length === 0) continue; // complete — nothing to do
+      const lines = text.split('\n');
+      // insert after plan: when present (header field order),
+      // else just before the closing -->
+      let at = block.end;
+      for (let i = block.start + 1; i < block.end; i++) {
+        if (/^plan:/.test(lines[i])) { at = i + 1; break; }
+      }
+      lines.splice(at, 0, ...add);
+      if (!f.values.check) atomicWrite(file, lines.join('\n'));
+      topped.push(`${name} + ${add.map((a) => a.split(':')[0]).join(', ')}`);
+      continue;
+    }
+    // legacy entry: derive every field from body + git + filename
+    const missing = [];
+    let role = null;
+    for (const line of text.split('\n')) {
+      const rm = /^\*{0,2}Role:\*{0,2} ([A-Za-z][A-Za-z0-9-]*)/.exec(line);
+      if (rm) { role = rm[1]; break; }
+    }
+    if (role === null) missing.push('role');
+    let date = null;
+    if (gitRoot) {
+      date = gitOut(gitRoot,
+        ['log', '--format=%cI', '-1', '--', path.relative(gitRoot, file)]);
+    }
+    if (date === null) missing.push('date');
+    let verdict = null;
+    for (const line of text.split('\n')) {
+      const vm = /^\*\*Verdict:\*\* (\w+)/.exec(line);
+      if (vm) { verdict = vm[1]; break; }
+    }
+    if (verdict === null) missing.push('verdict');
+    if (missing.length > 0) { hand.push({ name, missing }); continue; }
+    const planRel = `.hivemind/plans/${stem}.md`;
+    const hash = gitRoot
+      ? (gitOut(gitRoot, ['log', '-1', '--format=%h', '--', planRel]) ?? '-')
+      : '-';
+    const header = '<!-- machine\n' +
+      `role: ${role}\n` +
+      `date: ${date}\n` +
+      `verdict: ${verdict}\n` +
+      'checks-run: -\n' +
+      `plan: ${planRel} @ ${hash}\n` +
+      `task: task-${taskN}\n` +
+      'links: -\n' +
+      '-->\n\n';
+    if (!f.values.check) atomicWrite(file, header + text);
+    stamped.push(name);
+  }
+  let out = `${stamped.length} stamped · ${topped.length} topped-up · ` +
+    `${hand.length} hand-fix · ${oos.length} out-of-scope\n`;
+  for (const s of stamped) out += `stamped: ${s}\n`;
+  for (const t of topped) out += `topped-up: ${t}\n`;
+  for (const h of hand) {
+    out += `hand-fix: ${h.name} — missing ${h.missing.join(', ')}\n`;
+  }
+  for (const o of oos) out += `out-of-scope: ${o}\n`;
+  if (hand.length > 0) {
+    out += 'fix: hand-add the missing machine lines to each named ' +
+      'file, then re-run bee logbook stamp\n';
+    return { code: 1, out, err: '' };
+  }
+  return { code: 0, out, err: '' };
+}
+
+function logbookIndex(args) {
+  const f = flags(args, {
+    logbook: { type: 'string' },
+  });
+  if (f.error) return logbookUsageErr(f.error);
+  const dir = logbookDirOf(f.values.logbook);
+  let names;
+  try {
+    names = fs.readdirSync(dir).sort();
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      return { code: 0, out: `0 entries\nlogbook: ${dir}\n`, err: '' };
+    }
+    return { code: 1, out: '',
+      err: `bee logbook index: cannot read ${dir}: ${e.message}\n` };
+  }
+  const rows = [];
+  for (const name of names) {
+    if (!LOGBOOK_TASK_RE.test(name)) continue;
+    let fields = {};
+    try {
+      const b = entryBlockOf(
+        fs.readFileSync(path.join(dir, name), 'utf8'));
+      if (b) fields = b.fields;
+    } catch (e) { /* unreadable — every field renders '-' */ }
+    rows.push([name, fields.role ?? '-', fields.date ?? '-',
+      fields.task ?? '-', fields.verdict ?? '-'].join(' :: '));
+  }
+  let out = `${rows.length} entries\n`;
+  for (const r of rows) out += r + '\n';
+  return { code: 0, out, err: '' };
 }
 
 // ---- task (P4 Task 6 — work-item state moves, script-owned) ----

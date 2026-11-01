@@ -256,7 +256,7 @@ test('--record fans out one clean entry per task (r1)', () => {
   const e1 = path.join(lb, 'fixture-plan-task1-verify-r1.md');
   const e2 = path.join(lb, 'fixture-plan-task2-verify-r1.md');
   const t1 = fs.readFileSync(e1, 'utf8');
-  assert.match(t1, /^<!-- machine\nrole: bee\ndate: \S+\nverdict: PASS\nchecks-run: 1\nplan: \S+ @ -\n-->\n$/);
+  assert.match(t1, /^<!-- machine\nrole: bee\ndate: \S+\nverdict: PASS\nchecks-run: 1\nplan: \S+ @ -\ntask: task-1\nlinks: -\n-->\n$/);
   assert.ok(!t1.includes('---\n')); // body empty = clean run
   assert.equal(fs.readFileSync(e2, 'utf8').includes('verdict: PASS'),
     true);
