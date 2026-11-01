@@ -171,6 +171,8 @@ stamp_doc() { # stamp_doc <file>
   local f="$1" tmp line t inb=0 emitted=0 title=0
   local s_status=0 s_phase=0 s_hash=0 s_merge=0
   tmp=$(mktemp "${f}.stamp.XXXXXX") || die "mktemp failed near $f"
+  # preserve the target's mode (mktemp creates 0600; review r1 SF1)
+  chmod --reference="$f" "$tmp" 2>/dev/null || true
   # No title line → the block goes on top.
   if [[ $INSERT -eq 1 ]] && ! grep -q '^# ' "$f"; then
     { emit_block; cat "$f"; } >"$tmp"
