@@ -544,6 +544,18 @@ script-owned state
 - [x] Verify: full suite green.
 - [x] Commit: `add bee task state moves with provenance`
 
+**Task notes (loop, 2026-11-01):** task 0-5 done by hand-tick; task 6
+closed THROUGH `bee task` itself (first dogfood: implemented →
+verified → reviewed → done, provenance project-orchestrator, record
+r3 — the ledger lines in the machine block are its moves; record
+path is spine-absolute until phase close merges the entry to main).
+Verify r1 FAIL (link-rider: task-5 review's own inline-code
+examples) → deviation fix round (the task-5 reviewer's prescribed
+matcher fix + willWrite contract fix) → r2 PASS → review r1
+FIX-FIRST (0🔴 2🟡: fence-unaware checkbox rewrite; --full title
+truncation) → r3 PASS (fixes near-verbatim, probes replicated,
+re-review waived).
+
 ## Task 7: `bee guidance` skeleton + skill folds + task-orc codification
 
 **Files:** create `docs/guidance/how-to-be-a-bee.md`,
