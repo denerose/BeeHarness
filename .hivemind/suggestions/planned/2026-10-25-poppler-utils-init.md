@@ -18,3 +18,8 @@ already degrades gracefully (asks the human, offers to install), but
 init-time provisioning keeps every harnessed session PDF-capable
 without an interruption, and keeps the package under Debian security
 maintenance visibility.
+
+## Outcome (2026-11-01)
+Routed to P6: machine prerequisites land in the ~/.bee machine
+store / init contract (design:
+2026-11-01-pp-harness-feedback-channel.md).

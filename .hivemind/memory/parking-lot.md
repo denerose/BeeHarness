@@ -11,6 +11,10 @@ Parked items may carry open questions — discussing them is the unpark
 work; filing roles keep them open (no inline answers, no pre-tilting
 recommendations beyond what the keeper already directed).
 
+Resolution check: before resolving any item, re-read its full text
+and enumerate its asks — a resolution addresses every ask or names
+what remains open.
+
 ## Parked
 
 - **PL-002 — memory tooling specifics** — target recorded in ADR-001
@@ -200,8 +204,9 @@ recommendations beyond what the keeper already directed).
   table — escalate a decision with a live keeper-owned alternative
   (direction/law/tiering), after two failed fix rounds, on genuine
   conflict; never as artifact-reading, bundled mega-questions, or
-  approval-without-alternatives. Full arc in
-  `suggestions/2026-11-01-po-session-hindsight-signoff.md`.
+  approval-without-alternatives. Full arc in git history (the
+  suggestion file was deleted 2026-11-01 after its law landed in
+  both role files).
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any
@@ -211,6 +216,16 @@ recommendations beyond what the keeper already directed).
   `bee init` resolve the main checkout via `--git-common-dir` like
   `scripts/task.sh` does? — unpark when the keeper rules on
   worktree-aware registration (natural home: a later `bee` CLI phase).
+- **PL-PP-013 — power-planner session-memory sweep at the post-P8
+  fresh start** — keeper direction (2026-11-01): after P8, the
+  role starts NEW session memory; before that, sweep the current
+  memory (decision log, board, threads) and capture anything not
+  yet resolved into durable homes or new deferrals — open: what
+  counts as unresolved (a kernel carries vs full distillation),
+  and how the existing promotion split (keeper decisions → ADRs,
+  agent lessons → memory class, pointers → discard) applies at
+  sweep scale — unpark with the post-P8 session start or the
+  keeper's word.
 
 ## Resolved
 

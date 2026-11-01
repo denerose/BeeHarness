@@ -32,7 +32,10 @@ resolves them; the keeper may edit freely or just say the word)
 
 ## Needs the keeper
 
-1. [PO] 2026-10-25 — founding-orchestrator hindsight batch filed (6 files, `suggestions/2026-10-25-po-*`: brainstorm ownership filter, law re-read after sibling pulls, shared-append race check, session-log append-only, absolute paths to keeper, role codification pointers) — awaiting keeper read. Most-wanted: the brainstorm ownership filter.
+- None. (The founding-orchestrator hindsight batch was read and
+  actioned in the 2026-11-01 suggestions graduation pass: five of
+  six landed as law, the brainstorm ownership filter rides P8 in
+  `suggestions/planned/`.)
 
 ## Changed since last report
 

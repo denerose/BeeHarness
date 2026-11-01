@@ -16,3 +16,9 @@ paths — derive from the test file's own location (`import.meta.url`),
 or from a fixture, so the suite is green from any worktree. Consider
 having bee-verify at merge level run `npm test` from a linked worktree
 at least once per phase, which would have caught this class at P2.
+
+## Outcome (2026-11-01)
+Routed to the P8 pass — test-convention line (derive paths from the
+test's own location) + a worktree-suite run at merge level in
+bee verify's checks. Design note:
+2026-11-01-pp-p8-rectification-inputs.md.

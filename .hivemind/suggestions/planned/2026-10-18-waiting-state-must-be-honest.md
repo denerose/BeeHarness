@@ -13,3 +13,9 @@ orchestration phase) must surface wait state honestly: visible "waiting since
 status surface. Also: subagent dispatch cleanup needs auditing — some
 successful scout entries were not reaped (extension policy says delete on
 success); consider a periodic `paseo ls` truth-check in the harness tooling.
+
+## Outcome (2026-11-01)
+Absorbed into the P4 inbox design: the store carries state + age
+per item; rendered views surface waiting-since honestly. The
+paseo-ls truth-check half rides future ~/.bee machine tooling
+(design: 2026-11-01-pp-harness-feedback-channel.md) or drops.

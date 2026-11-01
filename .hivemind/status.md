@@ -6,31 +6,27 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Awaiting keeper (explicit-yes queue, per ADR-008)
 
-- [PP] 2026-10-25 — `pp-scripted-edits-verify` RESOLVED in-session
-  (keeper: "handle it here"): editing discipline is now law in
-  AGENTS.md Rules of engagement (three rules: edit-tool anchoring;
-  whole-file rewrites over scripted patches; residual grep before
-  commit). Outcome noted on the suggestion file. Inbox read order
-  for the keeper drops this from urgent.
-- [PP] 2026-10-25 — two new suggestions from the self-hindsight pass:
-  `suggestions/2026-10-25-pp-parked-item-resolution-check.md` (resolve
-  = every ask addressed) and
-  `suggestions/2026-10-25-pp-claim-with-commit.md` (state claims cite
-  commit hashes). Also: `pp-scripted-edits-verify` RECURRED after
-  filing (three more clobbered-line edits) — recommend acting on it.
-- [PO] 2026-10-25 — queue hygiene: three RESOLVED bullets removed
-  (resolved items leave the queue — convention now enforced by
-  `bee report`'s RESOLVED skip; history in git).
-
-- [PO] 2026-10-25 — founding-orchestrator hindsight batch filed (6
-  files, `suggestions/2026-10-25-po-*`: brainstorm ownership filter,
-  law re-read after sibling pulls, shared-append race check,
-  session-log append-only, absolute paths to keeper, role
-  codification pointers) — awaiting keeper read. Most-wanted: the
-  brainstorm ownership filter.
+- 2026-11-01 — none pending: the graduation pass read and actioned
+  the standing suggestions (law landed in AGENTS/role files/
+  GLOSSARY; routed-but-unbuilt items live in `suggestions/planned/`,
+  consumed at P4/P6/P8; origin files deleted once their fix lands).
 
 ## Open escalations
 
+- [PP] 2026-11-01 — SUGGESTIONS GRADUATION PASS COMPLETE (keeper-
+  approved): discipline batch landed as law — AGENTS editing block
+  extended (rules 4–5: fresh re-reads, real bytes; batch
+  continue-and-report) + a commit-discipline bullet (stage by
+  name; re-read law after sibling pulls; pull+verify shared
+  appends); both role files gained session-log layout, claim-with-
+  commit, corrections-graduation, surface-freshness lines (PP
+  also: assumption sweep); GLOSSARY gained the fourth safety line
+  (pin cwd); parking lot gained the resolution check. 32 of 35
+  suggestion files carry Outcomes (only retired-PP stays open —
+  bucket 4, keeper's queue). ALL P8-ROUTED INPUTS consolidated in
+  `.hivemind/designs/2026-11-01-pp-p8-rectification-inputs.md`
+  (13 numbered items — consume at P8 planning; the P4 plan is
+  untouched).
 - [PP] 2026-11-01 — PL-PP-012 RESOLVED (keeper design session);
   references home landed: `docs/research/` library (ours, never
   ships) + shipped slot (`bee init` scaffolds docs/ or
@@ -65,7 +61,7 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   thinking/ stands; P8's sweep renames skills/session/ →
   skills/thinking/ with references. Kit note's supersessions
   section carries both rulings.
-- [PO] 2026-11-01 — **P7 DONE** (merge 46d406a, real merge commit; close 5ca8599): both slices delivered — meta pair in skilldev/, in-house plan reviewer (six dimensions + plan-checks.sh mechanical core, --run/--extract, 7 tests) in loop/, bee-native handoff pair in session/ (keeper decision), loop-skill folds + determinism lines, kit folders + kit: front matter + namespace rule, full reference sweep (boundary greps zero). Keeper signed off via six decision cards (one at a time): task-branch logbook routing; pair→session; near-verbatim waiver kept; ALL skill-review dimension failures block; sync-last-write/prompt-last-act kept; entry checks dropped (fold later via bee-skill-write). Mid-review directive recorded: review findings are disputable — disputes escalate to the keeper, blocking stands until ruled (clause live in bee-skill-review). Phase review approve after one fix round (phase-added ADR cites stripped; P8 takes pre-existing). **OPEN TAIL: your two AGENTS.md law edits (gate rule → bee-plan-review; handoff rule → bee pair) still pending — the window note below stands until law and tool agree.** Hindsight filed: suggestions/2026-11-01-po-p7-close-hindsight.md. Propose-next issued to the keeper: P4.
+- [PO] 2026-11-01 — **P7 DONE** (merge 46d406a, real merge commit; close 5ca8599): both slices delivered — meta pair in skilldev/, in-house plan reviewer (six dimensions + plan-checks.sh mechanical core, --run/--extract, 7 tests) in loop/, bee-native handoff pair in session/ (keeper decision), loop-skill folds + determinism lines, kit folders + kit: front matter + namespace rule, full reference sweep (boundary greps zero). Keeper signed off via six decision cards (one at a time): task-branch logbook routing; pair→session; near-verbatim waiver kept; ALL skill-review dimension failures block; sync-last-write/prompt-last-act kept; entry checks dropped (fold later via bee-skill-write). Mid-review directive recorded: review findings are disputable — disputes escalate to the keeper, blocking stands until ruled (clause live in bee-skill-review). Phase review approve after one fix round (phase-added ADR cites stripped; P8 takes pre-existing). **OPEN TAIL: your two AGENTS.md law edits (gate rule → bee-plan-review; handoff rule → bee pair) still pending — the window note below stands until law and tool agree.** Hindsight filed: suggestions/planned/2026-11-01-po-p7-close-hindsight.md. Propose-next issued to the keeper: P4.
 - [PO] 2026-11-01 — **PP LAW-EDIT WINDOW OPEN (P7 Task 3/4 builds
   landed on the spine):** the bee-native instruments exist —
   `bee-plan-review` (skills/loop/, with scripts/plan-checks.sh
@@ -305,7 +301,7 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   gap). Repaired: merge commit 809385c completes the ancestry
   (content no-op), persistent worktree detached at main (rest state
   for the next spine cut), phase/3 deleted with -d. Pushed. Seam
-  filed: `suggestions/2026-11-01-po-phase-close-subcommand.md` —
+  filed: `suggestions/planned/2026-11-01-po-phase-close-subcommand.md` —
   phase-close mechanics were hand-rolled; propose scripted close per
   ADR-014 (first user: P4).
 - [PP] 2026-10-25 — received the shared-checkout sweep note; adopted

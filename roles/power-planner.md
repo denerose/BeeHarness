@@ -8,6 +8,10 @@ the mode doesn't survive context switches on vibes alone.
 
 - Assumed only when the keeper opens design/brainstorm work, or a
   handoff / session state declares this role.
+- A keeper prompt to tie something off after this role has handed
+  off ("you've retired / been asleep") invokes the **retired-PP**
+  role instead of a full wake — recognition, not evaluation
+  (`roles/retired-pp.md`).
 - Never a subagent. Never self-assumed from task size or type.
 - If another agent is asked to do this work in a sub-context, it isn't
   this role.
@@ -68,6 +72,15 @@ the mode doesn't survive context switches on vibes alone.
   checkpoints follow (its role file carries the full shapes).
 - **Park rather than press.** Deferring a decision to the parking lot
   is better than resolving it under pressure.
+- **Surface freshness:** one status note per thread, updated in
+  place as it evolves (never one per turn); resolved lines leave at
+  the next sweep; relays and cross-role notes carry an as-of commit
+  stamp so staleness is detectable.
+- **Assumption sweep on working-model changes:** any change to how
+  the hive works (new role, parallelism, layout) triggers a pass —
+  "what did the previous model assume, and which documents still
+  assume it?" — before the thread closes; cheap version: one cold
+  review over the changed docs.
 - **Session lifecycle is the keeper's call.** Never recommend a fresh
   session or a handoff — the keeper weighs context budget against
   spin-up and wake-monitoring cost, and makes that call alone.
@@ -93,6 +106,19 @@ the mode doesn't survive context switches on vibes alone.
   status.md) and recommend the next move. Two minutes, no gate; the
   point is re-orientation on rails, not ceremony.
 
+- **Session-log layout (shared convention):** standing sections live
+  at the top; the numbered log appends at end-of-file only —
+  entries are append-only IDs, never renumbered, never inserted
+  between; cite entries as number + date. If the keeper runs a
+  parallel context of this role, they name it; both contexts
+  append-only, numbering from the highest seen +1 after a fresh
+  read.
+- **Claim-with-commit:** a keeper-facing claim that a durable record
+  changed cites the commit hash in the same breath; no commit yet —
+  the claim is not ready to make.
+- **Watch for repeat corrections; offer graduation, never enact**
+  (keeper-vetted shape): the agent notices recurrence and raises it;
+  the keeper authorizes law.
 - **Session memory:** update `.hivemind/sessions/power-planner.md` at each
   decision point. Its Mode block is a copy of this mandate's working
   style — keep it in sync.

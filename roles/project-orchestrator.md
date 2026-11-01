@@ -96,3 +96,18 @@ them to a planner session.
 - **Session memory:** `.hivemind/sessions/project-orchestrator.md` —
   yours alone (role name in filename; one file per active role).
   Update at each decision point; re-read after compaction.
+- **Session-log layout (shared convention):** standing sections live
+  at the top; the numbered log appends at end-of-file only — entries
+  are append-only IDs, never renumbered, never inserted between. If
+  the keeper runs a parallel context of this role, they name it; both
+  contexts append-only, numbering from the highest seen +1 after a
+  fresh read.
+- **Claim-with-commit:** a keeper-facing claim that a durable record
+  changed cites the commit hash in the same breath; no commit yet —
+  the claim is not ready to make.
+- **Watch for repeat corrections; offer graduation, never enact**
+  (keeper-vetted shape): the agent notices recurrence and raises it;
+  the keeper authorizes law.
+- **Surface freshness:** one status note per thread, updated in place
+  (never one per turn); resolved lines leave at the next sweep;
+  relays and cross-role notes carry an as-of commit stamp.

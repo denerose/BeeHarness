@@ -31,3 +31,8 @@ now, nor to pre-resolve with embedded recommendations that tilt the
 future session. The capture skill's triage guidance must preserve
 such questions open until their design session. Same rule noted in
 the parking lot's format line.
+
+## Outcome (2026-11-01)
+Absorbed into P4: `bee capture` (Task 1) — minimal capture, routing
+stays conversational; the secretary-role half stays PL-PP-009
+(post-P4 design session, wanted).
