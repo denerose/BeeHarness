@@ -136,7 +136,7 @@ only — added by the script, never by hand)
 the mechanical core `bee design` (Task 4) wraps; the P4 design
 stamped `picked-up`
 
-- [ ] Write `scripts/design.sh` (bash, stdlib only; modeled on
+- [x] Write `scripts/design.sh` (bash, stdlib only; modeled on
   `scripts/plan-checks.sh` conventions): reads/writes the machine
   block defined in `.hivemind/designs/TEMPLATE.md` (`status:`,
   `phase:`, `hash:`, `merge:` between `<!-- machine` and `-->`).
@@ -150,14 +150,22 @@ stamped `picked-up`
   recorded hash ≠ current `git log -1` hash → `drift: pending
   rectification` (addenda after pickup are legal; the flag points
   at them, never blocks). `--check` supported on mutations.
-- [ ] Run it: `scripts/design.sh pick-up
+- [x] Run it: `scripts/design.sh pick-up
   .hivemind/designs/2026-10-25-pp-p4-inbox-design.md --phase 4` —
   expected: machine block added, `status: picked-up`,
   `hash: ad77aa4`. Verify `scripts/design.sh status` shows it.
-- [ ] Verify: `bash scripts/design.sh status` lists all designs;
+- [x] Verify: `bash scripts/design.sh status` lists all designs;
   re-running pick-up exits 1 with the not-live reason (idempotency
   proven); `node --test tests/*.test.mjs` still green.
-- [ ] Commit: `add design.sh, stamp P4 design picked-up`
+- [x] Commit: `add design.sh, stamp P4 design picked-up`
+**Task notes (loop, 2026-11-01):** done — verify r1 PASS + review r1
+(fix first: 2🟡) + verify r2 PASS (fixes applied; re-reviews waived —
+reviewer-suggested changes near-verbatim, probes replicated in r2).
+Deviation accepted + recorded: drift = content-diff excluding machine
+blocks, not literal hash-vs-hash (literal self-flags the stamping
+commit forever, contradicting Task 4's clean-clone verify; ADR-016
+drift = "the design changed after pickup" — machine blocks are script
+territory). Branch: task/4-design-stamp @ 1301888.
 
 ## Task 1: inbox store + `bee inbox` family + `bee capture`
 
@@ -167,7 +175,7 @@ stamped `picked-up`
 **Provides:** `bee inbox add|list|show|done`, `bee capture`, the
 store format Tasks 2–3 reuse
 
-- [ ] Implement in `bin/bee.js` (house patterns: `run(argv)` →
+- [x] Implement in `bin/bee.js` (house patterns: `run(argv)` →
   `{code,out,err}`, strict parseArgs, `--check` on mutations,
   atomicWrite):
   - `bee inbox add <addressee> <text> [--origin <role>] [--ref <path>]`
@@ -185,7 +193,7 @@ store format Tasks 2–3 reuse
   - `bee capture "<thought>"` — sugar for `add keeper <thought>
     --origin capture` (minimal per kickoff item 3; routing stays
     conversational).
-- [ ] Store format `.hivemind/inbox.toon` — verbatim contract:
+- [x] Store format `.hivemind/inbox.toon` — verbatim contract:
 
 ```text path=.hivemind/inbox.toon
 # inbox — items waiting on someone (agent store; views render from here)
@@ -204,11 +212,11 @@ done: -
   `taken:` stamped by `list --for` reads only (no claim command
   this phase — claims stay in the phase list per GLOSSARY).
   `origin` defaults to `bee` when no `--origin` passed.
-- [ ] Schema-for-later (ruling 3): timestamps always ISO 8601 with
+- [x] Schema-for-later (ruling 3): timestamps always ISO 8601 with
   offset; ids never reused; no field deleted this phase. A later
   escalation flag or auto-reviewer pass adds fields without
   breaking views.
-- [ ] AXI compliance tests (`tests/bee-inbox.test.mjs`): bare
+- [x] AXI compliance tests (`tests/bee-inbox.test.mjs`): bare
   `bee inbox` = list (content first); empty store → `0 items`;
   unknown flag → exit 1 + usage; `--check` add writes nothing
   (store absent after); done idempotent; aggregate header present;
@@ -216,9 +224,17 @@ done: -
   origin `capture`. Run against a temp-dir store (env var or flag
   for store path — `bee inbox --store <path>` internal flag is
   fine if documented in usage).
-- [ ] Verify: `node --test tests/bee-inbox.test.mjs` green; full
+- [x] Verify: `node --test tests/bee-inbox.test.mjs` green; full
   suite green.
-- [ ] Commit: `add inbox store, bee inbox family, capture`
+- [x] Commit: `add inbox store, bee inbox family, capture`
+**Task notes (loop, 2026-11-01):** done — verify r1 PASS + review r1
+(fix first: 1🟡) + verify r2 PASS (newline guard on done --note;
+re-review waived — near-verbatim, probe replicated as a regression
+test). Deviations accepted + recorded: real store created by Task 2's
+migration adds (not this task); optional `note:` field after `done:`
+(mirrors park `how`, ruling-3-safe); `<n> open` counts not-done items
+(documented in usage; Task 2's render keeps the wording hazard in
+mind). Branch: task/4-inbox-store @ aa4ff59.
 
 ## Task 2: migration + rendered views (status board + keeper report derive from the store)
 
