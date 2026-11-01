@@ -62,6 +62,57 @@ direct work) is conversation; resolution is the keeper's alone.
 None blocking. (KS session file only if use demands; supersede
 machanics inherit the inbox's.)
 
+## KS tooling extension — `bee report review` (keeper direction
+2026-11-01: plan and design)
+
+**The keeper's report walk.** `bee report review` emits a digest of
+the KEEPER-OWNED zones (Keeper's list, Keeper's notes): each item
+with age, cross-references (parking ids, commit hashes, inbox
+ids), and evidence-marked resolution candidates where they exist —
+a list item whose parking item already resolved; a note whose
+phase landed. KS walks the digest with the keeper conversationally;
+each resolution is the keeper's word, recorded through the store
+commands (`bee inbox done`, `bee park resolve`, keeper's-list
+marks); regen refreshes the report after the walk. ADR-008 zone law
+holds throughout: merge-never-drop, resolution keeper-only (in
+conversation counts).
+
+**Stale handling:** `--stale` flags aged items (threshold
+calibratable); flags only — nothing is ever auto-dropped or aged
+out.
+
+**Evidence attachment:** every resolution stamp carries date +
+conversation-origin + refs — the audit trail lives in the store,
+the report renders it.
+
+**Lane boundary:** keeper-owned zones are KS's to walk. Agent zones
+(Needs the keeper / Changed / Worth a sample) regenerate from the
+store; KS flags hygiene there (stale notes, one-note-per-thread
+violations) for the owning role — never edits them.
+
+**Explain-and-research mandate line** (keeper addition,
+2026-11-01): no new command — KS reads the rendered views
+(`bee inbox list`, the status board) and explains status, progress,
+and next steps from them; a digest command only if use demands one.
+
+**Build:** P9, with KS's other tooling; depends on P4 Task 2's
+store-derived report.
+
+## The keeper report, repurposed (keeper direction, 2026-11-01)
+
+The original report — ADR-008's zoned interim surface (agent
+sections regenerating from status.md, the keeper's list, the regen
+protocol) — is STALE and its purpose is outdated: the PP/PO stream
+split, self-contained asks, and the phase list as source of truth
+replaced its daily-driver role. Its FUTURE: **the secretary's
+tracker — the human-readable render of all the TOON tracking**
+(inbox, parking, phases, logbook index, design stamps). Design
+FRESH once the CLI is ready, with KS's build here at P9: do not
+salvage the old format, zones, or regen protocol — ADR-008's
+interim-report clause is amended at the rebuild. Interim: the
+stale markdown stands untouched; P4 Task 2's store-derived render
+is the bridge, not the destination.
+
 ## Feeds
 
 P9 (the build: tooling around the minted role); P4 (the capture
