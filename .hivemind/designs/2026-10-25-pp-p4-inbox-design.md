@@ -181,6 +181,12 @@ P4 plan has real input:
   phase**. The phase-kickoff skill reads the flag at the next
   kickoff. Turns the P7 calibration signal into a mechanical
   check: the loop measures its own asking discipline.
+- **`bee design` (ADR-016):** `new` (scaffolds the template),
+  `pick-up <doc> --phase <n>` (stamps picked-up + hash),
+  `implement <doc> --phase <n> --merge <hash>`, `status` (list +
+  drift flags). Transitions are script edits — agents never
+  hand-edit design machine blocks. Interim: a `scripts/` helper
+  may precede the CLI (plan-checks.sh pattern).
 - Open question for P4 planning: the plan-header field contract —
   the header is the interface between bee-plan (writer) and `bee
   verify` (reader); settle the field list there, including how

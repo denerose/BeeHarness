@@ -1,7 +1,8 @@
 # ADR 016: design-doc lifecycle — live, picked-up, implemented
 
 **Date:** 2026-11-01
-**Status:** Proposed (PP draft; keeper flips)
+**Status:** Accepted (keeper yes, 2026-11-01; amended same day —
+scripted status, point 5)
 
 ## Context
 
@@ -34,6 +35,17 @@ is checkable rather than remembered.
 4. **Planner discipline (role law).** Check the status stamp before
    editing any design doc; a non-live design changes only via the
    addendum path.
+5. **Scripted transitions, machine-readable status (keeper,
+   2026-11-01).** The status lives in a machine header block
+   (`<!-- machine … -->`, same convention as plan headers:
+   status / phase / hash / merge fields); a design TEMPLATE carries
+   it from birth (`.hivemind/designs/TEMPLATE.md`). Transitions are
+   SCRIPT edits, never agentic: `bee design pick-up <doc> --phase
+   <n>` (stamps + hash), `bee design implement <doc> --phase <n>
+   --merge <hash>`, `bee design status` (list + drift flags) — P4
+   CLI; an interim `scripts/` helper may precede it (the
+   plan-checks.sh pattern). Agents never hand-edit the machine
+   block.
 
 ## Consequences
 
@@ -43,6 +55,8 @@ is checkable rather than remembered.
   addenda).
 - PO's existing kickoff-card practice (design state hash) becomes
   the formal mechanism.
+- Existing design docs are stamped at their next touch (or by a
+  rectification sweep) — no mass retrofit required.
 
 ## Alternatives considered
 
