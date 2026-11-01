@@ -24,11 +24,12 @@ function atomicWrite(file, data) {
 const USAGE = `bee ${VERSION} — BeeHarness CLI
 
 usage:
-  bee report [--check] [--status <path>] [--report <path>]
+  bee report [--check] [--status <path>] [--report <path>] [--store <path>]
   bee init   [--check] [--settings <path>]
   bee inbox  [list [--for <addressee>] [--full]]
              | add <addressee> <text> [--origin <role>] [--ref <path>]
              | show <id> [--full] | done <id> [--note <how>]
+             | render [--status <path>]
   bee capture "<thought>"
   bee help | version
 
@@ -158,9 +159,9 @@ const ZONE_TITLES = [
   'Worth a sample',
 ];
 
-const FRESH_HEADER = `# Keeper report
+const FRESH_HEADER_PREFIX = `# Keeper report
 
-**Generated:** {STAMP} by bee report (fresh) · **Source:** \`.hivemind/status.md\`
+**Generated:** {STAMP} by bee report (fresh) · **Source:** \`{SOURCE}\`
 
 **Zones and rules — read before regenerating this file:** *Keeper's
 list* is the keeper's own — roles add items on the keeper's word,
@@ -172,6 +173,10 @@ from both roles (never silently dropping the other role's asks).
 Headings carry no pronouns. Paths absolute (Paseo). The keeper may
 edit any zone directly. (ADR-008 + ADR-007 amendment 1.)
 `;
+
+function freshHeader(source) {
+  return FRESH_HEADER_PREFIX.replace('{SOURCE}', source);
+}
 
 function stamp() {
   const d = new Date();
@@ -226,6 +231,7 @@ function queueBullets(statusText) {
       continue;
     }
     if (!inQueue) continue;
+    if (/^<!--.*-->$/.test(line.trim())) continue; // markers, not asks
     if (line.startsWith('- ')) {
       if (cur !== null) bullets.push(cur);
       cur = line.slice(2);
@@ -237,6 +243,24 @@ function queueBullets(statusText) {
   return bullets
     .filter((b) => !/^- *$/.test(b))
     .filter((b) => !/\bRESOLVED\b/.test(b)); // history, not an ask
+}
+
+// Open items addressed to the keeper — the report's derived asks
+// once the store is live (fallback: queueBullets above).
+function inboxKeeperAsks(items, repoRoot) {
+  return items
+    .filter((it) => it.addressee === 'keeper' && it.state !== 'done')
+    .sort((a, b) => (Date.parse(a.opened) || 0) - (Date.parse(b.opened) || 0))
+    .map((it) => {
+      const m = /^(\d{4}-\d{2}-\d{2})/.exec(it.opened || '');
+      const tail = [it.id];
+      if (it.ref && it.ref !== '-') {
+        tail.push(path.resolve(repoRoot, it.ref)); // always absolute
+      }
+      const line = `[${it.origin}] ${m ? m[1] : '?'} — ${it.text} ` +
+        `(${tail.join(' · ')})`;
+      return absolutize(line, repoRoot);
+    });
 }
 
 function absolutize(text, repoRoot) {
@@ -259,6 +283,8 @@ function absolutize(text, repoRoot) {
 
 function normItem(s) {
   return s.replace(/^\d+\.\s*/, '')
+    .replace(/^\[[^\]]*\]\s*/, '') // leading [role] tag
+    .replace(/^\d{4}-\d{2}-\d{2}\s*[—-]?\s*/, '') // leading date
     .replace(/[*_`]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
@@ -307,6 +333,7 @@ function cmdReport(rest) {
     check: { type: 'boolean' },
     status: { type: 'string' },
     report: { type: 'string' },
+    store: { type: 'string' },
   });
   if (f.error) {
     return { code: 1, out: '', err: String(f.error) + '\n' };
@@ -339,6 +366,23 @@ function cmdReport(rest) {
     };
   }
 
+  // Needs-the-keeper derivation: the inbox store when it carries
+  // open keeper items; status bullets otherwise (transition safety
+  // until the queues are migrated into the store).
+  const storePath = f.values.store
+    ? path.resolve(f.values.store)
+    : path.join(repoRoot, '.hivemind', 'inbox.toon');
+  const sr = readInbox(storePath);
+  if (sr.err) {
+    return { code: 1, out: '',
+      err: 'bee report: ' + sr.err.replace(/^bee inbox: /, '') };
+  }
+  const storeAsks = inboxKeeperAsks(sr.items, repoRoot);
+  const fromStore = storeAsks.length > 0;
+  const derived = fromStore ? storeAsks
+    : queueBullets(statusText).map((b) => absolutize(b, repoRoot));
+  const source = fromStore ? '.hivemind/inbox.toon' : '.hivemind/status.md';
+
   const zones = parsed !== null
     ? parsed.zones
     : {
@@ -352,11 +396,9 @@ function cmdReport(rest) {
     ? parsed.header.replace(
         /\*\*Generated:\*\*[^\n]*(?:\n(?!\s*$|\*\*|#)[^\n]*)*(?:\n\*\*Source:\*\*[^\n]*)?$/m,
         `**Generated:** ${stamp()} by bee report (merge regen) · ` +
-        `**Source:** \`.hivemind/status.md\``)
-    : FRESH_HEADER.replace('{STAMP}', stamp());
+        `**Source:** \`${source}\``)
+    : freshHeader(source).replace('{STAMP}', stamp());
 
-  const derived = queueBullets(statusText)
-    .map((b) => absolutize(b, repoRoot));
   zones['Needs the keeper'] = mergeNeeds(
     derived, zones['Needs the keeper']);
 
@@ -388,6 +430,7 @@ usage:
   bee inbox add <addressee> <text> [--origin <role>] [--ref <path>] [--check]
   bee inbox show <id> [--full]
   bee inbox done <id> [--note <how>] [--check]
+  bee inbox render [--status <path>] [--check]
   bee capture "<thought>" [--check]
 
 flags:
@@ -396,6 +439,8 @@ flags:
   --origin <role>    provenance on add (default: bee; capture: capture)
   --ref <path>       optional pointer riding the item (default: -)
   --note <how>       how it was resolved (recorded on done)
+  --status <path>    status file the render region lives in
+                     (default .hivemind/status.md)
   --full             all fields, no truncation
   --check            never write; report what would happen
   --store <path>     internal: store path (default .hivemind/inbox.toon)
@@ -403,6 +448,12 @@ flags:
 store: TOON — one item per block, blank line between; ids IN-NNN
 (monotonic, never reused); state open → taken → done; list counts
 not-done items as open; ages from ISO opened timestamps.
+
+render: writes the open-items view (grouped by addressee, oldest
+first, with ages; full text) between <!-- inbox:render --> markers
+in the status file; creates the region under the "Awaiting keeper"
+heading (replacing a hand-written section) when absent; text
+outside the region is never touched.
 `;
 
 const CAPTURE_USAGE = `bee capture "<thought>" — quick thought into the keeper's inbox
@@ -519,6 +570,7 @@ function cmdInbox(rest) {
   if (sub === 'add') return inboxAdd(rest.slice(1));
   if (sub === 'show') return inboxShow(rest.slice(1));
   if (sub === 'done') return inboxDone(rest.slice(1));
+  if (sub === 'render') return inboxRender(rest.slice(1));
   if (sub === 'help') return { code: 0, out: INBOX_USAGE, err: '' };
   return { code: 1, out: '',
     err: `bee inbox: unknown subcommand '${sub}'\n\n` + INBOX_USAGE };
@@ -709,6 +761,126 @@ function inboxDone(args) {
   const w = writeInbox(storePath, r.items);
   if (w) return { code: 1, out: '', err: w };
   return { code: 0, out: `${it.id} done\n`, err: '' };
+}
+
+// ---- render (P4 Task 2 — the status file's marked inbox region) ----
+
+const RENDER_OPEN = '<!-- inbox:render -->';
+const RENDER_CLOSE = '<!-- /inbox:render -->';
+const RENDER_HEADING = '## Awaiting keeper (rendered from inbox.toon)';
+
+function inboxRenderView(items) {
+  const open = items.filter((it) => it.state !== 'done');
+  if (open.length === 0) return '0 open';
+  const age = (it) => Date.parse(it.opened) || 0;
+  const oldest = open.reduce((a, b) => age(a) <= age(b) ? a : b);
+  const groups = new Map();
+  for (const it of open) {
+    if (!groups.has(it.addressee)) groups.set(it.addressee, []);
+    groups.get(it.addressee).push(it);
+  }
+  const names = [...groups.keys()].sort((a, b) =>
+    a.toLowerCase() < b.toLowerCase() ? -1 :
+      a.toLowerCase() > b.toLowerCase() ? 1 : 0);
+  let out = `${open.length} open · oldest ${ageOf(oldest.opened)}`;
+  for (const name of names) {
+    const g = groups.get(name).sort((x, y) => age(x) - age(y));
+    out += `\n\n${name} (${g.length} open · oldest ${ageOf(g[0].opened)}):`;
+    for (const it of g) {
+      const ref = it.ref && it.ref !== '-' ? ` · ref: ${it.ref}` : '';
+      out += `\n- ${it.id} · ${ageOf(it.opened)} — ${it.text}${ref}`;
+    }
+  }
+  return out;
+}
+
+function renderIntoStatus(statusText, view, statusPath) {
+  const openIdx = statusText.indexOf(RENDER_OPEN);
+  const closeIdx = statusText.indexOf(RENDER_CLOSE);
+  if (openIdx !== -1 || closeIdx !== -1) {
+    if (openIdx === -1 || closeIdx === -1 || closeIdx < openIdx) {
+      return {
+        err: `bee inbox render: unbalanced render markers in ` +
+          `${statusPath} — hand-fix the <!-- inbox:render --> pair, ` +
+          `then re-run\n`,
+      };
+    }
+    const before = statusText.slice(0, openIdx + RENDER_OPEN.length);
+    const after = statusText.slice(closeIdx);
+    return { text: `${before}\n${view}\n${after}`, note: 'region updated' };
+  }
+  // No region yet: create it under the rendered heading, replacing
+  // a hand-written "Awaiting keeper" section when one exists.
+  const lines = statusText.split('\n');
+  const section =
+    `${RENDER_HEADING}\n\n${RENDER_OPEN}\n${view}\n${RENDER_CLOSE}`;
+  const start = lines.findIndex((l) => l.startsWith('## Awaiting keeper'));
+  if (start !== -1) {
+    let end = lines.length;
+    for (let i = start + 1; i < lines.length; i++) {
+      if (/^## /.test(lines[i])) { end = i; break; }
+    }
+    return {
+      text: end < lines.length
+        ? [...lines.slice(0, start), section, '', ...lines.slice(end)]
+            .join('\n')
+        : [...lines.slice(0, start), section].join('\n') + '\n',
+      note: 'replaced hand-written queue section',
+    };
+  }
+  const first = lines.findIndex((l) => /^## /.test(l));
+  if (first === -1) {
+    return {
+      text: statusText.replace(/\n+$/, '') + '\n\n' + section + '\n',
+      note: 'region created',
+    };
+  }
+  return {
+    text: [...lines.slice(0, first), section, '', ...lines.slice(first)]
+      .join('\n'),
+    note: 'region created',
+  };
+}
+
+function inboxRender(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+    status: { type: 'string' },
+  }, true);
+  if (f.error) return inboxUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return inboxUsageErr(
+      `bee inbox render: unexpected argument '${f.positionals[0]}'`);
+  }
+  const storePath = storePathOf(f.values.store);
+  const statusPath = f.values.status
+    ? path.resolve(f.values.status)
+    : path.join(REPO_ROOT, '.hivemind', 'status.md');
+  const r = readInbox(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  let statusText;
+  try {
+    statusText = fs.readFileSync(statusPath, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee inbox render: cannot read ${statusPath}: ${e.message}\n` };
+  }
+  const view = inboxRenderView(r.items);
+  const res = renderIntoStatus(statusText, view, statusPath);
+  if (res.err) return { code: 1, out: '', err: res.err };
+  if (f.values.check) {
+    return { code: 0, out: `--check: would render into ${statusPath} ` +
+      `(${res.note})\n${RENDER_OPEN}\n${view}\n${RENDER_CLOSE}\n`, err: '' };
+  }
+  try {
+    atomicWrite(statusPath, res.text);
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee inbox render: cannot write ${statusPath}: ${e.message}\n` };
+  }
+  return { code: 0,
+    out: `bee inbox render: ${res.note} — ${statusPath}\n`, err: '' };
 }
 
 function cmdCapture(rest) {
