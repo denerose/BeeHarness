@@ -21,6 +21,9 @@ cut from the phase branch by the dispatcher before dispatch (e.g.
 branch and reach main at merge. Mid-flight reads from other checkouts
 use `git show <branch>:<path>`.
 
+While the dispatch runs, the dispatcher waits on the pass-back — it
+does not read the worktree mid-flight.
+
 **Safety lines:**
 1. Tool defaults may write to live files — always pass `--check` or
    explicit output paths, and verify with `git status` after.
