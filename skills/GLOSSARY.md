@@ -62,7 +62,9 @@ their own documents (`docs/AXI.md`).
 - **phase list** — the loop's one-line-per-phase tracking file,
   `.hivemind/phases/<project>.md` (project = repo name unless the keeper
   says otherwise). The only file the loop updates to track its own
-  progress.
+  progress. Each row links its plan and the design docs the phase
+  consumes — the list is the queue's source of truth; status notes
+  are transient.
 - **logbook** — `.hivemind/logbook/`. The loop's written account of
   its own work: verify entries and review reports, named
   `<plan-slug>-task<N>-verify-r<N>.md` and
