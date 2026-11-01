@@ -276,7 +276,10 @@ front-loaded decision list, every open question with alternatives
 call with a live alternative; rulings as fix rounds; a final
 mechanical close card with the merge summary; calibration — an
 inventory much over ~8 decisions means the phase was under-asked
-at kickoff). Build when P4 opens so its first formal use dogfoods
+at kickoff). Build when P4 opens so its first formal use dogfoods;
+  the close-side flag — `bee` counts the phase's recorded decisions
+  and flags over-threshold inventories as under-asked kickoffs — is
+  designed into P4 and lands with the close step
 (PO runs the manual version at P4 open regardless). Two
 honesty-loop reinforcements from the same retrospective:
 deliverables ship IN the reply that claims them (claim-with-commit

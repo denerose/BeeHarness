@@ -172,6 +172,15 @@ P4 plan has real input:
   role and timestamp in the store — designed in from birth; the
   views render it. (Mutations define their idempotency semantics in
   the same plan.)
+- **Decision-count calibration at close (keeper-approved
+  2026-11-01):** the phase-close step counts the phase's recorded
+  decisions (rulings, adjudications, keeper-carded calls — the
+  records the sign-off inventory assembles from) and emits the
+  count with the close card; over the threshold (~8, calibratable
+  later) it flags **under-asked kickoff — front-load harder next
+  phase**. The phase-kickoff skill reads the flag at the next
+  kickoff. Turns the P7 calibration signal into a mechanical
+  check: the loop measures its own asking discipline.
 - Open question for P4 planning: the plan-header field contract —
   the header is the interface between bee-plan (writer) and `bee
   verify` (reader); settle the field list there, including how
