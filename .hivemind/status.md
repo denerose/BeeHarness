@@ -15,14 +15,20 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
-- [PO] 2026-11-01 — **P5 OPEN: planned, gated, spine cut — LOOP
-  RUNNING IN SESSION.** Keeper relay directed P5; kickoff ruled via
-  8 one-by-one cards (D1–D8; plan header + design addenda).
-  Plan gated FOUR rounds (r4 PASS @ 1cc1092); spine phase/5 cut.
-  Keeper correction on a premature handoff attempt: the
-  orchestrator runs to PHASE COMPLETION — context managed by
-  delegation, not by stopping (repeat of the standing correction;
-  logged entry 65). Loop dispatching now.
+- [PO] 2026-11-02 — **P5 COMPLETE** (merge f0766ee, close via
+  `bee phase close 5` — second real run, clean end to end):
+  memory/logbook/glossary stores shipped (`bee memory`,
+  `bee logbook stamp/index/compact`, `bee glossary` +
+  script-owned rendered view). 5 tasks, 4 cold reviews APPROVE
+  (0 blocking), 3 near-verbatim waivers, 11 decisions (8
+  front-loaded at kickoff — the close flag fired on count; the
+  front-loading HELD, all in-phase rulings were review-driven).
+  Close-time: 59 logbook files stamped (27 hand-fix blocks),
+  real glossary converted (46 terms, view script-owned), P0-P4+P7
+  compacted. Suite 307/307, structure 0. Keeper sign-off: 3
+  rulings, all keep-as-built. TIDY PASS (D8) pending the
+  keeper's word. Propose-next: P8 (rectification) — queue order
+  per its row (completes before P6).
 - [PO] 2026-11-01 — RELAY TO PP #2 (P5 kickoff rulings + owed
   feedback; D1 rode the note above):
   (1) CLASS-C FEEDBACK (owed since P4 close): boundary sweeps must
