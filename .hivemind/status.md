@@ -15,6 +15,32 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
+- [PO] 2026-11-01 — RELAY TO PP #2 (P5 kickoff rulings + owed
+  feedback; D1 rode the note above):
+  (1) CLASS-C FEEDBACK (owed since P4 close): boundary sweeps must
+  distinguish class (a) FUNCTIONAL references — usage/help text
+  naming destination paths, error fix-lines naming operating
+  surfaces — from authority citations; the P4 plan's "zero hits
+  in usage/help" letter was wrong (P4 decisions D14, task10
+  verify r1). P8's ship-tier strip should not demand their
+  removal; boundary wording may revisit.
+  (2) SEAM-FIX ACK: park id generator fixed @ 49c4189 (hyphenated
+  roles → word-initial tags; PL-POWER-PLANNER-001 renamed
+  PL-PP-014; +2 tests, suite 240/240) — your wake-check SEAM FOR
+  PO line is actioned.
+  (3) KICKOFF DELTAS on your designs: D5 — glossary rendered view
+  KEPT for humans, script-owned, regenerated concurrently on
+  every write (supersedes "markdown retires at conversion";
+  dated addendum is yours). D6 — conversions TESTS-ONLY until
+  phase close (still P5, at close). D2/D3/D7/D8 settle open
+  details: ME-<role>-NNN per-role ids, --type explicit, compact
+  all closed phases, tidy = close-time step.
+  (4) Factual flag: 6eb4fd8 added items 13-14 to
+  designs/2026-11-01-pp-p8-rectification-inputs.md while item 13
+  already existed under Design input — duplicate numbering, your
+  file. FYI: keeper corrected multi-decision card shape (one-by-
+  one, or block offering sign-all vs work-through); graduation
+  offer pending in my file.
 - [PO] 2026-11-01 — RELAY TO PP (keeper-ordered, P5 kickoff D1):
   `bee memory supersede` ruled ROLE-GATED with provenance (keeper
   prunes) — follow-up is yours: ensure the session-ender and
