@@ -52,6 +52,9 @@ task-1: done 2026-11-02T09:18:43+11:00 by project-orchestrator record: .hivemind
 task-2: implemented 2026-11-02T09:08:13+11:00 by project-orchestrator
 task-2: verified 2026-11-02T09:18:48+11:00 by project-orchestrator
 task-2: done 2026-11-02T09:18:48+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task2-verify-r2.md
+task-4: implemented 2026-11-02T09:29:28+11:00 by project-orchestrator
+task-4: verified 2026-11-02T09:38:15+11:00 by project-orchestrator
+task-4: done 2026-11-02T09:38:15+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task4-verify-r2.md
 -->
 
 ## Shared contract: command grammar (USAGE additions)
@@ -146,12 +149,14 @@ links: <related entry paths, comma-separated, or ->
 **Depends on:** nothing (independent of Tasks 1–3)
 **Provides:** store `.hivemind/glossary.toon`; `bee glossary` lookup/supply/`--markdown`; concurrent view regeneration (D5); the conversion subcommand Task 5 runs at close (D6)
 
-- [ ] Step: implement per contracts below. Lookup: exact match → print the line; else unique prefix match → print it; else multiple prefix matches → print all, exit 0; else zero → structured error listing nearest matches (substring hits), exit 1. `--markdown` renders lookup/list output as markdown lines instead of TOON (on-demand human view; the committed view file is a separate artifact). `add` fails loud when the term exists (supply, not update — no update path). Absent store: bare call reports `0 terms`, lookup fails loud. Internal seam flags (`--store`, `--view`) follow the park/inbox house pattern: implemented, listed in per-subcommand help (`bee glossary help`), not in the top-level stanza.
-- [ ] Step: view regeneration (D5): every store write (`add`, and Task 5's `convert`) regenerates the rendered markdown view atomically — header marker + one `**term** — gist` line + indented `see:` pointers, alphabetical. View path: `--view <path>` overrides; default `<root>/skills/GLOSSARY.md` when `skills/GLOSSARY.md` exists, else `<root>/GLOSSARY.md`. Read-only lookups never touch the view.
-- [ ] Step: `bee glossary convert <md>`: scripted one-shot from the current `skills/GLOSSARY.md` shape — `- **term** — gist` bullets (46 today), where a bullet's continuation lines (the wrapped prose after the `—`) join into the single-line gist, space-joined, until the next bullet; `see` pointer detection: a trailing `See \`<path>\`.` sentence at the end of the joined gist moves to the `see` field (two bullets carry one today — power-planner, project-orchestrator); all others default `see: -`. Converted gists ride as-is even when long — conversion never editorializes (the P8 template distillation trims later). Fail loud on: duplicate term, unparseable line inside a bullet (hand-fix list, D4 pattern). Headings and prose outside bullets are skipped and reported. Runs against OUR real file only in Task 5 (D6) — tests use fixtures.
-- [ ] Step: tests: lookup exact/prefix/multi/miss; add duplicate fails; view regenerated on add (content + marker) and not on lookup; convert fixture (clean + duplicate + malformed); `--check` writes nothing; store+view land where expected with `--store`/`--view` overrides.
-- [ ] Step: run `node --test tests/bee-glossary.test.mjs` — all pass.
-- [ ] Commit: `add glossary store, lookup, concurrent rendered view`
+- [x] Step: implement per contracts below. Lookup: exact match → print the line; else unique prefix match → print it; else multiple prefix matches → print all, exit 0; else zero → structured error listing nearest matches (substring hits), exit 1. `--markdown` renders lookup/list output as markdown lines instead of TOON (on-demand human view; the committed view file is a separate artifact). `add` fails loud when the term exists (supply, not update — no update path). Absent store: bare call reports `0 terms`, lookup fails loud. Internal seam flags (`--store`, `--view`) follow the park/inbox house pattern: implemented, listed in per-subcommand help (`bee glossary help`), not in the top-level stanza.
+- [x] Step: view regeneration (D5): every store write (`add`, and Task 5's `convert`) regenerates the rendered markdown view atomically — header marker + one `**term** — gist` line + indented `see:` pointers, alphabetical. View path: `--view <path>` overrides; default `<root>/skills/GLOSSARY.md` when `skills/GLOSSARY.md` exists, else `<root>/GLOSSARY.md`. Read-only lookups never touch the view.
+- [x] Step: `bee glossary convert <md>`: scripted one-shot from the current `skills/GLOSSARY.md` shape — `- **term** — gist` bullets (46 today), where a bullet's continuation lines (the wrapped prose after the `—`) join into the single-line gist, space-joined, until the next bullet; `see` pointer detection: a trailing `See \`<path>\`.` sentence at the end of the joined gist moves to the `see` field (two bullets carry one today — power-planner, project-orchestrator); all others default `see: -`. Converted gists ride as-is even when long — conversion never editorializes (the P8 template distillation trims later). Fail loud on: duplicate term, unparseable line inside a bullet (hand-fix list, D4 pattern). Headings and prose outside bullets are skipped and reported. Runs against OUR real file only in Task 5 (D6) — tests use fixtures.
+- [x] Step: tests: lookup exact/prefix/multi/miss; add duplicate fails; view regenerated on add (content + marker) and not on lookup; convert fixture (clean + duplicate + malformed); `--check` writes nothing; store+view land where expected with `--store`/`--view` overrides.
+- [x] Step: run `node --test tests/bee-glossary.test.mjs` — all pass.
+- [x] Commit: `add glossary store, lookup, concurrent rendered view`
+
+Task notes: re-review waived — fix round c55eb34 applied the reviewer's two suggested fixes near-verbatim (live-view fence + split assertion); verify r2 replicates the probes; zero blocking findings (APPROVE r1).
 
 Store line format (design: `term :: gist :: see`; gist at most two lines, CLI adds are single-line):
 
