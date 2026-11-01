@@ -2571,7 +2571,10 @@ usage:
 flags:
   --logbook <dir>  internal: logbook directory
                    (default <repo-root>/.hivemind/logbook)
-  --check (stamp)  never write; report what would happen
+  --phases <dir>   internal: phase-list directory (compact)
+                   (default <repo-root>/.hivemind/phases)
+  --check          never write; report what would happen
+                   (stamp, compact)
 
 index (default): one TOON line per task-tier entry, derived from
 its machine block — file :: role :: date :: task :: verdict,
@@ -2593,7 +2596,18 @@ fields — hand-add the machine lines, re-run; the pass exits 1
 while any remain. Non-matching files are skipped and reported as
 out-of-scope (not errors). Idempotent: nothing to stamp → exit 0.
 
-compact: not implemented yet.
+compact <phase>: rewrite the phase's entries to their machine
+block + one marker line ('compacted at phase close; full text in
+git history'). An entry belongs to <phase> when its machine
+plan: path equals a plan linked in the phase's row of the phase
+list (<repo-root>/.hivemind/phases/<project>.md) — the list is
+the plan↔phase source of truth; plan files need no headers.
+Rows with plan — match nothing: 0 entries, exit 0. A missing
+phase list or row fails loud naming it. Task-tier files only;
+a task-tier file with no machine block fails loud (run
+bee logbook stamp first). Entries whose body is already only
+the marker line are skipped — idempotent. --check lists what
+would compact, writes nothing.
 `;
 
 function logbookUsageErr(e) {
@@ -2613,10 +2627,7 @@ function cmdLogbook(rest) {
     return logbookIndex(sub === 'index' ? rest.slice(1) : rest);
   }
   if (sub === 'stamp') return logbookStamp(rest.slice(1));
-  if (sub === 'compact') {
-    return { code: 1, out: '',
-      err: 'bee logbook compact: not implemented yet\n' };
-  }
+  if (sub === 'compact') return logbookCompact(rest.slice(1));
   if (sub === 'help') return { code: 0, out: LOGBOOK_USAGE, err: '' };
   return { code: 1, out: '',
     err: `bee logbook: unknown subcommand '${sub}'\n\n` +
@@ -2804,6 +2815,155 @@ function logbookIndex(args) {
   }
   let out = `${rows.length} entries\n`;
   for (const r of rows) out += r + '\n';
+  return { code: 0, out, err: '' };
+}
+
+const LOGBOOK_COMPACT_MARKER =
+  'compacted at phase close; full text in git history';
+
+// Plan paths linked in a phase's row of the phase list. The
+// list is the plan↔phase source of truth — plan files
+// themselves are never read. Returns { plans, file } or
+// { err }. A row with plan — yields plans: [] (matches
+// nothing — a clean no-op for compact).
+function phaseRowPlans(phasesDir, phase) {
+  let names;
+  try {
+    names = fs.readdirSync(phasesDir).sort();
+  } catch (e) {
+    return { err: `bee logbook compact: cannot read phase list ` +
+      `${phasesDir}: ${e.message}\n` };
+  }
+  const files = names.filter((n) => n.endsWith('.md') &&
+    n !== 'TEMPLATE.md');
+  if (files.length === 0) {
+    return { err: `bee logbook compact: no phase list in ` +
+      `${phasesDir} (expected <project>.md)\n` };
+  }
+  const hits = [];
+  const known = [];
+  for (const name of files) {
+    let text;
+    try {
+      text = fs.readFileSync(path.join(phasesDir, name), 'utf8');
+    } catch (e) {
+      return { err: `bee logbook compact: cannot read ` +
+        `${path.join(phasesDir, name)}: ${e.message}\n` };
+    }
+    for (const line of text.split('\n')) {
+      if (!line.startsWith('|')) continue;
+      const cells = line.split('|').map((c) => c.trim());
+      // | id | description | status | designs | plan | owner | …
+      // (7 columns → 9 cells after the split; shorter rows are
+      // malformed — skipped, so the phase reads as row-less)
+      if (cells.length < 9) continue;
+      const id = cells[1];
+      if (id === undefined || id === '' || id === 'id' ||
+          id.startsWith('---')) continue;
+      known.push(id);
+      if (id !== phase) continue;
+      const plans = [...cells[5].matchAll(/\.hivemind\/plans\/[^\s`|]+/g)]
+        .map((m) => m[0]);
+      hits.push({ name, plans });
+      break;
+    }
+  }
+  if (hits.length === 0) {
+    return { err: `bee logbook compact: no row for phase ${phase} ` +
+      `in ${phasesDir}` +
+      (known.length > 0 ? ` — phases with rows: ` +
+        `${[...new Set(known)].join(', ')}` : '') + '\n' };
+  }
+  if (hits.length > 1) {
+    return { err: `bee logbook compact: phase ${phase} has rows ` +
+      `in ${hits.length} lists: ${hits.map((h) => h.name).join(', ')}\n` };
+  }
+  return { plans: hits[0].plans, file: hits[0].name };
+}
+
+function logbookCompact(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    logbook: { type: 'string' },
+    phases: { type: 'string' },
+  }, true);
+  if (f.error) return logbookUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return logbookUsageErr('bee logbook compact: expected <phase>');
+  }
+  const dir = logbookDirOf(f.values.logbook);
+  const phasesDir = f.values.phases !== undefined
+    ? path.resolve(f.values.phases)
+    : path.join(REPO_ROOT, '.hivemind', 'phases');
+  const row = phaseRowPlans(phasesDir, pos[0]);
+  if (row.err) return { code: 1, out: '', err: row.err };
+  const plans = new Set(row.plans);
+  let names;
+  try {
+    names = fs.readdirSync(dir).sort();
+  } catch (e) {
+    if (e.code === 'ENOENT') return { code: 0, out: `0 entries\n`, err: '' };
+    return { code: 1, out: '',
+      err: `bee logbook compact: cannot read ${dir}: ${e.message}\n` };
+  }
+  // pass 1: classify every task-tier entry; any unstamped one
+  // fails loud BEFORE a single file is rewritten
+  const compacted = [];
+  const already = [];
+  let other = 0;
+  for (const name of names) {
+    if (!LOGBOOK_TASK_RE.test(name)) continue; // out of scope
+    let text;
+    try {
+      text = fs.readFileSync(path.join(dir, name), 'utf8');
+    } catch (e) {
+      return { code: 1, out: '',
+        err: `bee logbook compact: cannot read ` +
+        `${name}: ${e.message}\n` };
+    }
+    const block = entryBlockOf(text);
+    if (!block) {
+      return { code: 1, out: '',
+        err: `bee logbook compact: ${name} has no machine block ` +
+        '— run `bee logbook stamp` first\n' };
+    }
+    if (block.fields.plan === undefined) {
+      return { code: 1, out: '',
+        err: `bee logbook compact: ${name} has no plan: field ` +
+        '— run `bee logbook stamp` first\n' };
+    }
+    const planPath = block.fields.plan.split(' @ ')[0].trim();
+    if (!plans.has(planPath)) { other++; continue; }
+    const lines = text.split('\n');
+    const body = lines.slice(block.end + 1)
+      .filter((l) => l.trim() !== '');
+    if (body.length === 1 &&
+        body[0].trim() === LOGBOOK_COMPACT_MARKER) {
+      already.push(name);
+      continue;
+    }
+    compacted.push({ name, keep:
+      lines.slice(block.start, block.end + 1).join('\n') });
+  }
+  // pass 2: rewrite members (never under --check)
+  if (!f.values.check) {
+    for (const c of compacted) {
+      atomicWrite(path.join(dir, c.name),
+        c.keep + '\n\n' + LOGBOOK_COMPACT_MARKER + '\n');
+    }
+  }
+  const total = compacted.length + already.length;
+  if (total === 0) return { code: 0, out: `0 entries\n`, err: '' };
+  const verb = f.values.check ? 'to compact' : 'compacted';
+  let out = `${total} entries · ${compacted.length} ${verb} · ` +
+    `${already.length} already` +
+    (other > 0 ? ` · ${other} other-phase` : '') + '\n';
+  for (const c of compacted) {
+    out += (f.values.check ? 'would compact: ' : 'compacted: ') +
+      c.name + '\n';
+  }
+  for (const a of already) out += `already compacted: ${a}\n`;
   return { code: 0, out, err: '' };
 }
 
