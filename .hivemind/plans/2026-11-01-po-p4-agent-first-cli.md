@@ -107,6 +107,10 @@ task-8: implemented 2026-11-01T15:44:58+11:00 by project-orchestrator
 task-8: verified 2026-11-01T15:44:58+11:00 by project-orchestrator
 task-8: reviewed 2026-11-01T15:44:58+11:00 by project-orchestrator
 task-8: done 2026-11-01T15:44:58+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task8-verify-r2.md
+task-9: implemented 2026-11-01T16:15:05+11:00 by project-orchestrator
+task-9: verified 2026-11-01T16:15:05+11:00 by project-orchestrator
+task-9: reviewed 2026-11-01T16:15:05+11:00 by project-orchestrator
+task-9: done 2026-11-01T16:15:05+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task9-verify-r2.md
 -->
 
 ## Kickoff rulings (keeper, 2026-11-01 — binding for every task)
@@ -716,13 +720,13 @@ ledger)
 **Provides:** `bee phase close` — scripted close mechanics (the P3
 lesson + the filed suggestion) + the decision-count flag
 
-- [ ] `bee phase inventory <n> --decisions <file>` writes the
+- [x] `bee phase inventory <n> --decisions <file>` writes the
   phase's decision inventory to
   `.hivemind/logbook/<plan-slug>-decisions.toon` (one line per
   decision: `id · one-line · source-record-path`) — agent-assembled
   content (the sign-off inventory is judgment), script-owned
   format.
-- [ ] `bee phase close <phase-id> [--check]` performs the scripted
+- [x] `bee phase close <phase-id> [--check]` performs the scripted
   close (each step refuses + explains when preconditions fail —
   agent-facing output): (1) verify phase branch exists and its
   tree passes the suite; (2) real merge commit `phase/<n>` → main
@@ -735,14 +739,29 @@ lesson + the filed suggestion) + the decision-count flag
   calibratable later; rulings/fix-round-waivers counted, waivers
   included — a waiver is a decision); (6) push main. `--check`
   prints the plan without touching git.
-- [ ] Tests: `--check` mode over a fixture repo (temp git dir):
+- [x] Tests: `--check` mode over a fixture repo (temp git dir):
   refuses close with unmerged work (exit 1 + fix line); the
   merge-commit shape asserted (two parents); decision count +
   flag emitted at 9 fixture decisions, silent at 8; suite-gate
   failure blocks close.
-- [ ] Verify: full suite green. P4's own close (phase exit, below)
+- [x] Verify: full suite green. P4's own close (phase exit, below)
   is this command's first real run.
-- [ ] Commit: `add bee phase close with decision-count calibration`
+- [x] Commit: `add bee phase close with decision-count calibration`
+
+**Task notes (loop, 2026-11-01):** closed via `bee task` (record r2 —
+verify r1 command-minted PASS; review r1 FIX-FIRST 0🔴 3🟡:
+runCheckEntry NODE_TEST_CONTEXT hazard (the implementer's own
+escalation candidate — ruled fix-now, regression-tested); --check
+materialized a temp worktree vs plan text "without touching git";
+untracked-inventory residue would block P5's close — all fixed
+near-verbatim, re-review waived). Deviations accepted:
+NODE_TEST_CONTEXT strip in phaseSuiteGate (observed live: node --test
+child under a test-runner parent silently exits 0 red); -uall on the
+clean gate; inventory exemption (read worktree→phase-tree fallback);
+bare phase = list (AXI 8); branch-check before plan lookup. Standing
+notes: phaseWorktreeOf prefix collision (phase/4 vs phase/40,
+untriggered); full-close re-run says "no branch"; already-merged
+coverage gap.
 
 ## Task 10: reference sweep + phase exit
 
