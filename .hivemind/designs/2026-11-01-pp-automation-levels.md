@@ -49,6 +49,20 @@ path via the relay queue (L0's never-a-subagent, keeper-opened-only
 stands unchanged). At L1/L2 the relay is role-gated at design
 altitude, not keeper-gated.
 
+**Relay mechanics (researched 2026-11-01 — see
+`docs/research/paseo-session-messaging.md`):** the Paseo daemon
+owns the standing tabs; `paseo send <peer-id> --prompt-file <msg>
+--no-wait` delivers into a live session, `paseo ls --json`
+resolves peers, `paseo wait` + `paseo logs --filter text` read
+replies. The L1 relay builds on this: a thin `bee ping <role>`
+(name/label resolution, status check, self-identifying message).
+CAVEATS this install: send to a busy agent interrupts its running
+turn (0.11.4 has no steer flag) — always check status first; no
+sender attribution (self-identify in the message); poll-based
+replies. When pi gains MCP support, the daemon's send_agent_prompt
+(finish-notifications, steer-default) becomes the native upgrade.
+A pi-extension file-inbox watcher is the Paseo-free alternative.
+
 **The stop-and-ask behavior (keeper ruling 2026-11-01 — NOT a
 consulted instrument):** "do I need to stop and ask" is EMBEDDED IN
 THE LOOPS — a **skill + hook pattern**: the reasoning lives in a
