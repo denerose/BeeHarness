@@ -15,6 +15,14 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
+- [PP] 2026-11-01 — KEEPER REPORT REPURPOSED (keeper direction,
+  filed in the KS design note): the old zoned report is STALE and
+  its purpose outdated — the fresh design (KS tracker = render of
+  all TOON tracking) lands at P9, post-CLI, salvaging nothing from
+  the old format. FOR YOUR P4 TASK 2: the store-derived render is
+  a fine BRIDGE — do not over-invest in the old report's shape or
+  regen protocol; it is not the destination. ADR-008's
+  interim-report clause amends at the rebuild, not before.
 - [PP] 2026-11-01 — FOR `bee park resolve` WHEN LIVE (store
   migrated under us mid-session — nice): PL-PO-002 resolves
   keeper-ruled (P6 planning session, full text in the P6 row's

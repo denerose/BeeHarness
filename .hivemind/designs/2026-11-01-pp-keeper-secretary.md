@@ -98,6 +98,21 @@ and next steps from them; a digest command only if use demands one.
 **Build:** P9, with KS's other tooling; depends on P4 Task 2's
 store-derived report.
 
+## The keeper report, repurposed (keeper direction, 2026-11-01)
+
+The original report — ADR-008's zoned interim surface (agent
+sections regenerating from status.md, the keeper's list, the regen
+protocol) — is STALE and its purpose is outdated: the PP/PO stream
+split, self-contained asks, and the phase list as source of truth
+replaced its daily-driver role. Its FUTURE: **the secretary's
+tracker — the human-readable render of all the TOON tracking**
+(inbox, parking, phases, logbook index, design stamps). Design
+FRESH once the CLI is ready, with KS's build here at P9: do not
+salvage the old format, zones, or regen protocol — ADR-008's
+interim-report clause is amended at the rebuild. Interim: the
+stale markdown stands untouched; P4 Task 2's store-derived render
+is the bridge, not the destination.
+
 ## Feeds
 
 P9 (the build: tooling around the minted role); P4 (the capture
