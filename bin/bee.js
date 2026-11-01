@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`, `bee design`.
+// `bee capture`, `bee park`, `bee design`, `bee verify`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -42,6 +42,7 @@ usage:
              | pick-up <doc> --phase <n> [--check]
              | implement <doc> --phase <n> --merge <hash> [--check]
   bee capture "<thought>"
+  bee verify --plan <path> [--task <n>] [--base <ref>] [--record] [--check]
   bee help | version
 
   --check   never write; report what would happen
@@ -74,6 +75,9 @@ export function run(argv) {
   }
   if (cmd === 'capture') {
     return cmdCapture(rest);
+  }
+  if (cmd === 'verify') {
+    return cmdVerify(rest);
   }
   return { code: 1, out: '', err: `bee: unknown command '${cmd}'\n\n` + USAGE };
 }
@@ -1601,6 +1605,477 @@ function designNew(args) {
       `next: fill the sections, get the keeper's blessing, then ` +
       `bee design pick-up ${designShown(file)} --phase <n>\n`,
     err: '' };
+}
+
+// ---- verify (P4 Task 5 — plan-header checks + logbook evidence) ----
+// The plan's machine header names the checks (the contract in
+// skills/loop/bee-plan/assets/plan-template.md); bee verify runs
+// them, link-checks changed docs, and emits the logbook entry a
+// state move needs (ADR-006: the entry IS the evidence).
+
+const VERIFY_USAGE = `bee verify — run a plan's header checks, record the evidence
+
+usage:
+  bee verify --plan <path> [--task <n>] [--base <ref>] [--record] [--check]
+
+flags:
+  --plan <path>   the plan to verify; its machine header names the
+                  checks
+  --task <n>      run only task-<n>'s checks (default: all)
+  --base <ref>    link-check base ref (default main): every
+                  repo-relative markdown link in docs changed in
+                  git diff <base>..HEAD is resolved; broken → FAIL
+  --record        write the logbook entry even on FAIL (a run with
+                  passing checks writes it by default)
+  --role <role>   producing role stamped in the entry (default bee)
+  --check         never write; preview the logbook entry
+  --logbook <dir> internal: logbook directory
+                  (default <plan-root>/.hivemind/logbook)
+
+checks contract (plan machine header; one entry per task):
+  checks:
+    - id: task-<n>
+      cmd: <command proving the step>   (optional)
+      expect: exit 0                    (only form this phase)
+      files: [<path>, <path>]           (optional; must exist)
+  cmd and files are individually optional; at least one required.
+
+output: TOON — task-<n> · cmd · PASS|FAIL · note; every FAIL carries
+a fix: line (ruling 4 — agent-facing self-correction); exit 1 on
+any FAIL. logbook entry <plan-slug>-task<n>-verify-<rN>.md (one per
+task checked; next free rN): machine header (role, date, verdict,
+checks-run, plan path + hash); prose body only for anomalies
+(empty body = clean run).
+`;
+
+function verifyUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + VERIFY_USAGE };
+}
+
+// Parse a plan's FIRST <!-- machine … --> block. Only the first —
+// verbatim template blocks inside the plan's fenced code also
+// open with '<!-- machine'. Returns { header } or { err }.
+export function parsePlanHeader(text, label = 'the plan') {
+  const lines = text.split('\n');
+  let start = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (/<!--\s*machine/.test(lines[i])) { start = i; break; }
+  }
+  if (start === -1) {
+    return { err: `bee verify: ${label} has no <!-- machine --> header — ` +
+      'plans carry one; shape: ' +
+      'skills/loop/bee-plan/assets/plan-template.md\n' };
+  }
+  let end = -1;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (lines[i].trim().startsWith('-->')) { end = i; break; }
+  }
+  if (end === -1) {
+    return { err: `bee verify: ${label} machine header never closes ` +
+      '(missing -->)\n' };
+  }
+  const header = { phase: '', validation: '', stateSource: '',
+    design: '', suite: '', targets: [], checks: [] };
+  let mode = 'none';
+  let cur = null;
+  for (let i = start + 1; i < end; i++) {
+    const raw = lines[i];
+    const t = raw.trim();
+    if (t === '') continue;
+    const indent = raw.length - raw.trimStart().length;
+    if (t.startsWith('- ')) {
+      const rest = t.slice(2).trim();
+      if (mode === 'targets') {
+        const m = /^(.*?)\s*\((create|modify)\)$/.exec(rest);
+        header.targets.push(m
+          ? { path: m[1], verb: m[2] }
+          : { path: rest, verb: '' });
+      } else if (mode === 'checks') {
+        cur = { line: i + 1 };
+        header.checks.push(cur);
+        const bm = /^([A-Za-z-]+):\s*(.*)$/.exec(rest);
+        if (bm && ['id', 'cmd', 'expect', 'files'].includes(bm[1])) {
+          cur[bm[1]] = bm[2].trim();
+        }
+      }
+      continue;
+    }
+    const m = /^([A-Za-z-]+):\s*(.*)$/.exec(t);
+    if (!m) continue; // stray line — ignore
+    const key = m[1], val = m[2].trim();
+    if (indent === 0) {
+      cur = null;
+      if (key === 'targets') { mode = 'targets'; continue; }
+      if (key === 'checks') { mode = 'checks'; continue; }
+      mode = 'none';
+      if (key === 'phase') header.phase = val;
+      else if (key === 'validation') header.validation = val;
+      else if (key === 'state-source') header.stateSource = val;
+      else if (key === 'design') header.design = val;
+      else if (key === 'suite') header.suite = val;
+      // unknown top-level keys: ignored (forward-compatible)
+      continue;
+    }
+    // indented key while collecting checks → sub-field of the
+    // current entry (bullets are '- …'; sub-fields sit deeper)
+    if (mode === 'checks' && cur &&
+        ['id', 'cmd', 'expect', 'files'].includes(key)) {
+      cur[key] = val;
+    }
+  }
+  const seen = new Set();
+  for (const ch of header.checks) {
+    if (!/^task-\d+$/.test(ch.id ?? '')) {
+      return { err: `bee verify: checks entry (machine line ${ch.line}) ` +
+        `needs id: task-<n>` +
+        (ch.id !== undefined ? ` — got '${ch.id}'` : '') +
+        ' — see the checks contract in ' +
+        'skills/loop/bee-plan/assets/plan-template.md\n' };
+    }
+    if (seen.has(ch.id)) {
+      return { err: `bee verify: duplicate checks id '${ch.id}' — ` +
+        'one entry per task\n' };
+    }
+    seen.add(ch.id);
+    ch.n = Number(ch.id.slice(5));
+    ch.filesList = ch.files === undefined ? []
+      : ch.files.replace(/^\[/, '').replace(/\]$/, '')
+          .split(',').map((s) => s.trim()).filter((s) => s !== '');
+    if (ch.cmd === undefined && ch.filesList.length === 0) {
+      return { err: `bee verify: checks entry '${ch.id}' has neither ` +
+        'cmd nor files — at least one is required\n' };
+    }
+    if (ch.expect !== undefined && ch.expect !== 'exit 0') {
+      return { err: `bee verify: checks entry '${ch.id}': ` +
+        `expect '${ch.expect}' — expect: exit 0 is the only form ` +
+        'this phase\n' };
+    }
+  }
+  return { header };
+}
+
+const VERIFY_CMD_TIMEOUT_MS = 600000;
+
+function firstOutputLine(r) {
+  const src = (r.stderr || '') + '\n' + (r.stdout || '');
+  for (const l of src.split('\n')) {
+    if (l.trim() !== '') return truncText(l.trim(), 80);
+  }
+  return '';
+}
+
+function runCheckEntry(ch, root) {
+  const notes = [];
+  const fixes = [];
+  let pass = true;
+  if (ch.cmd !== undefined) {
+    const r = spawnSync('sh', ['-c', ch.cmd], {
+      cwd: root, encoding: 'utf8',
+      timeout: VERIFY_CMD_TIMEOUT_MS,
+    });
+    if (r.error) {
+      pass = false;
+      notes.push(`cannot run: ${r.error.message}`);
+      fixes.push(`fix: make '${truncText(ch.cmd, 50)}' runnable`);
+    } else if (r.signal) {
+      pass = false;
+      notes.push(`signal ${r.signal} (timeout after ` +
+        `${VERIFY_CMD_TIMEOUT_MS / 1000}s)`);
+      fixes.push(`fix: '${truncText(ch.cmd, 50)}' did not finish — ` +
+        'repair or shorten it');
+    } else if (r.status === 0) {
+      notes.push('exit 0');
+    } else {
+      pass = false;
+      const l = firstOutputLine(r);
+      notes.push(`exit ${r.status}` + (l ? `: ${l}` : ''));
+      fixes.push(`fix: run '${truncText(ch.cmd, 50)}' and repair what ` +
+        'it reports until exit 0');
+    }
+  }
+  if (ch.filesList.length > 0) {
+    const missing = ch.filesList.filter(
+      (p) => !fs.existsSync(path.resolve(root, p)));
+    if (missing.length > 0) {
+      pass = false;
+      notes.push(`missing: ${missing.join(', ')}`);
+      for (const p of missing) {
+        fixes.push(`fix: ${p} — place it or fix the path`);
+      }
+    } else {
+      notes.push(`${ch.filesList.length} file` +
+        (ch.filesList.length === 1 ? '' : 's'));
+    }
+  }
+  const shown = ch.cmd !== undefined
+    ? truncText(ch.cmd, 60)
+    : `files: ${truncText(ch.filesList.join(', '), 40)}`;
+  return { id: ch.id, n: ch.n, pass, note: notes.join(' · '), fixes,
+    shown };
+}
+
+// Links: every repo-relative markdown link in a changed doc must
+// resolve. Fenced code blocks are excluded; URLs, anchors,
+// absolute paths, and ~ paths are not repo-relative.
+function isRepoRelativeLink(t) {
+  if (t === '') return false;
+  if (/^[A-Za-z][A-Za-z0-9+.-]*:/.test(t)) return false; // scheme
+  if (t.startsWith('#') || t.startsWith('/') || t.startsWith('~')) {
+    return false;
+  }
+  return true;
+}
+
+function docLinkFindings(root, doc) {
+  const abs = path.join(root, doc);
+  const text = fs.readFileSync(abs, 'utf8');
+  const findings = [];
+  let nLinks = 0;
+  let inFence = false;
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s*(```|~~~)/.test(lines[i])) { inFence = !inFence; continue; }
+    if (inFence) continue;
+    const targets = [];
+    for (const m of lines[i]
+      .matchAll(/\[[^\]]*\]\(\s*<?([^)\s<>]+)>?[^)]*\)/g)) {
+      targets.push(m[1]);
+    }
+    for (const m of lines[i]
+      .matchAll(/^\s{0,3}\[[^\]]+\]:\s+<?([^\s<>]+)>?/g)) {
+      targets.push(m[1]);
+    }
+    for (const t of targets) {
+      const clean = t.split('#')[0];
+      if (!isRepoRelativeLink(clean)) continue;
+      nLinks++;
+      if (!fs.existsSync(path.resolve(path.dirname(abs), clean))) {
+        findings.push({ doc, line: i + 1, target: clean });
+      }
+    }
+  }
+  return { nLinks, findings };
+}
+
+function changedDocsForLinks(root, base) {
+  const inside = spawnSync('git',
+    ['rev-parse', '--is-inside-work-tree'],
+    { cwd: root, encoding: 'utf8' });
+  if (inside.status !== 0) {
+    return { skip: 'no git repo at plan root — link-check needs git' };
+  }
+  const r = spawnSync('git', ['diff', '--name-only', `${base}..HEAD`],
+    { cwd: root, encoding: 'utf8' });
+  if (r.status !== 0) {
+    return { err: `bee verify: --base '${base}' does not resolve (` +
+      `${firstOutputLine(r) || 'git exit ' + r.status}) — ` +
+      `fix: pass a ref that exists here: git -C . rev-parse ${base}\n` };
+  }
+  return { docs: r.stdout.split('\n').filter(Boolean)
+    .filter((f) => f.endsWith('.md'))
+    .filter((f) => fs.existsSync(path.join(root, f))) };
+}
+
+function escapeRe(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function nextVerifyRound(logbookDir, stem, taskN) {
+  let max = 0;
+  let names = [];
+  try {
+    names = fs.readdirSync(logbookDir);
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e;
+  }
+  const re = new RegExp(
+    `^${escapeRe(stem)}-task${taskN}-verify-r(\\d+)\\.md$`);
+  for (const n of names) {
+    const m = re.exec(n);
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return max + 1;
+}
+
+function verifyEntryText(role, verdict, checksRun, planShown, planHash,
+  anomalies) {
+  let e = '<!-- machine\n' +
+    `role: ${role}\n` +
+    `date: ${isoStampLocal()}\n` +
+    `verdict: ${verdict}\n` +
+    `checks-run: ${checksRun}\n` +
+    `plan: ${planShown} @ ${planHash}\n` +
+    '-->\n';
+  if (anomalies && anomalies.trim() !== '') {
+    e += '\n' + anomalies.trimEnd() + '\n';
+  }
+  return e;
+}
+
+function cmdVerify(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: VERIFY_USAGE, err: '' };
+  }
+  const f = flags(rest, {
+    plan: { type: 'string' },
+    task: { type: 'string' },
+    base: { type: 'string' },
+    record: { type: 'boolean' },
+    check: { type: 'boolean' },
+    role: { type: 'string' },
+    logbook: { type: 'string' },
+  });
+  if (f.error) return verifyUsageErr(f.error);
+  if (f.values.plan === undefined) {
+    return verifyUsageErr('bee verify: --plan <path> is required — ' +
+      'fix: e.g. bee verify --plan .hivemind/plans/<slug>.md');
+  }
+  const planPath = path.resolve(f.values.plan);
+  let text;
+  try {
+    text = fs.readFileSync(planPath, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee verify: cannot read ${planPath}: ${e.message} — ` +
+        'fix: point --plan at an existing plan\n' };
+  }
+  const parsed = parsePlanHeader(text, planPath);
+  if (parsed.err) return { code: 1, out: '', err: parsed.err };
+  const header = parsed.header;
+
+  let scope = header.checks;
+  if (f.values.task !== undefined) {
+    if (!/^\d+$/.test(f.values.task)) {
+      return verifyUsageErr(`bee verify: --task expects a task number, ` +
+        `got '${f.values.task}'`);
+    }
+    const id = 'task-' + f.values.task;
+    scope = header.checks.filter((c) => c.id === id);
+    if (scope.length === 0) {
+      const ids = header.checks.map((c) => c.id).join(', ');
+      return { code: 1, out: '',
+        err: `bee verify: no check '${id}' in ${planPath} — ` +
+          (ids !== '' ? `checks here: ${ids}`
+            : 'the plan declares no checks') +
+          '\nfix: run without --task for all checks, or use a ' +
+          'number from the list\n' };
+    }
+  }
+
+  const planDir = path.dirname(planPath);
+  const rootR = spawnSync('git', ['rev-parse', '--show-toplevel'],
+    { cwd: planDir, encoding: 'utf8' });
+  const planRoot = rootR.status === 0
+    ? rootR.stdout.trim() : planDir;
+
+  const results = scope.map((ch) => runCheckEntry(ch, planRoot));
+
+  const base = f.values.base ?? 'main';
+  const lc = changedDocsForLinks(planRoot, base);
+  if (lc.err) return { code: 1, out: '', err: lc.err };
+  let linksLine;
+  const linkFindings = [];
+  if (lc.skip) {
+    linksLine = `links · skipped · ${lc.skip}`;
+  } else {
+    let nLinks = 0;
+    for (const doc of lc.docs) {
+      const r = docLinkFindings(planRoot, doc);
+      nLinks += r.nLinks;
+      linkFindings.push(...r.findings);
+    }
+    linksLine = `links · ${lc.docs.length} docs · ` +
+      (linkFindings.length === 0 ? 'PASS' : 'FAIL') +
+      ` · ${nLinks} links checked` +
+      (linkFindings.length > 0
+        ? `, ${linkFindings.length} broken` : '');
+  }
+
+  const nPass = results.filter((r) => r.pass).length;
+  const nFail = results.length - nPass;
+  const anyFail = nFail > 0 || linkFindings.length > 0;
+  let out = '';
+  if (results.length === 0) {
+    out += '0 checks\n' +
+      'fix: add a checks: block to the plan machine header — one ' +
+      'entry per task (skills/loop/bee-plan/assets/plan-template.md)\n';
+  } else {
+    out += `${results.length} checks · ${nPass} pass · ${nFail} fail\n`;
+  }
+  for (const r of results) {
+    out += `${r.id} · ${r.shown} · ${r.pass ? 'PASS' : 'FAIL'} · ` +
+      `${r.note}\n`;
+    for (const fx of r.fixes) out += `  ${fx}\n`;
+  }
+  out += linksLine + '\n';
+  for (const b of linkFindings) {
+    out += `  ${b.doc}:${b.line} → ${b.target}\n`;
+    out += `  fix: repair the link or the target (${b.target})\n`;
+  }
+
+  // Logbook emission: one entry per task checked; written when
+  // the run passed (evidence), or with --record (a failing round
+  // still records). --check previews; 0 checks → nothing to
+  // evidence.
+  const checksRun = results.length;
+  const stem = path.basename(planPath, '.md');
+  const logbookDir = f.values.logbook !== undefined
+    ? path.resolve(f.values.logbook)
+    : path.join(planRoot, '.hivemind', 'logbook');
+  const relPlan = path.relative(planRoot, planPath);
+  const hashR = spawnSync('git', ['log', '-1', '--format=%h', '--', relPlan],
+    { cwd: planRoot, encoding: 'utf8' });
+  const planHash = hashR.status === 0 && hashR.stdout.trim() !== ''
+    ? hashR.stdout.trim() : '-';
+  const planShown = designShown(planPath);
+  const role = f.values.role || 'bee';
+
+  if (f.values.record && checksRun === 0) {
+    out += 'logbook: not written (0 checks ran — nothing to record)\n';
+  }
+  if (checksRun > 0 && (nFail === 0 || f.values.record)) {
+    const byTask = new Map();
+    for (const r of results) {
+      if (!byTask.has(r.n)) byTask.set(r.n, []);
+      byTask.get(r.n).push(r);
+    }
+    for (const [n, trs] of byTask) {
+      const taskFail = trs.filter((r) => !r.pass);
+      const verdict = taskFail.length === 0 &&
+        linkFindings.length === 0 ? 'PASS' : 'FAIL';
+      let anomalies = '';
+      for (const r of taskFail) {
+        anomalies += `${r.id} · ${r.shown} · FAIL · ${r.note}\n`;
+        for (const fx of r.fixes) anomalies += `${fx}\n`;
+      }
+      if (linkFindings.length > 0) {
+        anomalies += linksLine + '\n';
+        for (const b of linkFindings) {
+          anomalies += `${b.doc}:${b.line} → ${b.target}\n`;
+        }
+      }
+      const round = nextVerifyRound(logbookDir, stem, n);
+      const file = path.join(logbookDir,
+        `${stem}-task${n}-verify-r${round}.md`);
+      const entry = verifyEntryText(role, verdict, trs.length,
+        planShown, planHash, anomalies);
+      if (f.values.check) {
+        out += `--check: would write ${designShown(file)}\n${entry}`;
+      } else {
+        try {
+          fs.mkdirSync(logbookDir, { recursive: true });
+          atomicWrite(file, entry);
+        } catch (e) {
+          return { code: 1, out: '',
+            err: `bee verify: cannot write ${file}: ${e.message}\n` };
+        }
+        out += `logbook: ${designShown(file)}\n`;
+      }
+    }
+  }
+  return { code: anyFail ? 1 : 0, out, err: '' };
 }
 
 if (process.argv[1] &&

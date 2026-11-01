@@ -15,6 +15,11 @@ state-source: checkboxes below
 targets:
   - exact/path/file.ext (create)
   - exact/path/file.ext (modify)
+checks:
+  - id: task-<n>
+    cmd: <command proving the task's step>
+    expect: exit 0
+    files: [<path>, <path>]
 suite: <the command that proves the plan's work, e.g. node --test tests/*.test.mjs>
 -->
 
