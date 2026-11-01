@@ -145,7 +145,11 @@ We are designing the harness before building it. Right now:
 - Repo documentation: `AGENTS.md`, `README.md`, `SOUL.md` stay at
   the root; every other standalone document lives in `docs/`
   (currently `docs/AXI.md`, `docs/WRITING-STANDARD.md` — new
-  standards and guides go there, not the root).
+  standards and guides go there, not the root). `docs/` is
+  PROJECT-specific; shipped hive materials live in their own
+  top-level folders (`skills/`, `roles/`, `templates/`) — plan
+  layout with consumer repos in mind: what ships never sits in a
+  consuming project's `docs/`.
 - Session memory: `.hivemind/sessions/<role>.md` — one file per
   active role (role name in the filename), updated at each decision
   point; re-read yours after compaction/fork/new session.
