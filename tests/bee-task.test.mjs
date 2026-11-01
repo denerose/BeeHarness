@@ -486,3 +486,46 @@ test('show: definitive 0 tasks + fix when no checks', () => {
   assert.match(r.out, /^0 tasks\n/);
   assert.match(r.out, /fix: add a checks: block/);
 });
+
+test('fenced verbatim example boxes are not step boxes (review r1 SF1 regression)', () => {
+  const dir = tmpDir();
+  const { plan } = writePlan(dir);
+  // plant a fenced contract block with checkbox-looking lines inside task 1
+  let text = fs.readFileSync(plan, 'utf8');
+  text = text.replace('- [ ] step one',
+    '- [ ] step one\n\n```text path=store.toon\n- [ ] example line one\n- [x] example line two\n```');
+  fs.writeFileSync(plan, text);
+  fs.writeFileSync(path.join(dir, 'rec.md'), '# r\n');
+  const r = run(['task', 'move', plan, '1', 'done',
+    '--record', path.join(dir, 'rec.md')]);
+  assert.equal(r.code, 0, r.err);
+  const after = fs.readFileSync(plan, 'utf8');
+  assert.ok(after.includes('- [ ] example line one'),
+    'fenced example box must NOT tick');
+  assert.ok(after.includes('- [x] example line two'),
+    'fenced example ticked box must NOT untick');
+  assert.ok(after.includes('- [x] step one'));
+  assert.ok(after.includes('- [x] step two'));
+  // fenced boxes are not counted: show reports 2/2, not 2/4
+  const s = run(['task', 'show', plan]);
+  assert.match(s.out, /task-1 · done · 2\/2 steps/);
+});
+
+test('--full untruncates long task titles (review r1 SF2 regression)', () => {
+  const dir = tmpDir();
+  const longTitle = 'w'.repeat(80);
+  const plan = path.join(dir, 'fixture-plan.md');
+  fs.writeFileSync(plan, [
+    '# Plan: fixture', '',
+    '<!-- machine',
+    'phase: P1', 'validation: task', 'state-source: checkboxes below',
+    'checks:', '  - id: task-1', '    cmd: "true"',
+    'suite: "true"',
+    '-->', '',
+    `## Task 1: ${longTitle}`, '', '- [ ] step', '',
+  ].join('\n') + '\n');
+  const short = run(['task', 'show', plan]);
+  assert.match(short.out, /\u2026 \(\+\d+ chars\)/);
+  const full = run(['task', 'show', plan, '--full']);
+  assert.ok(full.out.includes(longTitle));
+});

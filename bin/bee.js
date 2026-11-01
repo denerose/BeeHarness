@@ -2242,7 +2242,13 @@ function taskSectionRange(lines, n) {
 function taskCheckboxStats(lines, range) {
   let total = 0;
   let checked = 0;
+  let inFence = false;
   for (let i = range.start + 1; i < range.end; i++) {
+    // review r1 fix: fenced verbatim blocks are not step boxes —
+    // the fence rule docLinkFindings applies (plans carry
+    // path=-tagged contracts inside task sections).
+    if (/^\s*(```|~~~)/.test(lines[i])) { inFence = !inFence; continue; }
+    if (inFence) continue;
     const m = /^(\s*)- \[( |x)\]/.exec(lines[i]);
     if (m) { total++; if (m[2] === 'x') checked++; }
   }
@@ -2323,11 +2329,12 @@ function taskShow(args) {
       ? taskCheckboxStats(r.lines, section) : { total: 0, checked: 0 };
     const entries = ledger.byTask.get(ch.n) ?? [];
     const state = taskCurrentState(entries, stats);
-    const title = section
-      ? truncText(
-          (/^## Task \d+: ?(.*)$/.exec(r.lines[section.start])?.[1] ?? '')
-            .trim(), 48)
+    const rawTitle = section
+      ? (/^## Task \d+: ?(.*)$/.exec(r.lines[section.start])?.[1] ?? '')
+        .trim()
       : 'no task section in body';
+    // review r1 fix: --full relieves the title truncation
+    const title = f.values.full ? rawTitle : truncText(rawTitle, 48);
     return { ch, state, stats, entries, title };
   });
   const nDone = rows.filter((x) => x.state === 'done').length;
@@ -2444,7 +2451,10 @@ function taskMove(args) {
   // only the leading marker changes) + the ledger line inserted
   // before the machine block's '-->'.
   const newLines = [...r.lines];
+  let inFence = false; // review r1 fix: never rewrite inside fences
   for (let i = section.start + 1; i < section.end; i++) {
+    if (/^\s*(```|~~~)/.test(newLines[i])) { inFence = !inFence; continue; }
+    if (inFence) continue;
     if (stateArg === 'done') {
       newLines[i] = newLines[i].replace(/^(\s*- \[) \]/, '$1x]');
     } else if (stateArg === 'draft') {
