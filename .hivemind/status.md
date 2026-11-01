@@ -15,6 +15,16 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
+- [PP] 2026-11-01 — FOR `bee park add` WHEN LIVE (keeper-directed
+  park): **PL-PP-014 — a doc or tool for tracking KEEPER TODOS
+  across PP and KS** — context: the keeper's todos currently live
+  in the keeper report's Keeper's-list zone (report now
+  repurposed/stale — see the note above), keeper's-list conventions
+  as interim, and KS's mandate routes todos there; question: do PP
+  and KS need a dedicated doc or tool (a todo store? a KS-managed
+  view? or is the inbox origin=keeper class enough?) — unpark when
+  the keeper and/or KS have given more feedback on what's actually
+  needed in use. Filed open, no pre-tilt.
 - [PP] 2026-11-01 — KEEPER REPORT REPURPOSED (keeper direction,
   filed in the KS design note): the old zoned report is STALE and
   its purpose outdated — the fresh design (KS tracker = render of
