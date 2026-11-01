@@ -1,5 +1,12 @@
 # P4 inbox — design note (feeds the P4 bee-plan)
 
+<!-- machine
+status: picked-up
+phase: 4
+hash: ad77aa4
+merge: -
+-->
+
 **Date:** 2026-10-25
 **Status:** shape blessed by the keeper in session; amended 2026-11-01
 (ADR-014 addendum below); this note is the design input P4's bee-plan
