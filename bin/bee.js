@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`.
+// `bee capture`, `bee park`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI).
 // Node >=20, stdlib only.
@@ -30,6 +30,11 @@ usage:
              | add <addressee> <text> [--origin <role>] [--ref <path>]
              | show <id> [--full] | done <id> [--note <how>]
              | render [--status <path>]
+  bee park   [list [--full]]
+             | add "<item>" [--context <text>] [--unpark-when <text>]
+               [--origin <role>]
+             | show <id> [--full] | resolve <id> [--how <text>]
+             | migrate <md>
   bee capture "<thought>"
   bee help | version
 
@@ -54,6 +59,9 @@ export function run(argv) {
   }
   if (cmd === 'inbox') {
     return cmdInbox(rest);
+  }
+  if (cmd === 'park') {
+    return cmdPark(rest);
   }
   if (cmd === 'capture') {
     return cmdCapture(rest);
@@ -491,13 +499,13 @@ function isoStampLocal() {
     String(a % 60).padStart(2, '0');
 }
 
-function readInbox(storePath) {
+function readToonStore(storePath, cmd) {
   let text;
   try {
     text = fs.readFileSync(storePath, 'utf8');
   } catch (e) {
     if (e.code === 'ENOENT') return { items: [] };
-    return { err: `bee inbox: cannot read ${storePath}: ${e.message}\n` };
+    return { err: `${cmd}: cannot read ${storePath}: ${e.message}\n` };
   }
   const items = [];
   let cur = null;
@@ -511,7 +519,7 @@ function readInbox(storePath) {
     }
     const at = line.indexOf(': ');
     if (at < 0) {
-      return { err: `bee inbox: cannot parse ${storePath}: ` +
+      return { err: `${cmd}: cannot parse ${storePath}: ` +
         `line ${i + 1} is not a field — hand-fix the store, then retry\n` };
     }
     cur = cur ?? {};
@@ -521,23 +529,36 @@ function readInbox(storePath) {
   return { items };
 }
 
-function renderInboxStore(items) {
+function readInbox(storePath) {
+  return readToonStore(storePath, 'bee inbox');
+}
+
+function renderToonStore(items, fields, header) {
   const blocks = items.map((it) => {
-    const known = Object.keys(it).filter((k) => INBOX_FIELDS.includes(k));
-    const extra = Object.keys(it).filter((k) => !INBOX_FIELDS.includes(k));
+    const known = Object.keys(it).filter((k) => fields.includes(k));
+    const extra = Object.keys(it).filter((k) => !fields.includes(k));
     return [...known, ...extra].map((k) => `${k}: ${it[k]}`).join('\n');
   });
-  return INBOX_HEADER + '\n' + blocks.join('\n\n') + '\n';
+  return header + '\n' + blocks.join('\n\n') + '\n';
+}
+
+function renderInboxStore(items) {
+  return renderToonStore(items, INBOX_FIELDS, INBOX_HEADER);
+}
+
+function writeStore(cmd, storePath, items, fields, header) {
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    atomicWrite(storePath, renderToonStore(items, fields, header));
+    return null;
+  } catch (e) {
+    return `${cmd}: cannot write ${storePath}: ${e.message}\n`;
+  }
 }
 
 function writeInbox(storePath, items) {
-  try {
-    fs.mkdirSync(path.dirname(storePath), { recursive: true });
-    atomicWrite(storePath, renderInboxStore(items));
-    return null;
-  } catch (e) {
-    return `bee inbox: cannot write ${storePath}: ${e.message}\n`;
-  }
+  return writeStore('bee inbox', storePath, items, INBOX_FIELDS,
+    INBOX_HEADER);
 }
 
 function nextInboxId(items) {
@@ -917,6 +938,454 @@ function cmdCapture(rest) {
     check: f.values.check,
     verb: 'captured',
   });
+}
+
+// ---- park (P4 Task 3 — .hivemind/memory/parking-lot.toon) ----
+
+const PARK_HEADER =
+  '# parking lot — deferred decisions (agent store; views render from here)';
+
+const PARK_FIELDS = ['id', 'item', 'context', 'unpark-when', 'origin',
+  'opened', 'resolved', 'how'];
+
+const PARK_USAGE = `bee park — deferred decisions (a store, not a document)
+
+usage:
+  bee park list [--full]
+  bee park add "<item>" [--context <text>] [--unpark-when <text>] [--origin <role>] [--check]
+  bee park show <id> [--full]
+  bee park resolve <id> [--how <text>] [--check]
+  bee park migrate <md> [--check]
+
+flags:
+  --context <text>     background + open questions (ride verbatim,
+                       never pre-answered)
+  --unpark-when <text> the unpark condition (default: -)
+  --origin <role>      provenance; picks the id series
+                       (default bee → PL-NNN; po → PL-PO-NNN)
+  --how <text>         how it was resolved (recorded on resolve)
+  --full               all fields, no truncation
+  --check              never write; report what would happen
+  --store <path>       internal: store path
+                       (default .hivemind/memory/parking-lot.toon)
+
+store: TOON — one item per block, blank line between; ids
+PL-<role>-NNN (origin bee = bare PL-NNN), monotonic per series,
+never reused; resolved items carry resolved: <date> and how:;
+state is derived (resolved ≠ -); list counts unresolved items as
+parked; ages from ISO opened timestamps (migrated items carry
+opened: - → age ?).
+
+law: resolve is keeper-gated (AGENTS.md; GLOSSARY: parking lot) —
+any agent may propose parking or resolving; only the keeper's
+word resolves. Run resolve only on that word.
+
+migrate: one-shot conversion of the markdown lot at <md> into the
+store — parses every PL-* entry (parked AND resolved; nothing
+leaves the views); ids key the store, and when an id appears in
+both sections the RESOLVED entry wins, its how line noting
+'superseded stale parked duplicate'. Replaces <md> with a pointer
+stub; history stays in git. Refuses when <md> holds no PL-*
+entries (already migrated?).
+`;
+
+function parkUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + PARK_USAGE };
+}
+
+function parkStorePathOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'memory', 'parking-lot.toon');
+}
+
+function parkIsResolved(it) {
+  return it.resolved !== undefined && it.resolved !== '-';
+}
+
+function parkOldestAge(view) {
+  let min = null;
+  for (const it of view) {
+    const t = Date.parse(it.opened || '');
+    if (!Number.isNaN(t)) min = min === null ? t : Math.min(min, t);
+  }
+  return min === null ? '?'
+    : ageOf(new Date(min).toISOString());
+}
+
+function nextParkId(items, origin) {
+  if (origin === 'bee') {
+    let max = 0;
+    for (const it of items) {
+      const m = /^PL-(\d+)$/.exec(it.id || '');
+      if (m) max = Math.max(max, Number(m[1]));
+    }
+    return 'PL-' + String(max + 1).padStart(3, '0');
+  }
+  const tag = origin.toUpperCase();
+  const re = new RegExp('^PL-' + tag + '-(\\d+)$', 'i');
+  let max = 0;
+  for (const it of items) {
+    const m = re.exec(it.id || '');
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return 'PL-' + tag + '-' + String(max + 1).padStart(3, '0');
+}
+
+function cmdPark(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'list' || sub.startsWith('--')) {
+    return parkList(sub === 'list' ? rest.slice(1) : rest);
+  }
+  if (sub === 'add') return parkAdd(rest.slice(1));
+  if (sub === 'show') return parkShow(rest.slice(1));
+  if (sub === 'resolve') return parkResolve(rest.slice(1));
+  if (sub === 'migrate') return parkMigrate(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: PARK_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee park: unknown subcommand '${sub}'\n\n` + PARK_USAGE };
+}
+
+function parkAdd(args) {
+  const f = flags(args, {
+    context: { type: 'string' },
+    'unpark-when': { type: 'string' },
+    origin: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return parkUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0] === '') {
+    return parkUsageErr('bee park add: expected "<item>"');
+  }
+  const item = pos[0];
+  const origin = f.values.origin || 'bee';
+  if (!/^[a-z][a-z0-9-]*$/i.test(origin)) {
+    return parkUsageErr(
+      `bee park add: --origin '${origin}' must be letters/digits/hyphens`);
+  }
+  for (const v of [item, f.values.context, f.values['unpark-when'],
+    f.values.origin]) {
+    if (v !== undefined && v.includes('\n')) {
+      return { code: 1, out: '',
+        err: 'bee park: field values must be single-line\n' };
+    }
+  }
+  const storePath = parkStorePathOf(f.values.store);
+  const r = readToonStore(storePath, 'bee park');
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const id = nextParkId(r.items, origin.toLowerCase());
+  const entry = {
+    id,
+    item,
+    context: f.values.context || '-',
+    'unpark-when': f.values['unpark-when'] || '-',
+    origin: origin.toLowerCase(),
+    opened: isoStampLocal(),
+    resolved: '-',
+  };
+  if (f.values.check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      renderToonStore([entry], PARK_FIELDS, PARK_HEADER)
+        .replace(PARK_HEADER + '\n', ''), err: '' };
+  }
+  const w = writeStore('bee park', storePath, [...r.items, entry],
+    PARK_FIELDS, PARK_HEADER);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0,
+    out: `${id} parked · ${truncText(item)} — bee park show ${id}\n`,
+    err: '' };
+}
+
+function parkList(args) {
+  const f = flags(args, {
+    full: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return parkUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return parkUsageErr(
+      `bee park list: unexpected argument '${f.positionals[0]}'`);
+  }
+  const r = readToonStore(parkStorePathOf(f.values.store), 'bee park');
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const view = r.items.filter((it) => !parkIsResolved(it));
+  if (view.length === 0) {
+    return { code: 0, out: '0 parked\n' +
+      'add one: bee park add "<item>"\n', err: '' };
+  }
+  let out = `${view.length} parked · oldest ${parkOldestAge(view)}\n`;
+  for (const it of view) {
+    if (f.values.full) {
+      out += `${it.id} · parked · ${ageOf(it.opened)} · ${it.item}\n` +
+        `  context: ${it.context}\n` +
+        `  unpark-when: ${it['unpark-when']} · origin: ${it.origin}\n` +
+        `  opened: ${it.opened} · resolved: ${it.resolved}\n`;
+    } else {
+      out += `${it.id} · ${truncText(it.item)} · ${ageOf(it.opened)} · ` +
+        `unpark: ${truncText(it['unpark-when'], 40)}\n`;
+    }
+  }
+  return { code: 0, out, err: '' };
+}
+
+function parkShow(args) {
+  const f = flags(args, {
+    full: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return parkUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return parkUsageErr('bee park show: expected <id>');
+  }
+  const r = readToonStore(parkStorePathOf(f.values.store), 'bee park');
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const it = r.items.find((i) => i.id === pos[0]);
+  if (!it) {
+    return { code: 1, out: '',
+      err: `bee park: no item ${pos[0]} — bee park list\n` };
+  }
+  const state = parkIsResolved(it) ? 'resolved' : 'parked';
+  let out = `${it.id} · ${state} · ${ageOf(it.opened)}\n` +
+    `item: ${it.item}\ncontext: ${it.context}\n` +
+    `unpark-when: ${it['unpark-when']}\n`;
+  if (f.values.full) {
+    out += `origin: ${it.origin}\nopened: ${it.opened}\n` +
+      `resolved: ${it.resolved}\n`;
+    if (it.how !== undefined) out += `how: ${it.how}\n`;
+  }
+  return { code: 0, out, err: '' };
+}
+
+function parkResolve(args) {
+  const f = flags(args, {
+    how: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return parkUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return parkUsageErr('bee park resolve: expected <id>');
+  }
+  const storePath = parkStorePathOf(f.values.store);
+  const r = readToonStore(storePath, 'bee park');
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const it = r.items.find((i) => i.id === pos[0]);
+  if (!it) {
+    return { code: 1, out: '',
+      err: `bee park: no item ${pos[0]} — bee park list\n` };
+  }
+  if (parkIsResolved(it)) {
+    return { code: 0, out: `${it.id} already resolved\n`, err: '' };
+  }
+  if (f.values.how !== undefined && f.values.how.includes('\n')) {
+    return { code: 1, out: '',
+      err: 'bee park: field values must be single-line\n' };
+  }
+  it.resolved = isoStampLocal();
+  if (f.values.how !== undefined) it.how = f.values.how;
+  if (f.values.check) {
+    return { code: 0, out: `--check: would resolve ${it.id}` +
+      (f.values.how !== undefined ? ` (how: ${f.values.how})` : '') +
+      '\n', err: '' };
+  }
+  const w = writeStore('bee park', storePath, r.items,
+    PARK_FIELDS, PARK_HEADER);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0, out: `${it.id} resolved\n`, err: '' };
+}
+
+// migrate: the named one-shot executor converting the markdown
+// lot into the store. The md file's own shape (from the live
+// .hivemind/memory/parking-lot.md):
+//   ## Parked / ## Resolved sections; one bullet per entry —
+//   - **PL-<id> — title** — body…  with hard-wrapped
+//   continuation lines; resolved bodies start 'resolved <date>…'.
+function joinWrapped(lines) {
+  // Hard-wrap join: a line ending in '-' joins WITHOUT the space
+  // (mid-token wraps like '2026-11-/01', 'worktree-/scoped');
+  // everything else joins with a single space.
+  let out = lines[0].trim();
+  for (let i = 1; i < lines.length; i++) {
+    const l = lines[i].trim();
+    out = out.endsWith('-') ? out + l : out + ' ' + l;
+  }
+  return out;
+}
+
+function parseLotEntry(lines, section) {
+  if (section !== 'parked' && section !== 'resolved') {
+    return { err: `entry '${truncText(lines[0], 50)}' is outside a ` +
+      `Parked/Resolved section — hand-fix the markdown, then re-run\n` };
+  }
+  const joined = joinWrapped(lines);
+  const m = /^- \*\*(PL-(?:([A-Z]+)-)?(\d+)) — (.+?)\*\*(?: — (.*))?$/.exec(joined);
+  if (!m) {
+    return { err: `cannot parse entry '${truncText(joined, 60)}' — ` +
+      `expected '- **PL-… — title** — body'; hand-fix, then re-run\n` };
+  }
+  const id = m[1];
+  const origin = m[2] ? m[2].toLowerCase() : 'bee';
+  const item = m[4];
+  const body = m[5] ?? '';
+  if (section === 'resolved') {
+    const rm = /^resolved (\d{4}-\d{2}-\d{2})\s*[,:]?\s*(.*)$/.exec(body);
+    if (!rm) {
+      return { err: `cannot parse resolution for ${id} — expected ` +
+        `'— resolved <date> …' after the title; hand-fix, then re-run\n` };
+    }
+    const e = { id, item, context: '-', 'unpark-when': '-',
+      origin, opened: '-', resolved: rm[1] };
+    if (rm[2] !== '') e.how = rm[2];
+    return e;
+  }
+  // Parked: split a trailing ' — unpark …' clause when present.
+  let context = body;
+  let unpark = '-';
+  const at = body.lastIndexOf(' — unpark ');
+  if (at !== -1) {
+    context = body.slice(0, at);
+    unpark = body.slice(at + ' — unpark '.length);
+  }
+  return { id, item, context: context || '-', 'unpark-when': unpark,
+    origin, opened: '-', resolved: '-' };
+}
+
+function parseMarkdownLot(text) {
+  const parked = [];
+  const resolved = [];
+  let section = null;
+  let cur = null;
+  let curSec = null;
+  let err = null;
+  const flush = () => {
+    if (cur === null) return;
+    const e = parseLotEntry(cur, curSec);
+    if (e.err) {
+      if (err === null) err = e.err;
+    } else {
+      (curSec === 'resolved' ? resolved : parked).push(e);
+    }
+    cur = null;
+    curSec = null;
+  };
+  for (const line of text.split('\n')) {
+    if (/^## /.test(line)) {
+      flush();
+      const h = line.slice(3).trim().toLowerCase();
+      section = h === 'parked' ? 'parked'
+        : h === 'resolved' ? 'resolved' : null;
+      continue;
+    }
+    if (/^- \*\*PL-/.test(line)) {
+      flush();
+      cur = [line];
+      curSec = section;
+      continue;
+    }
+    if (cur !== null) {
+      if (line.trim() === '') { flush(); continue; }
+      cur.push(line);
+    }
+  }
+  flush();
+  if (err) return { err };
+  return { parked, resolved };
+}
+
+function parkStub(storePath, mdPath) {
+  // Repo-relative when the target sits inside the repo; absolute
+  // otherwise (temp fixtures, external lots).
+  const rel = (p) => {
+    const r = path.relative(REPO_ROOT, p);
+    return r.startsWith('..') ? p : r;
+  };
+  return '# Parking lot — moved to the script-owned store\n\n' +
+    `- Store: \`${rel(storePath)}\` — view with \`bee park list\` ` +
+    '(--full for every field).\n' +
+    '- Resolve is keeper-only (AGENTS.md); any agent may propose ' +
+    'parking or resolving.\n' +
+    `- History of the markdown lot: \`git log -- ${rel(mdPath)}\`.\n`;
+}
+
+function parkMigrate(args) {
+  const f = flags(args, {
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return parkUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return parkUsageErr('bee park migrate: expected <md>');
+  }
+  const mdPath = path.resolve(pos[0]);
+  const storePath = parkStorePathOf(f.values.store);
+  let text;
+  try {
+    text = fs.readFileSync(mdPath, 'utf8');
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee park migrate: cannot read ${mdPath}: ${e.message}\n` };
+  }
+  const parsed = parseMarkdownLot(text);
+  if (parsed.err) {
+    return { code: 1, out: '', err: 'bee park migrate: ' + parsed.err };
+  }
+  const total = parsed.parked.length + parsed.resolved.length;
+  if (total === 0) {
+    return { code: 1, out: '',
+      err: `bee park migrate: no PL-* entries found in ${mdPath} — ` +
+        `already migrated? history: git log -- ${mdPath}\n` };
+  }
+  // Id-keyed store; an id in BOTH sections → the RESOLVED entry
+  // wins, and its how line records the superseded parked copy.
+  const order = [];
+  const byId = new Map();
+  for (const e of parsed.parked) {
+    if (!byId.has(e.id)) order.push(e.id);
+    byId.set(e.id, e);
+  }
+  const collisions = [];
+  for (const e of parsed.resolved) {
+    if (byId.has(e.id)) collisions.push(e.id);
+    else order.push(e.id);
+    byId.set(e.id, e);
+  }
+  for (const id of collisions) {
+    const e = byId.get(id);
+    e.how = e.how
+      ? e.how + ' · superseded stale parked duplicate'
+      : 'superseded stale parked duplicate';
+  }
+  const items = order.map((id) => byId.get(id));
+  const summary = `${items.length} items · ${parsed.parked.length} ` +
+    `parked · ${parsed.resolved.length} resolved` +
+    (collisions.length > 0
+      ? ` · ${collisions.length} id collisions (resolved wins): ` +
+        collisions.join(', ')
+      : '');
+  if (f.values.check) {
+    return { code: 0, out:
+      `--check: would write ${storePath} (${summary})\n` +
+      `--check: would replace ${mdPath} with the pointer stub:\n` +
+      parkStub(storePath, mdPath), err: '' };
+  }
+  const w = writeStore('bee park', storePath, items,
+    PARK_FIELDS, PARK_HEADER);
+  if (w) return { code: 1, out: '', err: w };
+  try {
+    atomicWrite(mdPath, parkStub(storePath, mdPath));
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee park migrate: cannot write ${mdPath}: ${e.message}\n` };
+  }
+  return { code: 0, out: `bee park migrate: ${summary}\n` +
+    `store: ${storePath}\n${mdPath} → pointer stub — bee park list to view\n`,
+    err: '' };
 }
 
 if (process.argv[1] &&
