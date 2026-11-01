@@ -518,3 +518,20 @@ test('--full untruncates long cmds (review r1 SF2 regression)', () => {
   assert.equal(rf.code, 0, rf.err);
   assert.ok(rf.out.includes(long)); // full cmd visible with --full
 });
+
+test('node --test check cmds FAIL red inside the test runner (review r1 SF1 regression)', () => {
+  const dir = tmpDir();
+  // a red node --test suite — inherits NODE_TEST_CONTEXT from this
+  // very test-runner process; without the env strip it exits 0
+  const redDir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-verify-red-'));
+  fs.writeFileSync(path.join(redDir, 'red.test.mjs'),
+    "import { test } from 'node:test';\n" +
+    "import assert from 'node:assert/strict';\n" +
+    "test('red', () => { assert.fail('probe'); });\n");
+  const plan = writePlan(dir,
+    `phase: P1\nchecks:\n  - id: task-1\n    cmd: node --test ${path.join(redDir, 'red.test.mjs')}`);
+  const r = run(['verify', '--plan', plan, '--task', '1']);
+  assert.equal(r.code, 1,
+    'a red node --test suite must FAIL even under the test runner');
+  assert.match(r.out, /FAIL/);
+});

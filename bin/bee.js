@@ -1794,9 +1794,15 @@ function runCheckEntry(ch, root, full = false) {
   const fixes = [];
   let pass = true;
   if (ch.cmd !== undefined) {
+    // review r1 fix: strip the Node test-runner's child-mode marker
+    // (NODE_TEST_CONTEXT) — a `node --test` check cmd spawned from
+    // inside a test-runner process inherits it and silently exits 0
+    // on failure; the check's verdict must be the command's own.
+    const env = { ...process.env };
+    delete env.NODE_TEST_CONTEXT;
     const r = spawnSync('sh', ['-c', ch.cmd], {
       cwd: root, encoding: 'utf8',
-      timeout: verifyTimeoutMs(),
+      timeout: verifyTimeoutMs(), env,
     });
     const timedOut = (r.signal === 'SIGTERM' && r.error !== undefined) ||
       (r.error !== undefined && r.error.code === 'ETIMEDOUT');
@@ -3122,7 +3128,7 @@ function phaseClose(args) {
   const pwtClean = pwt === null
     ? true
     : phaseGit(pwt, ['status', '--porcelain']).stdout.trim() === '';
-  const gate = phaseSuiteGate(root, branch, suite, pwt, pwtClean);
+  const gate = phaseSuiteGate(root, branch, suite, pwt, pwtClean, check);
   if (gate.err !== undefined) {
     out.push(`1 · gate · FAIL · cannot materialize the ${branch} tree: ` +
       `${gate.err}\n`);
@@ -3273,6 +3279,13 @@ function phaseClose(args) {
   out.push(`  decisions: ${decCount}\n`);
   if (decCount > PHASE_FLAG_THRESHOLD) {
     out.push('  flag: under-asked kickoff — front-load harder next phase\n');
+  }
+  // review r1 fix: surface the untracked inventory — exempt from
+  // the clean gate but blocks the NEXT phase's close until committed.
+  if (fs.existsSync(path.join(root, decRel)) &&
+      phaseGit(root, ['ls-files', '--error-unmatch', decRel]).status !== 0) {
+    out.push(`  note: ${decRel} is untracked — commit it ` +
+      `(git add ${decRel}) or it will block the next close\n`);
   }
 
   // step 6 — push
