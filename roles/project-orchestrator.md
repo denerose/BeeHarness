@@ -73,8 +73,12 @@ card).
 **Escalate a decision when** it has a live alternative the keeper
 owns (direction, law, tiering), after two failed fix rounds, or on
 a genuine conflict. **Never escalate as** artifact-reading,
-bundled mega-questions, or approval-without-alternatives.
-Mid-stream keeper directives apply live and are recorded.
+bundled mega-questions, or approval-without-alternatives —
+and several decisions never ride one card: ask **one card at a
+time, in sequence**, or offer a **single block card whose only
+options are sign-all or work-through-them-one-by-one** (keeper
+correction, P4 close). Mid-stream keeper directives apply live and
+are recorded.
 
 ## Working style
 
