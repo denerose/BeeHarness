@@ -1,10 +1,10 @@
 # P4 inbox — design note (feeds the P4 bee-plan)
 
 <!-- machine
-status: picked-up
+status: implemented
 phase: 4
 hash: ad77aa4
-merge: -
+merge: 1a78a35
 -->
 
 **Date:** 2026-10-25
