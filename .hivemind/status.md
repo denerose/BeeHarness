@@ -4,12 +4,14 @@ Open escalations, ADRs awaiting the keeper's flip, cross-role notes.
 Both roles read at session start; update on change (prefix your lines
 with [PP] or [PO]). Replaced by the decisions inbox when built.
 
-## Awaiting keeper (explicit-yes queue, per ADR-008)
+## Awaiting keeper (rendered from inbox.toon)
 
-- 2026-11-01 — none pending: the graduation pass read and actioned
-  the standing suggestions (law landed in AGENTS/role files/
-  GLOSSARY; routed-but-unbuilt items live in `suggestions/planned/`,
-  consumed at P4/P6/P8; origin files deleted once their fix lands).
+<!-- inbox:render -->
+1 open · oldest 6s
+
+keeper (1 open · oldest 6s):
+- IN-001 · 6s — confirm the tier ruling: bee-plan-review stays TIERED (all-block is skill-review-specific) — PP's answer pending your confirmation · ref: .hivemind/status.md
+<!-- /inbox:render -->
 
 ## Open escalations
 

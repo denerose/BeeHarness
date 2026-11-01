@@ -1,6 +1,6 @@
 # Keeper report
 
-**Generated:** 2026-10-31 23:08 by bee report (merge regen) · **Source:** `.hivemind/status.md`
+**Generated:** 2026-11-01 13:24 by bee report (merge regen) · **Source:** `.hivemind/inbox.toon`
 
 **Zones and rules — read before regenerating this file:** *Keeper's
 list* is the keeper's own — roles add items on the keeper's word,
@@ -32,10 +32,7 @@ resolves them; the keeper may edit freely or just say the word)
 
 ## Needs the keeper
 
-- None. (The founding-orchestrator hindsight batch was read and
-  actioned in the 2026-11-01 suggestions graduation pass: five of
-  six landed as law, the brainstorm ownership filter rides P8 in
-  `suggestions/planned/`.)
+1. [pp] 2026-11-01 — confirm the tier ruling: bee-plan-review stays TIERED (all-block is skill-review-specific) — PP's answer pending your confirmation (IN-001 · /home/saphron/BeeHarness/.hivemind/status.md)
 
 ## Changed since last report
 
