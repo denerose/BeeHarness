@@ -46,6 +46,9 @@ checks:
     expect: exit 0
     files: [.hivemind/glossary.toon, skills/GLOSSARY.md]
 suite: node --test tests/*.test.mjs
+task-1: implemented 2026-11-02T09:08:13+11:00 by project-orchestrator
+task-1: verified 2026-11-02T09:18:43+11:00 by project-orchestrator
+task-1: done 2026-11-02T09:18:43+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task1-verify-r2.md
 -->
 
 ## Shared contract: command grammar (USAGE additions)
@@ -71,12 +74,14 @@ bee glossary [<term>] [--markdown]
 **Depends on:** nothing
 **Provides:** store `.hivemind/memory/memory.toon` (line format below); command `bee memory add|list|show|supersede`; shared helper `originTag(role)` (generalized from `parkOriginTag`, used by park `PL-<tag>-NNN` and memory `ME-<tag>-NNN`)
 
-- [ ] Step: generalize `parkOriginTag` → `originTag` (same body: hyphenated names map to word-initial tags, `power-planner` → `PP`; short codes pass through). Park's behavior is unchanged — existing park tests must stay green.
-- [ ] Step: implement the store + command per the contracts below (grammar: the `bee memory` stanza of the shared USAGE block at the top of this plan, verbatim). Absent store: `list` reports `0 entries` (exit 0); `show` fails loud with the store path. Write commands accept `--check` (preview; never writes — house semantics). Newline guard on gist/ref (house rule). Fail loud on superseding an already-superseded id or an unknown id.
-- [ ] Step: supersede semantics: new entry gets a fresh id in the CALLING role's series (per `--origin`), `--type` explicit (D3), provenance stamped; the OLD entry's state rewrites to `superseded:<new-id>` in place (atomic write, whole store). Role-gated per D1: any origin may run it; the CLI stamps provenance and that is the audit trail — no extra gate. Internal seam flag `--store <path>` follows the park/inbox house pattern: implemented, listed in `bee memory help`, not in the top-level stanza.
-- [ ] Step: tests — mirror `tests/bee-park.test.mjs` structure (tmp store via `--store`): default bare series; per-role series via full and short origin; explicit `--type` required (omitting exits 1); field order + zero-padded ids; series continuation from seeded store; supersede rewrites state and mints successor; double-supersede fails; `--check` writes nothing; unknown id fails loud.
-- [ ] Step: run `node --test tests/bee-memory.test.mjs` — all pass.
-- [ ] Commit: `add memory store and bee memory command`
+- [x] Step: generalize `parkOriginTag` → `originTag` (same body: hyphenated names map to word-initial tags, `power-planner` → `PP`; short codes pass through). Park's behavior is unchanged — existing park tests must stay green.
+- [x] Step: implement the store + command per the contracts below (grammar: the `bee memory` stanza of the shared USAGE block at the top of this plan, verbatim). Absent store: `list` reports `0 entries` (exit 0); `show` fails loud with the store path. Write commands accept `--check` (preview; never writes — house semantics). Newline guard on gist/ref (house rule). Fail loud on superseding an already-superseded id or an unknown id.
+- [x] Step: supersede semantics: new entry gets a fresh id in the CALLING role's series (per `--origin`), `--type` explicit (D3), provenance stamped; the OLD entry's state rewrites to `superseded:<new-id>` in place (atomic write, whole store). Role-gated per D1: any origin may run it; the CLI stamps provenance and that is the audit trail — no extra gate. Internal seam flag `--store <path>` follows the park/inbox house pattern: implemented, listed in `bee memory help`, not in the top-level stanza.
+- [x] Step: tests — mirror `tests/bee-park.test.mjs` structure (tmp store via `--store`): default bare series; per-role series via full and short origin; explicit `--type` required (omitting exits 1); field order + zero-padded ids; series continuation from seeded store; supersede rewrites state and mints successor; double-supersede fails; `--check` writes nothing; unknown id fails loud.
+- [x] Step: run `node --test tests/bee-memory.test.mjs` — all pass.
+- [x] Commit: `add memory store and bee memory command`
+
+Task notes: re-review waived — fix round b89feb5 applied the reviewer's suggested change near-verbatim; verify r2 entry replicates the reviewer's probe (mixed-case provenance); zero blocking findings (APPROVE r1).
 
 Store line format (one line per entry, ` :: ` separators, fields never contain ` :: `):
 

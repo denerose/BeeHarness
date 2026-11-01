@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`, `bee design`, `bee verify`, `bee task`,
-// `bee guidance`, `bee phase`.
+// `bee capture`, `bee park`, `bee memory`, `bee design`, `bee verify`,
+// `bee task`, `bee guidance`, `bee phase`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -38,6 +38,10 @@ usage:
                [--origin <role>]
              | show <id> [--full] | resolve <id> [--how <text>]
              | migrate <md>
+  bee memory [list [--type lesson|fact] [--full]]
+             | add "<gist>" --type lesson|fact [--ref <path>] [--origin <role>]
+             | show <id> [--full]
+             | supersede <id> "<gist>" --type lesson|fact [--ref <path>] [--origin <role>]
   bee design [status [--full]]
              | new "<title>" [--check]
              | pick-up <doc> --phase <n> [--check]
@@ -77,6 +81,9 @@ export function run(argv) {
   }
   if (cmd === 'park') {
     return cmdPark(rest);
+  }
+  if (cmd === 'memory') {
+    return cmdMemory(rest);
   }
   if (cmd === 'design') {
     return cmdDesign(rest);
@@ -1048,7 +1055,8 @@ function parkOldestAge(view) {
 // ADR-007 role-initials convention: a hyphenated role name maps
 // to the first letter of each word (power-planner → PP,
 // project-orchestrator → PO); short codes pass through (pp → PP).
-function parkOriginTag(origin) {
+// Shared id-seam helper: park PL-<tag>-NNN and memory ME-<tag>-NNN.
+function originTag(origin) {
   if (origin.includes('-')) {
     return origin.split('-').map((w) => w[0] || '').join('').toUpperCase();
   }
@@ -1064,7 +1072,7 @@ function nextParkId(items, origin) {
     }
     return 'PL-' + String(max + 1).padStart(3, '0');
   }
-  const tag = parkOriginTag(origin);
+  const tag = originTag(origin);
   const re = new RegExp('^PL-' + tag + '-(\\d+)$', 'i');
   let max = 0;
   for (const it of items) {
@@ -1426,6 +1434,331 @@ function parkMigrate(args) {
   }
   return { code: 0, out: `bee park migrate: ${summary}\n` +
     `store: ${storePath}\n${mdPath} → pointer stub — bee park list to view\n`,
+    err: '' };
+}
+
+// ---- memory (P5 Task 1 — .hivemind/memory/memory.toon) ----
+// Line-based TOON (unlike park/inbox blocks): one entry per line,
+// ' :: ' separated. Supersede, never delete — a retired entry
+// names its successor; git holds history, reads stay cheap.
+
+const MEMORY_HEADER =
+  '# memory — durable lessons and facts (agent store; supersede, never delete)';
+
+const MEMORY_USAGE = `bee memory — durable lessons and facts (a store, not a document)
+
+usage:
+  bee memory list [--type lesson|fact] [--full]
+  bee memory add "<gist>" --type lesson|fact [--ref <path>] [--origin <role>] [--check]
+  bee memory show <id> [--full]
+  bee memory supersede <id> "<gist>" --type lesson|fact [--ref <path>] [--origin <role>] [--check]
+
+flags:
+  --type lesson|fact  entry type — ALWAYS explicit (D3): a lesson is
+                       agent-learned, a fact is project knowledge
+  --ref <path>        source pointer riding provenance (default: -)
+  --origin <role>     provenance; picks the id series from role
+                       initials (power-planner → ME-PP-NNN;
+                       default bee → ME-NNN)
+  --full              all fields, no truncation; list includes
+                       superseded entries
+  --check             never write; report what would happen
+  --store <path>      internal: store path
+                       (default .hivemind/memory/memory.toon)
+
+store: TOON — one entry per line, ' :: ' separated:
+id :: type :: gist :: provenance :: state. Ids ME-<role>-NNN
+(origin bee = bare ME-NNN), monotonic per series, never reused;
+provenance origin · date · ref stamped by the CLI; state live or
+superseded:<id> — list shows live only, --full shows all.
+
+supersede: role-gated (D1) — any origin may run it; the CLI
+stamps provenance and that is the audit trail. The successor
+mints in the calling role's series (--origin); the old entry's
+state rewrites to superseded:<new-id> in place. Never supersedes
+an already-superseded id.`;
+
+function memoryUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + MEMORY_USAGE };
+}
+
+function memoryStorePathOf(p) {
+  return p ? path.resolve(p)
+    : path.join(REPO_ROOT, '.hivemind', 'memory', 'memory.toon');
+}
+
+// Provenance dates are day-granular (YYYY-MM-DD), not ISO stamps.
+function todayLocal() {
+  return isoStampLocal().slice(0, 10);
+}
+
+function readMemoryStore(storePath) {
+  let text;
+  try {
+    text = fs.readFileSync(storePath, 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') return { items: [] };
+    return { err: `bee memory: cannot read ${storePath}: ${e.message}\n` };
+  }
+  const items = [];
+  const lines = text.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.startsWith('#') || line.trim() === '') continue;
+    const parts = line.split(' :: ');
+    if (parts.length !== 5 || !parts[0].startsWith('ME-')) {
+      return { err: `bee memory: cannot parse ${storePath}: ` +
+        `line ${i + 1} is not an entry — hand-fix the store, then retry\n` };
+    }
+    items.push({ id: parts[0], type: parts[1], gist: parts[2],
+      provenance: parts[3], state: parts[4] });
+  }
+  return { items };
+}
+
+function memoryEntryLine(e) {
+  return [e.id, e.type, e.gist, e.provenance, e.state].join(' :: ');
+}
+
+function renderMemoryStore(items) {
+  return MEMORY_HEADER + '\n' +
+    items.map(memoryEntryLine).join('\n') + '\n';
+}
+
+function writeMemoryStore(storePath, items) {
+  try {
+    fs.mkdirSync(path.dirname(storePath), { recursive: true });
+    atomicWrite(storePath, renderMemoryStore(items));
+    return null;
+  } catch (e) {
+    return `bee memory: cannot write ${storePath}: ${e.message}\n`;
+  }
+}
+
+function nextMemoryId(items, origin) {
+  if (origin === 'bee') {
+    let max = 0;
+    for (const it of items) {
+      const m = /^ME-(\d+)$/.exec(it.id || '');
+      if (m) max = Math.max(max, Number(m[1]));
+    }
+    return 'ME-' + String(max + 1).padStart(3, '0');
+  }
+  const tag = originTag(origin);
+  const re = new RegExp('^ME-' + tag + '-(\\d+)$', 'i');
+  let max = 0;
+  for (const it of items) {
+    const m = re.exec(it.id || '');
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return 'ME-' + tag + '-' + String(max + 1).padStart(3, '0');
+}
+
+function memoryAbsentErr(id, storePath, exists) {
+  return `bee memory: no entry ${id} — store ${storePath}` +
+    (exists ? '' : ' (absent)') + ' — bee memory list\n';
+}
+
+// Shared arg validation for add/supersede (both mint an entry).
+function memoryMintErrs(type, gist, ref, origin) {
+  if (type === undefined) {
+    return `bee memory: --type is required (lesson|fact) — ` +
+      'explicit, always (D3)';
+  }
+  if (type !== 'lesson' && type !== 'fact') {
+    return `bee memory: --type '${type}' must be lesson or fact`;
+  }
+  if (!/^[a-z][a-z0-9-]*$/i.test(origin)) {
+    return `bee memory: --origin '${origin}' must be letters/digits/hyphens`;
+  }
+  for (const v of [gist, ref]) {
+    if (v !== undefined &&
+      (v.includes('\n') || v.includes(' :: '))) {
+      return `bee memory: field values must be single-line ` +
+        `and must not contain ' :: '`;
+    }
+  }
+  return null;
+}
+
+function cmdMemory(rest) {
+  const [sub] = rest;
+  if (sub === undefined || sub === 'list' || sub.startsWith('--')) {
+    return memoryList(sub === 'list' ? rest.slice(1) : rest);
+  }
+  if (sub === 'add') return memoryAdd(rest.slice(1));
+  if (sub === 'show') return memoryShow(rest.slice(1));
+  if (sub === 'supersede') return memorySupersede(rest.slice(1));
+  if (sub === 'help') return { code: 0, out: MEMORY_USAGE, err: '' };
+  return { code: 1, out: '',
+    err: `bee memory: unknown subcommand '${sub}'\n\n` + MEMORY_USAGE };
+}
+
+function memoryAdd(args) {
+  const f = flags(args, {
+    type: { type: 'string' },
+    ref: { type: 'string' },
+    origin: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0] === '') {
+    return memoryUsageErr('bee memory add: expected "<gist>"');
+  }
+  const origin = f.values.origin || 'bee';
+  const err = memoryMintErrs(f.values.type, pos[0], f.values.ref, origin);
+  if (err) return memoryUsageErr(err);
+  const storePath = memoryStorePathOf(f.values.store);
+  const r = readMemoryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const id = nextMemoryId(r.items, origin.toLowerCase());
+  const entry = {
+    id,
+    type: f.values.type,
+    gist: pos[0],
+    provenance: `${origin} · ${todayLocal()} · ` +
+      (f.values.ref || '-'),
+    state: 'live',
+  };
+  if (f.values.check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      memoryEntryLine(entry) + '\n', err: '' };
+  }
+  const w = writeMemoryStore(storePath, [...r.items, entry]);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0,
+    out: `${id} added · ${truncText(pos[0])} — bee memory show ${id}\n`,
+    err: '' };
+}
+
+function memoryList(args) {
+  const f = flags(args, {
+    type: { type: 'string' },
+    full: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  if (f.positionals.length > 0) {
+    return memoryUsageErr(
+      `bee memory list: unexpected argument '${f.positionals[0]}'`);
+  }
+  if (f.values.type !== undefined &&
+    f.values.type !== 'lesson' && f.values.type !== 'fact') {
+    return memoryUsageErr(
+      `bee memory list: --type '${f.values.type}' must be lesson or fact`);
+  }
+  const r = readMemoryStore(memoryStorePathOf(f.values.store));
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const all = f.values.type === undefined ? r.items
+    : r.items.filter((e) => e.type === f.values.type);
+  const live = all.filter((e) => e.state === 'live');
+  if (f.values.full) {
+    if (all.length === 0) {
+      return { code: 0, out: '0 entries\n' +
+        'add one: bee memory add "<gist>" --type lesson|fact\n', err: '' };
+    }
+    let out = `${all.length} entries · ${live.length} live · ` +
+      `${all.length - live.length} superseded\n`;
+    for (const e of all) {
+      out += `${e.id} · ${e.type} · ${e.state}\n` +
+        `  gist: ${e.gist}\n  provenance: ${e.provenance}\n`;
+    }
+    return { code: 0, out, err: '' };
+  }
+  if (live.length === 0) {
+    return { code: 0, out: '0 entries\n' +
+      'add one: bee memory add "<gist>" --type lesson|fact\n', err: '' };
+  }
+  let out = `${live.length} live entries\n`;
+  for (const e of live) {
+    out += `${e.id} · ${e.type} · ${truncText(e.gist)}\n`;
+  }
+  return { code: 0, out, err: '' };
+}
+
+function memoryShow(args) {
+  const f = flags(args, {
+    full: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1) {
+    return memoryUsageErr('bee memory show: expected <id>');
+  }
+  const storePath = memoryStorePathOf(f.values.store);
+  const r = readMemoryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const e = r.items.find((i) => i.id === pos[0]);
+  if (!e) {
+    return { code: 1, out: '',
+      err: memoryAbsentErr(pos[0], storePath,
+        fs.existsSync(storePath)) };
+  }
+  let out = `${e.id} · ${e.type} · ${e.state}\ngist: ${e.gist}\n`;
+  if (f.values.full) out += `provenance: ${e.provenance}\n`;
+  return { code: 0, out, err: '' };
+}
+
+function memorySupersede(args) {
+  const f = flags(args, {
+    type: { type: 'string' },
+    ref: { type: 'string' },
+    origin: { type: 'string' },
+    check: { type: 'boolean' },
+    store: { type: 'string' },
+  }, true);
+  if (f.error) return memoryUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 2 || pos[1] === '') {
+    return memoryUsageErr('bee memory supersede: expected <id> "<gist>"');
+  }
+  const [oldId, gist] = pos;
+  const origin = f.values.origin || 'bee';
+  const err = memoryMintErrs(f.values.type, gist, f.values.ref, origin);
+  if (err) return memoryUsageErr(err);
+  const storePath = memoryStorePathOf(f.values.store);
+  const r = readMemoryStore(storePath);
+  if (r.err) return { code: 1, out: '', err: r.err };
+  const old = r.items.find((i) => i.id === oldId);
+  if (!old) {
+    return { code: 1, out: '',
+      err: memoryAbsentErr(oldId, storePath, fs.existsSync(storePath)) };
+  }
+  if (old.state !== 'live') {
+    const succ = /^superseded:(.+)$/.exec(old.state);
+    const why = succ
+      ? `bee memory: ${oldId} is already superseded ` +
+        `(state: ${old.state}) — supersede ${succ[1]} instead\n`
+      : `bee memory: ${oldId} is not live (state: ${old.state})\n`;
+    return { code: 1, out: '', err: why };
+  }
+  const newId = nextMemoryId(r.items, origin.toLowerCase());
+  const entry = {
+    id: newId,
+    type: f.values.type,
+    gist,
+    provenance: `${origin} · ${todayLocal()} · ` +
+      (f.values.ref || '-'),
+    state: 'live',
+  };
+  const items = r.items.map((e) =>
+    e.id === oldId ? { ...e, state: `superseded:${newId}` } : e);
+  items.push(entry); // successor appends; the old line rewrites in place
+  if (f.values.check) {
+    return { code: 0, out: `--check: would append to ${storePath}\n` +
+      memoryEntryLine(entry) + '\n' +
+      `--check: would mark ${oldId} superseded:${newId} ` +
+      '(state rewrite in place)\n', err: '' };
+  }
+  const w = writeMemoryStore(storePath, items);
+  if (w) return { code: 1, out: '', err: w };
+  return { code: 0,
+    out: `${newId} added · supersedes ${oldId} — bee memory show ${newId}\n`,
     err: '' };
 }
 
