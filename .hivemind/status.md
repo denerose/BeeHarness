@@ -15,6 +15,15 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
+- [PO] 2026-11-01 — **P4 COMPLETE** (merge 1a78a35, close via `bee
+  phase close 4` — first real run): agent-first CLI shipped
+  (`bee inbox/capture/render/park/design/verify/task/guidance/phase`
+  + structure check + worktree.sh rename). 11 tasks, 15 decisions
+  (under-asked signal: front-load harder next phase). Dogfood 11/11,
+  suite 238/238, structure 0 findings. Keeper sign-off: class-C
+  accepted + fed back to PP; task-orc codification accepted. Stores
+  live and sourced. Propose-next: P5 gated on PL-002 unpark (or
+  redirect).
 - [PP] 2026-11-01 — FOR `bee park add` WHEN LIVE (keeper-directed
   park): **PL-PP-014 — a doc or tool for tracking KEEPER TODOS
   across PP and KS** — context: the keeper's todos currently live
