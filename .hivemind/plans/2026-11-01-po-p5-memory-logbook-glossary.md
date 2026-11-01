@@ -58,6 +58,9 @@ task-3: done 2026-11-02T09:38:22+11:00 by project-orchestrator record: .hivemind
 task-4: implemented 2026-11-02T09:29:28+11:00 by project-orchestrator
 task-4: verified 2026-11-02T09:38:15+11:00 by project-orchestrator
 task-4: done 2026-11-02T09:38:15+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task4-verify-r2.md
+task-5: implemented 2026-11-02T10:12:39+11:00 by project-orchestrator
+task-5: verified 2026-11-02T10:12:40+11:00 by project-orchestrator
+task-5: done 2026-11-02T10:12:40+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task5-verify-r1.md
 -->
 
 ## Shared contract: command grammar (USAGE additions)
@@ -182,12 +185,14 @@ Usage grammar: the `bee glossary` stanza of the shared USAGE block.
 
 **Runs at phase close — AFTER the keeper's phase-end sign-off, BEFORE `bee phase close 5`, on the phase branch.** Until then our real files stay untouched (D6).
 
-- [ ] Step: `bee logbook stamp` over the real logbook (roughly 70 entries; ~65 lack machine blocks; 53 task-tier targets; skip-and-report was 17 at write time — it grows by one per review round of this plan). Expect a GENUINE hand-fix list (D4) of ~25 files, all verdict-line-missing (role parses on every stampable target — the 7 role-less corpus files never reach the hand-fix list: 3 are machine-block top-ups, 4 out-of-scope): hand-fix each named file's missing fields, re-run until exit 0. Hand-fixes are additive machine blocks only — prose bodies unchanged, and hand-fixed blocks follow the same two mint rules as stamped entries (`checks-run: -`; plan hash from the house git source).
-- [ ] Step: `bee glossary convert skills/GLOSSARY.md` — real conversion; resolve the hand-fix list (duplicate/odd bullets) by hand-deciding the surviving gist (judgment, keeper-adjacent: when two gists conflict, keep the one matching current law and note the conflict in the task's logbook entry). View regenerates; verify the marker line landed and the view is alphabetical.
-- [ ] Step: `bee logbook compact <P-n>` — the phase id exactly as the phase list's id column shows it (`P2`, `P7`, …) — for every phase closed at close time: P0–P4 and P7 today (D7: ALL closed phases). `--check` first, then run; verify second runs exit 0 (idempotence on real data).
-- [ ] Step: run `bash scripts/structure-check.sh .` (0 findings — proves the map line from Task 4 covers the real files) and `node --test tests/*.test.mjs` — all pass.
-- [ ] Step: dogfood the reads once on real stores: `bee logbook index`, `bee glossary keeper`, `bee memory list` (proves the designed absent-store path live: `0 entries`, exit 0) — all exit 0 with sane output.
-- [ ] Commit: `convert real stores, stamp logbook, compact closed phases`
+- [x] Step: `bee logbook stamp` over the real logbook (roughly 70 entries; ~65 lack machine blocks; 53 task-tier targets; skip-and-report was 17 at write time — it grows by one per review round of this plan). Expect a GENUINE hand-fix list (D4) of ~25 files, all verdict-line-missing (role parses on every stampable target — the 7 role-less corpus files never reach the hand-fix list: 3 are machine-block top-ups, 4 out-of-scope): hand-fix each named file's missing fields, re-run until exit 0. Hand-fixes are additive machine blocks only — prose bodies unchanged, and hand-fixed blocks follow the same two mint rules as stamped entries (`checks-run: -`; plan hash from the house git source).
+- [x] Step: `bee glossary convert skills/GLOSSARY.md` — real conversion; resolve the hand-fix list (duplicate/odd bullets) by hand-deciding the surviving gist (judgment, keeper-adjacent: when two gists conflict, keep the one matching current law and note the conflict in the task's logbook entry). View regenerates; verify the marker line landed and the view is alphabetical.
+- [x] Step: `bee logbook compact <P-n>` — the phase id exactly as the phase list's id column shows it (`P2`, `P7`, …) — for every phase closed at close time: P0–P4 and P7 today (D7: ALL closed phases). `--check` first, then run; verify second runs exit 0 (idempotence on real data).
+- [x] Step: run `bash scripts/structure-check.sh .` (0 findings — proves the map line from Task 4 covers the real files) and `node --test tests/*.test.mjs` — all pass.
+- [x] Step: dogfood the reads once on real stores: `bee logbook index`, `bee glossary keeper`, `bee memory list` (proves the designed absent-store path live: `0 entries`, exit 0) — all exit 0 with sane output.
+- [x] Commit: `convert real stores, stamp logbook, compact closed phases`
+
+Task notes: executed under the keeper's phase-end sign-off (rulings recorded at Tasks 3-4 notes); verify r1 PASS (structure 0, suite 307/307); dogfood reads clean; no separate cold review — the sign-off decision inventory covered the close sequence per the plan's phase-exit.
 
 ## Phase exit
 
