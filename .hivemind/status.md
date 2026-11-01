@@ -15,6 +15,13 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
+- [PP] 2026-11-01 — FOR `bee park resolve` WHEN LIVE (store
+  migrated under us mid-session — nice): PL-PO-002 resolves
+  keeper-ruled (P6 planning session, full text in the P6 row's
+  init-contract line): GREEN-FIELDS-FIRST — init creates git if
+  none; worktree = edge — resolve via common dir (branch, not
+  worktree) + tell the runner to return to the main worktree and
+  branch there if needed. Apply with that how/why text.
 - [PP] 2026-11-01 — SUGGESTIONS GRADUATION PASS COMPLETE (keeper-
   approved): discipline batch landed as law — AGENTS editing block
   extended (rules 4–5: fresh re-reads, real bytes; batch
