@@ -441,7 +441,7 @@ at dogfood time)
 **Provides:** `bee verify --plan <path> [--task <n>] [--check]` —
 header-driven checks + structured logbook entry emission
 
-- [ ] Settle the plan-header field contract (the design note's open
+- [x] Settle the plan-header field contract (the design note's open
   question — this is the interface `bee-plan` writes and
   `bee verify` reads). The template's machine block — the whole
   `<!-- machine … -->` region — becomes exactly (replace, not
@@ -469,7 +469,7 @@ suite: <the command that proves the plan's work, e.g. node --test tests/*.test.m
   `expect: exit 0` is the only form this phase. This plan's own
   header gains its `checks:` block in the same task (dogfood — the
   gate and every later verify run read it).
-- [ ] Implement `bee verify`: parses the plan header; `--task <n>`
+- [x] Implement `bee verify`: parses the plan header; `--task <n>`
   runs just that task's checks, default runs all; each check →
   TOON line `task-<n> · cmd · PASS|FAIL · <note>`; every FAIL
   carries a self-correction line (`fix: <what to run or repair>`)
@@ -480,7 +480,7 @@ suite: <the command that proves the plan's work, e.g. node --test tests/*.test.m
   `main` by default, `--base` overridable), every markdown link to
   a repo-relative path is resolved; broken ones are FAILs with the
   fix line.
-- [ ] Logbook emission: on success (or with `--record`), `bee
+- [x] Logbook emission: on success (or with `--record`), `bee
   verify` writes `.hivemind/logbook/<plan-slug>-task<N>-verify-<rN>.md`
   with a machine header (role, date, verdict, checks-run count,
   plan path + hash) and a prose body ONLY for anomalies (empty
@@ -488,16 +488,27 @@ suite: <the command that proves the plan's work, e.g. node --test tests/*.test.m
   series (next free N for that task). Writes are atomic;
   `--check` previews. ADR-006 invariant: the entry IS the evidence
   — states never move without it.
-- [ ] AXI compliance tests: bare `bee verify` with no plan → exit 1
+- [x] AXI compliance tests: bare `bee verify` with no plan → exit 1
   + fix instruction; empty checks → definitive `0 checks`; FAIL
   output includes a `fix:` line (asserted); `--check` writes no
   logbook file; suite-green run emits a clean entry against a
   fixture plan.
-- [ ] Verify: `bee verify --plan .hivemind/plans/2026-11-01-po-p4-agent-first-cli.md`
+- [x] Verify: `bee verify --plan .hivemind/plans/2026-11-01-po-p4-agent-first-cli.md`
   against this plan's own checks block (dogfood; expect PASS once
   earlier tasks land, partial until then — the task's own
   finished-test requires all-PASS).
-- [ ] Commit: `add bee verify, plan-header check contract`
+- [x] Commit: `add bee verify, plan-header check contract`
+**Task notes (loop, 2026-11-01):** done — verify r1 PASS, review r1
+FIX-FIRST (0🔴 3🟡: timeout fix-line shadowing; missing --full;
+unscoped fan-out), fix round near-verbatim with probe-replicating
+regression tests, re-review waived. Deviations accepted: dogfood
+checks-block added from main post-merge (this commit series); the
+task3-record link repair (the link-check's first real catch);
+unscoped runs write nothing by default (phase-exit dogfood uses
+--record — Task 10 note); BEE_VERIFY_TIMEOUT_MS seam. Dogfood
+evidence (from the spine): 11 checks · 6 pass (tasks 0-5) · 5 fail
+(tasks 6-10 unbuilt, fix lines) — the plan's "partial until then"
+state, moving to all-PASS as tasks land.
 
 ## Task 6: `bee task` (work-item state moves, script-owned)
 
