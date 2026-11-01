@@ -3,7 +3,7 @@
 phase: P5
 plan: .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
 count: 11
-assembled: 2026-11-02T10:12:00+11:00 by project-orchestrator
+assembled: 2026-11-02T10:15:23+11:00 by project-orchestrator
 
 D1 · kickoff: supersede role-gated w/ provenance (keeper prunes) · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
 D2 · kickoff: memory ids per-role ME-<role>-NNN · .hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md
