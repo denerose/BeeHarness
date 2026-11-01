@@ -16,8 +16,8 @@ design: .hivemind/designs/2026-10-25-pp-p4-inbox-design.md @ ad77aa4
 targets:
   - scripts/design.sh (create)
   - .hivemind/designs/2026-10-25-pp-p4-inbox-design.md (modify)
-  - .hivemind/inbox.toon (create)
-  - .hivemind/memory/parking-lot.toon (create)
+  - .hivemind/inbox.toon (modify)
+  - .hivemind/memory/parking-lot.toon (modify)
   - .hivemind/memory/parking-lot.md (modify)
   - scripts/structure.map (create)
   - scripts/structure-check.sh (create)
@@ -49,6 +49,51 @@ targets:
   - .hivemind/status.md (modify)
   - .hivemind/keeper-report.md (modify)
   - .hivemind/phases/BeeHarness.md (modify)
+checks:
+  - id: task-0
+    cmd: bash scripts/design.sh status
+    expect: exit 0
+    files: [scripts/design.sh]
+  - id: task-1
+    cmd: node --test tests/bee-inbox.test.mjs
+    expect: exit 0
+    files: [bin/bee.js, tests/bee-inbox.test.mjs]
+  - id: task-2
+    cmd: node --test tests/bee-render.test.mjs
+    expect: exit 0
+    files: [.hivemind/inbox.toon, tests/bee-render.test.mjs]
+  - id: task-3
+    cmd: node --test tests/bee-park.test.mjs
+    expect: exit 0
+    files: [.hivemind/memory/parking-lot.toon, .hivemind/memory/parking-lot.md]
+  - id: task-4
+    cmd: node --test tests/bee-design.test.mjs
+    expect: exit 0
+    files: [scripts/design.sh, tests/bee-design.test.mjs]
+  - id: task-5
+    cmd: node --test tests/bee-verify.test.mjs
+    expect: exit 0
+    files: [skills/loop/bee-plan/assets/plan-template.md]
+  - id: task-6
+    cmd: node --test tests/bee-task.test.mjs
+    expect: exit 0
+    files: [tests/bee-task.test.mjs]
+  - id: task-7
+    cmd: test -f docs/guidance/how-to-be-a-bee.md
+    expect: exit 0
+    files: [docs/guidance/how-to-be-a-bee.md, roles/task-orc.md]
+  - id: task-8
+    cmd: bash scripts/structure-check.sh .
+    expect: exit 0
+    files: [scripts/structure.map, scripts/worktree.sh]
+  - id: task-9
+    cmd: node --test tests/bee-phase.test.mjs
+    expect: exit 0
+    files: [tests/bee-phase.test.mjs]
+  - id: task-10
+    cmd: bash scripts/structure-check.sh .
+    expect: exit 0
+    files: [skills/GLOSSARY.md, AGENTS.md]
 suite: node --test tests/*.test.mjs
 -->
 
