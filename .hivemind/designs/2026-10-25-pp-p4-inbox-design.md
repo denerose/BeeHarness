@@ -141,6 +141,28 @@ lands). A subcommand, matching siblings (`bee task`, `bee report`):
   (provenance-stamped, role-gated writes — PL-002's shape); does NOT
   unpark PL-002; P5's memory system may absorb or sit beside it.
 
+## Kickoff decision list (front-loaded 2026-11-01 — PP
+recommendations; keeper rules at or before the kickoff card)
+
+1. Phase-close subcommand (PO suggestion
+   `2026-11-01-po-phase-close-subcommand`): ABSORB — fold with the
+   decision-count calibration into one close-step design; P4's own
+   close is the first user.
+2. PL-PP-003 (`bee guidance`): SPLIT — minimal command + first
+   topic files (how-to-be-a-bee, cli-writing, TDD, triage
+   distinction) in P4; full guidance injection + session rules at
+   the P6 init contract.
+3. Quick-thoughts capture (keeper suggestion): ABSORB minimal —
+   `bee capture` writes to the inbox store; routing stays
+   conversational.
+4. PL-PP-001 (link hygiene): ABSORB the mechanical piece — `bee
+   verify` link-checks changed docs; interim chat rule stays.
+5. PL-PP-005 (logbook compaction): DEFER to P6 — P4's machine
+   headers enable the later design.
+6. PL-PO-002 (worktree-aware `bee init`): DEFER to P6 init
+   contract; hazard noted (run init from the main checkout until
+   then).
+
 ## Determinism build-out in P4 (ADR-014)
 
 The addendum names `bee verify` and `bee task`; the shape, so the
