@@ -204,8 +204,9 @@ what remains open.
   table — escalate a decision with a live keeper-owned alternative
   (direction/law/tiering), after two failed fix rounds, on genuine
   conflict; never as artifact-reading, bundled mega-questions, or
-  approval-without-alternatives. Full arc in
-  `suggestions/2026-11-01-po-session-hindsight-signoff.md`.
+  approval-without-alternatives. Full arc in git history (the
+  suggestion file was deleted 2026-11-01 after its law landed in
+  both role files).
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any

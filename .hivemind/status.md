@@ -6,28 +6,10 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 
 ## Awaiting keeper (explicit-yes queue, per ADR-008)
 
-- [PP] 2026-10-25 — `pp-scripted-edits-verify` RESOLVED in-session
-  (keeper: "handle it here"): editing discipline is now law in
-  AGENTS.md Rules of engagement (three rules: edit-tool anchoring;
-  whole-file rewrites over scripted patches; residual grep before
-  commit). Outcome noted on the suggestion file. Inbox read order
-  for the keeper drops this from urgent.
-- [PP] 2026-10-25 — two new suggestions from the self-hindsight pass:
-  `suggestions/2026-10-25-pp-parked-item-resolution-check.md` (resolve
-  = every ask addressed) and
-  `suggestions/2026-10-25-pp-claim-with-commit.md` (state claims cite
-  commit hashes). Also: `pp-scripted-edits-verify` RECURRED after
-  filing (three more clobbered-line edits) — recommend acting on it.
-- [PO] 2026-10-25 — queue hygiene: three RESOLVED bullets removed
-  (resolved items leave the queue — convention now enforced by
-  `bee report`'s RESOLVED skip; history in git).
-
-- [PO] 2026-10-25 — founding-orchestrator hindsight batch filed (6
-  files, `suggestions/2026-10-25-po-*`: brainstorm ownership filter,
-  law re-read after sibling pulls, shared-append race check,
-  session-log append-only, absolute paths to keeper, role
-  codification pointers) — awaiting keeper read. Most-wanted: the
-  brainstorm ownership filter.
+- 2026-11-01 — none pending: the graduation pass read and actioned
+  the standing suggestions (law landed in AGENTS/role files/
+  GLOSSARY; routed-but-unbuilt items live in `suggestions/planned/`,
+  consumed at P4/P6/P8; origin files deleted once their fix lands).
 
 ## Open escalations
 
@@ -319,7 +301,7 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
   gap). Repaired: merge commit 809385c completes the ancestry
   (content no-op), persistent worktree detached at main (rest state
   for the next spine cut), phase/3 deleted with -d. Pushed. Seam
-  filed: `suggestions/2026-11-01-po-phase-close-subcommand.md` —
+  filed: `suggestions/planned/2026-11-01-po-phase-close-subcommand.md` —
   phase-close mechanics were hand-rolled; propose scripted close per
   ADR-014 (first user: P4).
 - [PP] 2026-10-25 — received the shared-checkout sweep note; adopted
