@@ -378,7 +378,12 @@ function cmdReport(rest) {
       err: 'bee report: ' + sr.err.replace(/^bee inbox: /, '') };
   }
   const storeAsks = inboxKeeperAsks(sr.items, repoRoot);
-  const fromStore = storeAsks.length > 0;
+  // Source of truth = the store whenever it exists (review r1
+  // blocking fix): deriving from it even when zero keeper asks are
+  // open — falling back only when the store is absent (pre-
+  // migration) never lets the rendered region's non-keeper view
+  // bullets leak into Needs the keeper.
+  const fromStore = fs.existsSync(storePath);
   const derived = fromStore ? storeAsks
     : queueBullets(statusText).map((b) => absolutize(b, repoRoot));
   const source = fromStore ? '.hivemind/inbox.toon' : '.hivemind/status.md';
@@ -867,6 +872,13 @@ function inboxRender(args) {
       err: `bee inbox render: cannot read ${statusPath}: ${e.message}\n` };
   }
   const view = inboxRenderView(r.items);
+  // review r1 fix: item text embedding a render marker would break
+  // region isolation on the next render — refuse, hand-fix line.
+  if (view.includes(RENDER_OPEN) || view.includes(RENDER_CLOSE)) {
+    return { code: 1, out: '',
+      err: 'bee inbox render: an item text contains a render marker — ' +
+        'hand-fix the store (remove <!-- inbox:render --> from item text), then re-run\n' };
+  }
   const res = renderIntoStatus(statusText, view, statusPath);
   if (res.err) return { code: 1, out: '', err: res.err };
   if (f.values.check) {

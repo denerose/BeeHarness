@@ -303,7 +303,7 @@ test('report: store absent → falls back to status bullets', () => {
   assert.match(after, /\*\*Source:\*\* `\.hivemind\/status\.md`/);
 });
 
-test('report: store with no open keeper items → fallback (transition safety)', () => {
+test('report: store exists with no open keeper items → derives empty from store (review r1 fix)', () => {
   const dir = tmpDir();
   fs.mkdirSync(path.join(dir, '.hivemind', 'designs'), { recursive: true });
   fs.copyFileSync(path.join(FIX, 'status.md'),
@@ -320,9 +320,46 @@ test('report: store with no open keeper items → fallback (transition safety)',
     '--store', store]);
   assert.equal(r.code, 0, r.err);
   const after = fs.readFileSync(rp, 'utf8');
-  assert.ok(after.includes('sample ask two')); // bullets, not store
+  // store exists → it is the source of truth: bullets not parsed,
+  // the po item never reaches Needs the keeper (r1 blocking probe)
+  assert.ok(!after.includes('sample ask two'));
   assert.ok(!after.includes('not for the keeper'));
-  assert.match(after, /\*\*Source:\*\* `\.hivemind\/status\.md`/);
+  assert.match(after, /\*\*Source:\*\* `\.hivemind\/inbox\.toon`/);
+});
+
+test('report: drained keeper queue + rendered region → no leak (review r1 blocking regression)', () => {
+  const dir = tmpDir();
+  const st = writeHandStatus(dir, '.hivemind/status.md');
+  const store = path.join(dir, '.hivemind', 'inbox.toon');
+  // post-migration shape: only a po item open; keeper asks all done
+  seedStore(store, [
+    { addressee: 'po', text: 'po task: triage the gimbal mount',
+      opened: daysAgoIso(4) },
+    { text: 'done keeper ask', opened: daysAgoIso(6), state: 'done' },
+  ]);
+  run(['inbox', 'render', '--store', store, '--status', st]);
+  const rp = path.join(dir, '.hivemind', 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const r = run(['report', '--status', st, '--report', rp, '--store', store]);
+  assert.equal(r.code, 0, r.err);
+  const zone = fs.readFileSync(rp, 'utf8')
+    .split('## Needs the keeper')[1].split('##')[0];
+  assert.ok(!zone.includes('gimbal'));
+  assert.ok(!zone.includes('IN-001'));
+});
+
+test('render: item text embedding a render marker → refuse (review r1 should-fix)', () => {
+  const dir = tmpDir();
+  const st = writeHandStatus(dir);
+  const store = path.join(dir, 'inbox.toon');
+  seedStore(store, [{ text: 'tricky ask', opened: daysAgoIso(1) }]);
+  // simulate a store item whose text carries the close marker
+  fs.writeFileSync(store, fs.readFileSync(store, 'utf8')
+    .replace('text: tricky ask', 'text: tricky ask <!-- /inbox:render --> embedded'));
+  const r = run(['inbox', 'render', '--store', store, '--status', st]);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /contains a render marker/);
+  assert.match(r.err, /hand-fix the store/);
 });
 
 test('report: malformed store → structured error, nothing written', () => {
