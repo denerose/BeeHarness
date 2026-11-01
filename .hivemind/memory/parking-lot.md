@@ -17,11 +17,14 @@ what remains open.
 
 ## Parked
 
-- **PL-002 — memory tooling specifics** — target recorded in ADR-001
-  amendment: headers-as-index storage; `bee memory` CLI as derived layer
-  (role-gated writes, proposals queue, provenance stamps); continuity
-  spec + plan shelved as design input — review with keeper when the
-  memory tooling build begins (harness build phase).
+- **PL-002 — memory tooling specifics** —
+  resolved 2026-11-01 (keeper design session, P5 prep): target
+  superseded by ADR-014's born-TOON rule (index IS the format);
+  the P5 design now lives in
+  `designs/2026-11-01-pp-p5-memory-and-logbook.md` — memory.toon
+  store, CLI-mediated writes (script owns structure, agents supply
+  text), supersede-not-delete, keeper prunes. PL-PP-013 carries the
+  session-memory migration.
 - **PL-004 — global AGENTS.md overreach cleanup** — existing global
   AGENTS.md hardcodes planner behaviors (ask_user-first questioning) as
   if law; probably one agent's self-instructions accreted. With keeper:
@@ -92,17 +95,26 @@ what remains open.
   over inference for BeeHarness, arch tests (Roslyn for C#, TS option
   TBD; all/some/none question), OpenAPI-first + contract tests,
   StackQL (research first), AXI principles (axi.md — maybe into
-  SOUL), Arazzo specs, auto-PR with human deployment audit — unpark
-  when the Power Planner session on these topics happens.
+  SOUL), Arazzo specs, auto-PR with human deployment audit —
+  REMAINDER HAS A PHASE HOME (keeper, 2026-11-01): P10, work-type
+  guidance absorbs the curated links, arch tests, StackQL, Arazzo,
+  auto-PR. Unpark when the Power Planner session on these topics
+  happens.
 - **PL-PP-005 — logbook & project-record lifecycle: cleanup and
-  compaction** — keeper direction (2026-10-25): when and how do
-  logbook entries (and related project records) get cleaned up or
-  compacted? Open question preserved for the unpark session: maybe a
-  skill or a role specifically for cleanup/compaction at set stages
-  in the cycle (the keeper's hypothesis — not settled) — unpark with
-  the P4 CLI design or productization (P6), or when the keeper wants
-  the conversation. Related: PL-002 (memory tooling), the capture
-  suggestion.
+  compaction** — keeper direction (2026-10-25, extended 2026-11-01):
+  when and how do logbook entries (and related project records) get
+  cleaned up or compacted? KEEPER ADDENDUM (2026-11-01): logbooks
+  are taking significant space and context — once the TOON first
+  version is live (P4's stores), run a review-and-tidy pass. Framing
+  for the unpark session: the EPHEMERA BUDGET — how much are we
+  keeping, and how long does each class actually need to live? The
+  bootstrap period is deliberately noisy (records standing in for
+  tooling); the tidy pass pays that down. Open question preserved:
+  maybe a skill or a role specifically for cleanup/compaction at set
+  stages in the cycle (the keeper's hypothesis — not settled) —
+  unpark when TOON v1 is live (P4 close), or with P6, or when the
+  keeper wants the conversation. Related: PL-002 (memory tooling),
+  PL-PP-013 (session-memory sweep, same budget lens).
 - **PL-PP-006 — distill ADR-referenced rules into bee behavior
   guidance (universal vs project)** — keeper direction (2026-11-01):
   our docs carry the real rules as "ADR-blah" pointers — fine while
@@ -146,29 +158,6 @@ what remains open.
   machine-readable records making observation possible in the
   first place — unpark when the keeper wants the conversation, or
   alongside the signals/guides session.
-- **PL-PP-009 — a lightweight keeper-secretary role (capture and
-  track only)** — keeper direction (2026-11-01): a new top-level
-  role, much lighter than the existing two — literally takes short
-  directions and notes from the keeper and keeps track of them;
-  nothing else. Might be a shared parking-item type; might end up
-  using the same suggestions model internal agents use. Open for
-  the unpark session, filed open: the store (parking lot vs
-  suggestions vs its own — likely shaped by the P4 inbox + capture
-  tooling once their kinks are worked out); attributes per ADR-010
-  (standing vs on-call; continuity is probably records-only — the
-  store IS the memory); relation to the keeper's quick-thoughts
-  capture suggestion (the role may reduce to the capture skill +
-  simple routing — which bucket a note lands in — in a dedicated
-  context; note: "triage" in that suggestion means routing, NOT the
-  keeper's interactive triage skill — terminology friction flagged
-  2026-11-01, "routing" is the capture meaning from now on); what
-  "keeps track" means — aging,
-  surfacing, the keeper's list — KEEPER NOTE (2026-11-01): the
-  PP+keeper design session is wanted; sequence it after P4 works
-  out the parking/suggestions kinks (the live inbox + `bee
-  capture` are the secretary's substrate), then get the role into
-  the next relevant phase once designed — unpark when the keeper
-  brings it back, after parking/suggestions mechanics are proven.
 - **PL-PP-010 — a rubber-duck skill and a "do-I-need-the-keeper"
   skill** — keeper direction (2026-11-01): two candidate skills.
   Rubber-duck: externalize and examine one's own reasoning before
@@ -229,6 +218,16 @@ what remains open.
 
 ## Resolved
 
+- **PL-PP-009 — a lightweight keeper-secretary role (capture and
+  track only)** — resolved 2026-11-01 (keeper design session, run
+  early): KS IS a role — minimal wrapper, tab parity with PP and PO
+  in the keeper's workspace — minted at `roles/keeper-secretary.md`.
+  Substrate = the P4 inbox with origin=keeper + `bee capture`; the
+  weight is structural (pinned above agent items, never aged or
+  auto-resolved, keeper-only resolution); report *Keeper's notes*
+  zone + kickoff/session-start checks surface them as pending
+  direction. Build at P9; interim = keeper's-list conventions.
+  Design: `designs/2026-11-01-pp-keeper-secretary.md`.
 - **PL-PP-012 — a home for guiding research and references**
   — resolved 2026-11-01 (keeper design session): two layers per
   the shipping test — build-time library at `docs/research/`
