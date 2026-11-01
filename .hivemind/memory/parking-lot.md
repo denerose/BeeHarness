@@ -65,7 +65,12 @@ recommendations beyond what the keeper already directed).
   (b) using-bee-harness guidance injection — session-start guidance
   for repos with the harness (AGENTS.md-like, bee-managed); (c) review
   or add start/end-of-session rules (wake prompts, thread-close,
-  status reads — bee-assisted rituals). Recommendation: design with
+  status reads — bee-assisted rituals). KEEPER CLARIFICATION
+  (2026-11-01): `bee init` is ONCE PER PROJECT (the hivemind
+  wiring import) — session-start context and role-pickup updates
+  are a SEPARATE tool, designing here; machine-level registration
+  (the P2 stub's current behavior) splits out to install/setup at
+  the P6 init contract. Recommendation: design with
   the P4 CLI lane, alongside the capture tool (see keeper's
   suggestion `2026-10-25-keeper-quick-thoughts-capture.md`) — unpark
   when P4 opens or the keeper wants the design session.
