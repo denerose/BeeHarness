@@ -202,6 +202,21 @@ recommendations beyond what the keeper already directed).
   conflict; never as artifact-reading, bundled mega-questions, or
   approval-without-alternatives. Full arc in
   `suggestions/2026-11-01-po-session-hindsight-signoff.md`.
+- **PL-PP-012 — a home for guiding research and references** —
+  keeper direction (2026-11-01, from the guides-and-sensors
+  review): do we need a place to keep known references / guiding
+  research? Build-time references accruing (AXI; guides-and-sensors
+  review + its sources; "4 pillars of AI harness engineering"
+  coming from the keeper). SHIPPING TEST applies: our build-time
+  references do NOT ship, but consuming projects WILL have their
+  own (tax rules for a tax tool, veganism guides for a meal
+  planner) — the harness ships the SLOT/mechanism (where a
+  project's guiding references live, wired into guidance), never
+  the content. Open for the unpark session: form (a `.hivemind`
+  class? docs/research/? linked from guidance topics?), what init
+  scaffolds, relation to PL-PP-006 distillation and the guidance
+  bundles — unpark when the keeper wants the design or with the
+  PL-PP-003 session.
 - **PL-PO-002 — `bee init` from a worktree registers the worktree's
   skills dir** — surfaced by P3's first dispatch: `bee init` derives
   the skills path from its own location, so running it from any
