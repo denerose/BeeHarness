@@ -128,8 +128,9 @@ We are designing the harness before building it. Right now:
   verify/review accounts; claims don't move states, these do) ·
   `suggestions/` (the inbox — any role + keeper) · `memory/` (deferred
   decisions: the parking lot) · `sessions/` (live role memory,
-  gitignored) · `status.md` (cross-role surface) · `keeper-report.md`
-  (keeper's zoned digest, ADR-008).
+  gitignored) · `status.md` (cross-role surface; the awaiting-keeper
+  queue renders from `inbox.toon` via `bee inbox render`) ·
+  `keeper-report.md` (keeper's zoned digest, ADR-008).
 - Repo documentation: `AGENTS.md`, `README.md`, `SOUL.md` stay at
   the root; every other standalone document lives in `docs/`
   (currently `docs/AXI.md`, `docs/WRITING-STANDARD.md` — new
