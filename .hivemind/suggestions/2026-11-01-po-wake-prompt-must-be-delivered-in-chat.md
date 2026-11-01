@@ -16,3 +16,9 @@ the wake prompt is delivered TWICE — written into the handoff file
 the keeper to copy). In-chat delivery is mandatory, not optional;
 a file reference is not delivery. Same for the repo AGENTS.md
 handoff-ritual line: name the fenced in-chat block explicitly.
+
+**Outcome (keeper ruling, 2026-11-01):** adopted for the BEE pair —
+bee-handoff gains the mandatory in-chat fenced delivery; rides P8
+(rectification/tidy-up). NO AGENTS.md change: law files stay lean,
+procedural detail lives in the instruments. The global skill is the
+keeper's kit — untouched.
