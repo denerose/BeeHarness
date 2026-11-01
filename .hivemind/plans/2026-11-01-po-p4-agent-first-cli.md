@@ -4,7 +4,7 @@
 **Design doc:** `.hivemind/designs/2026-10-25-pp-p4-inbox-design.md` @ ad77aa4 (note + 2026-11-01 addendum + kickoff decision list items 1–7 — all seven keeper-ruled at kickoff, 2026-11-01)
 **Validation level:** phase (recommended — multi-build phase with law-touching edits and a keeper sign-off gate; the design names keeper gates)
 **Detail:** mixed — verbatim contracts for stores, formats, and command grammars (the interfaces later tasks and the gate verify); lean for implementation code (each task names exact files, grammar, behavior, and its test list; implementer works in-repo with the design note, `docs/AXI.md`, and `bin/bee.js` house patterns — review gates check the result)
-**Reviewed:** bee-plan-review round 1 FAIL 2026-11-01 (2 blocking, 10 should-fix — `.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-plan-review-r1.md`); both blocking + 6 should-fix fixed in-plan, 4 should-fix waived with reasons beside their findings in the report; round 2 re-review pending
+**Reviewed:** bee-plan-review round 1 FAIL 2026-11-01 (2 blocking, 10 should-fix — `.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-plan-review-r1.md`); both blocking + 6 should-fix fixed in-plan, 4 should-fix waived with reasons beside their findings in the report. Round-2 dispatch TIMED OUT before writing its report; its six verified findings (docs/research map miss; phase/4 behind main; skills/ sweep unreachable as written; bee.js:158 outside named classes; three lot duplicates not two; two sweep-modified files missing from targets) were recovered from its transcript, re-verified by the planner, and fixed in-plan; fresh round-2 dispatch pending
 
 **Phase:** P4 (spine `phase/4`, persistent worktree `/home/saphron/BeeHarness-phase3`)
 
@@ -33,6 +33,8 @@ targets:
   - tests/structure-check.test.mjs (create)
   - tests/worktree-sh.test.mjs (create)
   - tests/task-sh.test.mjs (modify)
+  - skills/loop/bee-loop/assets/dispatch-brief-template.md (modify)
+  - skills/session/bee-brainstorm/assets/design-doc-template.md (modify)
   - docs/guidance/how-to-be-a-bee.md (create)
   - docs/guidance/cli-writing.md (create)
   - docs/guidance/tdd.md (create)
@@ -110,6 +112,10 @@ suite: node --test tests/*.test.mjs
   current name until then); records ride the task branch; shared
   surfaces (status.md, phases/, plans/, GLOSSARY, AGENTS) are
   edited from the main checkout, atomic commits, push promptly.
+  **Spine currency:** main moves mid-flight (shared surfaces,
+  parallel-role landings) — before every dispatch, sync `phase/4`
+  with main (merge main into the spine; never force), so task
+  trees never run stale against the plan they execute.
 - **No ephemeral prose in durable docs** — GLOSSARY/AGENTS/skills
   edits are durable content only (writing standard;
   `docs/WRITING-STANDARD.md`).
@@ -285,10 +291,10 @@ done: -
   text, context lines, unpark condition, resolved date+how where
   present); history stays in git. **Collision rule:** the store is
   keyed by id; when an id appears in both Parked and Resolved
-  (two such exist today: PL-004, PL-PO-001 — stale parked
-  copies), the RESOLVED entry wins and the stale parked duplicate
-  is recorded in that entry's `how` line (`superseded stale parked
-  duplicate`). Replace
+  (three such exist today: PL-004, PL-PO-001, PL-PP-002 — stale
+  parked copies), the RESOLVED entry wins and the stale parked
+  duplicate is recorded in that entry's `how` line (`superseded
+  stale parked duplicate`). Replace
   `.hivemind/memory/parking-lot.md` body with a three-line pointer
   (store path + `bee park list` + keeper-gate line) — durable text,
   no narratives.
@@ -300,8 +306,8 @@ done: -
   aggregate, idempotent resolve) + migration test: run `bee park
   migrate` against a fixture copy of the old markdown — every id
   appears in the store exactly once with state preserved, and the
-  two duplicate ids resolve per the collision rule (resolved wins,
-  `how` notes the superseded duplicate).
+  three duplicate ids resolve per the collision rule (resolved
+  wins, `how` notes the superseded duplicate).
 - [ ] Verify: full suite green; `bee park list` shows the migrated
   open items with correct ages.
 - [ ] Commit: `convert parking lot to script-owned store`
@@ -515,6 +521,14 @@ scripts: scripts/<file>.sh scripts/structure.map
 tests: tests/<file>.test.mjs tests/fixtures/<file>
 ```
 
+  The seed covers everything tracked at plan-gate time plus this
+  phase's planned files. Structure is living: new trees land
+  mid-flight (they did during this plan's own gating) — Task 8's
+  build step includes running the check over the repo and
+  extending the map deliberately for anything tracked that misses
+  (the map edit IS the recorded decision; a miss is never
+  ignored, never suppressed).
+
 - [ ] `scripts/structure-check.sh <root>`: walks tracked files
   (`git ls-files`), matches each against the map; every miss is a
   finding WITH a fix instruction (`place it in <class>, or extend
@@ -601,16 +615,31 @@ lesson + the filed suggestion) + the decision-count flag
 - [ ] Reference sweep, grep shown: no stale `parking-lot.md`
   reads, no stale `task.sh` (already zero from Task 8 — re-grep),
   no skill text pointing at hand-run verify steps that `bee
-  verify` now owns. Boundary grep with named hit classes:
-  `grep -rn "hivemind\|ADR-" skills/` → zero hits (shipped skill
-  text carries its own rules, cites nothing of ours — GLOSSARY
-  included); `grep -rn "hivemind\|ADR-" bin scripts` → hits
-  allowed ONLY as (a) functional default paths inside code
-  strings (e.g. `.hivemind/status.md` as `bee report`'s input —
-  functionality, not citation) or (b) provenance comments in code
-  (`# ADR-016 …`); usage/help text and error strings carry zero
-  hits. Every hit is classified (a)/(b) in the sweep's verify
-  entry; an unclassifiable hit is a finding, not a pass.
+  verify` now owns. Boundary grep with named hit classes, split
+  by pattern:
+  - `grep -rn "hivemind" skills/` → hits are FUNCTIONAL surface
+    references (skills naming the `.hivemind/` surfaces they
+    operate on — the harness's own layout); each hit is classified
+    functional in the sweep's verify entry; a hit that cites a
+    `.hivemind/` path as authority ("see <our record>") rather
+    than as an operating surface is a finding.
+  - `grep -rn "ADR-" skills/` → hits allowed ONLY inside
+    `skills/GLOSSARY.md` as provenance pointers (the recorded
+    glossary design: definitions + pointers, law lives in the
+    ADRs). Any `ADR-` hit in a SKILL.md or asset is a finding; the
+    one today (`bee-brainstorm/assets/design-doc-template.md`, an
+    example value) is placeholder-ized in this task (`ADR-<n>`
+    form).
+  - `grep -rn "hivemind\|ADR-" bin scripts` → hits allowed ONLY
+    as (a) functional default paths inside code strings (e.g.
+    `.hivemind/status.md` as `bee report`'s input), (b) provenance
+    comments in code (`# ADR-016 …`), or (c) provenance prose
+    inside generated-output templates (`bee report`'s header
+    protocol cites ADR-008 by design — rendered output, not help
+    text). Usage/help text and error strings carry zero hits.
+  Every hit is classified (a)/(b)/(c)/functional/GLOSSARY-pointer
+  in the sweep's verify entry; an unclassifiable hit is a finding,
+  not a pass.
 - [ ] Full suite + structure check + `bee verify` over this plan's
   checks block: all green, evidence in the logbook.
 - [ ] Phase-end (orchestrator, from main checkout): decision
