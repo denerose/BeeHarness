@@ -111,6 +111,10 @@ task-9: implemented 2026-11-01T16:15:05+11:00 by project-orchestrator
 task-9: verified 2026-11-01T16:15:05+11:00 by project-orchestrator
 task-9: reviewed 2026-11-01T16:15:05+11:00 by project-orchestrator
 task-9: done 2026-11-01T16:15:05+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task9-verify-r2.md
+task-10: implemented 2026-11-01T16:27:51+11:00 by project-orchestrator
+task-10: verified 2026-11-01T16:27:51+11:00 by project-orchestrator
+task-10: reviewed 2026-11-01T16:27:51+11:00 by project-orchestrator
+task-10: done 2026-11-01T16:27:51+11:00 by project-orchestrator record: /home/saphron/BeeHarness-phase3/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task10-verify-r1.md
 -->
 
 ## Kickoff rulings (keeper, 2026-11-01 — binding for every task)
@@ -770,7 +774,7 @@ coverage gap.
 **Depends on:** Tasks 1–9
 **Provides:** the phase-end sweep; phase exit criteria
 
-- [ ] GLOSSARY vocabulary entries (definitions + pointers only, no
+- [x] GLOSSARY vocabulary entries (definitions + pointers only, no
   law): `inbox` (the store + views + what it absorbs), `bee
   capture`, `bee park` (store; keeper-gated resolve), `bee
   design` (ADR-016 transitions as CLI), `bee verify` /
@@ -779,7 +783,7 @@ coverage gap.
   the `status surface` entry: queues render from the inbox;
   escalations/notes remain its prose (interim until the decisions
   inbox replaces the whole surface).
-- [ ] AGENTS.md durable updates: parking-lot line → store +
+- [x] AGENTS.md durable updates: parking-lot line → store +
   `bee park` (resolve stays keeper-only); the plan-review-gate
   rule gains the checks-contract mention (plans carry `checks:`
   headers; `bee verify` reads them); status-surface line for the
@@ -787,7 +791,7 @@ coverage gap.
   enumeration generalizes — drop the exhaustive "currently"
   parenthetical (standards and guides live in `docs/`, discoverable
   there). No narratives, no state prose.
-- [ ] Reference sweep, grep shown: no stale `parking-lot.md`
+- [x] Reference sweep, grep shown: no stale `parking-lot.md`
   reads, no stale `task.sh` (already zero from Task 8 — re-grep),
   no skill text pointing at hand-run verify steps that `bee
   verify` now owns. Boundary grep with named hit classes, split
@@ -815,14 +819,29 @@ coverage gap.
   Every hit is classified (a)/(b)/(c)/functional/GLOSSARY-pointer
   in the sweep's verify entry; an unclassifiable hit is a finding,
   not a pass.
-- [ ] Full suite + structure check + `bee verify` over this plan's
+- [x] Full suite + structure check + `bee verify` over this plan's
   checks block: all green, evidence in the logbook.
-- [ ] Phase-end (orchestrator, from main checkout): decision
+- [x] Phase-end (orchestrator, from main checkout): decision
   inventory → keeper sign-off cards (law-touching: task-orc file,
   bee-verify/bee-plan skill text, AGENTS/GLOSSARY edits — rulings
   applied as fix rounds) → `bee phase close 4` (first real run;
   its output rides the final mechanical close card).
-- [ ] Commit: `sweep references, close P4`
+- [x] Commit: `sweep references, close P4`
+
+**Task notes (loop, 2026-11-01):** closed via `bee task` (record r1 —
+command-minted; review r1 FIX-FIRST 0🔴 3🟡: README "suggestions (the
+inbox)" collision + "(when built)" staleness — both fixed; class-C
+usage/error-string deviation — RULING RECORDED in the verify entry:
+ruling-4 fix lines + usage destination docs naming operating paths
+are class (a); re-review waived, near-verbatim + recording). Dogfood
+on the spine: 11/11 PASS, links 53 docs PASS, structure 0 findings,
+suite 238/238. Deviations accepted: AGENTS suggestions gloss
+decollision; GLOSSARY consistency touches (hivemind enumeration,
+park family); phases row = the close step's (loop's, below). Notes:
+Boundary A count 15 vs actual 16 (all functional); bee design entry
+wording wobble; hand-run-verify grep gap (reviewer verified clean);
+README "(when built)" staleness flagged by implementer, ruled
+in-scope by review.
 
 ## Phase exit
 
