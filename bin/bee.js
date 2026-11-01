@@ -2894,6 +2894,17 @@ function glossaryViewPathOf(p) {
     : path.join(REPO_ROOT, 'GLOSSARY.md');
 }
 
+// A --store override without --view would regenerate the
+// repo-default view (the live skills/GLOSSARY.md) from the
+// overridden store — fail loud instead. Write paths only
+// (add/convert); lookups never resolve the view.
+function glossaryStoreWithoutView(storeArg, viewArg) {
+  if (storeArg && !viewArg) return { code: 1, out: '',
+    err: 'bee glossary: --store given without --view — pass ' +
+      '--view too, or drop both\n' };
+  return null;
+}
+
 function readGlossaryStore(storePath) {
   let text;
   try {
@@ -3054,6 +3065,8 @@ function glossaryAdd(args) {
         `single-line and must not contain ' :: '`);
     }
   }
+  const guard = glossaryStoreWithoutView(f.values.store, f.values.view);
+  if (guard) return guard;
   const storePath = glossaryStorePathOf(f.values.store);
   const viewPath = glossaryViewPathOf(f.values.view);
   const r = readGlossaryStore(storePath);
@@ -3169,6 +3182,8 @@ function glossaryConvert(args) {
       err: `bee glossary convert: cannot read ${mdPath}: ` +
         `${e.message}\n` };
   }
+  const guard = glossaryStoreWithoutView(f.values.store, f.values.view);
+  if (guard) return guard;
   const storePath = glossaryStorePathOf(f.values.store);
   const viewPath = glossaryViewPathOf(f.values.view);
   const r = readGlossaryStore(storePath);

@@ -10,7 +10,10 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { run } from '../bin/bee.js';
+import { fileURLToPath } from 'node:url';
 
+const REPO_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)), '..');
 const STORE_HEADER =
   '# glossary — shared vocabulary (term :: gist :: see; supply, never update)';
 const VIEW_MARKER = '<!-- glossary view — script-owned: ' +
@@ -278,8 +281,8 @@ test('convert clean fixture: join, see extraction, store + view', () => {
   // the view regenerated: marker + alphabetical markdown
   const view = fs.readFileSync(v, 'utf8');
   assert.ok(view.startsWith(VIEW_MARKER));
-  assert.ok(view.indexOf('**ADR**') <
-    view.indexOf('**inbox**') < view.indexOf('**keeper**'));
+  assert.ok(view.indexOf('**ADR**') < view.indexOf('**inbox**'));
+  assert.ok(view.indexOf('**inbox**') < view.indexOf('**keeper**'));
   assert.ok(view.includes('  see: `.hivemind/inbox.toon`'));
   // source md untouched (its afterlife is the view's default path,
   // pinned separately below — convert itself never edits it)
@@ -370,6 +373,24 @@ test('--store/--view overrides land exactly where expected', () => {
   const look = run(['glossary', 'keeper', '--store', p]);
   assert.equal(look.code, 0);
   assert.match(look.out, /keeper :: the human owner :: -/);
+});
+
+// a store override with no view override must never regenerate
+// the repo-default (live) view from the overridden store — one
+// forgotten --view in any probe would clobber it
+test('add --store without --view fails loud, nothing written anywhere', () => {
+  const p = tmpStore();
+  const live = fs.existsSync(path.join(REPO_ROOT, 'skills', 'GLOSSARY.md'))
+    ? path.join(REPO_ROOT, 'skills', 'GLOSSARY.md')
+    : path.join(REPO_ROOT, 'GLOSSARY.md');
+  const before = fs.readFileSync(live, 'utf8');
+  const r = run(['glossary', 'add', 'fenced', 'a gist', '--store', p]);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /--view/);
+  // nothing written anywhere: the tmp store dir stays empty and
+  // the live view is byte-identical
+  assert.equal(fs.readdirSync(path.dirname(p)).length, 0);
+  assert.equal(fs.readFileSync(live, 'utf8'), before);
 });
 
 // ---- fail-loud / usage surfaces ----
