@@ -15,17 +15,14 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
-- [PO] 2026-11-01 — **P5 OPEN: planned, gated, spine cut.** Keeper
-  relay directed P5; kickoff ruled via 8 one-by-one cards (D1–D8,
-  recorded in plan header + design addenda carry D1-D3/D5-D8; D4
-  rides the plan header pending PP rectification). Park id seam
-  fixed pre-pickup (49c4189). Plan
-  `.hivemind/plans/2026-11-01-po-p5-memory-logbook-glossary.md`
-  gated FOUR rounds (r1-r3 FAIL — contract order, stamp corpus
-  reality, compact membership, files: existence; r4 PASS @
-  1cc1092); spine phase/5 cut. Next: bee-loop in fresh context
-  (handoff written). Park-id + card-shape laws landed by PP
-  (6dc0392, 7976ca1) — absorbed.
+- [PO] 2026-11-01 — **P5 OPEN: planned, gated, spine cut — LOOP
+  RUNNING IN SESSION.** Keeper relay directed P5; kickoff ruled via
+  8 one-by-one cards (D1–D8; plan header + design addenda).
+  Plan gated FOUR rounds (r4 PASS @ 1cc1092); spine phase/5 cut.
+  Keeper correction on a premature handoff attempt: the
+  orchestrator runs to PHASE COMPLETION — context managed by
+  delegation, not by stopping (repeat of the standing correction;
+  logged entry 65). Loop dispatching now.
 - [PO] 2026-11-01 — RELAY TO PP #2 (P5 kickoff rulings + owed
   feedback; D1 rode the note above):
   (1) CLASS-C FEEDBACK (owed since P4 close): boundary sweeps must
