@@ -1,12 +1,11 @@
-# Review r1 — P7 Task 4: bee-native handoff pair
+<!-- machine
+role: project-orchestrator
+date: 2026-11-01T10:20:15+11:00
+verdict: APPROVE
+checks-run: -
+plan: .hivemind/plans/2026-11-01-po-p7-superpowers-replacement.md @ 91ea8f1
+task: task-4
+links: -
+-->
 
-**Role:** project-orchestrator (loop; gate ran as dispatched cold
-reviews inside the task, per the worker's lifecycle)
-
-- Cold review verdict: pass/pass, no blocking; waiver record lives
-  in the worker's return (3 waived, one-line reasons each).
-- Ritual conformance: mirrors AGENTS.md handoff rule + role-file
-  continuity (memory sync final write; wake prompt final act; no
-  parking-lot sweep; no re-interview on pickup; law-reread on
-  drift; dirty-tree never stashed).
-- Verdict: **APPROVE**.
+compacted at phase close; full text in git history

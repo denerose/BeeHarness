@@ -1,33 +1,11 @@
-# Review: P4 Task 3 — `bee park` (parking lot → script-owned store)
+<!-- machine
+role: project-orchestrator
+date: 2026-11-01T14:20:10+11:00
+verdict: FIX
+checks-run: -
+plan: .hivemind/plans/2026-11-01-po-p4-agent-first-cli.md @ 5e1784a
+task: task-3
+links: -
+-->
 
-**Role:** project-orchestrator (bee-review dispatch, review round r1)
-**Reviewer:** cold-dispatched reviewer (bee-review skill)
-**Plan section:** Task 3 — [`/home/saphron/BeeHarness/.hivemind/plans/2026-11-01-po-p4-agent-first-cli.md`](/home/saphron/BeeHarness/.hivemind/plans/2026-11-01-po-p4-agent-first-cli.md)
-**Verify record:** [`/home/saphron/BeeHarness-task-park-store/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task3-verify-r1.md`](/home/saphron/BeeHarness-task-park-store/.hivemind/logbook/2026-11-01-po-p4-agent-first-cli-task3-verify-r1.md) (task/4-park-store @ ef65f21) — link target `(_..)` repaired to the sibling convention when bee verify's link-check caught it (task 5, 2026-11-01)
-**Scope:** CODE half only — commits 1be4a9e (bin/bee.js, tests/bee-park.test.mjs) + ef65f21 (AGENTS.md, skills/GLOSSARY.md, verify record). The LIVE migration run (dispatcher's, from main, post-merge) is out of review scope; its preconditions are not.
-
-## Claim vs record (first check)
-
-Clean. Plan Task 3 boxes all `[ ]` — correctly left for the loop. Verify record's claims independently reproduced: 31/31 park tests, 108/108 full suite, migrate summary string exact (`19 items · 16 parked · 6 resolved · 3 id collisions (resolved wins): PL-PO-001, PL-PP-002, PL-004`), `13 parked · oldest ?` on the migrated temp store, reference-sweep greps re-run with identical hits and sound classifications. Merge-order question re-tested against main's newest lot (c87dfbe, two keeper addendas newer than the branch base): 108/108 green in a scratch worktree with main's lot overlaid — the live-read, shape-based design holds through the merge.
-
-## Verdict
-
-**Fix first** — one blocking sequencing defect: the migration battery reads the live `parking-lot.md` it is about to turn into a stub, so the suite goes red on main at the dispatcher's live run and stays red through the phase's own exit gates.
-
-## Blocking
-
-- `tests/bee-park.test.mjs:18` — `LOT_MD` reads the repo's live `.hivemind/memory/parking-lot.md` at module load. The dispatcher's live migration replaces that exact file with the pointer stub, and from that commit onward the migration battery fails on main: simulated in a scratch worktree (temp store + scratch copy — live surfaces untouched), 8/31 park tests fail (`migrate: every md id lands…` and seven siblings; first failure is migrate exiting 1 with "no PL-* entries found" against the stub). This breaks the phase's own exit criteria (Task 10: full suite green; Task 9: `bee phase close` requires the tree to pass the suite), and the live half is run-only by Task 2 precedent — no runway exists for the required test change after the run. The plan's text said "a fixture copy of the old markdown"; the live-read deviation (disclosed in the verify record, endorsed in the dispatch brief) holds exactly through the merge — proven above — and dies at the migration it tests. Suggested fix: freeze the fixture — snapshot the pre-migration lot to `tests/fixtures/parking-lot-v1.md` (`scripts/structure.map`'s seed already allows `tests/fixtures/<file>`) and point `LOT_MD` at it, landing pre-merge so the live run stays run-only; optionally keep a one-line canary asserting the repo md is either a PL-bearing lot or the stub.
-
-## Should fix
-
-- `bin/bee.js:1315` (`parkMigrate`; live lot line 21) — since main's fcba48a ("resolve PL-002"), the live lot carries **PL-002 in the Parked section with a body beginning `resolved 2026-11-01 (keeper design session, P5 prep): …`**. The shape-based parser records it `parked` with the keeper's resolution buried in `context` (verified against a temp copy: `PL-002 · parked`, `resolved: -`), so the live migration would store 13 parked where the keeper's record leaves 12 open — state not preserved for the one entry the md records by body rather than section. Suggested fix: before the live run, hand-move the PL-002 entry into the md's Resolved section (the md is still the live lot until migration) — zero code change. (Alternative, if the loop prefers code: `parseLotEntry` refuses a parked-section body starting `resolved <date>` with the existing hand-fix instruction, so the shape cannot silently mis-state state.)
-
-## Notes
-
-- Deviations 1–6 from the verify record: adjudicated **accepted**. (1) `opened: -` → age `?` is the only honest reading of "correct ages" for date-less md items — fabricating timestamps would poison ruling 3's stable-ISO schema; the plan step's intent (visible, truthful aging) is satisfied. (2) Bare `PL-NNN` = the bee series is the only reading that "continues the existing numbering" across PL-001..004 and the po/pp series; pinned by tests. (3) Conditional `how` mirrors the sanctioned inbox `note` deviation; round-trip safe. (4) Shared store core is pure parameterization — inbox delegates with identical constants, 77 pre-existing tests green. (5) Uncommitted store follows the Task 1/2 birth-from-live-run precedent. (6) `joinWrapped` de-hyphenation is right for the shapes that exist (mid-token wraps of dates/compounds); a sentence-final bare hyphen before a wrap would misjoin (`-then`) — theoretical, none in the live lot.
-- `bin/bee.js:1377` — `parkMigrate` overwrites an existing non-empty target store wholesale; the 0-entry guard protects the md side only. If a store ever holds live adds before a re-run against an old md copy, they vanish silently. Consider refusing when the target store already has items.
-- Migration tests pin live-lot content beyond shape (PL-PP-013's exact text, the exact ordered collision-summary string, the ≥19 floor at `tests/bee-park.test.mjs`). Any keeper edit to those entries must update the test in the same change. A frozen fixture (per the blocking finding) converts these into stable pins — a second argument for freezing.
-- GLOSSARY "parking lot" drops "removes" from the old "only the keeper removes or resolves one" — accurate for the store (no remove command exists; AGENTS.md keeps "unparks or resolves"), but the law wording narrowed by one verb. Meaning-preserving in substance; recorded here so the narrowing is a known act.
-- `skills/session/bee-brainstorm/SKILL.md:49` still reads the md path — outside Task 3's file scope, functional post-migration (the md becomes the stub), Task 10's sweep owns it. Matches the verify record's classification.
-- Merge mechanics: no lot conflict is possible (the branch never touches the md; main's newer content wins by construction). The branch's AGENTS/GLOSSARY edits touch lines main did not change (main's AGENTS change is the status.md line; main's GLOSSARY slimming left the parking-lot entry text identical at the base) — clean merge expected.
-- Safety lines kept: every command ran against temp stores, scratch-worktree copies, or read-only default-store calls; live repo verified clean after each step; this report is the only write.
+compacted at phase close; full text in git history
