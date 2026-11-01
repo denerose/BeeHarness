@@ -52,6 +52,9 @@ task-1: done 2026-11-02T09:18:43+11:00 by project-orchestrator record: .hivemind
 task-2: implemented 2026-11-02T09:08:13+11:00 by project-orchestrator
 task-2: verified 2026-11-02T09:18:48+11:00 by project-orchestrator
 task-2: done 2026-11-02T09:18:48+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task2-verify-r2.md
+task-3: implemented 2026-11-02T09:29:28+11:00 by project-orchestrator
+task-3: verified 2026-11-02T09:38:22+11:00 by project-orchestrator
+task-3: done 2026-11-02T09:38:22+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-01-po-p5-memory-logbook-glossary-task3-verify-r1.md
 -->
 
 ## Shared contract: command grammar (USAGE additions)
@@ -135,10 +138,12 @@ links: <related entry paths, comma-separated, or ->
 **Depends on:** task-2 (headers are what entries compact TO)
 **Provides:** scripted, idempotent compaction; used at close (Task 5) over every phase closed at close time, per D7 (today: P0–P4 and P7)
 
-- [ ] Step: implement per contract: an entry belongs to `<phase>` when its machine block's `plan:` path equals a plan path linked in that phase's row of `.hivemind/phases/<project>.md` — the phase list is the plan↔phase source of truth, so plan files themselves need no machine headers (the six pre-convention P2 entries resolve via their row's plan link). Rows with plan `—` match nothing → compact reports `0 entries`, exit 0 (clean no-op). Missing phase list or row → fail loud naming it. Target entries rewrite to: machine block + blank line + one marker line `compacted at phase close; full text in git history`. Idempotent: an entry whose body is only the marker line is skipped. Compact scans task-tier files (the Task 2 filename regex) — out-of-scope files (phase/plan-review reports, calibration records, round-less names) are never scanned; a scanned task-tier file with no machine block → fail loud, "run `bee logbook stamp` first" (all task-tier files carry blocks after stamp). `--check` lists what would compact, writes nothing.
-- [ ] Step: tests: compact a fixture phase (entries + phase list + plan-linked rows in tmp root — including a HEADERLESS plan file, proving membership comes from the list, not the plan, and a blockless out-of-scope file proving it is never scanned); marker-only second run exits 0 unchanged; unstamped task-tier file fails loud; `--check` writes nothing; entries of other phases untouched; plan-`—` row reports `0 entries`, exit 0.
-- [ ] Step: run `node --test tests/bee-logbook.test.mjs` — all pass.
-- [ ] Commit: `add idempotent bee logbook compact`
+- [x] Step: implement per contract: an entry belongs to `<phase>` when its machine block's `plan:` path equals a plan path linked in that phase's row of `.hivemind/phases/<project>.md` — the phase list is the plan↔phase source of truth, so plan files themselves need no machine headers (the six pre-convention P2 entries resolve via their row's plan link). Rows with plan `—` match nothing → compact reports `0 entries`, exit 0 (clean no-op). Missing phase list or row → fail loud naming it. Target entries rewrite to: machine block + blank line + one marker line `compacted at phase close; full text in git history`. Idempotent: an entry whose body is only the marker line is skipped. Compact scans task-tier files (the Task 2 filename regex) — out-of-scope files (phase/plan-review reports, calibration records, round-less names) are never scanned; a scanned task-tier file with no machine block → fail loud, "run `bee logbook stamp` first" (all task-tier files carry blocks after stamp). `--check` lists what would compact, writes nothing.
+- [x] Step: tests: compact a fixture phase (entries + phase list + plan-linked rows in tmp root — including a HEADERLESS plan file, proving membership comes from the list, not the plan, and a blockless out-of-scope file proving it is never scanned); marker-only second run exits 0 unchanged; unstamped task-tier file fails loud; `--check` writes nothing; entries of other phases untouched; plan-`—` row reports `0 entries`, exit 0.
+- [x] Step: run `node --test tests/bee-logbook.test.mjs` — all pass.
+- [x] Commit: `add idempotent bee logbook compact`
+
+Task notes: review r1 APPROVE, zero findings — no fix round, no waiver needed.
 
 ## Task 4: glossary store + `bee glossary` (store + concurrent view)
 
