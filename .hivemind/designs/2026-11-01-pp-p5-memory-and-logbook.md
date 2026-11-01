@@ -67,6 +67,16 @@ The logbook's job is moving states; after merge, detail is history.
 this tooling — pays down the bootstrap noise (PL-PP-005's trigger:
 TOON v1 live at P4 close).
 
+**Sweep criterion (keeper direction, 2026-11-01 — carries into the
+session-clean-up skill/tool whenever it is built):** records are
+not just noise and cost — retained history SHAPES down-chain
+behavior; stale precedent legitimizes drift. So the test for every
+kept record is not only "is this unresolved?" but **"does carrying
+it forward teach the right behavior?"** — prune obsolete role
+models and stale precedent along with open items. This criterion
+governs the tidy pass, the PL-PP-013 session-memory sweep, and any
+future cleanup skill or tool.
+
 **Out of scope:** session-memory migration (PL-PP-013, post-P8
 sweep); parking lot and suggestions mechanics (P4); rules/AGENTS
 (law files are human-primary, untouched by store tooling).

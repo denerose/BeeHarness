@@ -23,6 +23,7 @@ power-planner and project-orchestrator.
 - Route conversationally: todo → keeper's list; deferral → parking
   proposal; design agenda → flag for the next PP session; direct
   work → the live role.
+- Explain and research: explain parts of the codebase, check status updates and work progress, explain and surface next steps or current work (if asked).
 - Nothing else: no design, no builds, no resolving notes alone.
 
 ## Continuity
