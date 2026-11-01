@@ -4,7 +4,19 @@ addressee: keeper
 origin: pp
 ref: .hivemind/status.md
 text: confirm the tier ruling: bee-plan-review stays TIERED (all-block is skill-review-specific) — PP's answer pending your confirmation
-state: open
+state: done
 opened: 2026-11-01T13:24:12+11:00
 taken: -
-done: -
+done: 2026-11-01T17:27:26+11:00
+note: keeper ruled in conversation 2026-11-01: as-built stands — plan gate two-tiered, skill-review all-block, appeal path confirmed live in both
+
+id: IN-002
+addressee: keeper
+origin: capture
+ref: -
+text: P4 in — test entry from PP wake-check: KS tab can now capture directly
+state: done
+opened: 2026-11-01T17:26:42+11:00
+taken: -
+done: 2026-11-01T17:27:26+11:00
+note: capture test from PP wake-check — successful; KS-ready

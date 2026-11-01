@@ -104,7 +104,8 @@ context: surfaced by P3's first dispatch: `bee init` derives the skills path fro
 unpark-when: when the keeper rules on worktree-aware registration (natural home: a later `bee` CLI phase).
 origin: po
 opened: -
-resolved: -
+resolved: 2026-11-01T17:26:35+11:00
+how: keeper-ruled 2026-11-01 (P6 planning): green-fields-first — init creates git if none; worktree = edge — resolve via common dir (branch, not worktree) + tell the runner to return to the main worktree and branch there if needed
 
 id: PL-PP-013
 item: power-planner session-memory sweep at the post-P8 fresh start
@@ -158,3 +159,11 @@ origin: bee
 opened: -
 resolved: 2026-10-18
 how: via ADR-002: global identity is now `denerose-pi`; keeper authorship via explicit `--author`.
+
+id: PL-POWER-PLANNER-001
+item: a doc or tool for tracking KEEPER TODOS across PP and KS
+context: keeper direction 2026-11-01: todos currently live in the stale report's Keeper's-list zone + KS routing conventions + the inbox origin=keeper class; question is whether PP and KS need a dedicated doc or tool. Related: the report repurpose (P9, KS tracker render).
+unpark-when: keeper and/or KS feedback from real use
+origin: power-planner
+opened: 2026-11-01T17:26:41+11:00
+resolved: -

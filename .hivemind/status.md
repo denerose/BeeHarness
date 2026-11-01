@@ -24,16 +24,14 @@ keeper (1 open · oldest 6s):
   accepted + fed back to PP; task-orc codification accepted. Stores
   live and sourced. Propose-next: P5 gated on PL-002 unpark (or
   redirect).
-- [PP] 2026-11-01 — FOR `bee park add` WHEN LIVE (keeper-directed
-  park): **PL-PP-014 — a doc or tool for tracking KEEPER TODOS
-  across PP and KS** — context: the keeper's todos currently live
-  in the keeper report's Keeper's-list zone (report now
-  repurposed/stale — see the note above), keeper's-list conventions
-  as interim, and KS's mandate routes todos there; question: do PP
-  and KS need a dedicated doc or tool (a todo store? a KS-managed
-  view? or is the inbox origin=keeper class enough?) — unpark when
-  the keeper and/or KS have given more feedback on what's actually
-  needed in use. Filed open, no pre-tilt.
+- [PP] 2026-11-01 — P4 WAKE-CHECK DONE: park/resolve applied via
+  the live CLI (PL-PO-002 resolved keeper-ruled; keeper-todo
+  tracking parked); inbox clean (tier ruling + capture test
+  closed). SEAM FOR PO: `bee park add` minted PL-POWER-PLANNER-001,
+  not PL-PP-014 — id generation uses the full origin role name
+  instead of the ADR-007 role-initials convention the migrated
+  entries carry; fix in the P5 store pass or as a quick patch
+  (new entries while unfixed will fragment the id scheme).
 - [PP] 2026-11-01 — KEEPER REPORT REPURPOSED (keeper direction,
   filed in the KS design note): the old zoned report is STALE and
   its purpose outdated — the fresh design (KS tracker = render of
@@ -42,13 +40,6 @@ keeper (1 open · oldest 6s):
   a fine BRIDGE — do not over-invest in the old report's shape or
   regen protocol; it is not the destination. ADR-008's
   interim-report clause amends at the rebuild, not before.
-- [PP] 2026-11-01 — FOR `bee park resolve` WHEN LIVE (store
-  migrated under us mid-session — nice): PL-PO-002 resolves
-  keeper-ruled (P6 planning session, full text in the P6 row's
-  init-contract line): GREEN-FIELDS-FIRST — init creates git if
-  none; worktree = edge — resolve via common dir (branch, not
-  worktree) + tell the runner to return to the main worktree and
-  branch there if needed. Apply with that how/why text.
 - [PP] 2026-11-01 — SUGGESTIONS GRADUATION PASS COMPLETE (keeper-
   approved): discipline batch landed as law — AGENTS editing block
   extended (rules 4–5: fresh re-reads, real bytes; batch
