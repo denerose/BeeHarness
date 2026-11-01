@@ -95,14 +95,20 @@ what remains open.
   SOUL), Arazzo specs, auto-PR with human deployment audit — unpark
   when the Power Planner session on these topics happens.
 - **PL-PP-005 — logbook & project-record lifecycle: cleanup and
-  compaction** — keeper direction (2026-10-25): when and how do
-  logbook entries (and related project records) get cleaned up or
-  compacted? Open question preserved for the unpark session: maybe a
-  skill or a role specifically for cleanup/compaction at set stages
-  in the cycle (the keeper's hypothesis — not settled) — unpark with
-  the P4 CLI design or productization (P6), or when the keeper wants
-  the conversation. Related: PL-002 (memory tooling), the capture
-  suggestion.
+  compaction** — keeper direction (2026-10-25, extended 2026-11-01):
+  when and how do logbook entries (and related project records) get
+  cleaned up or compacted? KEEPER ADDENDUM (2026-11-01): logbooks
+  are taking significant space and context — once the TOON first
+  version is live (P4's stores), run a review-and-tidy pass. Framing
+  for the unpark session: the EPHEMERA BUDGET — how much are we
+  keeping, and how long does each class actually need to live? The
+  bootstrap period is deliberately noisy (records standing in for
+  tooling); the tidy pass pays that down. Open question preserved:
+  maybe a skill or a role specifically for cleanup/compaction at set
+  stages in the cycle (the keeper's hypothesis — not settled) —
+  unpark when TOON v1 is live (P4 close), or with P6, or when the
+  keeper wants the conversation. Related: PL-002 (memory tooling),
+  PL-PP-013 (session-memory sweep, same budget lens).
 - **PL-PP-006 — distill ADR-referenced rules into bee behavior
   guidance (universal vs project)** — keeper direction (2026-11-01):
   our docs carry the real rules as "ADR-blah" pointers — fine while
