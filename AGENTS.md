@@ -3,7 +3,9 @@
 Always-applicable rules for any agent working in this repo. Identity and
 values live in `SOUL.md` — planners should read it fully; implementers
 may skim it. This file is the operational layer: what applies on every
-task.
+task. Standing, mode-neutral rules only — live state lives in the phase
+list; per-role behavior lives in `roles/`. Anything here must hold for
+every agent on every task.
 
 This repo IS the pi plugin: top-level `skills/` is the single source of
 truth for all bee-* skills (registered machine-wide via
@@ -21,17 +23,6 @@ elsewhere.
   decision — when unsure whether something was decided, ask.
 - The same gate covers every durable record: ADRs, project memory,
   parking-lot entries.
-
-## Current mode: DESIGN
-
-We are designing the harness before building it. Right now:
-
-- Discussions produce **documents** — never implementation without an
-  approved plan (focus discipline).
-- Every design decision worth keeping becomes an **ADR** once agreed
-  (use the `adr` skill). Unrecorded decisions are lost decisions.
-- Drafts are cheap: when context is sufficient, produce a concrete
-  draft to react to instead of asking more questions. Refine together.
 
 ## Work modes (all opt-in — never auto-escalate ceremony)
 
@@ -84,12 +75,13 @@ We are designing the harness before building it. Right now:
   `bee verify` runs — so review-time claims and verify-time
   evidence share one contract. Lives here since
   PL-004, not in global law.
-- Ask one question at a time, and **always recommend** — never a bare
-  menu. Use the `ask_user` tool (Paseo card) for decisions.
+- Ask hygiene — one decision per ask, always recommend, never a
+  bare menu — is shared law; how firmly a role leans on question
+  cards is role-file law.
 - Verify every factual claim (call sites, tool names, paths) before
   dispatching subagents.
 - Evidence over assertion: no "done"/"works" claim without verification
-  output. Reproduce bugs before fixing them.
+  output.
 - **Editing discipline for living documents** (keeper direction
   2026-10-25): three standing rules —
   (1) the edit tool REPLACES text, it never inserts: when adding a
@@ -118,20 +110,22 @@ We are designing the harness before building it. Right now:
   before acting on anything they govern; before committing an
   append to a shared-write file, pull --rebase once more and verify
   the entry appears exactly once.
-- When context runs short, run a handoff (`bee-handoff` skill); resume with
-  `bee-pickup-handoff`. A handoff ends with a memory sync (session state
-  current) — NOT a parking-lot sweep. Sweeps belong to closing work
-  (brainstorm loop-back, session close, phase gates), when something
-  actually ended. Every handoff's final step: give the keeper a
-  **wake prompt** for the successor (fenced markdown: who it is, how to
-  pick up) — the files carry the content; the prompt is the pointer.
+- Context management follows the role file's continuity protocol —
+  a handoff (`bee-handoff` / `bee-pickup-handoff`) is a same-role
+  context refresh, never a scheduling move; when one applies is role
+  law, not this file. When a handoff runs it ends with a memory sync
+  (session state current) — NOT a parking-lot sweep (sweeps belong to
+  closing work, when something actually ended) — and its final step
+  hands the keeper a **wake prompt** (fenced markdown: who it is, how
+  to pick up; the files carry the content, the prompt is the
+  pointer).
 - When a thread of work completes mid-session (**thread-close**,
   GLOSSARY): update your session log, offer durable bits for promotion,
   park new deferrals, then recommend the next move. Either party may
   trigger it. Applies to every role — with each role's own instruments
   (planner: session log + board; loop: the Record step).
 
-## Layout & continuity (bootstrap conventions until the harness MVP)
+## Layout & continuity
 
 <!-- adr-path: .hivemind/decisions -->
 
@@ -141,7 +135,9 @@ We are designing the harness before building it. Right now:
   (*how*; bee-plan writes, reviewer gates) · `phases/` (*when/next* —
   the queue) · `logbook/` (*what actually happened* — the loop's
   verify/review accounts; claims don't move states, these do) ·
-  `suggestions/` (improvement proposals — any role + keeper) · `memory/` (deferred
+  `suggestions/` (improvement
+  proposals — any role + keeper; routed-not-built live in `planned/`,
+  the live queue is `inbox.toon` via `bee inbox`) · `memory/` (deferred
   decisions: the parking lot) · `sessions/` (live role memory,
   gitignored) · `status.md` (cross-role surface; the awaiting-keeper
   queue renders from `inbox.toon` via `bee inbox render`) ·
@@ -165,15 +161,15 @@ We are designing the harness before building it. Right now:
   on the keeper's word). Brainstorms end with a loop-back gate over
   `bee park list`.
 - Scrappy continuity is sanctioned (ADR-001 amendment): session memory
-  may hold project knowledge until the harness lands. Nothing gets built
-  with the harness before MVP.
+  may hold project knowledge until the memory tooling takes over (P5+).
 
 ## Tooling constraints
 
 - Pi and Paseo coupling is welcome everywhere.
 - The subagents extension may be extended but must never depend on us.
-- Superpowers skills are reference material during bootstrap: learn the
-  patterns, write our own — never import or depend on them.
+- Superpowers skills were bootstrap reference material (replacements
+  shipped at P7; P8 completes the sweep): learn the patterns, write our
+  own — never import or depend on them.
 - **Bee-native boundary (ADR-015):** the loop and bee-built work
   depend only on bee-native instruments plus the foundations (Pi,
   Paseo, subagents extension) — never on global skills or the global
