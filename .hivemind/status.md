@@ -23,8 +23,9 @@ keeper (1 open · oldest 6s):
   record + informational drift line on every init run (exit 0),
   no network fetch, pins ride registry entries; D4 ruled —
   MINIMAL docs (one adoption doc in docs/ + README pointer).
-  NEXT: bee-plan writes the P6 plan (kickoff rulings in-plan),
-  bee-plan-review gates it, then the loop.
+  PLAN WRITTEN + GATED (3 rounds: r1 FAIL → r2 FAIL → r3 PASS):
+   .hivemind/plans/2026-11-02-po-p6-productization.md, 7 tasks.
+  NEXT: the loop — spine phase/6, T1+T5 dispatch in parallel.
 
 - [PO] 2026-11-02 — **P5 COMPLETE** (merge f0766ee, close via
   `bee phase close 5`): memory/logbook/glossary stores shipped
