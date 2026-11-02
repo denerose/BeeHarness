@@ -54,6 +54,7 @@ checks:
     expect: exit 0
     files: [.hivemind/config.toon, scripts/structure.map, docs/adoption.md, README.md]
 suite: node --test tests/*.test.mjs
+task-1: done 2026-11-02T17:09:03+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task1-verify-r1.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -134,9 +135,9 @@ suite: node --test tests/*.test.mjs
 **Depends on:** nothing
 **Provides:** `machineDirOf(flagValue)` → path; `machineRegistryPath(dir)`; `readMachineRegistry(dir)` → array of entry objects `{ repo, commit, date }`; `writeMachineRegistry(dir, entries)` (atomicWrite); drift-line computation used by init; `--machine <dir>` flag parsed by `cmdInit`.
 
-- [ ] Step: add to `cmdInit`'s flag spec: `machine: { type: 'string' }`;
+- [x] Step: add to `cmdInit`'s flag spec: `machine: { type: 'string' }`;
   `machineDirOf(v)` resolves `v` if given, else `path.join(os.homedir(), '.bee')`.
-- [ ] Step: registry store at `<machine>/registry.toon`. File shape
+- [x] Step: registry store at `<machine>/registry.toon`. File shape
   (TOON, header comments + one line per repo):
 
 ```text (shape — baked into bee.js as constants)
@@ -152,7 +153,7 @@ suite: node --test tests/*.test.mjs
   the CLI's own store writers emit (`INBOX_HEADER`, `GLOSSARY_HEADER` —
   review r1 J4: a divergent seed header would be silently replaced at
   the first add).
-- [ ] Step: after the existing skills-registration step in `cmdInit`
+- [x] Step: after the existing skills-registration step in `cmdInit`
   (both check and write modes), init reports the machine-store state.
   Write mode also ensures the registry entry: current harness commit =
   `git rev-parse HEAD` executed in `REPO_ROOT` (the PINNED commit at
@@ -166,16 +167,16 @@ bee init: harness <registered-short> · head <head-short> · DRIFTED (pull + bee
 bee init: machine store: not registered (run without --check to add <repo-abs-path>)              (--check only, absent entry)
 ```
 
-- [ ] Step: `--check` reports the drift/registry lines WITHOUT writing
+- [x] Step: `--check` reports the drift/registry lines WITHOUT writing
   the registry file. Exit code unchanged by drift (0) — drift is
   informational (D3).
-- [ ] Step: hygiene (review r1 J6) — every write-mode `init` call in
+- [x] Step: hygiene (review r1 J6) — every write-mode `init` call in
   the EXISTING `tests/bee.test.mjs` gains `--machine <tmp>` (a tmp dir
   per test), so the suite never writes the real `~/.bee/` (the
   unconditional registry-ensure would otherwise touch the user's home
   on every suite run; the dogfood write in task 7 is the ONE
   intentional real-machine write).
-- [ ] Step: create `tests/bee-machine.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-machine.test.mjs` (verbatim below) and run
   `node --test tests/bee-machine.test.mjs` — all pass.
 
 ```javascript path=tests/bee-machine.test.mjs
@@ -270,7 +271,7 @@ test('registry survives unrelated lines (read-modify-write keeps them)', () => {
 });
 ```
 
-- [ ] Commit: `bee init: machine registry + drift pins`
+- [x] Commit: `bee init: machine registry + drift pins`
 
 ## Task 2: init contract — green-fields-first + consumer scaffolding
 
