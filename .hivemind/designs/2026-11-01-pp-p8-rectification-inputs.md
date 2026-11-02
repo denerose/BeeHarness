@@ -96,6 +96,35 @@ suggestion file carries its Outcome pointing here):**
     to tidy up without annoying the keeper (P5 kickoff D1
     follow-up, keeper: supersede/write authority scoped so
     close-time tidying needs no per-step ask).
+17. Close sequence + decisions inventory (P5 hindsight): extend
+    `bee phase close` to mint the decisions-inventory file (a
+    defined, parseable format — P4's example no longer parses),
+    flip the phase row, and run the design stamps mechanically;
+    the close checklist lands in bee-loop's close step. Files:
+    `2026-11-02-po-close-sequence-checklist.md`,
+    `2026-11-02-po-decisions-inventory-format.md`.
+18. Plan-time corpus census (P5 hindsight): a census helper in
+    bee-plan's assets — counts, role-form coverage, regex reach
+    scripted at plan time so the gate judges interpretation only
+    (three of P5's four gate rounds were hand-counted corpus
+    facts, partly wrong). File:
+    `2026-11-02-po-plan-time-corpus-census.md`.
+19. bee-handoff pre-write gate (P5 hindsight): before compiling,
+    confirm this is a same-role refresh the role file's continuity
+    law permits — if the role law says delegate-harder or
+    crash-recovery-only, that law wins; say so and stop. File:
+    `2026-11-02-po-handoff-scheduling-guard.md`.
+20. Close-flag calibration (P5 hindsight): count kickoff-ruled and
+    in-phase decisions separately in `bee phase close` — the
+    under-asked signal flags low kickoff front-loading, not
+    review-driven extras. File:
+    `2026-11-02-po-close-flag-counts-kickoff-separately.md`.
+21. Loop-kit mechanics sweep (P5 hindsight observation): any
+    mechanic that appears in a handoff but in no skill or script
+    is a codification gap by definition — sweep PO's handoff
+    Mechanics section (verify minting shapes, worktree.sh arg
+    asymmetry, spine sync rule) into the durable homes at this
+    pass.
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a
