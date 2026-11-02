@@ -28,7 +28,7 @@ const USAGE = `bee ${VERSION} — BeeHarness CLI
 
 usage:
   bee report [--check] [--status <path>] [--report <path>] [--store <path>]
-  bee init   [--check] [--settings <path>]
+  bee init   [--check] [--settings <path>] [--machine <dir>]
   bee inbox  [list [--for <addressee>] [--full]]
              | add <addressee> <text> [--origin <role>] [--ref <path>]
              | show <id> [--full] | done <id> [--note <how>]
@@ -140,10 +140,116 @@ function tildeForm(p) {
     : p;
 }
 
+// ---- machine store (P6, task 1) -------------------------------------
+// One registry per machine dir (default ~/.bee), keyed by absolute
+// repo path; entries pin the harness commit at registration (D3).
+// Drift (registered commit vs REPO_ROOT head) is informational on
+// every init run — exit code unchanged; --check reports only.
+
+const MACHINE_REGISTRY_HEADER =
+  '# bee machine registry — one line per harnessed repo\n' +
+  '# repo :: <absolute path> :: commit <sha at registration> :: ' +
+  '<ISO date>\n';
+
+function machineDirOf(v) {
+  return v ? path.resolve(v) : path.join(os.homedir(), '.bee');
+}
+
+function machineRegistryPath(dir) {
+  return path.join(dir, 'registry.toon');
+}
+
+// Read: `#` lines ignored; absent/empty file = zero entries (the
+// file is created on first write only). Well-formed entry lines are
+// `<repo> :: commit <sha> :: <date>`; anything else drops on the
+// next write.
+function readMachineRegistry(dir) {
+  let text;
+  try {
+    text = fs.readFileSync(machineRegistryPath(dir), 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') return [];
+    throw e;
+  }
+  const entries = [];
+  for (const line of text.split('\n')) {
+    if (!line || line.startsWith('#')) continue;
+    const parts = line.split(' :: ');
+    if (parts.length < 3 || !parts[1].startsWith('commit ')) continue;
+    entries.push({
+      repo: parts[0],
+      commit: parts[1].slice('commit '.length),
+      date: parts[2],
+    });
+  }
+  return entries;
+}
+
+function writeMachineRegistry(dir, entries) {
+  fs.mkdirSync(dir, { recursive: true });
+  const body = entries
+    .map((e) => `${e.repo} :: commit ${e.commit} :: ${e.date}`)
+    .join('\n');
+  atomicWrite(machineRegistryPath(dir),
+    MACHINE_REGISTRY_HEADER + body + (body ? '\n' : ''));
+}
+
+function shortSha(sha) {
+  return sha.slice(0, 7);
+}
+
+// Runs after the skills-registration step in both modes. Write mode
+// ensures this repo's entry (update-in-place, never a duplicate);
+// check mode reports only. Drift never changes the exit code — only
+// a structured failure (harness commit unread) does.
+function machineStoreReport(machineFlag, check) {
+  const dir = machineDirOf(machineFlag);
+  const repo = process.cwd();
+  const headR = spawnSync('git', ['rev-parse', 'HEAD'],
+    { cwd: REPO_ROOT, encoding: 'utf8' });
+  if (headR.status !== 0) {
+    return {
+      code: 1,
+      out: '',
+      err: `bee init: cannot read harness commit in ${REPO_ROOT}: ` +
+        `${(headR.stderr || '').trim()}\n`,
+    };
+  }
+  const head = headR.stdout.trim();
+  const entries = readMachineRegistry(dir);
+  const prior = entries.find((e) => e.repo === repo);
+  let out = '';
+  if (prior !== undefined) {
+    out += prior.commit === head
+      ? `bee init: harness ${shortSha(prior.commit)} · head ` +
+        `${shortSha(head)} · in sync\n`
+      : `bee init: harness ${shortSha(prior.commit)} · head ` +
+        `${shortSha(head)} · DRIFTED (pull + bee init to re-register)\n`;
+  }
+  if (!check) {
+    const entry = { repo, commit: head, date: new Date().toISOString() };
+    const next = [...entries];
+    const at = next.findIndex((e) => e.repo === repo);
+    if (at === -1) {
+      next.push(entry);
+    } else {
+      next[at] = entry;
+    }
+    writeMachineRegistry(dir, next);
+    out += `bee init: machine registry: ${machineRegistryPath(dir)} ` +
+      `— registered ${repo} @ ${shortSha(head)}\n`;
+  } else if (prior === undefined) {
+    out += `bee init: machine store: not registered ` +
+      `(run without --check to add ${repo})\n`;
+  }
+  return { code: 0, out, err: '' };
+}
+
 function cmdInit(rest) {
   const f = flags(rest, {
     check: { type: 'boolean' },
     settings: { type: 'string' },
+    machine: { type: 'string' },
   });
   if (f.error) {
     return { code: 1, out: '', err: String(f.error) + '\n' };
@@ -182,30 +288,37 @@ function cmdInit(rest) {
     (e) => typeof e === 'string' &&
       path.resolve(expandTilde(e)) === target);
 
+  let code, out, err;
   if (hit !== undefined) {
-    return {
-      code: 0,
-      out: `bee init: already registered: ${hit} (${settingsPath})\n`,
-      err: '',
-    };
-  }
-  if (f.values.check) {
-    return {
-      code: 1,
-      out: '',
-      err: `bee init: NOT registered (${tildeForm(skillsDir)}) ` +
-           `— run without --check to add it (${settingsPath})\n`,
-    };
+    code = 0;
+    out = `bee init: already registered: ${hit} (${settingsPath})\n`;
+    err = '';
+  } else if (f.values.check) {
+    code = 1;
+    out = '';
+    err = `bee init: NOT registered (${tildeForm(skillsDir)}) ` +
+      `— run without --check to add it (${settingsPath})\n`;
+  } else {
+    settings.skills = [...entries, tildeForm(skillsDir)];
+    fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+    atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+    code = 0;
+    out = `bee init: registered ${tildeForm(skillsDir)} in ` +
+      `${settingsPath}\n`;
+    err = '';
   }
 
-  settings.skills = [...entries, tildeForm(skillsDir)];
-  fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
-  atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+  // Machine store runs after the skills step in both modes; drift
+  // never changes the exit code (D3).
+  const machine = machineStoreReport(f.values.machine,
+    !!f.values.check);
+  if (machine.code === 1) {
+    code = 1;
+  }
   return {
-    code: 0,
-    out: `bee init: registered ${tildeForm(skillsDir)} in ` +
-         `${settingsPath}\n`,
-    err: '',
+    code,
+    out: out + machine.out,
+    err: err + machine.err,
   };
 }
 

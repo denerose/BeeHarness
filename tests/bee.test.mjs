@@ -37,7 +37,7 @@ test('init: adds skills entry, preserves other keys', () => {
     theme: 'dark',
     skills: ['~/other/skills'],
   }, null, 2));
-  const r = run(['init', '--settings', sp]);
+  const r = run(['init', '--settings', sp, '--machine', tmp()]);
   assert.equal(r.code, 0);
   const after = JSON.parse(fs.readFileSync(sp, 'utf8'));
   assert.equal(after.theme, 'dark');
@@ -62,7 +62,7 @@ test('init: already registered exits 0 (tilde entry)', () => {
   fs.writeFileSync(sp, JSON.stringify({
     skills: [BEE_SKILLS],
   }, null, 2));
-  const r = run(['init', '--settings', sp]);
+  const r = run(['init', '--settings', sp, '--machine', tmp()]);
   assert.equal(r.code, 0);
   assert.match(r.out, /already registered/);
 });
@@ -71,7 +71,7 @@ test('init: malformed settings exits 1, writes nothing', () => {
   const dir = tmp();
   const sp = path.join(dir, 'settings.json');
   fs.writeFileSync(sp, '{broken');
-  const r = run(['init', '--settings', sp]);
+  const r = run(['init', '--settings', sp, '--machine', tmp()]);
   assert.equal(r.code, 1);
   assert.match(r.err, /cannot parse/);
 });
@@ -79,7 +79,7 @@ test('init: malformed settings exits 1, writes nothing', () => {
 test('init: missing settings file is created fresh', () => {
   const dir = tmp();
   const sp = path.join(dir, 'nested', 'settings.json');
-  const r = run(['init', '--settings', sp]);
+  const r = run(['init', '--settings', sp, '--machine', tmp()]);
   assert.equal(r.code, 0);
   const after = JSON.parse(fs.readFileSync(sp, 'utf8'));
   assert.deepEqual(after.skills, [BEE_SKILLS]);
