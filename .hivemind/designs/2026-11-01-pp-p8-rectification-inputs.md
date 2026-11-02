@@ -125,6 +125,21 @@ suggestion file carries its Outcome pointing here):**
     Mechanics section (verify minting shapes, worktree.sh arg
     asymmetry, spine sync rule) into the durable homes at this
     pass.
+22. LAW CLAUSE (keeper-authorized in principle, planned not
+    landed — PP lands it at P8): union-merge suite gate, into
+    AGENTS commit discipline — "after manually resolving merge
+    conflicts, run the full suite before committing the merge;
+    git's union splice can silently drop lines when two regions
+    share an ending." File:
+    `planned/2026-11-02-po-union-merge-suite-gate.md`.
+23. LAW CLAUSE (keeper-authorized in principle, planned not
+    landed — PP lands it at P8): editing-law scope, into the
+    AGENTS editing block — "the editing discipline covers all
+    files, not only living documents: scripted patches to source
+    files (marker surgery included) verify the region's exact
+    bytes first and chain a parse-or-test check in the same
+    command." File:
+    `planned/2026-11-02-po-marker-surgery-edit-tool.md`.
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a
