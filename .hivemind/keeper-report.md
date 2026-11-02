@@ -29,6 +29,15 @@ resolves them; the keeper may edit freely or just say the word)
   — first PO builds are the bee-skill-write + bee-skill-review
   pair; two-tier kit (core ships, meta dormant) proposed, pending
   this session.
+- Two-lane suggestions in consuming projects (discuss with PP):
+  in this repo every suggestion is harness self-heal; consuming
+  repos will have BOTH project-specific suggestions AND bee-related
+  feedback, and both lanes must work. The hive files its own
+  project suggestions in its own hivemind; bee feedback escalates
+  into BeeHarness via the planned shared channel (`~/.bee/
+  suggestions/`). Check the design + P4/P5 suggestion flows keep
+  both first-class. Design:
+  /home/saphron/BeeHarness/.hivemind/designs/2026-11-01-pp-harness-feedback-channel.md
 
 ## Needs the keeper
 
