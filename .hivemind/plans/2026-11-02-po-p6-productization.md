@@ -12,8 +12,8 @@ validation: phase
 state-source: checkboxes below
 targets:
   - bin/bee.js (modify)
-  - scripts/worktree.sh (delete)
-  - tests/worktree-sh.test.mjs (delete)
+  - tests/bee.test.mjs (modify)
+  - tests/bee-logbook.test.mjs (modify)
   - tests/bee-machine.test.mjs (create)
   - tests/bee-init.test.mjs (create)
   - tests/bee-agents.test.mjs (create)
@@ -122,14 +122,15 @@ suite: node --test tests/*.test.mjs
 - **P11 no-creep:** no `bee ping`, no relay queue, no level tooling
   beyond scaffolding the config file (automation-levels: P6 is
   pre-scaffolding ONLY).
-- **Living references to `worktree.sh`:** exactly one exists in a law
-  surface (`skills/loop/bee-loop/assets/dispatch-brief-template.md`);
-  task 5 sweeps it. Records (plans, logbook, session logs, the P6 row
-  itself) keep the old name as history.
+- **Living references to `worktree.sh`:** three exist (review r1 J7
+  verified): the dispatch-brief template (law surface), a `bin/bee.js`
+  code comment, and a `tests/bee-logbook.test.mjs` header comment;
+  task 5 sweeps all three. Records (plans, logbook, session logs, the
+  P6 row itself) keep the old name as history.
 
 ## Task 1: machine store — registry + version pins
 
-**Files:** modify `bin/bee.js` · create `tests/bee-machine.test.mjs`
+**Files:** modify `bin/bee.js` · modify `tests/bee.test.mjs` · create `tests/bee-machine.test.mjs`
 **Depends on:** nothing
 **Provides:** `machineDirOf(flagValue)` → path; `machineRegistryPath(dir)`; `readMachineRegistry(dir)` → array of entry objects `{ repo, commit, date }`; `writeMachineRegistry(dir, entries)` (atomicWrite); drift-line computation used by init; `--machine <dir>` flag parsed by `cmdInit`.
 
@@ -146,7 +147,11 @@ suite: node --test tests/*.test.mjs
 
   Read: ignore `#` lines; empty/absent file = zero entries (create on
   first write only). Keyed by absolute repo path; a re-init of a known
-  repo UPDATES its line (new commit + date), never duplicates.
+  repo UPDATES its line (new commit + date), never duplicates. The
+  consumer-seed headers in task 2 use the SAME canonical header strings
+  the CLI's own store writers emit (`INBOX_HEADER`, `GLOSSARY_HEADER` —
+  review r1 J4: a divergent seed header would be silently replaced at
+  the first add).
 - [ ] Step: after the existing skills-registration step in `cmdInit`
   (both check and write modes), init reports the machine-store state.
   Write mode also ensures the registry entry: current harness commit =
@@ -164,6 +169,12 @@ bee init: machine store: not registered (run without --check to add <repo-abs-pa
 - [ ] Step: `--check` reports the drift/registry lines WITHOUT writing
   the registry file. Exit code unchanged by drift (0) — drift is
   informational (D3).
+- [ ] Step: hygiene (review r1 J6) — every write-mode `init` call in
+  the EXISTING `tests/bee.test.mjs` gains `--machine <tmp>` (a tmp dir
+  per test), so the suite never writes the real `~/.bee/` (the
+  unconditional registry-ensure would otherwise touch the user's home
+  on every suite run; the dogfood write in task 7 is the ONE
+  intentional real-machine write).
 - [ ] Step: create `tests/bee-machine.test.mjs` (verbatim below) and run
   `node --test tests/bee-machine.test.mjs` — all pass.
 
@@ -173,7 +184,6 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { run } from '../bin/bee.js';
 
 function tmp() {
@@ -305,13 +315,13 @@ bee init: running inside a worktree — return to the main worktree (<main-root>
   5. `.hivemind/inbox.toon` — header-only:
 
 ```text path=.hivemind/inbox.toon (consumer seed)
-# bee inbox — one addressee per item; bee inbox list
+# inbox — items waiting on someone (agent store; views render from here)
 ```
 
   6. `.hivemind/glossary.toon` — header-only:
 
 ```text path=.hivemind/glossary.toon (consumer seed)
-# bee glossary store — term :: gist :: see; bee glossary add
+# glossary — shared vocabulary (term :: gist :: see; supply, never update)
 ```
 
   7. `.hivemind/status.md` — fresh surface:
@@ -324,9 +334,10 @@ prefix your lines with a role tag.
 ```
 
   8. `.hivemind/config.toon` — automation level + gates (default L1,
-     decision 3):
+     decision 3; this block is the consumer-default CONSTANT baked into
+     `bee.js` — the file block for THIS repo's own config is task 7's):
 
-```text path=.hivemind/config.toon (consumer default)
+```text (consumer-default constant — baked into bee.js)
 # bee config — automation level + keeper gates; level changes are keeper-only
 level :: L1
 gates :: SOUL/identity · irreversible acts · direction beyond the design · config-named items
@@ -350,8 +361,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
 import { run } from '../bin/bee.js';
+
+const TESTS_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 function tmp() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'bee-init6-'));
@@ -451,7 +465,7 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
   const sp = path.join(machine, 's.json');
   fs.writeFileSync(sp, JSON.stringify({ skills: [] }, null, 2));
   const r = run(['init', '--settings', sp, '--machine', machine,
-    '--repo', path.resolve(__dirname, '..')]);
+    '--repo', path.resolve(TESTS_DIR, '..')]);
   assert.equal(r.code, 0, r.err);
   assert.match(r.out, /harness repo — scaffolding \+ managed block skipped/);
 });
@@ -683,15 +697,15 @@ test('empty text: structured error, exit 1', () => {
 
 ## Task 5: `bee worktree` — fold the script into the CLI
 
-**Files:** modify `bin/bee.js` · delete `scripts/worktree.sh` · delete `tests/worktree-sh.test.mjs` · create `tests/bee-worktree.test.mjs` · modify `skills/loop/bee-loop/assets/dispatch-brief-template.md`
+**Files:** modify `bin/bee.js` · delete `scripts/worktree.sh` · delete `tests/worktree-sh.test.mjs` · create `tests/bee-worktree.test.mjs` · modify `skills/loop/bee-loop/assets/dispatch-brief-template.md` · modify `tests/bee-logbook.test.mjs`
 **Depends on:** nothing (parallel-safe with tasks 1–4)
 **Provides:** `bee worktree create <phase>-<slug> | merge <slug> | abandon <slug>`; USAGE line in the top-level usage block.
 
 - [ ] Step: port `scripts/worktree.sh`'s three subcommands to Node in
   `bin/bee.js` (`cmdWorktree`). The script is the spec — semantics,
   validation order, error classes (usage exit 1; not-a-phase-branch
-  exit 2; exists/no-match exit 3; ambiguous/no-match exit 4; unmerged
-  exit 5), and message strings port verbatim with `worktree.sh:` →
+  exit 2; branch/worktree already-exists exit 3; no-match and
+  ambiguous slug exit 4; unmerged abandon exit 5), and message strings port verbatim with `worktree.sh:` →
   `bee worktree:`. Git runs via `execFileSync('git', args, { cwd:
   process.cwd() })`; repo context resolves from cwd exactly as the
   script does (dirname of `--git-common-dir`), never from REPO_ROOT.
@@ -702,14 +716,21 @@ test('empty text: structured error, exit 1', () => {
   as `run(['worktree', 'create', ...])` etc.; where the suite ran the
   script with `bash`, run `bee` in-process instead. Then delete
   `tests/worktree-sh.test.mjs` and `scripts/worktree.sh`.
-- [ ] Step: sweep the one law-surface reference:
-  `skills/loop/bee-loop/assets/dispatch-brief-template.md` names
+- [ ] Step: sweep the live references (review r1 J7 — three, not one):
+  (a) `skills/loop/bee-loop/assets/dispatch-brief-template.md` names
   `scripts/worktree.sh create <phase>-<slug>` — rewrite that phrase to
   `bee worktree create <phase>-<slug>` (the template's other text
-  stands). Then verify no live references remain:
-  `grep -rn "worktree.sh" skills/ roles/ docs/ README.md AGENTS.md SOUL.md scripts/` →
-  only historical/none (records under `.hivemind/plans|logbook|sessions`
-  keep the old name as history — out of scope of the grep).
+  stands); (b) the `bin/bee.js` comment near the phase-close worktree
+  walk ("the same porcelain walk worktree.sh uses") — reword to
+  "the same porcelain walk `bee worktree` uses"; (c) the header
+  comment in `tests/bee-logbook.test.mjs` citing
+  `tests/worktree-sh.test.mjs patterns` — reword to
+  `tests/bee-worktree.test.mjs patterns`. Then verify no live
+  references remain:
+  `grep -rn "worktree.sh" skills/ roles/ docs/ README.md AGENTS.md SOUL.md scripts/ bin/ tests/` →
+  zero hits (records under `.hivemind/plans|logbook|sessions` keep the
+  old name as history; `.pi/handoff-*` is an ephemeral crash-brief
+  replaced at the next handoff write — out of scope).
 - [ ] Step: run `node --test tests/bee-worktree.test.mjs` — all pass;
   full suite still green (`node --test tests/*.test.mjs`).
 - [ ] Commit: `bee worktree: fold helper script into CLI`
@@ -760,7 +781,8 @@ and runs `bee init`.
 
 ## Prerequisites
 
-- Node 24+ and git on PATH.
+- Node 20+ and git on PATH (the repo's declared floor —
+  `package.json` engines).
 - A checkout of this harness repo somewhere on the machine (update =
   `git pull` in it).
 
