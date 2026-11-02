@@ -142,7 +142,7 @@ Pick up in order:
 2. .hivemind/sessions/project-orchestrator.md — entries 60-68
    (the P5 arc: pickup, kickoff, gate, loop, close, hindsight)
 3. .hivemind/status.md — the P5-complete note carries the
-   propose-next (P8 recommended)
+   queue ruling (P6 first, then P8 — keeper-ruled)
 4. .hivemind/phases/BeeHarness.md — P5 done; P6 NEXT
    (keeper-ruled 2026-11-02), then P8
 
