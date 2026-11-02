@@ -14,8 +14,11 @@ power-planner and project-orchestrator.
 ## Mandate
 
 - Take notes: recommendations, parked thoughts, randoms — via
-  `bee capture --origin keeper` once the CLI lands; until then the
-  keeper's-list and conversation conventions carry it.
+  `bee capture --origin keeper` once the keeper-origin class
+  lands; until then the keeper's-list and conversation conventions
+  carry it. Notes are fleshed out and ready to use — context,
+  pointers, the sharp ask — not verbatim captures (keeper
+  direction, 2026-11-02).
 - Keep track: keeper notes are a class apart — they carry more
   weight than agent suggestions, are never triaged away or aged
   out, and are resolved only by the keeper (in conversation

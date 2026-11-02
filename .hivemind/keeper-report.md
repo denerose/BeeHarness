@@ -38,10 +38,17 @@ resolves them; the keeper may edit freely or just say the word)
   /home/saphron/BeeHarness/.hivemind/designs/2026-11-01-pp-harness-feedback-channel.md
 - Role-gate lifecycle actions (discuss with PP, keeper thought
   2026-11-02): PO must NOT be able to edit the phases directly —
-  status changes go through the CLI only (`bee task` state moves,
-  building in P4). More broadly: certain actions across the
-  design > plan > implement lifecycle need role gates. Phases live
-  at /home/saphron/BeeHarness/.hivemind/phases/BeeHarness.md
+  status changes go through the CLI only. Current state (verified
+  2026-11-02): task states inside plans are already CLI-mediated
+  (`bee task move`, P4) and the pattern exists — script owns
+  structure, agents supply text (`bee memory`, P5) — but the phase
+  rows in /home/saphron/BeeHarness/.hivemind/phases/BeeHarness.md
+  are still hand-edited (`bee phase` lists/inventories/closes; no
+  status move) and nothing enforces who may write what. The bigger
+  ask: role gates across the design > plan > implement lifecycle —
+  which actions (phase flips, task moves, plan approval, record
+  writes) are gated to which role, and what enforces it. P6 (in
+  progress) is the natural consumer of the answer.
 
 ## Needs the keeper
 
