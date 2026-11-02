@@ -40,7 +40,12 @@ is scaffold-class tooling (computational feedforward).
 - machine registration (the P2 stub's check-and-do concept
   generalizes into this store);
 - the registry of harnessed repos on this machine;
-- version pins (installed vs available).
+- version pins: registration records the checked-out commit; drift
+  (registered commit vs current HEAD) reports as an informational
+  line on every `bee init` run, exit 0 — `--check` reports the
+  same without writing. No network fetch; no "available" concept
+  until a real distribution channel exists (keeper ruling,
+  2026-11-02, P6 kickoff). Pins ride the registry entries.
 
 The per-machine store complements the per-repo `.hivemind/`.
 Distribution stays git: the repo is the source of truth; an update
