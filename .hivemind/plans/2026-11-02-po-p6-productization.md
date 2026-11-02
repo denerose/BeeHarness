@@ -54,6 +54,7 @@ checks:
     expect: exit 0
     files: [.hivemind/config.toon, scripts/structure.map, docs/adoption.md, README.md]
 suite: node --test tests/*.test.mjs
+task-5: done 2026-11-02T17:08:30+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task5-verify-r2.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -701,7 +702,7 @@ test('empty text: structured error, exit 1', () => {
 **Depends on:** nothing (parallel-safe with tasks 1–4)
 **Provides:** `bee worktree create <phase>-<slug> | merge <slug> | abandon <slug>`; USAGE line in the top-level usage block.
 
-- [ ] Step: port `scripts/worktree.sh`'s three subcommands to Node in
+- [x] Step: port `scripts/worktree.sh`'s three subcommands to Node in
   `bin/bee.js` (`cmdWorktree`). The script is the spec — semantics,
   validation order, error classes (usage exit 1; not-a-phase-branch
   exit 2; branch/worktree already-exists exit 3; no-match and
@@ -711,12 +712,12 @@ test('empty text: structured error, exit 1', () => {
   script does (dirname of `--git-common-dir`), never from REPO_ROOT.
   stdout of `create` carries only the worktree path; git chatter goes
   to stderr (match the script).
-- [ ] Step: port the test cases from `tests/worktree-sh.test.mjs` to
+- [x] Step: port the test cases from `tests/worktree-sh.test.mjs` to
   `tests/bee-worktree.test.mjs`: same scenarios and assertions, invoked
   as `run(['worktree', 'create', ...])` etc.; where the suite ran the
   script with `bash`, run `bee` in-process instead. Then delete
   `tests/worktree-sh.test.mjs` and `scripts/worktree.sh`.
-- [ ] Step: sweep the live references (review r1 J7 — three, not one):
+- [x] Step: sweep the live references (review r1 J7 — three, not one):
   (a) `skills/loop/bee-loop/assets/dispatch-brief-template.md` names
   `scripts/worktree.sh create <phase>-<slug>` — rewrite that phrase to
   `bee worktree create <phase>-<slug>` (the template's other text
@@ -733,9 +734,9 @@ test('empty text: structured error, exit 1', () => {
   review r2 J2. (Records under `.hivemind/plans|logbook|sessions` keep
   the old name as history; `.pi/handoff-*` is an ephemeral crash-brief
   replaced at the next handoff write — out of scope.)
-- [ ] Step: run `node --test tests/bee-worktree.test.mjs` — all pass;
+- [x] Step: run `node --test tests/bee-worktree.test.mjs` — all pass;
   full suite still green (`node --test tests/*.test.mjs`).
-- [ ] Commit: `bee worktree: fold helper script into CLI`
+- [x] Commit: `bee worktree: fold helper script into CLI`
 
   Task notes: review r1 (task5-review-r1) verdict FIX-FIRST on one
   should-fix (prefix-match in worktreeOfBranch → wrong-worktree
