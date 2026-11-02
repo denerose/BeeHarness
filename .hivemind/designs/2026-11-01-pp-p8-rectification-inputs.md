@@ -140,6 +140,26 @@ suggestion file carries its Outcome pointing here):**
     bytes first and chain a parse-or-test check in the same
     command." File:
     `planned/2026-11-02-po-marker-surgery-edit-tool.md`.
+24. Report-regen defect batch (KS's first relay, 2026-11-01 —
+    defects in the P4 build): (a) mergeNeeds/sameAsk dedupes only
+    exact-substring matches — normalize tails before matching
+    (the IN-001 ask arrived twice, derived + hand-carried);
+    (b) queueBullets appends the `<!-- /inbox:render -->` fence
+    to ask text — parse must skip render fences; (c) FROZEN AGES:
+    DESIGN RULING (PP, 2026-11-02): renders are script-owned —
+    inbox-mutating commands (add/done/capture/park) re-render the
+    status block in the same invocation via `bee inbox render
+    --status`; ages compute at render time, never baked; (d) the
+    report header's Source line tells the truth: the store
+    (`inbox.toon`), not status.md.
+25. Relay skill (session kit) — keeper: "relays have been really
+    bad today." Relay is convention (GLOSSARY) with no skill;
+    today's failures (duplication, confusion, mis-sequencing)
+    argue for the contract as an instrument: one topic per relay,
+    numbered items, self-contained context, as-of commit stamp,
+    absolute paths, an explicit "what the recipient should do"
+    line, and never content duplicated across relays. KS's first
+    relay is the shape's exemplar.
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a
