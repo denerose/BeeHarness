@@ -15,9 +15,10 @@ as decisions.
 **First action: take the keeper's direction.** The board is
 empty of directed work; two open items await the keeper's word —
 the **tidy pass** (D8, P5's close-time step, on the keeper's word
-only) and the **next phase** (propose-next issued: P8
-recommended — gate satisfied, completes before P6, and its
-rectification sweep now covers P5's output too). Do not open a
+only) and the **next phase** (keeper-ruled 2026-11-02: **P6
+first, then P8** — P7's out-of-order run was a special case,
+not a pattern; P8's rectification sweep then covers P5's output
+too). Do not open a
 phase or run the tidy pass without the keeper's direction.
 
 **Card law (keeper-corrected, now in the role file):**
@@ -53,8 +54,9 @@ correctly-sized addenda.
   work; full suite after any union merge BEFORE committing;
   relayed pass-back claims get verified before entering briefs;
   plan corpus counts get derived, not hand-counted.
-- **Board:** P8 ready (P7 done; row says completes before P6);
-  P6 next after; P9+ queued. Tidy pass pending (D8).
+- **Board:** queue order keeper-ruled 2026-11-02: **P6 → P8**
+  (P7's out-of-order run was special-case). P9+ queued. Tidy
+  pass pending (D8).
 - **Session corrections this arc:** premature handoff (runs to
   phase completion — context managed by delegation), hindsight
   filing reflex, text-gopher pattern. All logged; the handoff
@@ -71,8 +73,8 @@ correctly-sized addenda.
    67 close, 68 hindsight correction)
 4. `.hivemind/status.md` — the [PO] P5-complete note carries the
    propose-next
-5. `.hivemind/phases/BeeHarness.md` — P5 row done; P8/P6 rows
-   carry their inputs
+5. `.hivemind/phases/BeeHarness.md` — P5 row done; P6 is next
+   (keeper-ruled), then P8
 6. If PP triaged the suggestions (check `.hivemind/suggestions/`
    + status surface) — graduation outcomes may have landed law
 
@@ -141,11 +143,11 @@ Pick up in order:
    (the P5 arc: pickup, kickoff, gate, loop, close, hindsight)
 3. .hivemind/status.md — the P5-complete note carries the
    propose-next (P8 recommended)
-4. .hivemind/phases/BeeHarness.md — P5 done; P8 ready (gate
-   satisfied, completes before P6)
+4. .hivemind/phases/BeeHarness.md — P5 done; P6 NEXT
+   (keeper-ruled 2026-11-02), then P8
 
 Then announce the role and hold for the keeper's direction —
-the tidy pass (D8, on their word) and/or P8 pickup. Do not open
+the tidy pass (D8, on their word) and/or P6 pickup. Do not open
 a phase without direction. Card law and own-lane rules are in
 the handoff's working-mode section — read them before your
 first card. The files carry the content; this prompt is the

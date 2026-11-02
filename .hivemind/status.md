@@ -27,8 +27,8 @@ keeper (1 open · oldest 6s):
   real glossary converted (46 terms, view script-owned), P0-P4+P7
   compacted. Suite 307/307, structure 0. Keeper sign-off: 3
   rulings, all keep-as-built. TIDY PASS (D8) pending the
-  keeper's word. Propose-next: P8 (rectification) — queue order
-  per its row (completes before P6).
+  keeper's word. Queue order KEEPER-RULED 2026-11-02: P6 first,
+  then P8 — P7's out-of-order run was a special case.
 - [PO] 2026-11-01 — RELAY TO PP #2 (P5 kickoff rulings + owed
   feedback; D1 rode the note above):
   (1) CLASS-C FEEDBACK (owed since P4 close): boundary sweeps must
