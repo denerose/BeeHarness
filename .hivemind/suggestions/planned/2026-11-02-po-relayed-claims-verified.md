@@ -4,3 +4,8 @@
 **Scope:** harness
 **What happened:** The P5 Task-2 review brief carried the implementer's disclosed deviation ("the plan's stamp line has an unbalanced `]]` typo; I shipped the balanced form") relayed verbatim and unverified — the reviewer had to burn a finding disproving it (the plan's committed stanza was already balanced; the claim was wrong). The verify-before-dispatch law was applied to plan/corpus facts I derived myself, but not to claims handed to me in pass-backs — the law's wording ("verify every factual claim in the brief") got read as "claims you wrote," not "claims you relayed."
 **Suggestion:** Close the wording gap where dispatch law lives: a relayed pass-back claim is a factual claim like any other — the dispatcher verifies it against the repo before it enters a brief (one grep), or marks it explicitly as "claimed, unverified — confirm" in the brief so the reviewer treats it as a question, not a premise. Mechanical option: the dispatch-brief template (skills/loop/bee-loop/assets/dispatch-brief-template.md) gains a "relayed claims: none | verified list" line, forcing the check at brief-writing time.
+
+## Outcome (2026-11-02)
+Routed to the P8 pass (items 25/26 and item 6 plus) with drafted
+text in the inputs note — keeper authorized in principle; planned,
+not landed.

@@ -47,7 +47,11 @@ suggestion file carries its Outcome pointing here):**
    keeper-requested" vocabulary; sixth question "what worked?";
    slug format `YYYY-MM-DD-<role>-<slug>.md`; list new suggestions
    in status under Awaiting keeper). File:
-   `planned/2026-10-25-pp-hindsight-skill-fixes.md`.
+   `planned/2026-10-25-pp-hindsight-skill-fixes.md`. PLUS (P5
+   addendum): the summary REPORTS what was filed, never asks
+   permission to file — filing is unambated (any-role,
+   adds-only); the keeper's gate is at promotion, not filing.
+   File: `planned/2026-11-02-po-hindsight-summary-never-asks-to-file.md`.
 7. bee-brainstorm step 4 ownership filter ("a decision is what the
    keeper decided, not what the conversation concluded"). File:
    `planned/2026-10-25-po-brainstorm-ownership-filter.md`.
@@ -159,7 +163,18 @@ suggestion file carries its Outcome pointing here):**
     numbered items, self-contained context, as-of commit stamp,
     absolute paths, an explicit "what the recipient should do"
     line, and never content duplicated across relays. KS's first
-    relay is the shape's exemplar.
+    relay is the shape's exemplar. PLUS (P5 addendum, drafted for
+    the GLOSSARY relay entry too): keeper-facing relay blocks are
+    FINAL ARTIFACTS — never ask the keeper to edit, merge, or
+    splice; deltas arrive as standalone, self-contained,
+    correctly-sized addenda. File:
+    `planned/2026-11-02-po-relays-are-final-artifacts.md`.
+26. Dispatch-brief claims discipline (P5 addendum): disclosed
+    claims ride as MARKED-UNVERIFIED claims, never as fact — a
+    review brief relayed an implementer's "the plan has a typo"
+    claim unverified and the reviewer burned a finding disproving
+    it. Brief-template line + review-brief convention. File:
+    `planned/2026-11-02-po-relayed-claims-verified.md`.
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a
