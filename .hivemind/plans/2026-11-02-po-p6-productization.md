@@ -737,6 +737,13 @@ test('empty text: structured error, exit 1', () => {
   full suite still green (`node --test tests/*.test.mjs`).
 - [ ] Commit: `bee worktree: fold helper script into CLI`
 
+  Task notes: review r1 (task5-review-r1) verdict FIX-FIRST on one
+  should-fix (prefix-match in worktreeOfBranch → wrong-worktree
+  removal). Fix round 1: reviewer's one-token exact-match fix applied
+  near-verbatim + permanent regression test; verify r2 carries the
+  probe. Re-review waived — near-verbatim fix + probe replicated
+  (verify r2 body).
+
 ## Task 6: AXI compliance pass
 
 **Files:** modify `bin/bee.js` (gap fixes)

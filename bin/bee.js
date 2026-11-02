@@ -4599,7 +4599,9 @@ function worktreeOfBranch(branch) {
   let wt = null;
   for (const line of r.stdout.split('\n')) {
     if (line.startsWith('worktree ')) wt = line.slice(9);
-    else if (line.startsWith(`branch refs/heads/${branch}`)) return wt;
+    // Exact line match, not prefix: task/9-ax must never match a
+    // porcelain line for task/9-axx (review r1 should-fix).
+    else if (line === `branch refs/heads/${branch}`) return wt;
   }
   return null;
 }

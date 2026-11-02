@@ -163,3 +163,33 @@ test('unknown subcommand -> exit 1, usage on stderr', async () => {
     assert.match(r.err, /usage:/);
   });
 });
+
+test('merge never removes a longer-named branch\'s worktree (review r1)',
+  async () => {
+    const s = await sandbox();
+    await inSandbox(s, async () => {
+      // task/9-axx checked out in its own worktree; task/9-ax (a
+      // strict name-prefix) merged with NO worktree of its own. The
+      // porcelain walk must match `branch refs/heads/<branch>` lines
+      // EXACTLY — a prefix match would remove the axx worktree.
+      const wtXx = s.wtPath('axx');
+      await s.git('worktree', 'add', '-b', 'task/9-axx', wtXx);
+      await gitIn(wtXx, 'commit', '--allow-empty', '-m', 'axx work');
+      await s.git('branch', 'task/9-ax');
+      await s.git('checkout', 'task/9-ax');
+      await s.git('commit', '--allow-empty', '-m', 'ax work');
+      await s.git('checkout', 'phase/9');
+      const r = task('merge', 'ax');
+      assert.equal(r.code, 0);
+      assert.match(r.out, /merged task\/9-ax into phase\/9/);
+      assert.ok(!r.out.includes('removed worktree'),
+        `must not claim a worktree removal: ${r.out}`);
+      assert.match(r.err, /no worktree registered for task\/9-ax/);
+      assert.ok(fs.existsSync(wtXx), 'axx worktree must survive');
+      const xxBranch = (await s.git('branch', '--list', 'task/9-axx')).stdout;
+      assert.ok(xxBranch.includes('task/9-axx'),
+        'task/9-axx branch must survive');
+      fs.rmSync(wtXx, { recursive: true, force: true });
+      await s.git('worktree', 'prune');
+    });
+  });
