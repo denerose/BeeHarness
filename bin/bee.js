@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
 // `bee capture`, `bee park`, `bee memory`, `bee design`, `bee verify`,
-// `bee logbook`, `bee glossary`, `bee task`, `bee guidance`, `bee phase`.
+// `bee logbook`, `bee glossary`, `bee task`, `bee guidance`, `bee phase`,
+// `bee worktree`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -61,6 +62,9 @@ usage:
   bee phase  [list [--full]]
              | inventory <phase-id> --decisions <file> [--origin <role>]
              | close <phase-id> [--check]
+  bee worktree create <phase>-<slug>
+             | merge <slug>
+             | abandon <slug>
   bee help | version
 
   --check   never write; report what would happen
@@ -114,6 +118,9 @@ export function run(argv) {
   }
   if (cmd === 'phase') {
     return cmdPhase(rest);
+  }
+  if (cmd === 'worktree') {
+    return cmdWorktree(rest);
   }
   return { code: 1, out: '', err: `bee: unknown command '${cmd}'\n\n` + USAGE };
 }
@@ -4042,7 +4049,7 @@ function phaseFindPlan(root, n) {
 }
 
 // The worktree holding <branch> checked out (null when none) —
-// the same porcelain walk worktree.sh uses.
+// the same porcelain walk `bee worktree` uses.
 function phaseWorktreeOf(root, branch) {
   const r = phaseGit(root, ['worktree', 'list', '--porcelain']);
   if (r.status !== 0) return null;
@@ -4495,6 +4502,240 @@ function phaseClose(args) {
     out.push('6 · push · origin main · pushed\n');
   }
   return { code: 0, out: out.join(''), err: '' };
+}
+
+// ---- worktree (P6 Task 5 — task-tier worktree helper, ADR-012) ----
+
+const WORKTREE_USAGE = `bee worktree — task-tier worktree helper (ADR-012: task branch mechanics)
+
+usage: bee worktree create <phase>-<slug>
+       bee worktree merge <slug>
+       bee worktree abandon <slug>
+
+  create <phase>-<slug>  branch task/<phase>-<slug> + worktree
+                         <root-parent>/$(basename <root>)-task-<slug> at HEAD
+  merge <slug>           resolve unique task/*-<slug>, merge into current
+                         phase/<n>; remove worktree first, delete branch second
+  abandon <slug>         resolve unique task/*-<slug>; remove worktree, then
+                         delete branch (git branch -d — merged only)
+
+Repo context resolves from the CURRENT DIRECTORY, never from the
+harness checkout; git ops run in cwd.
+`;
+
+// git in the caller's cwd — the helper's repo context is always
+// process.cwd(), never REPO_ROOT (ADR-012).
+function worktreeGit(args) {
+  return spawnSync('git', args, { cwd: process.cwd(), encoding: 'utf8' });
+}
+
+// Chatter discipline inherited from the script: git's stdout and
+// stderr ride the caller's stderr; callers read status only.
+function worktreeChatter(r) {
+  return (r.stdout ?? '') + (r.stderr ?? '');
+}
+
+// Repo root from cwd: dirname of the absolute git-common-dir —
+// stable across main checkout, phase worktree, and test sandboxes.
+function worktreeRepoRoot() {
+  const r = worktreeGit(['rev-parse', '--path-format=absolute',
+    '--git-common-dir']);
+  if (r.status !== 0) {
+    return { err: 'bee worktree: not a git repository (or any parent): ' +
+      `${process.cwd()}\n`, code: 1 };
+  }
+  return { root: path.dirname(r.stdout.trim()) };
+}
+
+// A slug may not contain '/' or ref-invalid characters (usage, exit
+// 1). Validation is delegated to git itself via check-ref-format.
+// Returns the error message or null.
+function worktreeCheckSlug(arg) {
+  if (arg.includes('/')) {
+    return `bee worktree: '${arg}': '/' not allowed in a slug\n`;
+  }
+  if (worktreeGit(['check-ref-format', '--branch', `task/x-${arg}`]).status !== 0) {
+    return `bee worktree: '${arg}': ref-invalid characters\n`;
+  }
+  return null;
+}
+
+// Exit 2 unless the current checkout is on a phase/<n> branch; on
+// success the branch name rides .branch.
+function worktreePhaseBranch() {
+  const r = worktreeGit(['branch', '--show-current']);
+  const cur = (r.stdout ?? '').trim();
+  if (!/^phase\/[0-9]+$/.test(cur)) {
+    return { err: `bee worktree: not on a phase branch (current: ` +
+      `${cur || 'detached HEAD'})\n`, code: 2 };
+  }
+  return { branch: cur };
+}
+
+// Resolve <slug> to the unique branch matching task/*-<slug>; rides
+// .branch. 0 or 2+ matches: exit 4 (candidates listed when 2+).
+function worktreeResolve(slug) {
+  const r = worktreeGit(['for-each-ref', '--format=%(refname:short)',
+    'refs/heads/task/']);
+  const matches = (r.stdout ?? '').split('\n').filter(Boolean)
+    .filter((b) => b.startsWith('task/') && b.endsWith('-' + slug));
+  if (matches.length === 1) return { branch: matches[0] };
+  if (matches.length === 0) {
+    return { err: `bee worktree: no branch matches task/*-${slug}\n`,
+      code: 4 };
+  }
+  return {
+    err: `bee worktree: ambiguous slug '${slug}' — matches:\n` +
+      matches.map((b) => `  ${b}\n`).join(''),
+    code: 4,
+  };
+}
+
+// The worktree holding <branch> checked out (null when none) —
+// robust to worktrees created by any means.
+function worktreeOfBranch(branch) {
+  const r = worktreeGit(['worktree', 'list', '--porcelain']);
+  if (r.status !== 0) return null;
+  let wt = null;
+  for (const line of r.stdout.split('\n')) {
+    if (line.startsWith('worktree ')) wt = line.slice(9);
+    else if (line.startsWith(`branch refs/heads/${branch}`)) return wt;
+  }
+  return null;
+}
+
+function worktreeCreate(arg) {
+  const slugErr = worktreeCheckSlug(arg);
+  if (slugErr !== null) {
+    return { code: 1, out: '', err: slugErr + WORKTREE_USAGE };
+  }
+  if (!arg.includes('-')) {
+    return { code: 1, out: '', err:
+      "bee worktree: create takes <phase>-<slug> (phase separator '-' " +
+      `missing)\n` + WORKTREE_USAGE };
+  }
+  const pb = worktreePhaseBranch();
+  if (pb.err) return { code: pb.code, out: '', err: pb.err };
+  const rr = worktreeRepoRoot();
+  if (rr.err) return { code: rr.code, out: '', err: rr.err };
+  const parent = path.dirname(rr.root);
+  const base = path.basename(rr.root);
+  const branch = `task/${arg}`;
+  const wt = path.join(parent, `${base}-task-${arg.slice(arg.indexOf('-') + 1)}`);
+  if (worktreeGit(['show-ref', '--verify', '--quiet',
+    `refs/heads/${branch}`]).status === 0) {
+    return { code: 3, out: '', err: `bee worktree: branch ${branch} already exists\n` };
+  }
+  if (fs.existsSync(wt)) {
+    return { code: 3, out: '',
+      err: `bee worktree: worktree path already exists: ${wt}\n` };
+  }
+  // One step: branch + worktree. Git's chatter rides stderr so
+  // stdout carries only the worktree path.
+  const add = worktreeGit(['worktree', 'add', '-b', branch, wt]);
+  if (add.status !== 0) {
+    return { code: add.status, out: '', err: worktreeChatter(add) };
+  }
+  return { code: 0, out: wt + '\n', err: worktreeChatter(add) };
+}
+
+function worktreeMerge(slug) {
+  const slugErr = worktreeCheckSlug(slug);
+  if (slugErr !== null) {
+    return { code: 1, out: '', err: slugErr + WORKTREE_USAGE };
+  }
+  const rv = worktreeResolve(slug);
+  if (rv.err) return { code: rv.code, out: '', err: rv.err };
+  const branch = rv.branch;
+  const pb = worktreePhaseBranch();
+  if (pb.err) return { code: pb.code, out: '', err: pb.err };
+  const cur = pb.branch;
+  const merge = worktreeGit(['merge', branch]);
+  if (merge.status !== 0) {
+    return { code: merge.status, out: '', err: worktreeChatter(merge) };
+  }
+  let err = worktreeChatter(merge);
+  const wt = worktreeOfBranch(branch);
+  if (wt !== null) {
+    // Worktree first (a branch checked out in a worktree cannot be
+    // deleted first); dirty worktrees fail here with git's message.
+    const rm = worktreeGit(['worktree', 'remove', wt]);
+    err += worktreeChatter(rm);
+    if (rm.status !== 0) return { code: rm.status, out: '', err };
+  } else {
+    err += `bee worktree: no worktree registered for ${branch} ` +
+      `(nothing to remove)\n`;
+  }
+  const del = worktreeGit(['branch', '-d', branch]);
+  err += worktreeChatter(del);
+  if (del.status !== 0) {
+    if (wt !== null) {
+      err += `bee worktree: worktree ${wt} removed but branch ${branch} ` +
+        `remains\n`;
+    }
+    return { code: del.status, out: '', err };
+  }
+  let out = `merged ${branch} into ${cur}\n`;
+  if (wt !== null) out += `removed worktree ${wt}\n`;
+  out += `deleted branch ${branch}\n`;
+  return { code: 0, out, err };
+}
+
+function worktreeAbandon(slug) {
+  const slugErr = worktreeCheckSlug(slug);
+  if (slugErr !== null) {
+    return { code: 1, out: '', err: slugErr + WORKTREE_USAGE };
+  }
+  const rv = worktreeResolve(slug);
+  if (rv.err) return { code: rv.code, out: '', err: rv.err };
+  const branch = rv.branch;
+  // No phase-branch requirement: abandon operates on named refs from
+  // any checkout (task reset is PO's call anywhere, ADR-012).
+  const wt = worktreeOfBranch(branch);
+  let err = '';
+  if (wt !== null) {
+    const rm = worktreeGit(['worktree', 'remove', wt]);
+    err += worktreeChatter(rm);
+    if (rm.status !== 0) return { code: rm.status, out: '', err };
+  } else {
+    err += `bee worktree: no worktree registered for ${branch} ` +
+      `(nothing to remove)\n`;
+  }
+  const del = worktreeGit(['branch', '-d', branch]);
+  err += worktreeChatter(del);
+  if (del.status !== 0) {
+    if (wt !== null) {
+      err += `bee worktree: worktree ${wt} removed but branch ${branch} ` +
+        `still present\n`;
+    }
+    err += `bee worktree: branch ${branch} is not fully merged; run ` +
+      `'git branch -D ${branch}' if that is really intended\n`;
+    return { code: 5, out: '', err };
+  }
+  let out = '';
+  if (wt !== null) out += `removed worktree ${wt}\n`;
+  out += `deleted branch ${branch}\n`;
+  return { code: 0, out, err };
+}
+
+function cmdWorktree(rest) {
+  const [cmd] = rest;
+  if (cmd === 'help') return { code: 0, out: WORKTREE_USAGE, err: '' };
+  if (cmd === undefined) {
+    return { code: 1, out: '', err: WORKTREE_USAGE };
+  }
+  if (cmd !== 'create' && cmd !== 'merge' && cmd !== 'abandon') {
+    return { code: 1, out: '',
+      err: `bee worktree: unknown subcommand: ${cmd}\n` + WORKTREE_USAGE };
+  }
+  if (rest.length !== 2) {
+    return { code: 1, out: '',
+      err: `bee worktree: ${cmd} takes exactly one argument\n` +
+        WORKTREE_USAGE };
+  }
+  if (cmd === 'create') return worktreeCreate(rest[1]);
+  if (cmd === 'merge') return worktreeMerge(rest[1]);
+  return worktreeAbandon(rest[1]);
 }
 
 if (process.argv[1] &&

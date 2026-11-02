@@ -1,8 +1,10 @@
-// worktree-sh.test.mjs — suite wrapper for scripts/worktree.sh.
-// Each test builds a sandbox git repo in a mkdtemp dir and invokes
-// the real script by absolute path with cwd = sandbox. Derived
-// worktrees land OUTSIDE the sandbox (<sandbox-parent>/$(basename
-// <sandbox>)-task-<slug>) and are cleaned up per case.
+// bee-worktree.test.mjs — suite for `bee worktree` (P6 Task 5). Each
+// test builds a sandbox git repo in a mkdtemp dir and runs bee IN-PROCESS
+// with cwd parked in the sandbox (chdir in, restore after — the
+// command reads its repo context from process.cwd(), never from the
+// harness checkout). Derived worktrees land OUTSIDE the sandbox
+// (<sandbox-parent>/$(basename <sandbox>)-task-<slug>) and are cleaned
+// up per case.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFile } from 'node:child_process';
@@ -10,14 +12,12 @@ import { promisify } from 'node:util';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { run } from '../bin/bee.js';
 
 const exec = promisify(execFile);
-const SCRIPT = path.resolve(path.dirname(fileURLToPath(import.meta.url)),
-  '..', 'scripts', 'worktree.sh');
 
 async function sandbox() {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-tasksh-'));
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-beewt-'));
   const git = (...args) => exec('git', args, { cwd: dir });
   await git('init', '-b', 'main');
   await git('config', 'user.email', 'test@example.com');
@@ -37,134 +37,129 @@ async function sandbox() {
   return { dir, git, wtPath, cleanup };
 }
 
-// Run the script; never throws — captures exit code and streams.
-const task = (dir, ...args) =>
-  exec(SCRIPT, args, { cwd: dir }).then(
-    ({ stdout, stderr }) => ({ code: 0, stdout, stderr }),
-    (e) => ({ code: e.code, stdout: e.stdout ?? '', stderr: e.stderr ?? '' }));
+// Run `bee worktree` in-process (cwd must already sit in the sandbox);
+// returns the run() result { code, out, err } — never throws.
+const task = (...args) => run(['worktree', ...args]);
+
+// Park cwd in the sandbox for the body, restore it (and clean up)
+// after — bee's repo context is process.cwd().
+async function inSandbox(s, body) {
+  const prev = process.cwd();
+  process.chdir(s.dir);
+  try {
+    await body();
+  } finally {
+    process.chdir(prev);
+    s.cleanup();
+  }
+}
 
 // Commit inside a worktree (identity is shared via the common config).
 const gitIn = (wt, ...args) => exec('git', args, { cwd: wt });
 
 test('create: branch + worktree exist, prints path, exit 0', async () => {
   const s = await sandbox();
-  try {
+  await inSandbox(s, async () => {
     const wt = s.wtPath('alpha');
-    const r = await task(s.dir, 'create', '9-alpha');
+    const r = task('create', '9-alpha');
     assert.equal(r.code, 0);
-    assert.equal(r.stdout.trim(), wt);
+    assert.equal(r.out.trim(), wt);
     assert.ok(fs.existsSync(wt));
     const branches = (await s.git('branch', '--list', 'task/9-alpha')).stdout;
     assert.ok(branches.includes('task/9-alpha'));
-  } finally {
-    s.cleanup();
-  }
+  });
 });
 
 test('merge: branch merged into phase/9, worktree + branch gone',
   async () => {
     const s = await sandbox();
-    try {
+    await inSandbox(s, async () => {
       const wt = s.wtPath('alpha');
-      await task(s.dir, 'create', '9-alpha');
+      task('create', '9-alpha');
       fs.writeFileSync(path.join(wt, 'work.txt'), 'task work\n');
       await gitIn(wt, 'add', '.');
       await gitIn(wt, 'commit', '-m', 'task work');
-      const r = await task(s.dir, 'merge', 'alpha');
+      const r = task('merge', 'alpha');
       assert.equal(r.code, 0);
-      assert.match(r.stdout, /merged task\/9-alpha into phase\/9/);
-      assert.match(r.stdout, /removed worktree/);
+      assert.match(r.out, /merged task\/9-alpha into phase\/9/);
+      assert.match(r.out, /removed worktree/);
       assert.ok(!fs.existsSync(wt));
       const branches = (await s.git('branch', '--list', 'task/9-alpha')).stdout;
       assert.equal(branches.trim(), '');
       const subject = (await s.git('log', '-1', '--format=%s')).stdout.trim();
       assert.equal(subject, 'task work');
-    } finally {
-      s.cleanup();
-    }
+    });
   });
 
 test('abandon: unmerged branch with a commit -> exit 5, branch kept',
   async () => {
     const s = await sandbox();
-    try {
+    await inSandbox(s, async () => {
       const wt = s.wtPath('alpha');
-      await task(s.dir, 'create', '9-alpha');
+      task('create', '9-alpha');
       fs.writeFileSync(path.join(wt, 'work.txt'), 'task work\n');
       await gitIn(wt, 'add', '.');
       await gitIn(wt, 'commit', '-m', 'task work');
-      const r = await task(s.dir, 'abandon', 'alpha');
+      const r = task('abandon', 'alpha');
       assert.equal(r.code, 5);
-      assert.match(r.stderr, /git branch -D task\/9-alpha/);
+      assert.match(r.err, /git branch -D task\/9-alpha/);
       const branches = (await s.git('branch', '--list', 'task/9-alpha')).stdout;
       assert.ok(branches.includes('task/9-alpha'));
       assert.ok(!fs.existsSync(wt)); // worktree removed, branch kept
-    } finally {
-      s.cleanup();
-    }
+    });
   });
 
 test('abandon: empty task branch -> clean removal, exit 0', async () => {
   const s = await sandbox();
-  try {
+  await inSandbox(s, async () => {
     const wt = s.wtPath('beta');
-    await task(s.dir, 'create', '9-beta');
-    const r = await task(s.dir, 'abandon', 'beta');
+    task('create', '9-beta');
+    const r = task('abandon', 'beta');
     assert.equal(r.code, 0);
     assert.ok(!fs.existsSync(wt));
     const branches = (await s.git('branch', '--list', 'task/9-beta')).stdout;
     assert.equal(branches.trim(), '');
-  } finally {
-    s.cleanup();
-  }
+  });
 });
 
 test('create: off a non-phase branch -> exit 2', async () => {
   const s = await sandbox();
-  try {
+  await inSandbox(s, async () => {
     await s.git('checkout', 'main');
-    const r = await task(s.dir, 'create', '9-alpha');
+    const r = task('create', '9-alpha');
     assert.equal(r.code, 2);
-    assert.match(r.stderr, /not on a phase branch/);
-  } finally {
-    s.cleanup();
-  }
+    assert.match(r.err, /not on a phase branch/);
+  });
 });
 
 test('create: existing branch name -> exit 3', async () => {
   const s = await sandbox();
-  try {
+  await inSandbox(s, async () => {
     await s.git('branch', 'task/9-alpha'); // raw precondition
-    const r = await task(s.dir, 'create', '9-alpha');
+    const r = task('create', '9-alpha');
     assert.equal(r.code, 3);
-    assert.match(r.stderr, /already exists/);
-  } finally {
-    s.cleanup();
-  }
+    assert.match(r.err, /already exists/);
+  });
 });
 
 test('merge: ambiguous slug (two phases, same slug) -> exit 4', async () => {
   const s = await sandbox();
-  try {
+  await inSandbox(s, async () => {
     await s.git('branch', 'task/8-alpha'); // other phase, same slug
-    await task(s.dir, 'create', '9-alpha');
-    const r = await task(s.dir, 'merge', 'alpha');
+    task('create', '9-alpha');
+    const r = task('merge', 'alpha');
     assert.equal(r.code, 4);
-    assert.match(r.stderr, /ambiguous/);
-    assert.match(r.stderr, /task\/8-alpha/);
-    assert.match(r.stderr, /task\/9-alpha/);
-  } finally {
-    s.cleanup();
-  }
+    assert.match(r.err, /ambiguous/);
+    assert.match(r.err, /task\/8-alpha/);
+    assert.match(r.err, /task\/9-alpha/);
+  });
 });
 
 test('unknown subcommand -> exit 1, usage on stderr', async () => {
   const s = await sandbox();
-  try {
-    const r = await task(s.dir, 'frobnicate', 'x');
+  await inSandbox(s, async () => {
+    const r = task('frobnicate', 'x');
     assert.equal(r.code, 1);
-    assert.match(r.stderr, /usage:/);
-  } finally {
-    s.cleanup();
-  }
+    assert.match(r.err, /usage:/);
+  });
 });
