@@ -1,6 +1,6 @@
 // bee logbook — stamp + index + compact battery (P5 Tasks 2–3).
 // Every run goes through tmp-dir --logbook fixtures (git
-// sandboxes for the date/hash sources, tests/worktree-sh.test.mjs
+// sandboxes for the date/hash sources, tests/bee-worktree.test.mjs
 // patterns); nothing touches the live .hivemind/logbook.
 
 import { test } from 'node:test';
