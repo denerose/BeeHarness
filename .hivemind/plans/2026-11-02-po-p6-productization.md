@@ -44,7 +44,7 @@ checks:
   - id: task-5
     cmd: node --test tests/bee-worktree.test.mjs
     expect: exit 0
-    files: [bin/bee.js, tests/bee-worktree.test.mjs, tests/worktree-sh.test.mjs, scripts/worktree.sh, skills/loop/bee-loop/assets/dispatch-brief-template.md]
+    files: [bin/bee.js, tests/bee-worktree.test.mjs, skills/loop/bee-loop/assets/dispatch-brief-template.md]
   - id: task-6
     cmd: node --test tests/bee-init.test.mjs tests/bee-machine.test.mjs tests/bee-suggest.test.mjs tests/bee-worktree.test.mjs tests/bee-agents.test.mjs
     expect: exit 0
@@ -725,12 +725,14 @@ test('empty text: structured error, exit 1', () => {
   "the same porcelain walk `bee worktree` uses"; (c) the header
   comment in `tests/bee-logbook.test.mjs` citing
   `tests/worktree-sh.test.mjs patterns` — reword to
-  `tests/bee-worktree.test.mjs patterns`. Then verify no live
-  references remain:
+  `tests/bee-worktree.test.mjs patterns`. Then verify:
   `grep -rn "worktree.sh" skills/ roles/ docs/ README.md AGENTS.md SOUL.md scripts/ bin/ tests/` →
-  zero hits (records under `.hivemind/plans|logbook|sessions` keep the
-  old name as history; `.pi/handoff-*` is an ephemeral crash-brief
-  replaced at the next handoff write — out of scope).
+  exactly ONE hit: `tests/fixtures/parking-lot-v1.md` — a historical
+  fixture (the v1 parking-lot snapshot; its PL-PO-002 entry quotes the
+  old script as a record). Fixture data stays as written — carve-out,
+  review r2 J2. (Records under `.hivemind/plans|logbook|sessions` keep
+  the old name as history; `.pi/handoff-*` is an ephemeral crash-brief
+  replaced at the next handoff write — out of scope.)
 - [ ] Step: run `node --test tests/bee-worktree.test.mjs` — all pass;
   full suite still green (`node --test tests/*.test.mjs`).
 - [ ] Commit: `bee worktree: fold helper script into CLI`
@@ -823,10 +825,12 @@ to the main worktree — branch there, then re-run.
   with `.hivemind/config.toon` (same line style, space-separated).
 - [ ] Step: dogfood on the harness repo itself: run
   `node bin/bee.js init --check` — expect: skills registered ✓,
-  registry drift line, scaffold `exists:` everywhere, `harness repo —
-  scaffolding + managed block skipped`. Then the write run:
-  `node bin/bee.js init` — expect the machine-store registration line
-  for this repo. Create `.hivemind/config.toon` BY HAND from the run's
+  machine store: not registered (the first check runs BEFORE the first
+  real-machine write), and `harness repo — scaffolding + managed block
+  skipped` (no per-item scaffold lines — the skip rule replaces them,
+  review r2 J3). Then the write run: `node bin/bee.js init` — expect
+  the machine-store registration line for this repo; a follow-up
+  `--check` now reports the harness in-sync drift line. Create `.hivemind/config.toon` BY HAND from the run's
   check-and-do semantics with the harness-repo level (decision 3):
 
 ```text path=.hivemind/config.toon
