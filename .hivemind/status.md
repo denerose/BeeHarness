@@ -15,14 +15,16 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
-- [PO] 2026-11-02 — P6 KICKOFF IN PROGRESS, PAUSED at card 3
-  (version pins): D1 dissolved by keeper ruling — NO CONSUMERS
-  BEFORE P8 (shipped-file seam moot); D2 ruled — one phase, plan
-  splits into tasks; D3 (version-pins semantics) relayed to PP
-  for a keeper–PP discussion (keeper-passed relay); D4+ held
-  behind the pause. Phase-row drift fixed: designs column now
-  links the real glossary-store.md (command ruled `glossary` over
-  `define` at design time). Resume on the keeper's word.
+- [PO] 2026-11-02 — **P6 KICKOFF COMPLETE** — phase OPEN
+  (row in-progress, owner claimed): D1 dissolved by keeper
+  ruling — NO CONSUMERS BEFORE P8 (shipped-file seam moot);
+  D2 ruled — one phase, plan splits into tasks; D3 ruled via PP
+  relay, verified @ cfb8272 — version pins = registered-commit
+  record + informational drift line on every init run (exit 0),
+  no network fetch, pins ride registry entries; D4 ruled —
+  MINIMAL docs (one adoption doc in docs/ + README pointer).
+  NEXT: bee-plan writes the P6 plan (kickoff rulings in-plan),
+  bee-plan-review gates it, then the loop.
 
 - [PO] 2026-11-02 — **P5 COMPLETE** (merge f0766ee, close via
   `bee phase close 5`): memory/logbook/glossary stores shipped
