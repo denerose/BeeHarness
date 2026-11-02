@@ -38,6 +38,12 @@ resolves them; the keeper may edit freely or just say the word)
   mechanism must escalate bee-related feedback into this repo via
   the already-planned central file location. Related design:
   /home/saphron/BeeHarness/.hivemind/designs/2026-11-01-pp-harness-feedback-channel.md
+- Role-gate lifecycle actions (discuss with PP, keeper thought
+  2026-11-02): PO must NOT be able to edit the phases directly —
+  status changes go through the CLI only (`bee task` state moves,
+  building in P4). More broadly: certain actions across the
+  design > plan > implement lifecycle need role gates. Phases live
+  at /home/saphron/BeeHarness/.hivemind/phases/BeeHarness.md
 
 ## Needs the keeper
 
