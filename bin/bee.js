@@ -29,7 +29,7 @@ const USAGE = `bee ${VERSION} — BeeHarness CLI
 
 usage:
   bee report [--check] [--status <path>] [--report <path>] [--store <path>]
-  bee init   [--check] [--settings <path>] [--machine <dir>]
+  bee init   [--check] [--settings <path>] [--machine <dir>] [--repo <dir>]
   bee inbox  [list [--for <addressee>] [--full]]
              | add <addressee> <text> [--origin <role>] [--ref <path>]
              | show <id> [--full] | done <id> [--note <how>]
@@ -208,10 +208,10 @@ function shortSha(sha) {
 // Runs after the skills-registration step in both modes. Write mode
 // ensures this repo's entry (update-in-place, never a duplicate);
 // check mode reports only. Drift never changes the exit code — only
-// a structured failure (harness commit unread) does.
-function machineStoreReport(machineFlag, check) {
+// a structured failure (harness commit unread) does. Keyed by the
+// resolved consumer repo root (task 2's --repo seam; cwd default).
+function machineStoreReport(machineFlag, check, repo) {
   const dir = machineDirOf(machineFlag);
-  const repo = process.cwd();
   const headR = spawnSync('git', ['rev-parse', 'HEAD'],
     { cwd: REPO_ROOT, encoding: 'utf8' });
   if (headR.status !== 0) {
@@ -245,6 +245,12 @@ function machineStoreReport(machineFlag, check) {
     writeMachineRegistry(dir, next);
     out += `bee init: machine registry: ${machineRegistryPath(dir)} ` +
       `— registered ${repo} @ ${shortSha(head)}\n`;
+    if (prior === undefined) {
+      // A fresh registration is in sync by construction — say so,
+      // so drift reporting doesn't wait for the second run.
+      out += `bee init: harness ${shortSha(head)} · head ` +
+        `${shortSha(head)} · in sync\n`;
+    }
   } else if (prior === undefined) {
     out += `bee init: machine store: not registered ` +
       `(run without --check to add ${repo})\n`;
@@ -252,14 +258,268 @@ function machineStoreReport(machineFlag, check) {
   return { code: 0, out, err: '' };
 }
 
+// ---- consumer repo resolution + scaffold (P6, task 2) ---------------
+// `bee init` consumers are OTHER repos (--repo is the test seam;
+// default cwd). Root resolution is common-dir aware (PL-PO-002):
+// the repo root is the git-common-dir's dirname; a consumer dir not
+// under that root sits in a linked worktree — refuse (respect the
+// branch, not the worktree), exit 0, write nothing. No git at all →
+// green-fields: git init happens in the scaffold step, no first
+// commit (decision 8). Any checkout of the harness itself (same
+// common dir as REPO_ROOT) takes the harness-skip path (decision 2).
+
+function gitCommonDirOf(cwd) {
+  const r = spawnSync('git', ['rev-parse', '--path-format=absolute',
+    '--git-common-dir'], { cwd, encoding: 'utf8' });
+  if (r.error) {
+    return { err: `bee init: cannot run git in ${cwd}: ` +
+      `${r.error.message}\n` };
+  }
+  if (r.status !== 0) {
+    return { notRepo: true };
+  }
+  return { commonDir: r.stdout.trim() };
+}
+
+function consumerRepoRoot(repoFlag) {
+  const dir = repoFlag ? path.resolve(repoFlag) : process.cwd();
+  const consumer = gitCommonDirOf(dir);
+  if (consumer.err) {
+    return { dir, err: consumer.err };
+  }
+  if (consumer.notRepo) {
+    return { dir, root: dir, greenFields: true };
+  }
+  const root = path.dirname(consumer.commonDir);
+  const harness = gitCommonDirOf(REPO_ROOT);
+  if (harness.err) {
+    return { dir, root, err: harness.err };
+  }
+  if (!harness.notRepo && harness.commonDir === consumer.commonDir) {
+    return { dir, root, harness: true };
+  }
+  if (dir !== root && !dir.startsWith(root + path.sep)) {
+    return {
+      dir, root,
+      refuse: `bee init: running inside a worktree — return to the ` +
+        `main worktree (${root}) and branch there, then re-run\n`,
+    };
+  }
+  return { dir, root };
+}
+
+// Consumer-default config (decision 3: safe default L1; this repo's
+// own L0 lives in .hivemind/config.toon, written by hand in task 7).
+const CONSUMER_CONFIG_DEFAULT =
+  '# bee config — automation level + keeper gates; ' +
+  'level changes are keeper-only\n' +
+  'level :: L1\n' +
+  'gates :: SOUL/identity · irreversible acts · direction beyond ' +
+  'the design · config-named items\n';
+
+const CONSUMER_STATUS_SEED =
+  '# Status — cross-role surface\n' +
+  '\n' +
+  'Open escalations, cross-role notes. Roles read at session start;\n' +
+  'prefix your lines with a role tag.\n';
+
+const HIVEMIND_CLASS_DIRS = ['phases', 'designs', 'plans', 'decisions',
+  'logbook', 'memory', 'suggestions', 'sessions'];
+
+// Check-and-do scaffold for the consumer repo. One line per item —
+// exists:/scaffolded (write mode), exists:/would scaffold (--check,
+// which writes nothing). The harness-repo skip replaces every
+// per-item line (decision 2; registry + drift already ran above).
+function scaffoldReport(consumer, check) {
+  if (consumer.harness) {
+    return { code: 0,
+      out: 'bee init: harness repo — scaffolding + managed block ' +
+        'skipped\n',
+      err: '' };
+  }
+  // Pre-flight the harness sources this scaffold copies from — a
+  // broken harness fails loud before any item write, never
+  // half-scaffolded.
+  const phasesSrc = path.join(REPO_ROOT, '.hivemind', 'phases',
+    'TEMPLATE.md');
+  const designsSrc = path.join(REPO_ROOT, '.hivemind', 'designs',
+    'TEMPLATE.md');
+  const rolesSrc = path.join(REPO_ROOT, 'roles');
+  for (const src of [phasesSrc, designsSrc]) {
+    if (!fs.existsSync(src)) {
+      return { code: 1, out: '',
+        err: `bee init: harness template missing: ${src}\n` };
+    }
+  }
+  if (!fs.existsSync(rolesSrc)) {
+    return { code: 1, out: '',
+      err: `bee init: harness roles directory missing: ${rolesSrc}\n` };
+  }
+
+  const repoRoot = consumer.root;
+  const lines = [];
+  let touched = false;
+  const step = (rel, present, write) => {
+    if (present) {
+      lines.push(`exists: ${rel}`);
+      return;
+    }
+    if (check) {
+      lines.push(`would scaffold ${rel}`);
+      return;
+    }
+    write();
+    touched = true;
+    lines.push(`scaffolded ${rel}`);
+  };
+
+  // Green-fields: git init, no first commit (decision 8) — the
+  // next-step line below suggests it.
+  if (consumer.greenFields) {
+    if (check) {
+      lines.push(`bee init: would create git repository at ${repoRoot}`);
+    } else {
+      const r = spawnSync('git', ['init'],
+        { cwd: repoRoot, encoding: 'utf8' });
+      if (r.error) {
+        return { code: 1, out: '',
+          err: `bee init: cannot run git in ${repoRoot}: ` +
+            `${r.error.message}\n` };
+      }
+      if (r.status !== 0) {
+        return { code: 1, out: '',
+          err: `bee init: git init failed in ${repoRoot}: ` +
+            `${(r.stderr || '').trim()}\n` };
+      }
+      touched = true;
+      lines.push(`bee init: created git repository at ${repoRoot}`);
+    }
+  }
+
+  // 1. docs/ + docs/research/ (references-home): an existing docs/
+  //    keeps its shape and gains research/; a missing one ships with
+  //    a .gitkeep (an empty dir alone does not survive git).
+  const docsDir = path.join(repoRoot, 'docs');
+  if (fs.existsSync(docsDir)) {
+    const research = path.join(docsDir, 'research');
+    step('docs/research', fs.existsSync(research), () => {
+      fs.mkdirSync(research, { recursive: true });
+    });
+  } else {
+    step('docs', false, () => {
+      fs.mkdirSync(docsDir, { recursive: true });
+      atomicWrite(path.join(docsDir, '.gitkeep'), '');
+    });
+  }
+
+  // 2. .hivemind class dirs.
+  for (const d of HIVEMIND_CLASS_DIRS) {
+    const dir = path.join(repoRoot, '.hivemind', d);
+    step(`.hivemind/${d}`, fs.existsSync(dir), () => {
+      fs.mkdirSync(dir, { recursive: true });
+    });
+  }
+
+  // 3. Phase/design templates, verbatim from the harness repo.
+  step('.hivemind/phases/TEMPLATE.md',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'phases',
+      'TEMPLATE.md')),
+    () => fs.copyFileSync(phasesSrc,
+      path.join(repoRoot, '.hivemind', 'phases', 'TEMPLATE.md')));
+  step('.hivemind/designs/TEMPLATE.md',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'designs',
+      'TEMPLATE.md')),
+    () => fs.copyFileSync(designsSrc,
+      path.join(repoRoot, '.hivemind', 'designs', 'TEMPLATE.md')));
+
+  // 4. Phase list for THIS project: the phases template verbatim.
+  const project = path.basename(repoRoot);
+  step(`.hivemind/phases/${project}.md`,
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'phases',
+      `${project}.md`)),
+    () => fs.copyFileSync(phasesSrc,
+      path.join(repoRoot, '.hivemind', 'phases', `${project}.md`)));
+
+  // 5–8. Born-at-init stores + surfaces. The store seeds use the
+  // same canonical headers the CLI's own writers emit, so a seed
+  // header is never replaced at the first add (review r1 J4).
+  step('.hivemind/inbox.toon',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'inbox.toon')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'inbox.toon'),
+      INBOX_HEADER + '\n'));
+  step('.hivemind/glossary.toon',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'glossary.toon')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'glossary.toon'),
+      GLOSSARY_HEADER + '\n'));
+  step('.hivemind/status.md',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'status.md')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'status.md'),
+      CONSUMER_STATUS_SEED));
+  step('.hivemind/config.toon',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'config.toon')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'config.toon'),
+      CONSUMER_CONFIG_DEFAULT));
+
+  // 9. Role files, as-is (D1 — no consumers before P8; P8 sweeps).
+  if (!check) {
+    fs.mkdirSync(path.join(repoRoot, 'roles'), { recursive: true });
+  }
+  for (const name of fs.readdirSync(rolesSrc)
+    .filter((n) => n.endsWith('.md')).sort()) {
+    step(`roles/${name}`,
+      fs.existsSync(path.join(repoRoot, 'roles', name)),
+      () => fs.copyFileSync(path.join(rolesSrc, name),
+        path.join(repoRoot, 'roles', name)));
+  }
+
+  // 10. .gitignore carries the sessions line (create or append).
+  const gitignore = path.join(repoRoot, '.gitignore');
+  const SESSIONS_LINE = '.hivemind/sessions/';
+  const hasSessionsLine = () => {
+    try {
+      return fs.readFileSync(gitignore, 'utf8').split('\n')
+        .includes(SESSIONS_LINE);
+    } catch (e) {
+      if (e.code === 'ENOENT') return false;
+      throw e;
+    }
+  };
+  step('.gitignore', hasSessionsLine(), () => {
+    if (fs.existsSync(gitignore)) {
+      const text = fs.readFileSync(gitignore, 'utf8');
+      fs.appendFileSync(gitignore,
+        (text.endsWith('\n') || text === '' ? '' : '\n') +
+        SESSIONS_LINE + '\n');
+    } else {
+      atomicWrite(gitignore, SESSIONS_LINE + '\n');
+    }
+  });
+
+  if (touched) {
+    lines.push('bee init: next — commit the scaffold ' +
+      '(git add -A && git commit -m "bee init")');
+  }
+  return { code: 0, out: lines.map((l) => l + '\n').join(''), err: '' };
+}
+
 function cmdInit(rest) {
   const f = flags(rest, {
     check: { type: 'boolean' },
     settings: { type: 'string' },
     machine: { type: 'string' },
+    repo: { type: 'string' },
   });
   if (f.error) {
     return { code: 1, out: '', err: String(f.error) + '\n' };
+  }
+  // Consumer repo resolution precedes every writing step: a linked
+  // worktree refuses (exit 0, nothing written — PL-PO-002).
+  const consumer = consumerRepoRoot(f.values.repo);
+  if (consumer.err) {
+    return { code: 1, out: '', err: consumer.err };
+  }
+  if (consumer.refuse) {
+    return { code: 0, out: consumer.refuse, err: '' };
   }
   const settingsPath = f.values.settings
     ? path.resolve(f.values.settings)
@@ -318,14 +578,22 @@ function cmdInit(rest) {
   // Machine store runs after the skills step in both modes; drift
   // never changes the exit code (D3).
   const machine = machineStoreReport(f.values.machine,
-    !!f.values.check);
+    !!f.values.check, consumer.root);
   if (machine.code === 1) {
+    code = 1;
+  }
+
+  // Scaffold (or the harness-repo skip) runs last in both modes;
+  // --check reports without writing. Task 3's managed block hooks
+  // in after scaffold item 10.
+  const scaffold = scaffoldReport(consumer, !!f.values.check);
+  if (scaffold.code === 1) {
     code = 1;
   }
   return {
     code,
-    out: out + machine.out,
-    err: err + machine.err,
+    out: out + machine.out + scaffold.out,
+    err: err + machine.err + scaffold.err,
   };
 }
 
