@@ -175,6 +175,14 @@ suggestion file carries its Outcome pointing here):**
     claim unverified and the reviewer burned a finding disproving
     it. Brief-template line + review-brief convention. File:
     `planned/2026-11-02-po-relayed-claims-verified.md`.
+27. Project-update skill (session kit, keeper-directed design
+    2026-11-02): one skill, three altitudes — design (compare
+    against the target state), execution (on-track against
+    phases/tasks/goals), keeper digest (light). Shared lean
+    gather: `bee design status` + phase list + `bee task show` +
+    inbox/park counts. One new mechanic: a Target-state section in
+    the governing design doc (PP-maintained, keeper-approved).
+    Design: `designs/2026-11-02-pp-project-update-skill.md`.
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a
