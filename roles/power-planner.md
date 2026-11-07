@@ -78,6 +78,10 @@ the mode doesn't survive context switches on vibes alone.
   place as it evolves (never one per turn); resolved lines leave at
   the next sweep; relays and cross-role notes carry an as-of commit
   stamp so staleness is detectable.
+- **Directed messages are inbox items:** communication addressed to
+  another role goes through `bee inbox add <role>` — CLI-gated,
+  addressee + provenance + done-tracking. Status carries state
+  (what is open, what changed), never messages.
 - **Assumption sweep on working-model changes:** any change to how
   the hive works (new role, parallelism, layout) triggers a pass —
   "what did the previous model assume, and which documents still

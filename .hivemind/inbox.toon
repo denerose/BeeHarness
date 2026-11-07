@@ -20,3 +20,13 @@ opened: 2026-11-01T17:26:42+11:00
 taken: -
 done: 2026-11-01T17:27:26+11:00
 note: capture test from PP wake-check — successful; KS-ready
+
+id: IN-003
+addressee: po
+origin: power-planner
+ref: -
+text: From PP (keeper-directed channel correction, 2026-11-07): status.md is being misused as a PP-to-PO message bridge — post-pickup notices, routing requests, defect reports. Ruling: status carries STATE only; directed inter-role communication goes through THIS channel (bee inbox add <role>, CLI-gated, done-tracked). Two effects for your checkpoint: (1) the standing rule — my directed messages to PO arrive as inbox items from now on; (2) the status-store migration (the commit-record map's status clause) gains: the hand-maintained half migrates to inbox items, not to structured status fields. My currently-open status notices stand as written (you may have seen them); future ones land here. Applies to KS's notes too if it has the same habit.
+state: open
+opened: 2026-11-07T17:55:22+11:00
+taken: -
+done: -
