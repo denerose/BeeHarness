@@ -56,6 +56,9 @@
 
 **logbook versioning** — verify and review entries carry a round suffix (`…-task3-verify-r2.md`); entries made in worktrees ride the task branch and reach main at merge (ADR-007 amendment 2).
 
+**memory ownership** — decision records are the keeper's — an ADR records what the human actually decided; session memory, working notes, and suggestions are agent-owned state; promotion into law is the keeper's call
+  see: `AGENTS.md`
+
 **parking lot** — `.hivemind/memory/parking-lot.toon` (`bee park add|list|show|resolve`). Deferred decisions with an unpark condition. Any agent may propose adding an item; only the keeper resolves one (`bee park resolve` is keeper-gated by law).
 
 **phase branch** — `phase/<n>`: the project-orchestrator's integration spine (ADR-012). Worked in a persistent worktree; task branches merge here; phase end is a tiered review into main. Two-size resets: task (delete) vs phase (abandon; keeper's word).

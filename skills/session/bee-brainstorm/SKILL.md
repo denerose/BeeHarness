@@ -38,9 +38,11 @@ Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) f
    Reacting beats interrogating. Drafting sections to react to is
    always fine; what you may not do is finalize a design doc without
    the keeper approving each section.
-4. **Record decisions as ADRs** (global `adr` skill) as they are agreed.
-   Every decision worth remembering gets an ADR. Don't batch them to the
-   end.
+4. **Record keeper decisions as ADRs** (global `adr` skill) as they are
+   agreed — a decision is what the keeper decided, not what the
+   conversation concluded; when unsure, offer first (GLOSSARY: memory
+   ownership). Every decision worth remembering gets an ADR. Don't batch
+   them to the end.
 5. **Write a design doc only if one design will guide several plans**
    (template in `assets/design-doc-template.md`). Design docs are
    written together with the keeper, section by section. Never write one
