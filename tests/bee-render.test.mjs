@@ -417,6 +417,123 @@ Protocol line.
   assert.equal(hits, 1); // old zone line matched the store ask, dropped
 });
 
+// ---------- P8 item 24 pins (check-then-apply, D12) ----------
+
+// 24a: two asks differing only in tail wrappers — the store-derived
+// `[PO] <date> — confirm X (IN-001 · /abs/ref)` and an old-zone
+// `confirm X · ref: .hivemind/status.md` — are ONE ask; the merge
+// must never carry both.
+test('report: tail-wrapper variants of one ask never duplicate (item 24a)', () => {
+  const dir = tmpDir();
+  const st = writeHandStatus(dir, '.hivemind/status.md');
+  const store = path.join(dir, 'inbox.toon');
+  seedStore(store, [
+    { text: 'confirm the staging gate', opened: daysAgoIso(2),
+      origin: 'po', ref: '.hivemind/status.md' },
+  ]);
+  const rp = path.join(dir, '.hivemind', 'keeper-report.md');
+  fs.mkdirSync(path.dirname(rp), { recursive: true });
+  fs.writeFileSync(rp, `# Keeper report (fixture)
+
+**Generated:** 2026-11-01 by hand · **Source:** \`.hivemind/status.md\`
+
+Protocol line.
+
+## Keeper's list
+
+- keep me.
+
+## Needs the keeper
+
+1. confirm the staging gate · ref: .hivemind/status.md
+
+## Changed since last report
+
+- change.
+
+## Worth a sample
+
+- sample.
+`);
+  const r = run(['report', '--status', st, '--report', rp,
+    '--store', store]);
+  assert.equal(r.code, 0, r.err);
+  const zone = fs.readFileSync(rp, 'utf8')
+    .split('## Needs the keeper')[1].split('##')[0];
+  const hits = (zone.match(/confirm the staging gate/g) || []).length;
+  assert.equal(hits, 1); // same ask, one line — not one per wrapper style
+});
+
+// 24b: a status whose Awaiting-keeper section carries fenced render
+// regions — fence markers and the region's view lines never join a
+// derived ask (queueBullets fallback, store absent).
+const FENCED_STATUS = `# Status — fixture
+
+Intro prose.
+
+## Awaiting keeper (rendered from inbox.toon)
+
+- [PP] hand ask, no wrapper
+
+${RENDER_OPEN}
+1 open · oldest 5d
+
+keeper (1 open · oldest 5d):
+- IN-001 · 5d — store ask rendered earlier
+${RENDER_CLOSE}
+
+## Open escalations
+
+- none
+`;
+
+test('report fallback: fenced render regions never leak into ask text (item 24b)', () => {
+  const dir = tmpDir();
+  const st = path.join(dir, 'status.md');
+  fs.writeFileSync(st, FENCED_STATUS);
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const r = run(['report', '--status', st, '--report', rp]); // store absent
+  assert.equal(r.code, 0, r.err);
+  const zone = fs.readFileSync(rp, 'utf8')
+    .split('## Needs the keeper')[1].split('##')[0];
+  // no fence text anywhere in the asks
+  assert.ok(!zone.includes('inbox:render'));
+  assert.ok(!zone.includes('1 open · oldest'));
+  assert.ok(!zone.includes('keeper (1 open'));
+  // the hand ask arrives intact — no view line glued onto it
+  assert.match(zone, /\d+\. \[PP\] hand ask, no wrapper$/m);
+  // the region's bullets ARE asks in the fallback derivation
+  assert.ok(zone.includes('IN-001 · 5d — store ask rendered earlier'));
+});
+
+// 24d: with the store present the header's Source line names the
+// store — fresh and merge-regen forms both end with the true value.
+test('report: Source line stamps the store path, fresh and regen (item 24d)', () => {
+  const dir = tmpDir();
+  const st = writeHandStatus(dir, '.hivemind/status.md');
+  const store = path.join(dir, 'inbox.toon');
+  seedStore(store, [{ text: 'an open ask', opened: daysAgoIso(1) }]);
+  const rp = path.join(dir, 'keeper-report.md');
+  // fresh: no prior report → the FRESH header carries the store source
+  const r1 = run(['report', '--status', st, '--report', rp,
+    '--store', store]);
+  assert.equal(r1.code, 0, r1.err);
+  assert.match(fs.readFileSync(rp, 'utf8'),
+    /\*\*Source:\*\* `\.hivemind\/inbox\.toon`/);
+  // merge regen: an old header claiming status.md must end with the
+  // true source after the replace
+  fs.writeFileSync(rp, fs.readFileSync(rp, 'utf8').replace(
+    /\*\*Generated:\*\*.*$/m,
+    '**Generated:** 2026-11-01 by hand · **Source:** `.hivemind/status.md`'));
+  const r2 = run(['report', '--status', st, '--report', rp,
+    '--store', store]);
+  assert.equal(r2.code, 0, r2.err);
+  const header = fs.readFileSync(rp, 'utf8').split('## ')[0];
+  assert.match(header, /\*\*Source:\*\* `\.hivemind\/inbox\.toon`/);
+  assert.ok(!header.includes('`.hivemind/status.md`'));
+});
+
 // ---------- migration driver (fixture) ----------
 // Drives the dispatcher's live half end-to-end against fixtures:
 // queue bullets → store adds (RESOLVED skipped, re-run deduped) →

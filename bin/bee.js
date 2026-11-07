@@ -833,7 +833,16 @@ function queueBullets(statusText) {
       continue;
     }
     if (!inQueue) continue;
-    if (/^<!--.*-->$/.test(line.trim())) continue; // markers, not asks
+    // Render fences close any open bullet: the region's view lines
+    // (headers, counts) never join an ask (P8 item 24b). Runs before
+    // the generic marker skip — a fence must close, not just skip.
+    const t = line.trim();
+    if (t.startsWith(RENDER_OPEN.slice(0, -4)) ||
+        t.startsWith(RENDER_CLOSE.slice(0, -4))) {
+      if (cur !== null) { bullets.push(cur); cur = null; }
+      continue;
+    }
+    if (/^<!--.*-->$/.test(t)) continue; // markers, not asks
     if (line.startsWith('- ')) {
       if (cur !== null) bullets.push(cur);
       cur = line.slice(2);
@@ -887,6 +896,12 @@ function normItem(s) {
   return s.replace(/^\d+\.\s*/, '')
     .replace(/^\[[^\]]*\]\s*/, '') // leading [role] tag
     .replace(/^\d{4}-\d{2}-\d{2}\s*[—-]?\s*/, '') // leading date
+    // tail wrappers ride the same ask: a trailing (id · ref) group,
+    // a ` · ref: …` pointer, or an `— …` tail — compare on the
+    // core text (P8 item 24a)
+    .replace(/\s*\([^)]*\)$/, '')
+    .replace(/\s+·\s+ref:\s*\S.*$/i, '')
+    .replace(/\s+[—–]\s+\S.*$/, '')
     .replace(/[*_`]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
@@ -1073,7 +1088,9 @@ flags:
   --ref <path>       optional pointer riding the item (default: -)
   --note <how>       how it was resolved (recorded on done)
   --status <path>    status file the render region lives in
-                     (default .hivemind/status.md)
+                     (render default .hivemind/status.md; add/done/
+                     capture accept it to refresh the region in the
+                     same run — else the store-derived default)
   --full             all fields, no truncation
   --check            never write; report what would happen
   --store <path>     internal: store path (default .hivemind/inbox.toon)
@@ -1092,7 +1109,7 @@ outside the region is never touched.
 const CAPTURE_USAGE = `bee capture "<thought>" — quick thought into the keeper's inbox
 (routing stays conversational; this only records the thought)
 
-usage: bee capture "<thought>" [--check] [--store <path>]
+usage: bee capture "<thought>" [--check] [--store <path>] [--status <path>]
 `;
 
 function inboxUsageErr(e) {
@@ -1223,7 +1240,7 @@ function cmdInbox(rest) {
 }
 
 function inboxAddItem({ storePath, addressee, text, origin, ref, check,
-  verb }) {
+  verb, statusFlag }) {
   for (const v of [addressee, text, origin, ref]) {
     if (v !== undefined && v.includes('\n')) {
       return { code: 1, out: '',
@@ -1250,8 +1267,11 @@ function inboxAddItem({ storePath, addressee, text, origin, ref, check,
   }
   const w = writeInbox(storePath, [...r.items, item]);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${id} ${verb} · ${addressee} — bee inbox show ${id}\n`,
-    err: '' };
+  return withRegionRefresh(storePath,
+    statusFlag ? path.resolve(statusFlag) : derivedStatusPath(storePath),
+    { code: 0,
+      out: `${id} ${verb} · ${addressee} — bee inbox show ${id}\n`,
+      err: '' });
 }
 
 function inboxAdd(args) {
@@ -1260,6 +1280,7 @@ function inboxAdd(args) {
     ref: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return inboxUsageErr(f.error);
   const pos = f.positionals;
@@ -1279,6 +1300,7 @@ function inboxAdd(args) {
     ref: f.values.ref,
     check: f.values.check,
     verb: 'added',
+    statusFlag: f.values.status,
   });
 }
 
@@ -1373,6 +1395,7 @@ function inboxDone(args) {
     note: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return inboxUsageErr(f.error);
   const pos = f.positionals;
@@ -1406,8 +1429,11 @@ function inboxDone(args) {
   }
   const w = writeInbox(storePath, r.items);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${it.id} done — bee inbox render refreshes ` +
-    `the status view\n`, err: '' };
+  return withRegionRefresh(storePath,
+    f.values.status ? path.resolve(f.values.status)
+      : derivedStatusPath(storePath),
+    { code: 0, out: `${it.id} done — bee inbox render refreshes ` +
+      `the status view\n`, err: '' });
 }
 
 // ---- render (P4 Task 2 — the status file's marked inbox region) ----
@@ -1538,6 +1564,89 @@ function inboxRender(args) {
       `next: bee report renders the keeper digest\n`, err: '' };
 }
 
+// ---- post-mutation region refresh (P8 item 24c) ----
+// After a successful store mutation (inbox add/done, capture, park
+// add/resolve), re-render the status region in the SAME invocation
+// so the view's membership and ages always match a fresh render —
+// never the frozen pre-mutation one. Any failure to refresh is an
+// informational stderr note: the mutation stands, exit stays 0.
+
+// The status surface derived from a store path: the .hivemind dir
+// when the store lives under one (works for both inbox.toon and
+// memory/parking-lot.toon layouts); the store's own dir otherwise.
+function derivedStatusPath(storePath) {
+  const marker = path.sep + '.hivemind' + path.sep;
+  const at = storePath.indexOf(marker);
+  const dir = at !== -1
+    ? storePath.slice(0, at + 1) + '.hivemind'
+    : path.dirname(storePath);
+  return path.join(dir, 'status.md');
+}
+
+// inboxStorePath is the INBOX store the view renders from (never
+// the park store — park refreshes the inbox-owned region).
+function refreshStatusRegion(inboxStorePath, statusPath) {
+  let text;
+  try {
+    text = fs.readFileSync(statusPath, 'utf8');
+  } catch (e) {
+    return { err: `status view not refreshed: cannot read ${statusPath} ` +
+      `(${e.message}) — run bee inbox render when a status file exists\n` };
+  }
+  if (!text.includes(RENDER_OPEN) && !text.includes(RENDER_CLOSE)) {
+    return { err: `status view not refreshed: no render region in ` +
+      `${statusPath} — bee inbox render creates one\n` };
+  }
+  if (!fs.existsSync(inboxStorePath)) {
+    return { err: `status view not refreshed: no inbox store at ` +
+      `${inboxStorePath} — nothing to render from\n` };
+  }
+  const r = readInbox(inboxStorePath);
+  if (r.err) {
+    return { err: `status view not refreshed: ` +
+      r.err.replace(/^bee inbox: /, '') };
+  }
+  const view = inboxRenderView(r.items);
+  if (view.includes(RENDER_OPEN) || view.includes(RENDER_CLOSE)) {
+    return { err: 'status view not refreshed: an item text contains a ' +
+      'render marker — hand-fix the store, then bee inbox render\n' };
+  }
+  const res = renderIntoStatus(text, view, statusPath);
+  if (res.err) {
+    return { err: 'status view not refreshed: ' +
+      res.err.replace(/^bee inbox render: /, '') };
+  }
+  try {
+    atomicWrite(statusPath, res.text);
+  } catch (e) {
+    return { err: `status view not refreshed: cannot write ${statusPath}: ` +
+      `${e.message}\n` };
+  }
+  return { ok: `status view refreshed: ${statusPath}\n` };
+}
+
+// Shared mutation-epilogue: refresh the region at statusPath
+// (rendered from inboxStorePath) and fold the note into the command
+// result without failing it.
+function withRegionRefresh(inboxStorePath, statusPath, base) {
+  const rf = refreshStatusRegion(inboxStorePath, statusPath);
+  return {
+    code: base.code,
+    out: base.out + (rf.ok || ''),
+    err: (base.err || '') + (rf.err || ''),
+  };
+}
+
+// Park variant: the status path derives from the PARK store, but
+// the region renders from the inbox store that owns it — the
+// sibling inbox.toon of the status file.
+function parkWithRegionRefresh(parkStorePath, statusFlag, base) {
+  const statusPath = statusFlag ? path.resolve(statusFlag)
+    : derivedStatusPath(parkStorePath);
+  return withRegionRefresh(
+    path.join(path.dirname(statusPath), 'inbox.toon'), statusPath, base);
+}
+
 function cmdCapture(rest) {
   if (rest[0] === 'help') {
     return { code: 0, out: CAPTURE_USAGE, err: '' };
@@ -1545,6 +1654,7 @@ function cmdCapture(rest) {
   const f = flags(rest, {
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) {
     const msg = f.error.message ? f.error.message
@@ -1563,6 +1673,7 @@ function cmdCapture(rest) {
     origin: 'capture',
     check: f.values.check,
     verb: 'captured',
+    statusFlag: f.values.status,
   });
 }
 
@@ -1855,6 +1966,7 @@ function parkAdd(args) {
     origin: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return parkUsageErr(f.error);
   const pos = f.positionals;
@@ -1895,9 +2007,10 @@ function parkAdd(args) {
   const w = writeStore('bee park', storePath, [...r.items, entry],
     PARK_FIELDS, PARK_HEADER);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0,
-    out: `${id} parked · ${truncText(item)} — bee park show ${id}\n`,
-    err: '' };
+  return parkWithRegionRefresh(storePath, f.values.status,
+    { code: 0,
+      out: `${id} parked · ${truncText(item)} — bee park show ${id}\n`,
+      err: '' });
 }
 
 function parkList(args) {
@@ -1966,6 +2079,7 @@ function parkResolve(args) {
     how: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return parkUsageErr(f.error);
   const pos = f.positionals;
@@ -1997,8 +2111,9 @@ function parkResolve(args) {
   const w = writeStore('bee park', storePath, r.items,
     PARK_FIELDS, PARK_HEADER);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0,
-    out: `${it.id} resolved — bee park list\n`, err: '' };
+  return parkWithRegionRefresh(storePath, f.values.status,
+    { code: 0,
+      out: `${it.id} resolved — bee park list\n`, err: '' });
 }
 
 // migrate: the named one-shot executor converting the markdown
