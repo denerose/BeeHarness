@@ -77,11 +77,11 @@ suggestion file carries its Outcome pointing here):**
     (derive from the test's own location); consider a worktree
     suite run at merge level in `bee verify`. File:
     `planned/2026-10-31-po-no-hardcoded-checkout-paths-in-tests.md`.
-13. Gate budget (P4 hindsight): cold-dispatched gate reviews get
-    900s + "write the report even if incomplete" as the default —
-    dispatch-brief template line. File:
-    `planned/2026-11-01-po-p4-hindsight-gate-budget.md` (or its
-    slug).
+13. Gate budget (P4 hindsight): KEEPER STANDING WORD at P8 kickoff
+    D4, 2026-11-07 — cold-dispatched gate reviews get **900s and
+    write-the-report-anyway** as the standing default, effective
+    now. The dispatch-brief template line lands in item 10's pass.
+    File: `planned/2026-11-01-po-p4-hindsight-gate-budget.md`.
 14. Plan-size guard (P4 hindsight): non-blocking size note in
     plan-checks.sh output above ~500 lines so the dispatcher sees
     the gate cost. File:
@@ -90,6 +90,10 @@ suggestion file carries its Outcome pointing here):**
 
 **Design input:**
 15. Design-note consolidation at rectification boundaries —
+    LANDED 2026-11-07 (PP, relay task): the skill-authoring-kit
+    note consolidated as this discipline's first use (superseded
+    sections collapsed into successors; status = historical design
+    record, current as consolidated; history in git).
     superseded sections collapse into their successor; history
     stays in git. Extends ADR-016's addendum discipline; P8 is its
     first user (start with the skill-authoring-kit note). File:
@@ -129,15 +133,15 @@ suggestion file carries its Outcome pointing here):**
     Mechanics section (verify minting shapes, worktree.sh arg
     asymmetry, spine sync rule) into the durable homes at this
     pass.
-22. LAW CLAUSE (keeper-authorized in principle, planned not
-    landed — PP lands it at P8): union-merge suite gate, into
+22. LAW CLAUSE — LANDED in AGENTS commit discipline (PP, relay
+    task 2026-11-07, pre-loop): union-merge suite gate, into
     AGENTS commit discipline — "after manually resolving merge
     conflicts, run the full suite before committing the merge;
     git's union splice can silently drop lines when two regions
     share an ending." File:
     `planned/2026-11-02-po-union-merge-suite-gate.md`.
-23. LAW CLAUSE (keeper-authorized in principle, planned not
-    landed — PP lands it at P8): editing-law scope, into the
+23. LAW CLAUSE — LANDED in the AGENTS editing block (PP, relay
+    task 2026-11-07, pre-loop): editing-law scope, into the
     AGENTS editing block — "the editing discipline covers all
     files, not only living documents: scripted patches to source
     files (marker surgery included) verify the region's exact

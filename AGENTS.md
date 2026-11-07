@@ -82,8 +82,11 @@ elsewhere.
   dispatching subagents.
 - Evidence over assertion: no "done"/"works" claim without verification
   output.
-- **Editing discipline for living documents** (keeper direction
-  2026-10-25): three standing rules —
+- **Editing discipline** (keeper direction 2026-10-25): standing
+  rules, and they cover ALL files, not only living documents —
+  scripted patches to source files (marker surgery included)
+  verify the region's exact bytes first and chain a parse-or-test
+  check in the same command. Three standing rules —
   (1) the edit tool REPLACES text, it never inserts: when adding a
   line or block near existing text, anchor the match on a unique
   line that will remain (a section header, or the first line of the
@@ -112,7 +115,10 @@ elsewhere.
   the changed law files (AGENTS.md, roles/, skills/GLOSSARY.md)
   before acting on anything they govern; before committing an
   append to a shared-write file, pull --rebase once more and verify
-  the entry appears exactly once.
+  the entry appears exactly once; after manually resolving merge
+  conflicts, run the full suite before committing the merge —
+  git's union splice can silently drop lines when two regions
+  share an ending.
 - Context management follows the role file's continuity protocol —
   a handoff (`bee-handoff` / `bee-pickup-handoff`) is a same-role
   context refresh, never a scheduling move; when one applies is role
