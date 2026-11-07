@@ -1143,6 +1143,21 @@ function suggestSlug(text) {
   return slug || 'item';
 }
 
+// The LOCAL default store is PROJECT-LOCAL: the repo root of the
+// current directory (git common-dir aware — review r1 blocking:
+// storePathOf's REPO_ROOT default would route consumer-repo feedback
+// into the harness repo's own inbox). Falls back to cwd when not in
+// a git repo.
+function suggestStorePath(p) {
+  if (p) return path.resolve(p);
+  const r = spawnSync('git', ['rev-parse', '--path-format=absolute',
+    '--git-common-dir'], { cwd: process.cwd(), encoding: 'utf8' });
+  const root = r.status === 0
+    ? path.dirname(r.stdout.trim())
+    : process.cwd();
+  return path.join(root, '.hivemind', 'inbox.toon');
+}
+
 // NNNN = highest 4-digit prefix in the folder + 1; an absent folder
 // starts at 0001.
 function nextSuggestNumber(folder) {
@@ -1240,7 +1255,7 @@ function cmdSuggest(rest) {
   const text = pos[0];
   if (f.values.harness) return suggestHarness(text, f.values);
   return inboxAddItem({
-    storePath: storePathOf(f.values.store),
+    storePath: suggestStorePath(f.values.store),
     addressee: 'keeper',
     text,
     origin: f.values.origin || 'agent',

@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { run } from '../bin/bee.js';
+
+const TESTS_DIR = path.dirname(fileURLToPath(import.meta.url));
 
 function tmp() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'bee-suggest-'));
@@ -58,3 +62,28 @@ test('empty text: structured error, exit 1', () => {
   assert.equal(r.code, 1);
   assert.match(r.err, /expected "<text>"/);
 });
+
+test('local default is project-local: subprocess from a consumer repo',
+  async () => {
+    // Review r1 blocking: the default store must resolve from the
+    // runner's repo (cwd), never from the harness checkout.
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-suggest-sub-'));
+    try {
+      const git = (...args) => execFileSync('git', args, { cwd: dir });
+      git('init');
+      git('config', 'user.email', 't@t');
+      git('config', 'user.name', 't');
+      const bee = path.resolve(TESTS_DIR, '..', 'bin', 'bee.js');
+      const r = execFileSync('node', [bee, 'suggest',
+        'consumer feedback lands at home'], { cwd: dir,
+        encoding: 'utf8' });
+      assert.match(r, /IN-001 suggested · keeper/);
+      const inbox = path.join(dir, '.hivemind', 'inbox.toon');
+      assert.ok(fs.existsSync(inbox),
+        'item must land in the CONSUMER repo inbox');
+      assert.match(fs.readFileSync(inbox, 'utf8'),
+        /consumer feedback lands at home/);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  }, { timeout: 30000 });
