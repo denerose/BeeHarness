@@ -33,6 +33,18 @@ treating this list as the full picture is the known failure mode.*
 6. The hive observes itself — hindsight feeds graduation, every
    promotion keeper-gated; the self-improving loop is real and
    intentionally not autonomous (ADR-008; P10 state history).
+7. Consuming projects grow their own guidance — guides and
+   sensors bundled per work type, carried in the shipped surfaces
+   (`bee guidance` topics, the managed AGENTS block, the template
+   glossary) — never only in BeeHarness design docs (the shipping
+   test; P10 bundles design).
+8. Records stay lean — compaction at phase close, tidy passes on
+   the ephemera budget, retention tested by "does carrying it
+   forward teach the right behavior?" (P5 design; PL-PP-005/013).
+9. Knowledge carries forward — the memory store holds durable
+   lessons with provenance; sessions refresh without the keeper
+   re-explaining; supersede, never delete (P5 design; P11
+   handoff variants).
 
 ## What BeeHarness is
 
