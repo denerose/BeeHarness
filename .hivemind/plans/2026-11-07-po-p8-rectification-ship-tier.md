@@ -223,6 +223,16 @@ non-blocking size note — consumed by every future gate run.
       `.hivemind/suggestions/planned/2026-11-02-po-marker-surgery-edit-tool.md`.
 - [ ] Commit: `plan-checks: exists satisfied + size note`
 
+**Task 1 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 3
+notes). Should-fix fixed in-round, re-review WAIVED: the deleted
+p7-close-hindsight file carried undispositioned items #3/#4 — re-filed
+verbatim from history at 44eae33 as
+`2026-11-07-po-design-drift-repull-step.md` and
+`2026-11-07-po-worker-claims-gitlog-verify.md` (near-verbatim reviewer
+fix; probe = the files' origin headers cite the deleted file). Both
+implementer deviations adjudicated by the reviewer as load-bearing
+(both-reporter grep pattern; NODE_TEST_CONTEXT hygiene).
+
 ## Task 2: bee phase close — mechanical row flip, design stamps, flag split (items 17, 20)
 
 **Files:** modify `bin/bee.js`, `tests/bee-phase.test.mjs`
