@@ -6,7 +6,7 @@ bin: bin/<file>.js
 pi: .pi/handoff-<role>.md
 roles: roles/<file>.md
 skills: skills/GLOSSARY.md skills/<kit>/<name>/SKILL.md skills/<kit>/<name>/assets/<file>
-hivemind: .hivemind/status.md .hivemind/keeper-report.md .hivemind/inbox.toon .hivemind/glossary.toon
+hivemind: .hivemind/status.md .hivemind/keeper-report.md .hivemind/inbox.toon .hivemind/glossary.toon .hivemind/config.toon
 hivemind: .hivemind/<class>/<file>  # class: decisions designs plans phases logbook suggestions memory sessions
 hivemind: .hivemind/suggestions/planned/<file>
 docs: docs/<file>.md docs/guidance/<file>.md docs/research/<file>.md
