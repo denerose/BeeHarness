@@ -360,7 +360,15 @@ function ensureManagedBlock(repoRoot, check) {
   try {
     text = fs.readFileSync(agPath, 'utf8');
   } catch (e) {
-    if (e.code !== 'ENOENT') throw e;
+    if (e.code !== 'ENOENT') {
+      // Unexpected read failure (e.g. AGENTS.md is a directory) —
+      // structured error per house convention, never a raw stack
+      // (review r1 should-fix).
+      return {
+        code: 1, out: '', wrote: false,
+        err: `bee init: cannot read ${agPath}: ${e.message}\n`,
+      };
+    }
     // No AGENTS.md: one-line header + blank line + the block.
     if (!check) {
       atomicWrite(agPath,

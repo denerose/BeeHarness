@@ -84,3 +84,16 @@ test('single fence: fail loud, no writes', () => {
   assert.match(r.err, /corrupt managed block/);
   assert.match(fs.readFileSync(path.join(dir, 'AGENTS.md'), 'utf8'), /orphan/);
 });
+
+test('AGENTS.md as a directory: structured error, no raw stack', () => {
+  const dir = tmp();
+  fs.mkdirSync(path.join(dir, 'AGENTS.md'));
+  git(dir, 'init');
+  const machine = tmp();
+  const sp = path.join(dir, 's.json');
+  fs.writeFileSync(sp, JSON.stringify({ skills: [] }, null, 2));
+  const r = run(['init', '--settings', sp, '--machine', machine, '--repo', dir]);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /bee init: cannot read .*AGENTS\.md: /);
+  assert.doesNotMatch(r.err, /at /); // no stack frames
+});
