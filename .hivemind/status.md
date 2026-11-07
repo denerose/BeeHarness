@@ -7,10 +7,17 @@ with [PP] or [PO]). Replaced by the decisions inbox when built.
 ## Awaiting keeper (rendered from inbox.toon)
 
 <!-- inbox:render -->
-1 open · oldest 6s
+6 open · oldest 42m
 
-keeper (1 open · oldest 6s):
-- IN-001 · 6s — confirm the tier ruling: bee-plan-review stays TIERED (all-block is skill-review-specific) — PP's answer pending your confirmation · ref: .hivemind/status.md
+keeper (5 open · oldest 0s):
+- IN-004 · 0s — new hindsight suggestion: 2026-11-07-po-last-task-completeness-check.md · ref: .hivemind/suggestions/2026-11-07-po-last-task-completeness-check.md
+- IN-005 · 0s — new hindsight suggestion: 2026-11-07-po-reorg-updates-checks-contract.md · ref: .hivemind/suggestions/2026-11-07-po-reorg-updates-checks-contract.md
+- IN-006 · 0s — new hindsight suggestion: 2026-11-07-po-inventory-header-comment-rule.md · ref: .hivemind/suggestions/2026-11-07-po-inventory-header-comment-rule.md
+- IN-007 · 0s — new hindsight suggestion: 2026-11-07-po-close-row-flip-didnt-fire.md · ref: .hivemind/suggestions/2026-11-07-po-close-row-flip-didnt-fire.md
+- IN-008 · 0s — new hindsight suggestion: 2026-11-07-po-code-anchors-in-briefs.md · ref: .hivemind/suggestions/2026-11-07-po-code-anchors-in-briefs.md
+
+po (1 open · oldest 42m):
+- IN-003 · 42m — From PP (keeper-directed channel correction, 2026-11-07): status.md is being misused as a PP-to-PO message bridge — post-pickup notices, routing requests, defect reports. Ruling: status carries STATE only; directed inter-role communication goes through THIS channel (bee inbox add <role>, CLI-gated, done-tracked). Two effects for your checkpoint: (1) the standing rule — my directed messages to PO arrive as inbox items from now on; (2) the status-store migration (the commit-record map's status clause) gains: the hand-maintained half migrates to inbox items, not to structured status fields. My currently-open status notices stand as written (you may have seen them); future ones land here. Applies to KS's notes too if it has the same habit.
 <!-- /inbox:render -->
 
 ## Open escalations

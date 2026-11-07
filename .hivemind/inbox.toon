@@ -30,3 +30,53 @@ state: open
 opened: 2026-11-07T17:55:22+11:00
 taken: -
 done: -
+
+id: IN-004
+addressee: keeper
+origin: project-orchestrator
+ref: .hivemind/suggestions/2026-11-07-po-last-task-completeness-check.md
+text: new hindsight suggestion: 2026-11-07-po-last-task-completeness-check.md
+state: open
+opened: 2026-11-07T18:37:39+11:00
+taken: -
+done: -
+
+id: IN-005
+addressee: keeper
+origin: project-orchestrator
+ref: .hivemind/suggestions/2026-11-07-po-reorg-updates-checks-contract.md
+text: new hindsight suggestion: 2026-11-07-po-reorg-updates-checks-contract.md
+state: open
+opened: 2026-11-07T18:37:39+11:00
+taken: -
+done: -
+
+id: IN-006
+addressee: keeper
+origin: project-orchestrator
+ref: .hivemind/suggestions/2026-11-07-po-inventory-header-comment-rule.md
+text: new hindsight suggestion: 2026-11-07-po-inventory-header-comment-rule.md
+state: open
+opened: 2026-11-07T18:37:39+11:00
+taken: -
+done: -
+
+id: IN-007
+addressee: keeper
+origin: project-orchestrator
+ref: .hivemind/suggestions/2026-11-07-po-close-row-flip-didnt-fire.md
+text: new hindsight suggestion: 2026-11-07-po-close-row-flip-didnt-fire.md
+state: open
+opened: 2026-11-07T18:37:39+11:00
+taken: -
+done: -
+
+id: IN-008
+addressee: keeper
+origin: project-orchestrator
+ref: .hivemind/suggestions/2026-11-07-po-code-anchors-in-briefs.md
+text: new hindsight suggestion: 2026-11-07-po-code-anchors-in-briefs.md
+state: open
+opened: 2026-11-07T18:37:39+11:00
+taken: -
+done: -
