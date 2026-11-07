@@ -64,9 +64,11 @@ keeper a short summary: what you examined, what you filed, what you'd
 most like acted on. The summary REPORTS what was filed — it never
 offers to file, asks permission, or tees up "want this one too?".
 Borderline items get filed (filing is adds-only, any-role work; the
-keeper's gate is at promotion, not filing). Final step: list new
-suggestions in the status surface's prose, under Awaiting keeper —
-never inside the script-owned render region. You edit nothing that
+keeper's gate is at promotion, not filing). Final step: surface
+new suggestions to the keeper — as inbox items (`bee inbox add`,
+addressee keeper; they render into the status surface's
+script-owned region) or as a prose note outside that region; never
+hand-edit the render region itself. You edit nothing that
 already exists.
 
 ## Boundaries

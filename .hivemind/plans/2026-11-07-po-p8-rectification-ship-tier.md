@@ -485,6 +485,13 @@ confirmed the wiring fires — exit 1 + fix line).
       and lands in this task's edit.)
 - [ ] Commit: `hindsight: generalized inputs, sixth question, never-asks`
 
+**Task 6 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 2
+notes). Fixed in-round, re-review WAIVED (reviewer's own channel
+fix, evidence in report): the status-listing step now names BOTH
+channels (inbox add renders into the script-owned region; prose
+notes ride outside it) — resolves the glossary channel conflict and
+the region-less destruction edge.
+
 ## Task 7: bee-plan minimums + census helper (items 8, 18)
 
 **Files:** create `scripts/plan-census.sh`, modify
