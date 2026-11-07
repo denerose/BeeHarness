@@ -3216,6 +3216,26 @@ function verifyEntryText(role, verdict, checksRun, planShown, planHash,
   return e;
 }
 
+// D9 (P8 Task 5): is the checkout at <root> the repo's MAIN
+// checkout? `git rev-parse --git-common-dir` (absolute) equal
+// to the checkout's own .git → main; any other value → the
+// checkout is a linked worktree. No git at all → { noGit } —
+// callers skip silently.
+function isMainCheckout(root) {
+  const r = spawnSync('git', ['rev-parse', '--path-format=absolute',
+    '--git-common-dir'], { cwd: root, encoding: 'utf8' });
+  if (r.status !== 0) return { noGit: true };
+  const norm = (p) => {
+    try {
+      return fs.realpathSync(p);
+    } catch (e) {
+      return path.resolve(p);
+    }
+  };
+  return { main: norm(r.stdout.trim()) ===
+    norm(path.join(root, '.git')) };
+}
+
 function cmdVerify(rest) {
   if (rest[0] === 'help') {
     return { code: 0, out: VERIFY_USAGE, err: '' };
@@ -3344,8 +3364,52 @@ function cmdVerify(rest) {
 
   const nPass = results.filter((r) => r.pass).length;
   const nFail = results.length - nPass;
+
+  // D9 (P8 Task 5) — merge-level worktree suite: once the
+  // declared checks pass at merge or phase level, re-run the
+  // plan's suite in a throwaway --detach worktree of HEAD, but
+  // only from the MAIN checkout. The class it catches: suites
+  // green only at the checkout they were written in (hardcoded
+  // checkout paths in tests). A verify already inside a linked
+  // worktree skips with a note; a plan without a suite line
+  // (or below merge level, or no git) skips silently. Reuses
+  // phaseSuiteGate's throwaway path — same env hygiene
+  // (NODE_TEST_CONTEXT strip), timeout, and cleanup.
+  const suiteCmd = (header.suite || '').trim();
+  let suiteLine = null;
+  const suiteFindings = [];
+  if (suiteCmd !== '' && results.length > 0 && nFail === 0 &&
+      (header.validation === 'merge' ||
+        header.validation === 'phase')) {
+    const mc = isMainCheckout(planRoot);
+    if (!mc.noGit && !mc.main) {
+      suiteLine = 'suite · skipped · already inside a linked ' +
+        'worktree (D9)';
+    } else if (!mc.noGit) {
+      const g = phaseSuiteGate(planRoot, 'HEAD', suiteCmd, null,
+        false);
+      if (g.err) {
+        suiteLine = `suite · ${truncText(suiteCmd, 60)} · FAIL · ` +
+          `cannot create worktree: ${g.err}`;
+        suiteFindings.push('fix: git worktree add --detach <tmp> ' +
+          'HEAD at the plan root failed — clear what it reports, ' +
+          'then re-run');
+      } else if (g.pass) {
+        suiteLine = `suite · ${truncText(suiteCmd, 60)} · PASS · ` +
+          `${g.note} · worktree re-run of HEAD`;
+      } else {
+        suiteLine = `suite · ${truncText(suiteCmd, 60)} · FAIL · ` +
+          `${g.note} · worktree re-run of HEAD`;
+        suiteFindings.push('fix: the suite fails in a fresh ' +
+          'worktree of HEAD — run it from a new checkout and repair ' +
+          'what it reports (a checkout-derived path is the usual ' +
+          'suspect)');
+      }
+    }
+  }
+
   const anyFail = nFail > 0 || linkFindings.length > 0 ||
-    structureFindings.length > 0;
+    structureFindings.length > 0 || suiteFindings.length > 0;
   let out = '';
   if (results.length === 0) {
     out += '0 checks\n' +
@@ -3367,6 +3431,12 @@ function cmdVerify(rest) {
   out += structureLine + '\n';
   for (const l of structureFindings) {
     out += `  ${l}\n`;
+  }
+  if (suiteLine !== null) {
+    out += suiteLine + '\n';
+    for (const l of suiteFindings) {
+      out += `  ${l}\n`;
+    }
   }
 
   // Logbook emission: one entry per task checked; written when
@@ -3419,7 +3489,8 @@ function cmdVerify(rest) {
       const taskFail = trs.filter((r) => !r.pass);
       const verdict = taskFail.length === 0 &&
         linkFindings.length === 0 &&
-        structureFindings.length === 0 ? 'PASS' : 'FAIL';
+        structureFindings.length === 0 &&
+        suiteFindings.length === 0 ? 'PASS' : 'FAIL';
       let anomalies = '';
       for (const r of taskFail) {
         anomalies += `${r.id} · ${r.shown} · FAIL · ${r.note}\n`;
@@ -3434,6 +3505,12 @@ function cmdVerify(rest) {
       if (structureFindings.length > 0) {
         anomalies += structureLine + '\n';
         for (const l of structureFindings) {
+          anomalies += `${l}\n`;
+        }
+      }
+      if (suiteFindings.length > 0) {
+        anomalies += suiteLine + '\n';
+        for (const l of suiteFindings) {
           anomalies += `${l}\n`;
         }
       }
