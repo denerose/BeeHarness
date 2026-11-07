@@ -77,6 +77,19 @@ resolves them; the keeper may edit freely or just say the word)
   and is the fix habits, .gitignore, squash-at-phase-close, or
   accept the noise? Joins the role-gate/edit-authority notes for
   the same PP session.
+- Starter prompt on `bee init` — IDEA to discuss with PP (keeper
+  thought 2026-11-07): `bee init` should emit a small starter
+  prompt that kicks off a power-planner session for the newly
+  harnessed repo and maps the repo context. Timely: the full init
+  contract is P6 (in progress) — natural rider if it fits, else a
+  follow-up. Related parked thread: PL-PP-007 (project mapping /
+  architecture navigation docs; unpark trigger: first product
+  project needs orientation — this idea would be that trigger
+  material). Open design bits for PP: what the starter prompt
+  contains, where PP writes the map (designs vs the consumer's
+  docs/ per the references-home layout), and how it interacts
+  with the managed AGENTS block + guidance injection already
+  ruled for init.
 
 ## Needs the keeper
 
