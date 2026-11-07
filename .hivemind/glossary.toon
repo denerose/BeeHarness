@@ -46,3 +46,4 @@ bee-native :: lives in the BeeHarness repo and ships with it. The loop and bee-b
 dispatch :: a role sending work down to a subagent within its own mandate. Gated by the loop, not the keeper. :: -
 claim :: the phase list's `owner` column: role + timestamp written before dispatching a task; re-read before writing. :: -
 memory ownership :: decision records are the keeper's — an ADR records what the human actually decided; session memory, working notes, and suggestions are agent-owned state; promotion into law is the keeper's call :: AGENTS.md
+relay block :: a relay's deliverable: self-contained, final on first hand-off; deltas arrive as standalone addenda, never splice requests :: -

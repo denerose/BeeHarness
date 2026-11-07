@@ -77,6 +77,8 @@
 
 **relay** — passing work or context between different roles. Two modes: gated (a short keeper-passed prompt — the keeper gates direction) and ambient (shared surfaces carry each role's state; roles pick up each other's context without the keeper relaying). The design doc is the relay artifact. Not a handoff.
 
+**relay block** — a relay's deliverable: self-contained, final on first hand-off; deltas arrive as standalone addenda, never splice requests
+
 **role** — a named agent spec in `roles/`: mandate plus attributes (entry, escalation, workspace, lifespan, continuity — ADR-010). Assumed by direction from the keeper or a handoff — never inferred from the work's shape. First-class roles take keeper direction and keep session files; dispatched roles are spawned by other roles and remember via their work's logbook. Not every role is first-class.
 
 **Role trailer** — a `Role: <role>` line in commit messages and record/report headers saying which role produced the work (ADR-007).
