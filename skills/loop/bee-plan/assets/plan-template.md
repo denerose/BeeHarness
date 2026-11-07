@@ -30,7 +30,7 @@ suite: <the command that proves the plan's work, e.g. node --test tests/*.test.m
 **Provides:** exact names/paths/signatures later tasks rely on
 
 - [ ] Step: what to do (verbatim content or shape-only + spike step)
-- [ ] Step: run `verification command` — expected result
+- [ ] Step: run `verification command` — expected result (grep expectations as minimums, ≥ N, unless the exact count is the contract)
 - [ ] Commit: `short imperative message`
 
 Verbatim file content goes in a path-tagged block — the tag says
