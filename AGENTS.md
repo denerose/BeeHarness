@@ -88,7 +88,10 @@ elsewhere.
   line or block near existing text, anchor the match on a unique
   line that will remain (a section header, or the first line of the
   following block) and repeat it inside the replacement — anchoring
-  on the target line's own text silently deletes it. Read the exact
+  on the target line's own text silently deletes it. An oldText
+  that ends at the boundary of the NEXT entry repeats that entry's
+  header byte-exact inside the replacement — or the edit is split
+  so no oldText crosses an entry boundary at all. Read the exact
   lines before writing the match; a failed match is the warning
   working — re-read, don't re-guess.
   (2) Prefer whole-file rewrites over scripted patches (sed/python)

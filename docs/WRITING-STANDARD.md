@@ -24,3 +24,8 @@ AGENTS.md (Rules of engagement); this file carries the full text.
   careful executors would run identically is written as a script the
   skill calls, not as prose steps — and every skill names the judgment
   it keeps, so the line holds in both directions (ADR-014).
+- **Digests point, never paraphrase.** Summaries, views, and target
+  sections name where the law lives (a pointer); they never restate
+  the rule. One source of truth — anything restated will drift. The
+  position against a summary is computed at read time, never stored
+  in it.

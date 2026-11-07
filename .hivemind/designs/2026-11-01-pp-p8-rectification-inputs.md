@@ -189,7 +189,20 @@ suggestion file carries its Outcome pointing here):**
     design answer): `bee init`'s check-and-do PRUNES dead entries
     — paths that no longer exist drop on the next init run,
     symmetric with the registry's self-healing drift line. No new
-    verb. File: `suggestions/2026-11-07-po-settings-skills-lifecycle.md`.
+    verb. File: `suggestions/planned/2026-11-07-po-settings-skills-lifecycle.md`.
+29. Observation-type suggestion files RULED IN (keeper,
+    2026-11-07 — resolves PL-PP-015): a problem with no proposed
+    solution is a legitimate suggestion file; graduation treats
+    them as design inputs, not law candidates. Template line
+    lands in bee-hindsight's suggestion-format (item 6's pass);
+    `bee suggest`'s template inherits. No new store — visibility
+    of known-and-routed problems stays a computed view (P9
+    render).
+
+CLOSE STEP (keeper's standing word, 2026-11-07): the tidy pass
+(PL-PP-005) runs at P8 close — bootstrap-noise paydown using the
+P5 tooling, after rectification lands. Build it into the close
+plan.
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a

@@ -56,7 +56,8 @@ context: keeper direction (2026-10-25, extended 2026-11-01): when and how do log
 unpark-when: when TOON v1 is live (P4 close), or with P6, or when the keeper wants the conversation. Related: PL-002 (memory tooling), PL-PP-013 (session-memory sweep, same budget lens).
 origin: pp
 opened: -
-resolved: -
+resolved: 2026-11-07T13:04:32+11:00
+how: resolved 2026-11-07: mechanics built at P5 (headers, compact, D7 ran at close); sweep criterion recorded; the tidy pass runs at P8 close on the keeper's standing word — P8 note CLOSE STEP
 
 id: PL-PP-006
 item: distill ADR-referenced rules into bee behavior guidance (universal vs project)
@@ -174,4 +175,5 @@ context: keeper direction 2026-11-02: agents observing a breakage with no fix in
 unpark-when: P8 skill pass planning, or the keeper's word
 origin: power-planner
 opened: 2026-11-07T11:15:50+11:00
-resolved: -
+resolved: 2026-11-07T13:04:32+11:00
+how: ruled in by the keeper 2026-11-07: observation-type suggestion files allowed (problem, no solution = legitimate; design inputs at graduation); template line lands at P8 — item 29
