@@ -58,6 +58,7 @@ task-2: done 2026-11-07T11:14:10+11:00 by project-orchestrator record: .hivemind
 task-4: done 2026-11-07T11:13:47+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task4-verify-r3.md
 task-3: done 2026-11-07T11:29:15+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task3-verify-r2.md
 task-6: done 2026-11-07T12:00:01+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task6-verify-r2.md
+task-7: done 2026-11-07T12:13:50+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task7-verify-r1.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -783,7 +784,7 @@ test('empty text: structured error, exit 1', () => {
 **Files:** create `docs/adoption.md` · modify `README.md` · modify `scripts/structure.map` · create `.hivemind/config.toon`
 **Depends on:** tasks 1–6 (dogfood exercises the finished contract)
 
-- [ ] Step: create `docs/adoption.md` (verbatim below).
+- [x] Step: create `docs/adoption.md` (verbatim below).
 
 ```markdown path=docs/adoption.md
 # Adopting BeeHarness
