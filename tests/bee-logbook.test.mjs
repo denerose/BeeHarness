@@ -502,7 +502,8 @@ test('compact: writes carry the phase-close next-step, --check does not (AXI 9)'
   const r = compact(root, 'P1');
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /next: bee phase close P1 --check\n$/);
-  // idempotent re-run (all already compacted) still names the close
+  // idempotent re-run (all already compacted) writes nothing and
+  // stays lean — a no-op is a read (review r1, matching stamp)
   const again = compact(root, 'P1');
-  assert.match(again.out, /next: bee phase close P1 --check\n$/);
+  assert.ok(!again.out.includes('next:'));
 });

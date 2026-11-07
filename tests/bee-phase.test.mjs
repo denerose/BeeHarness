@@ -116,7 +116,8 @@ test('bare bee phase lists phases (content first, aggregate header)', () => {
   assert.equal(r.code, 0);
   assert.match(r.out, /^1 phase\n/);
   assert.match(r.out, new RegExp(`P4 · ${PLAN_SLUG} · fixture close plan`));
-  assert.match(r.out, /next: bee phase close <phase-id> --check/);
+  // populated list output stays lean (AXI P1/P9 split — review r1)
+  assert.ok(!r.out.includes('next:'));
 });
 
 test('list: definitive empty state over a bare dir', () => {

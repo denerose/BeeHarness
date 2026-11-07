@@ -3297,9 +3297,11 @@ function cmdVerify(rest) {
         wrote++;
       }
     }
-    if (wrote > 0) {
+    if (wrote > 0 && !anyFail) {
       // AXI P9: one next-step line rides the mutation — the entry
-      // is the evidence bee task move done requires.
+      // is the evidence bee task move done requires. FAIL runs
+      // never take the hint: --record exists to capture failed
+      // rounds, and a FAIL entry is not done-evidence (review r1).
       out += 'next: bee task move <plan> <task-n> done --record ' +
         '<entry above>\n';
     }
@@ -3722,7 +3724,7 @@ function logbookCompact(args) {
       c.name + '\n';
   }
   for (const a of already) out += `already compacted: ${a}\n`;
-  if (!f.values.check) {
+  if (!f.values.check && compacted.length > 0) {
     out += `next: bee phase close ${pos[0]} --check\n`;
   }
   return { code: 0, out, err: '' };
@@ -4618,7 +4620,6 @@ function guidanceList(args) {
     const line = guidanceOneLiner(text);
     out += `${stem} · ${f.values.full ? line : truncText(line)}\n`;
   }
-  out += 'show one: bee guidance show <topic>\n';
   return { code: 0, out, err: '' };
 }
 
@@ -4861,7 +4862,6 @@ function phaseList(args) {
     const title = f.values.full ? p.title : truncText(p.title, 48);
     out += `P${p.n} · ${slug} · ${title}\n`;
   }
-  out += 'next: bee phase close <phase-id> --check\n';
   return { code: 0, out, err: '' };
 }
 

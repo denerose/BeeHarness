@@ -312,6 +312,9 @@ test('FAIL writes nothing unless --record; --record captures the FAIL', () => {
   assert.match(t, /verdict: FAIL/);
   assert.match(t, /task-1 · exit 3 · FAIL · exit 3/); // anomaly body
   assert.match(t, /fix: run /); // fix rides into the record
+  // FAIL runs never take the task-move hint — a FAIL entry is not
+  // done-evidence (AXI review r1)
+  assert.ok(!rr.out.includes('next: bee task move'));
 });
 
 test('--check previews, writes nothing', () => {
