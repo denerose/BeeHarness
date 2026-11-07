@@ -854,6 +854,14 @@ skills); the checkbox rule now routes ticks through `bee task move`
 - [ ] Step: run `test -d skills/thinking -a ! -e skills/session` — exit 0
 - [ ] Commit: `reorg: session/ → thinking/ (D3), kit retags, refs`
 
+**Task 15 notes:** review r1 FIX-FIRST (1 blocking, 0 should-fix,
+7 notes). Blocking fixed in-round: the glossary STORE line
+(.hivemind/glossary.toon:35) still read skills/session — the view
+hand-edit would self-revert on the next store write (the view is
+script-owned). Store line hand-fixed per the tool's own duplicate-
+error guidance; probe replicated (zero stale refs store+view).
+Blocking = always re-reviewed → r2 dispatched.
+
 ## Task 16: ship-tier citation strip (item 3, D8)
 
 **Files:** modify `roles/power-planner.md`, `roles/project-orchestrator.md`,
