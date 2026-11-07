@@ -49,6 +49,19 @@ resolves them; the keeper may edit freely or just say the word)
   which actions (phase flips, task moves, plan approval, record
   writes) are gated to which role, and what enforces it. P6 (in
   progress) is the natural consumer of the answer.
+- Edit authority by role (joins the role-gate note above; discuss
+  with PP, keeper thought 2026-11-07): KS gets SOME edit
+  authority, but ONLY when triggered by the keeper as an explicit
+  skill call or command — no autonomous edits (this is the working
+  pattern from the 2026-11-01→07 sessions: keeper says
+  regen/note/restore, KS edits). PP gets LESS — maybe even NO —
+  code or config edit authority: locked down to planning and
+  design documents plus its own memories (session file, memory
+  store). Extends the role-gate design from “which actions are
+  gated” to “which file classes each role may write, and what
+  enforces it.” Role files:
+  /home/saphron/BeeHarness/roles/keeper-secretary.md ·
+  /home/saphron/BeeHarness/roles/power-planner.md
 
 ## Needs the keeper
 
