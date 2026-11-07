@@ -122,6 +122,9 @@ task-10: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11
 task-6: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task6-verify-r2.md
 task-9: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task9-verify-r2.md
 task-11: done 2026-11-07T17:22:42+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task11-verify-r1.md
+task-13: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task13-verify-r1.md
+task-14: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task14-verify-r1.md
+task-17: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task17-verify-r1.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -752,7 +755,7 @@ skills); the checkbox rule now routes ticks through `bee task move`
   standard)
 **Provides:** the relay contract as a shipped instrument.
 
-- [ ] Step: Create `skills/session/bee-relay/SKILL.md` with
+- [x] Step: Create `skills/session/bee-relay/SKILL.md` with
       front-matter `kit: session`, `name: bee-relay`, description:
       "Carries context between roles as a final artifact — gated
       (keeper-passed) or ambient (shared surfaces). One topic per
@@ -776,18 +779,18 @@ skills); the checkbox rule now routes ticks through `bee task move`
       refresh is a handoff, not a relay; in-repo notes are the
       status surface's job). Judgment kept (what to include, what
       the delta is; the checklist is the skill).
-- [ ] Step: `skills/GLOSSARY.md` relay entry gains (via `bee
+- [x] Step: `skills/GLOSSARY.md` relay entry gains (via `bee
       glossary add`? No — supply-not-update applies to the store;
       the rendered view regenerates): add a NEW entry
       `relay block` :: "a relay's deliverable: self-contained,
       final on first hand-off; deltas arrive as standalone
       addenda, never splice requests" :: `-`. (Store op: `bee
       glossary add 'relay block' '<gist>' --see -`.)
-- [ ] Step: run `test -f skills/session/bee-relay/SKILL.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `test -f skills/session/bee-relay/SKILL.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-02-po-relays-are-final-artifacts.md`
       per D7.
-- [ ] Commit: `relay skill: the contract as an instrument`
+- [x] Commit: `relay skill: the contract as an instrument`
 
 ## Task 14: project-update skill (item 27)
 
@@ -795,7 +798,7 @@ skills); the checkbox rule now routes ticks through `bee task move`
 **Depends on:** task 11 (authored under the standard)
 **Provides:** one skill, three altitudes, per its design note.
 
-- [ ] Step: Create `skills/session/bee-project-update/SKILL.md`
+- [x] Step: Create `skills/session/bee-project-update/SKILL.md`
       (`kit: session`, `name: bee-project-update`), from the
       design note `2026-11-02-pp-project-update-skill.md`:
       The gather (identical all altitudes): `bee design status`;
@@ -816,8 +819,8 @@ skills); the checkbox rule now routes ticks through `bee task move`
       trigger = the keeper asks any role for an update, or a
       role-file routing line fires). Judgment kept: the comparison
       and the findings; the gather is scripted.
-- [ ] Step: run `test -f skills/session/bee-project-update/SKILL.md` — exit 0
-- [ ] Commit: `project-update skill: one skill, three altitudes`
+- [x] Step: run `test -f skills/session/bee-project-update/SKILL.md` — exit 0
+- [x] Commit: `project-update skill: one skill, three altitudes`
 
 ## Task 15: reorg sweep — session/ → thinking/ (item 1, D3)
 
@@ -894,7 +897,7 @@ skills); the checkbox rule now routes ticks through `bee task move`
 **Provides:** init seeds the project's own glossary with the core
   bee terms, self-contained, user-extendable.
 
-- [ ] Step: In `bin/bee.js`, replace the glossary seed constant's
+- [x] Step: In `bin/bee.js`, replace the glossary seed constant's
       use in scaffold step 6: seed `.hivemind/glossary.toon` with
       `TEMPLATE_GLOSSARY_SEED` (new constant) instead of
       `GLOSSARY_HEADER + '\n'` — the header line followed by the
@@ -928,15 +931,15 @@ role :: a named agent spec in roles/: mandate plus attributes; assumed by direct
 skill :: a procedure: how a class of work gets done; skills stay role-agnostic :: -
 ```
 
-- [ ] Step: The seed rides the existing step-6 idempotence: a repo
+- [x] Step: The seed rides the existing step-6 idempotence: a repo
       whose glossary.toon exists is never overwritten (verify the
       existing `step()` guard covers it — it does).
-- [ ] Step: Extend `tests/bee-init.test.mjs`: green-fields init
+- [x] Step: Extend `tests/bee-init.test.mjs`: green-fields init
       produces a glossary.toon whose term-line count is ≥ 21 and
       which contains the `bee-loop` and `keeper` lines verbatim;
       re-run init on the seeded repo changes nothing.
-- [ ] Step: run `node --test tests/bee-init.test.mjs` — pass
-- [ ] Commit: `init: seed template glossary (core terms)`
+- [x] Step: run `node --test tests/bee-init.test.mjs` — pass
+- [x] Commit: `init: seed template glossary (core terms)`
 
 ## Phase exit
 
