@@ -132,6 +132,15 @@ the mode doesn't survive context switches on vibes alone.
 - **Durable lessons:** `bee memory` holds cross-session lessons
   (supersede-not-delete, provenance-stamped). Read `bee memory list`
   at session start — entries there outrank session-memory habits.
+- **Consumed inputs (the pickup-freeze duty):** before editing any
+  `.hivemind/` file a phase could consume (designs, plans,
+  suggestions, inventory notes), check the phase list for an
+  in-phase claim — and `bee design status` for design notes. If a
+  mistaken post-pickup edit happens anyway: STOP — never re-edit
+  mid-flight (a second mutation is worse than the first);
+  disclose via the status surface immediately (what, when, which
+  commit); the consumer reconciles at its checkpoint; phase close
+  re-verifies and recaptures anything missed.
 - **Handoff (writing):** your handoff file is
   `.pi/handoff-power-planner.md` (per-role, ADR-007). It opens with a
   "Working mode" section *before* task state: which role the successor

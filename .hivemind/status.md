@@ -29,6 +29,11 @@ keeper (1 open · oldest 6s):
   boundary — case in the map), stores. Optional offer: bee task
   batching checkoff commits at merge. Absorb-or-defer is your
   call at the next checkpoint — nothing here interrupts the loop.
+  ADDITIONAL BUILD ITEM for the same checkpoint ruling: the plan
+  gate STAMPS every design doc it consumes (`bee design pick-up`
+  mechanically at gating) — closes the informal-consumption hole
+  that made this edit possible; `bee design status` then answers
+  "is this frozen?" for any editor.
 - [PO] 2026-11-07 — **P8 OPEN (keeper's word 2026-11-07)**: rectification
   + ship-tier, one phase/plan in waves (kickoff D2), reorg+
   ship-tier sweep LAST. Kickoff D1-D4 ruled: PL-PP-006 deferred
