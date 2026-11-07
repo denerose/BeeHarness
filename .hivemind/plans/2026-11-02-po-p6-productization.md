@@ -56,6 +56,7 @@ checks:
 suite: node --test tests/*.test.mjs
 task-2: done 2026-11-07T11:14:10+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task2-verify-r1.md
 task-4: done 2026-11-07T11:13:47+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task4-verify-r3.md
+task-3: done 2026-11-07T11:29:15+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task3-verify-r2.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -481,7 +482,7 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
 **Depends on:** task 2 (scaffold step order; harness-skip rule)
 **Provides:** `ensureManagedBlock(repoRoot)` — create-if-absent, idempotent regen, fail-loud on corrupt fences; wired as init's final scaffold step (runs on every init, after item 10; skipped for the harness repo).
 
-- [ ] Step: block content (verbatim — pointer-only until P8's PL-PP-006
+- [x] Step: block content (verbatim — pointer-only until P8's PL-PP-006
   distillation; decisions 2 + 5):
 
 ```text path=AGENTS.md managed block (exact fenced content)
@@ -492,7 +493,7 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
 <!-- bee:managed:end -->
 ```
 
-- [ ] Step: `ensureManagedBlock(repoRoot)` behavior:
+- [x] Step: `ensureManagedBlock(repoRoot)` behavior:
   - no `AGENTS.md` → create it with a one-line header
     (`# AGENTS.md — <Project>`) + blank line + the block; report
     `managed block: created AGENTS.md`;
@@ -504,10 +505,10 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
   - exactly one fence → structured error, exit 1:
     `bee init: corrupt managed block in <path> — found one fence, expected a start/end pair; fix by hand`;
   - never write anything outside the fences (marker-surgery seam law).
-- [ ] Step: wire into `cmdInit` after scaffold item 10 (write mode
+- [x] Step: wire into `cmdInit` after scaffold item 10 (write mode
   executes it; `--check` reports `managed block: <state>` without
   writing).
-- [ ] Step: create `tests/bee-agents.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-agents.test.mjs` (verbatim below) and run
   `node --test tests/bee-agents.test.mjs` — all pass.
 
 ```javascript path=tests/bee-agents.test.mjs
@@ -599,7 +600,7 @@ test('single fence: fail loud, no writes', () => {
 });
 ```
 
-- [ ] Commit: `bee init: managed AGENTS.md block, fence-safe`
+- [x] Commit: `bee init: managed AGENTS.md block, fence-safe`
 
 ## Task 4: `bee suggest` — project-local + harness channel
 
