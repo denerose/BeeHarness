@@ -278,6 +278,16 @@ as mechanical.
       it for the keeper's triage read per D7.
 - [ ] Commit: `phase close: row flip, design stamps, flag split`
 
+**Task 2 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 5
+notes). Both should-fixes fixed in-round, re-reviews WAIVED (loop law:
+near-verbatim reviewer fixes + replicated probes): (1) TEMPLATE.md
+excluded from phaseRowFind's scan — pinned by the ignores-TEMPLATE test
+(probe); (2) refused implement on an already-stamped doc recovers the
+row annotation from the doc's machine block — pinned by the recovery
+test (probe). Real-P8-close note carried: all three P8-row designs are
+live/blockless — close will refuse stamps informationally unless
+pick-up runs first.
+
 ## Task 3: report-regen defect batch (item 24, check-then-apply per D12)
 
 **Files:** modify `bin/bee.js`, `tests/bee-render.test.mjs`, `tests/bee-inbox.test.mjs`

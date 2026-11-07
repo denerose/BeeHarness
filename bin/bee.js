@@ -5060,6 +5060,29 @@ function phaseSuiteGate(root, branch, suite, pwt, pwtClean) {
 // carrying a '| P<n> |' table row. Returns { file, lines, rowIdx }
 // or { none: reason } — a missing board is a consumer-layout fact,
 // reported informationally, never a close failure.
+// The design doc's own machine block, as its implemented stamp —
+// used by the close's recovery path (a refused implement may mean
+// a previous run already stamped the doc; the row annotation
+// recovers from the doc's record, not a fresh stamp). Returns the
+// recorded merge sha, or null when the doc is absent, blockless,
+// or not implemented.
+function phaseDesignStampOf(root, entry) {
+  let text;
+  try {
+    text = fs.readFileSync(path.join(root, '.hivemind', entry), 'utf8');
+  } catch (e) {
+    return null;
+  }
+  const m = text.match(/<!--[\s]*machine[\s\S]*?-->/);
+  if (m === null) return null;
+  const st = /^status:[\s]*(\S+)/m.exec(m[0]);
+  const mg = /^merge:[\s]*(\S+)/m.exec(m[0]);
+  if (st === null || st[1] !== 'implemented' || mg === null) {
+    return null;
+  }
+  return /^[0-9a-fA-F]{7,40}$/.test(mg[1]) ? mg[1] : null;
+}
+
 function phaseRowFind(root, n) {
   const dir = path.join(root, '.hivemind', 'phases');
   let names;
@@ -5072,7 +5095,10 @@ function phaseRowFind(root, n) {
     return { none: `cannot read ${dir}: ${e.message}` };
   }
   const re = new RegExp(`^\\| P${n} \\|`);
-  for (const name of names.sort()) {
+  // TEMPLATE.md is not a board — its example row must never win
+  // the scan (byte-sort puts it before lowercase-named project
+  // files; review r1 should-fix).
+  for (const name of names.filter((x) => x !== 'TEMPLATE.md').sort()) {
     let text;
     try {
       text = fs.readFileSync(path.join(dir, name), 'utf8');
@@ -5157,10 +5183,21 @@ function phaseRowFlip(root, n, mergeSha, check) {
       lines.push(`  designs: ${path.join('.hivemind', d.entry)} — ` +
         `stamped (implemented @ ${mergeSha})\n`);
     } else {
-      const first = (r.err.split('\n')
-        .find((l) => l.trim() !== '') || `exit ${r.code}`)
-        .replace(/^bee phase close: /, '');
-      lines.push(`  note: ${first}\n`);
+      // recovery path (review r1 should-fix): a refused implement
+      // may mean a PREVIOUS run stamped the doc and then failed its
+      // row write — design.sh refuses on implemented docs, but the
+      // row annotation recovers from the doc's own machine block.
+      const rec = phaseDesignStampOf(root, d.entry);
+      if (rec !== null) {
+        stamped.push({ ...d, sha: rec });
+        lines.push(`  designs: ${path.join('.hivemind', d.entry)} — ` +
+          `recovered (implemented @ ${rec})\n`);
+      } else {
+        const first = (r.err.split('\n')
+          .find((l) => l.trim() !== '') || `exit ${r.code}`)
+          .replace(/^bee phase close: /, '');
+        lines.push(`  note: ${first}\n`);
+      }
     }
   }
   if (todo.length === 0) lines.push(designNote);
@@ -5169,7 +5206,7 @@ function phaseRowFlip(root, n, mergeSha, check) {
     : cells[3].replace(statusOld, 'done');
   for (const d of stamped) {
     cells[4] = cells[4].replace('`' + d.entry + '`',
-      '`' + d.entry + '` (implemented @ ' + mergeSha + ')');
+      '`' + d.entry + '` (implemented @ ' + (d.sha ?? mergeSha) + ')');
   }
   const escIdx = cells.length - 2;
   const closeNote = `close via bee phase close ${n} (merge ${mergeSha})`;

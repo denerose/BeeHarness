@@ -63,6 +63,11 @@ function fixtureRepo(opts = {}) {
     fs.writeFileSync(path.join(dir, '.hivemind', 'phases', 'phases.md'),
       opts.phasesFile);
   }
+  if (opts.templateFile) {
+    fs.mkdirSync(path.join(dir, '.hivemind', 'phases'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.hivemind', 'phases', 'TEMPLATE.md'),
+      opts.templateFile);
+  }
   if (opts.designDocs) {
     fs.mkdirSync(path.join(dir, '.hivemind', 'designs'), { recursive: true });
     for (const d of opts.designDocs) {
@@ -618,4 +623,52 @@ test('design-stamp refusal is informational — close still succeeds', () => {
   assert.match(board, /\| P4 \| fixture phase \| done \|/);
   assert.ok(!board.includes('(implemented @'));
   assert.match(r.out, /next: commit the phase-row flip\n$/);
+});
+
+test('close ignores TEMPLATE.md when finding the phase row', () => {
+  // byte-sort puts TEMPLATE.md before lowercase-named boards — its
+  // example row must never win the scan (review r1 should-fix)
+  const fx = fixtureRepo({
+    phasesFile: phasesBoard('—'),
+    templateFile: [
+      '# Phases — template', '',
+      '| id | description | status | designs | plan | owner | escalations |',
+      '|---|---|---|---|---|---|---|',
+      '| P4 | example row — never flip | planned | — | — | — | — |',
+      '',
+    ].join('\n'),
+  });
+  runInventory(fx, 3);
+  const r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  const board = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'phases.md'), 'utf8');
+  assert.match(board, /\| P4 \| fixture phase \| done \|/);
+  const tmpl = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'TEMPLATE.md'), 'utf8');
+  assert.match(tmpl, /\| P4 \| example row — never flip \| planned \|/);
+  assert.ok(!tmpl.includes('close via'));
+});
+
+test('recovery: refused implement on an already-stamped doc recovers the row annotation', () => {
+  // crash-recovery shape (review r1 should-fix): a previous run
+  // stamped the doc, then failed its row write — the row entry is
+  // still bare; design.sh refuses; the annotation recovers from
+  // the doc's machine block
+  const fx = fixtureRepo({
+    phasesFile: phasesBoard('`designs/design-done.md`'),
+    designDocs: [
+      { name: 'design-done.md', text: designDocText('implemented', '0aaaaaa') },
+    ],
+  });
+  runInventory(fx, 2);
+  const r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  assert.match(r.out, /designs: \.hivemind\/designs\/design-done\.md — recovered \(implemented @ 0aaaaaa\)/);
+  const board = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'phases.md'), 'utf8');
+  assert.ok(board.includes('`designs/design-done.md` (implemented @ 0aaaaaa)'));
+  const doc = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'designs', 'design-done.md'), 'utf8');
+  assert.match(doc, /^merge: 0aaaaaa$/m);
 });
