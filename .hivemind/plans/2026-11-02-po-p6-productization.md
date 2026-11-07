@@ -56,6 +56,7 @@ checks:
 suite: node --test tests/*.test.mjs
 task-1: done 2026-11-02T17:09:03+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task1-verify-r1.md
 task-5: done 2026-11-02T17:08:30+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task5-verify-r2.md
+task-2: done 2026-11-07T11:14:10+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task2-verify-r1.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -280,9 +281,9 @@ test('registry survives unrelated lines (read-modify-write keeps them)', () => {
 **Depends on:** task 1 (registry/drift already wired)
 **Provides:** `consumerRepoRoot()` (cwd-based, common-dir aware); scaffold steps in `cmdInit`; `config.toon` default content; empty-store headers; `--repo <dir>` flag as the consumer-repo test seam (tests never chdir; default = `process.cwd()`).
 
-- [ ] Step: add `repo: { type: 'string' }` to `cmdInit` flags; resolved
+- [x] Step: add `repo: { type: 'string' }` to `cmdInit` flags; resolved
   consumer repo = `f.values.repo ? path.resolve(f.values.repo) : process.cwd()`.
-- [ ] Step: repo-root resolution, in order (worktree edge, PL-PO-002
+- [x] Step: repo-root resolution, in order (worktree edge, PL-PO-002
   ruling): run `git rev-parse --path-format=absolute --git-common-dir`
   in the consumer dir. Not a repo → GREEN-FIELDS path (below). A repo →
   main-checkout test: the repo root is the common dir's dirname; if the
@@ -293,12 +294,12 @@ test('registry survives unrelated lines (read-modify-write keeps them)', () => {
 bee init: running inside a worktree — return to the main worktree (<main-root>) and branch there, then re-run
 ```
 
-- [ ] Step: GREEN-FIELDS: no git in the consumer dir → `git init`
+- [x] Step: GREEN-FIELDS: no git in the consumer dir → `git init`
   (execFileSync, `cwd` = consumer dir; fail loud with git's stderr and
   exit 1 if git is missing — structured error, no guessing). Output:
   `bee init: created git repository at <path>`. NO first commit
   (decision 8); the scaffold summary carries the next-step line.
-- [ ] Step: scaffolding, check-and-do per item, each printing
+- [x] Step: scaffolding, check-and-do per item, each printing
   `scaffolded <path>` or `exists: <path>` (write mode) and
   `would scaffold <path>` / `exists: <path>` (`--check` mode, writes
   nothing). Item list, in order:
@@ -349,12 +350,12 @@ gates :: SOUL/identity · irreversible acts · direction beyond the design · co
      consumer repo's `roles/` (as-is, D1 ruling; P8 sweeps);
   10. `.gitignore` — create if absent, else append if the line is
       missing: `.hivemind/sessions/`.
-- [ ] Step: harness-repo skip (decision 2): when the resolved consumer
+- [x] Step: harness-repo skip (decision 2): when the resolved consumer
   repo equals `REPO_ROOT`, print
   `bee init: harness repo — scaffolding + managed block skipped` and
   skip items 1–10 and task 3's block (registry + drift still ran in
   task 1's step). Dogfood assertions ride this rule.
-- [ ] Step: create `tests/bee-init.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-init.test.mjs` (verbatim below) and run
   `node --test tests/bee-init.test.mjs` — all pass.
 
 ```javascript path=tests/bee-init.test.mjs
@@ -473,7 +474,7 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
 });
 ```
 
-- [ ] Commit: `bee init: green-fields scaffold per P6 rulings`
+- [x] Commit: `bee init: green-fields scaffold per P6 rulings`
 
 ## Task 3: MANAGED AGENTS.md BLOCK
 
