@@ -99,7 +99,7 @@ checks:
     expect: exit 0
     files: [skills/thinking/bee-project-update/SKILL.md]
   - id: task-15
-    cmd: test -d skills/thinking -a ! -e skills/thinking
+    cmd: test -d skills/thinking -a ! -e skills/session
     expect: exit 0
     files: [skills/thinking/]
   - id: task-16
