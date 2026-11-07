@@ -31,11 +31,19 @@ directed by the keeper) says to. Read `../../GLOSSARY.md` (the shared bee glossa
 2. **Implement** — yourself for small tasks; a subagent when the task is
    self-contained or benefits from isolation (fresh context, parallel
    safety). Independent tasks may run in parallel as subagents; verify
-   each result before using it.
+   each result before using it. Dispatched tasks work in task
+   worktrees (GLOSSARY: task branch): `bee worktree create
+   <phase>-<slug>` — merge takes the slug only. The persistent spine
+   worktree (GLOSSARY: phase branch) rests detached at main; cut
+   `phase/<n>` there from main (`git switch -c phase/<n> main`) and
+   unset upstream immediately — a tracking spine could push to main.
 3. **Verify** — run the **bee-verify skill** (sibling skill, see
    GLOSSARY) at the task level. Its logbook entry lands in
    `.hivemind/logbook/`. State the round in the dispatch brief (first
-   run is `r1`).
+   run is `r1`). `bee verify --plan <relative plan path> --task <n>
+   --role <role> --record` runs from the task worktree; absolute
+   plan paths resolve to the main checkout and fail the `files:`
+   checks.
 4. **Review** — dispatch the **bee-review skill** on the finished work
    (fresh subagent when available; hand it the plan path, task id,
    changed files, and logbook entry path). Reviewer briefs carry the
@@ -67,13 +75,27 @@ directed by the keeper) says to. Read `../../GLOSSARY.md` (the shared bee glossa
    Carry a `Role:` trailer (GLOSSARY). Never hand-edit state a script
    owns: when a script owns a piece of state (checkboxes it checks off,
    lists it generates, files it rewrites), you move it by running the
-   script — never by editing the state directly. Records ride the
-   task branch with the task's diff and reach main at merge; from
-   other checkouts, mid-flight records read via
-   `git show <branch>:<path>`.
+   script — never by editing the state directly. Check off
+   exactly the current task's boxes at its commit — never batch
+   checkbox edits across task or section boundaries (a partition
+   slice sweeps everything downstream); checked boxes are state
+   claims and land with their own evidence. Where `bee task` owns
+   a state line, the state line is authoritative; the script's
+   box-ticking is cosmetic. Records ride the task branch with the
+   task's diff and reach main at merge; from other checkouts,
+   mid-flight records read via `git show <branch>:<path>`.
 7. Repeat until the plan is done, then run **bee-verify at the phase
    level** (GLOSSARY: validation level — the full suite the plan lists)
    and report to the keeper.
+8. **Close** — the checklist, in order: assemble the decisions
+   inventory (`#`-comment header lines only, `id · one-line ·
+   source-record-path` entries, middle-dot separators) → `bee phase
+   inventory <n> --decisions <file>` → `bee phase close <n>` (gates,
+   merges, flips the phase row, stamps designs, counts front-loaded
+   vs in-phase decisions) → the status note for the phase → the tidy
+   pass where the keeper's word directs one (bootstrap-noise paydown
+   with the P5 tooling — standing authority, no per-step ask;
+   disclose after) → report to the keeper.
 
 ## States
 
