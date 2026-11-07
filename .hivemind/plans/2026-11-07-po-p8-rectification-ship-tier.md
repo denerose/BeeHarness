@@ -550,6 +550,12 @@ now carries its own definition.
       per D7.
 - [ ] Commit: `brainstorm: ownership filter in step 4`
 
+**Task 8 notes:** review r1 FIX-FIRST (0 blocking, 1 should-fix, 3
+notes). Fixed in-round, re-review WAIVED (supply-the-term fix, loop
+precedent Task 13): `memory ownership` added to the glossary store —
+the pointer in step 4 now resolves; plan text untouched (verbatim
+held). Reviewer's byte-compared verbatim confirmation on record.
+
 ## Task 9: bee-loop Record rule + close checklist + tidy authority (items 9, 17, 16)
 
 **Files:** modify `skills/loop/bee-loop/SKILL.md`
