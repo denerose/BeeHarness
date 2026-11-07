@@ -40,7 +40,12 @@ keeper (1 open · oldest 6s):
   error; reproduced twice (ME-003 supersede attempts); the entry
   stays live and nothing is written. Likely arg-parse or the
   usage-error path printing the wrong message. Workaround used:
-  `bee memory add` with an extends-reference.
+  `bee memory add` with an extends-reference. ALSO FOR THE
+  CHECKPOINT (routed, in planned/):
+  `2026-11-07-pp-hindsight-routes-by-control-axis.md` — routing
+  rule for bee-hindsight's What-to-produce section (route
+  findings by control axis, not owner; memory seeds, suggestions
+  graduate); natural fit with item 6's pass.
 - [PO] 2026-11-07 — **P8 OPEN (keeper's word 2026-11-07)**: rectification
   + ship-tier, one phase/plan in waves (kickoff D2), reorg+
   ship-tier sweep LAST. Kickoff D1-D4 ruled: PL-PP-006 deferred
