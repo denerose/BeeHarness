@@ -22,19 +22,19 @@ targets:
   - tests/bee-init.test.mjs (modify)
   - tests/bee-verify.test.mjs (modify)
   - tests/bee-suggest.test.mjs (modify)
-  - skills/session/bee-hindsight/SKILL.md (modify)
-  - skills/session/bee-hindsight/assets/suggestion-format.md (modify)
-  - skills/session/bee-brainstorm/SKILL.md (modify)
-  - skills/session/bee-argue/SKILL.md (modify)
-  - skills/session/bee-handoff/SKILL.md (modify)
+  - skills/thinking/bee-hindsight/SKILL.md (modify)
+  - skills/thinking/bee-hindsight/assets/suggestion-format.md (modify)
+  - skills/thinking/bee-brainstorm/SKILL.md (modify)
+  - skills/thinking/bee-argue/SKILL.md (modify)
+  - skills/thinking/bee-handoff/SKILL.md (modify)
   - skills/loop/bee-loop/SKILL.md (modify)
   - skills/loop/bee-loop/assets/dispatch-brief-template.md (modify)
   - skills/loop/bee-plan/SKILL.md (modify)
   - skills/loop/bee-plan/assets/plan-template.md (modify)
   - skills/loop/bee-verify/SKILL.md (modify)
   - skills/skilldev/bee-skill-write/SKILL.md (modify)
-  - skills/session/bee-relay/SKILL.md (create)
-  - skills/session/bee-project-update/SKILL.md (create)
+  - skills/thinking/bee-relay/SKILL.md (create)
+  - skills/thinking/bee-project-update/SKILL.md (create)
   - skills/thinking/ (create)
   - skills/GLOSSARY.md (modify)
   - roles/power-planner.md (modify)
@@ -65,15 +65,15 @@ checks:
   - id: task-6
     cmd: node --test tests/bee-suggest.test.mjs
     expect: exit 0
-    files: [skills/session/bee-hindsight/SKILL.md, skills/session/bee-hindsight/assets/suggestion-format.md, bin/bee.js, tests/bee-suggest.test.mjs]
+    files: [skills/thinking/bee-hindsight/SKILL.md, skills/thinking/bee-hindsight/assets/suggestion-format.md, bin/bee.js, tests/bee-suggest.test.mjs]
   - id: task-7
     cmd: node --test tests/plan-census.test.mjs
     expect: exit 0
     files: [scripts/plan-census.sh, skills/loop/bee-plan/SKILL.md, skills/loop/bee-plan/assets/plan-template.md, tests/plan-census.test.mjs]
   - id: task-8
-    cmd: grep -q 'a decision is what the keeper decided' skills/session/bee-brainstorm/SKILL.md
+    cmd: grep -q 'a decision is what the keeper decided' skills/thinking/bee-brainstorm/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-brainstorm/SKILL.md]
+    files: [skills/thinking/bee-brainstorm/SKILL.md]
   - id: task-9
     cmd: grep -q 'exactly the current task' skills/loop/bee-loop/SKILL.md
     expect: exit 0
@@ -83,23 +83,23 @@ checks:
     expect: exit 0
     files: [skills/loop/bee-loop/assets/dispatch-brief-template.md]
   - id: task-11
-    cmd: grep -q 'Should you use this skill' skills/session/bee-argue/SKILL.md
+    cmd: grep -q 'Should you use this skill' skills/thinking/bee-argue/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-argue/SKILL.md, skills/skilldev/bee-skill-write/SKILL.md]
+    files: [skills/thinking/bee-argue/SKILL.md, skills/skilldev/bee-skill-write/SKILL.md]
   - id: task-12
-    cmd: grep -q 'continuity-law check' skills/session/bee-handoff/SKILL.md
+    cmd: grep -q 'continuity-law check' skills/thinking/bee-handoff/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-handoff/SKILL.md]
+    files: [skills/thinking/bee-handoff/SKILL.md]
   - id: task-13
-    cmd: test -f skills/session/bee-relay/SKILL.md && grep -q 'relay block' skills/GLOSSARY.md
+    cmd: test -f skills/thinking/bee-relay/SKILL.md && grep -q 'relay block' skills/GLOSSARY.md
     expect: exit 0
-    files: [skills/session/bee-relay/SKILL.md, skills/GLOSSARY.md]
+    files: [skills/thinking/bee-relay/SKILL.md, skills/GLOSSARY.md]
   - id: task-14
-    cmd: test -f skills/session/bee-project-update/SKILL.md
+    cmd: test -f skills/thinking/bee-project-update/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-project-update/SKILL.md]
+    files: [skills/thinking/bee-project-update/SKILL.md]
   - id: task-15
-    cmd: test -d skills/thinking -a ! -e skills/session
+    cmd: test -d skills/thinking -a ! -e skills/thinking
     expect: exit 0
     files: [skills/thinking/]
   - id: task-16
@@ -127,6 +127,7 @@ task-14: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11
 task-17: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task17-verify-r1.md
 task-15: done 2026-11-07T17:47:20+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task15-verify-r2.md
 task-16: done 2026-11-07T18:02:51+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task16-verify-r2.md
+task-12: done 2026-11-07T18:15:19+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task12-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -724,30 +725,30 @@ skills); the checkbox rule now routes ticks through `bee task move`
 **Provides:** the continuity-law gate; the scoped supersede/write
   authority line.
 
-- [ ] Step: Verify item 5 already landed: the skill's "Hand over
+- [x] Step: Verify item 5 already landed: the skill's "Hand over
       the wake prompt" step delivers the fenced block in-chat as
       the last act — confirm present (it is, as of this plan's
       writing); record in the commit body "verified present, no
       edit". Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-po-wake-prompt-must-be-delivered-in-chat.md`.
-- [ ] Step: New section before "## The handoff file": "## Before
+- [x] Step: New section before "## The handoff file": "## Before
       writing: the continuity-law check\n\nConfirm this is a
       same-role refresh the role file's continuity law permits.
       Where the role's law says delegate-harder or
       crash-recovery-only, that law wins over this skill: say so
       and stop — a handoff the role's law forbids is not this
       skill's to write."
-- [ ] Step: "Write the handoff" section gains the authority line:
+- [x] Step: "Write the handoff" section gains the authority line:
       "This skill supersedes the previous handoff wholesale and
       refreshes the session memory's standing sections without
       per-step keeper asks — scoped tidy authority. Surfaces the
       keeper gates (parking resolves, decision records, the
       report's keeper zone) stay gated."
-- [ ] Step: run `grep -q 'continuity-law check' skills/session/bee-handoff/SKILL.md` — exit 0
-- [ ] Step: Handoff-scheduling-guard is a LIVE suggestion file —
+- [x] Step: run `grep -q 'continuity-law check' skills/session/bee-handoff/SKILL.md` — exit 0
+- [x] Step: Handoff-scheduling-guard is a LIVE suggestion file —
       stamp its Outcome (landed: pre-write gate) and LEAVE it for
       the keeper's triage read per D7.
-- [ ] Commit: `handoff: pre-write gate + scoped tidy authority`
+- [x] Commit: `handoff: pre-write gate + scoped tidy authority`
 
 ## Task 13: relay skill (item 25)
 
