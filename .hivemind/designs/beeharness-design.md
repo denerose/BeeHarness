@@ -3,6 +3,34 @@
 **Status:** living document — ratified by keeper direction 2026-10-25;
 changes via ADR-003's amendment ritual.
 
+## Target state
+
+*Done looks like. Aims only — the means live in the ADRs and design
+notes each bullet points at. This section changes only on
+keeper-approved target changes; position against it is computed at
+update time (the project-update skill), never stored here. Live work
+state lives in the phase list.*
+
+1. The harness comes alive in any project of the keeper's — init
+   scaffolds everything and the tab workflow runs from day one,
+   proven by a live test (ADR-005 am.; feedback-channel,
+   references-home designs).
+2. Agents work from stores, not prose — script owns structure,
+   agents supply text; nothing durable lives only in chat or a
+   hand-maintained file (ADR-014).
+3. The loop is trustworthy end to end — states move on records,
+   gates present decisions, backpressure slows bad signals
+   (ADR-004, ADR-006, ADR-008; P10 sensors design).
+4. The shipped kit is self-contained — rule text inline, consumer
+   records theirs, zero planning ephemera leaked (ADR-015; the
+   shipping test).
+5. Autonomy is a dial, set by the keeper alone — stop-and-ask
+   embedded, the keeper never the switchboard
+   (automation-levels design).
+6. The hive observes itself — hindsight feeds graduation, every
+   promotion keeper-gated; the self-improving loop is real and
+   intentionally not autonomous (ADR-008; P10 state history).
+
 ## What BeeHarness is
 
 A personal agent harness for one keeper and a swarm of agents, built as
