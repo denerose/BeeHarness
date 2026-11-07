@@ -117,6 +117,8 @@ task-3: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-
 task-7: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task7-verify-r2.md
 task-4: done 2026-11-07T16:41:01+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task4-verify-r1.md
 task-8: done 2026-11-07T16:41:02+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task8-verify-r2.md
+task-5: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task5-verify-r3.md
+task-10: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task10-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -395,7 +397,7 @@ removed (review note). (d) closed already-landed per D12.
 **Provides:** the checkout-assumption class caught at merge level;
   the convention line in the verifier's skill.
 
-- [ ] Step: CLI (D9): in `cmdVerify`, after the declared checks
+- [x] Step: CLI (D9): in `cmdVerify`, after the declared checks
       pass at validation level `merge` or `phase`, when the
       current checkout is the repo's MAIN checkout (cwd's
       `git rev-parse --git-common-dir` equals the checkout's own
@@ -406,28 +408,28 @@ removed (review note). (d) closed already-landed per D12.
       worktree. Suite failure = verify FAIL with the worktree
       note. Already in a linked worktree → skip with an
       informational note line. Suite line absent → skip silently.
-- [ ] Step: Skill line: `skills/loop/bee-verify/SKILL.md` gains,
+- [x] Step: Skill line: `skills/loop/bee-verify/SKILL.md` gains,
       in "Run the command": "Tests derive paths from the test's
       own location (`import.meta.url`) or fixtures — never a
       hardcoded checkout path; the merge-level worktree re-run
       exists to catch that class."
-- [ ] Step: Extend `tests/bee-verify.test.mjs`: at merge level
+- [x] Step: Extend `tests/bee-verify.test.mjs`: at merge level
       from the main checkout, a plan whose suite echoes a path
       derived from the test's location runs in the temp worktree
       (assert the note line); a verify invoked from inside a
       linked worktree skips (note line, exit 0).
-- [ ] Step: Sweep-audit: `grep -rn --include='*.test.mjs'
+- [x] Step: Sweep-audit: `grep -rn --include='*.test.mjs'
       'BeeHarness\|/home/' tests/` — known clean (one comment,
       bee.test.mjs:93); any live hit becomes a derive-from-
       location fix in this task. Fixture files are historical
       data and exempt — three 'BeeHarness' prose hits exist there
       today (tests/fixtures/parking-lot-v1.md:1,92,254) and are
       not path assumptions.
-- [ ] Step: run `node --test tests/bee-verify.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/bee-verify.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-31-po-no-hardcoded-checkout-paths-in-tests.md`
       per D7.
-- [ ] Commit: `verify: merge-level worktree suite + path convention`
+- [x] Commit: `verify: merge-level worktree suite + path convention`
 
 **Task 5 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 6
 notes). Both fixed in-round, re-reviews WAIVED (reviewer-suggested
@@ -619,26 +621,26 @@ held). Reviewer's byte-compared verbatim confirmation on record.
 **Provides:** the fourth safety line; return-contract line;
   gate-budget line; relayed-claims line.
 
-- [ ] Step: Safety lines gain: "4. Work from the pinned absolute
+- [x] Step: Safety lines gain: "4. Work from the pinned absolute
       working directory named in this brief (`cwd` / `-C`) —
       never a look-alike path (a worktree of the same repo is a
       different checkout)."
-- [ ] Step: Pass-back section gains: "Return the FINISHED brief
+- [x] Step: Pass-back section gains: "Return the FINISHED brief
       only — omit working notes, transcripts, and process
       narration."
-- [ ] Step: ADD a marked Gate-dispatch block to the template
+- [x] Step: ADD a marked Gate-dispatch block to the template
       body (no such section exists yet): "Gate dispatch: budget
       ≥ 900s; write the report even if incomplete — an incomplete
       report reaches the dispatcher, silence does not (standing
       default, effective 2026-11-07)."
-- [ ] Step: ADD to the dispatcher preamble, immediately above
+- [x] Step: ADD to the dispatcher preamble, immediately above
       Pass-back: "Relayed claims: none | verified list. A
       pass-back claim is a factual claim — verify it against the
       repo before it enters a brief, or mark it 'claimed,
       unverified — confirm' so the reader treats it as a
       question, not a premise."
-- [ ] Step: run `grep -q 'FINISHED brief only' skills/loop/bee-loop/assets/dispatch-brief-template.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `grep -q 'FINISHED brief only' skills/loop/bee-loop/assets/dispatch-brief-template.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-pp-researcher-briefs-final-only.md`
       and
       `.hivemind/suggestions/planned/2026-11-02-po-relayed-claims-verified.md`
@@ -647,7 +649,7 @@ held). Reviewer's byte-compared verbatim confirmation on record.
       (`.hivemind/suggestions/2026-11-01-po-p4-hindsight-gate-budget.md`,
       landed: template line, keeper standing word at kickoff D4)
       and LEAVE it for the keeper's triage read per D7.
-- [ ] Commit: `brief template: cwd pin, final-only, gate budget, claims`
+- [x] Commit: `brief template: cwd pin, final-only, gate budget, claims`
 
 ## Task 11: entry discipline — authoring standard + bee-argue (item 2)
 
