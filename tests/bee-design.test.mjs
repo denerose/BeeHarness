@@ -160,6 +160,7 @@ test('pick-up --check and implement --check write nothing', () => {
   r = inDesignDir(designs, ['implement', doc, '--phase', '4',
     '--merge', 'abc1234'], dir);
   assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /next: bee design status shows the family/); // AXI 9
   assert.match(fs.readFileSync(doc, 'utf8'), /^status: implemented$/m);
   assert.match(fs.readFileSync(doc, 'utf8'), /^merge: abc1234$/m);
 });

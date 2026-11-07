@@ -63,7 +63,8 @@ test('create: branch + worktree exist, prints path, exit 0', async () => {
     const wt = s.wtPath('alpha');
     const r = task('create', '9-alpha');
     assert.equal(r.code, 0);
-    assert.equal(r.out.trim(), wt);
+    assert.equal(r.out.trim(), wt); // stdout stays the machine contract
+    assert.match(r.err, new RegExp(`bee worktree: next — cd ${wt.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`)); // AXI 9 hint rides stderr
     assert.ok(fs.existsSync(wt));
     const branches = (await s.git('branch', '--list', 'task/9-alpha')).stdout;
     assert.ok(branches.includes('task/9-alpha'));
@@ -82,6 +83,7 @@ test('merge: branch merged into phase/9, worktree + branch gone',
       const r = task('merge', 'alpha');
       assert.equal(r.code, 0);
       assert.match(r.out, /merged task\/9-alpha into phase\/9/);
+      assert.match(r.err, /bee worktree: next — bee phase close 9 --check/); // AXI 9
       assert.match(r.out, /removed worktree/);
       assert.ok(!fs.existsSync(wt));
       const branches = (await s.git('branch', '--list', 'task/9-alpha')).stdout;
@@ -193,3 +195,17 @@ test('merge never removes a longer-named branch\'s worktree (review r1)',
       await s.git('worktree', 'prune');
     });
   });
+
+test('abandon (clean branch): removes both, stderr carries the restart hint (AXI 9)', async () => {
+  const s = await sandbox();
+  await inSandbox(s, async () => {
+    const wt = s.wtPath('alpha');
+    task('create', '9-alpha');
+    const r = task('abandon', 'alpha');
+    assert.equal(r.code, 0, r.err);
+    assert.match(r.out, /deleted branch task\/9-alpha/);
+    assert.match(r.err,
+      /bee worktree: next — create a fresh task branch when the task restarts/);
+    assert.ok(!fs.existsSync(s.wtPath('alpha')));
+  });
+});

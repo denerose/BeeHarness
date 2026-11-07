@@ -406,6 +406,8 @@ test('close: full scripted run — no-ff merge, rest, delete, card, push', () =>
   assert.match(r.out, /flag: under-asked kickoff — front-load harder next phase/);
   // push: origin/main advanced to the merge
   assert.match(r.out, /6 · push · origin main · pushed/);
+  // AXI 9: the mutation output ends with one next-step line
+  assert.match(r.out, /next: bee phase list shows what remains\n$/);
   assert.equal(fx.git('rev-parse origin/main').trim(),
     fx.git('rev-parse main').trim());
   // no leftover worktrees beyond main + the rested persistent one

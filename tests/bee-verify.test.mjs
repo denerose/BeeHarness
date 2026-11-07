@@ -535,3 +535,23 @@ test('node --test check cmds FAIL red inside the test runner (review r1 SF1 regr
     'a red node --test suite must FAIL even under the test runner');
   assert.match(r.out, /FAIL/);
 });
+
+// ---- AXI pass (P6 task 6): entry-write next-step hint ----
+
+test('logbook writes carry the task-move next-step (AXI 9)', () => {
+  const { plan } = fixtureHome();
+  const lb = path.join(tmpDir(), 'lb');
+  const r = run(['verify', '--plan', plan, '--logbook', lb,
+    '--task', '1', '--base', 'HEAD']);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out,
+    /next: bee task move <plan> <task-n> done --record <entry above>\n$/);
+  // --check previews the write: no next-step hint (read stays lean)
+  const lb2 = path.join(tmpDir(), 'lb2');
+  fs.mkdirSync(lb2);
+  const check = run(['verify', '--plan', plan, '--logbook', lb2,
+    '--task', '1', '--base', 'HEAD', '--check']);
+  assert.equal(check.code, 0, check.out);
+  assert.ok(!check.out.includes('next:'));
+  assert.ok(fs.readdirSync(lb2).length === 0);
+});

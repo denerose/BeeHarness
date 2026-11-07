@@ -472,3 +472,37 @@ test('compact: missing phase list or row fails loud naming it', () => {
   assert.match(r2.err, /no phase list in/);
   assert.ok(r2.err.includes(phasesOf(empty)));
 });
+
+// ---- AXI pass (P6 task 6): stamp/compact mutation hints ----
+
+test('stamp: writes carry the index next-step, --check does not (AXI 9)', () => {
+  const s = sandbox();
+  entry(s.lb, '2026-11-02-x-demo-task3-verify-r1.md',
+    legacyBody('Role: task-orc'));
+  s.git('add', '.');
+  s.git('commit', '-m', 'seed');
+  const check = stamp(s.lb, '--check');
+  assert.equal(check.code, 0, check.out);
+  assert.ok(!check.out.includes('next:')); // preview stays lean
+  const r = stamp(s.lb);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out,
+    /next: bee logbook index shows the derived view\n$/);
+  // idempotent no-op run (nothing left to stamp) stays lean
+  const again = stamp(s.lb);
+  assert.equal(again.code, 0, again.out);
+  assert.ok(!again.out.includes('next:'));
+});
+
+test('compact: writes carry the phase-close next-step, --check does not (AXI 9)', () => {
+  const { root } = seedCompactFixture();
+  const check = compact(root, 'P1', '--check');
+  assert.equal(check.code, 0, check.out);
+  assert.ok(!check.out.includes('next:'));
+  const r = compact(root, 'P1');
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /next: bee phase close P1 --check\n$/);
+  // idempotent re-run (all already compacted) still names the close
+  const again = compact(root, 'P1');
+  assert.match(again.out, /next: bee phase close P1 --check\n$/);
+});

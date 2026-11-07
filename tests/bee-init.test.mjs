@@ -111,3 +111,59 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
   assert.equal(r.code, 0, r.err);
   assert.match(r.out, /harness repo — scaffolding \+ managed block skipped/);
 });
+
+// ---- AXI pass (P6 task 6): init help reachability + next-step line
+
+test('init: help exits 0 with the family usage (AXI 10)', () => {
+  const r = run(['init', 'help']);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /usage: bee init/);
+});
+
+test('init: misuse exits 1 with usage, never a raw parse error (AXI 10)', () => {
+  const r = run(['init', '--bogus']);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /usage: bee init/);
+  assert.ok(!r.err.includes('TypeError'));
+});
+
+test('init: write run ends with exactly one next-step line when nothing scaffolds (AXI 9)', () => {
+  const dir = tmp();
+  const sp = path.join(dir, 'settings.json');
+  fs.writeFileSync(sp, JSON.stringify({ skills: [] }, null, 2));
+  const repo = path.join(dir, 'repo');
+  fs.mkdirSync(repo);
+  const first = run(['init', '--settings', sp, '--machine', dir,
+    '--repo', repo]);
+  assert.equal(first.code, 0, first.err);
+  assert.match(first.out, /bee init: next — commit the scaffold/);
+  // re-runs converge on nothing-to-scaffold (docs/research lands on
+  // the second pass — the docs/ branch adds research/ only once
+  // docs/ exists); the machine store still re-registers each time
+  let again;
+  for (let i = 0; i < 2; i++) {
+    again = run(['init', '--settings', sp, '--machine', dir,
+      '--repo', repo]);
+    assert.equal(again.code, 0, again.err);
+  }
+  assert.match(again.out,
+    /bee init: next — bee init --check reports registration \+ drift/);
+  assert.equal((again.out.match(/bee init: next —/g) ?? []).length, 1);
+  // --check is a read: no next-step line
+  const check = run(['init', '--check', '--settings', sp,
+    '--machine', dir, '--repo', repo]);
+  assert.equal(check.code, 0, check.err);
+  assert.ok(!check.out.includes('bee init: next'));
+});
+
+test('harness repo: write run still ends with the next-step line (AXI 9)', () => {
+  const machine = tmp();
+  const sp = path.join(machine, 's.json');
+  fs.writeFileSync(sp, JSON.stringify({ skills: [] }, null, 2));
+  const r = run(['init', '--settings', sp, '--machine', machine,
+    '--repo', path.resolve(TESTS_DIR, '..')]);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /harness repo — scaffolding \+ managed block skipped/);
+  assert.match(r.out,
+    /bee init: next — bee init --check reports registration \+ drift/);
+});

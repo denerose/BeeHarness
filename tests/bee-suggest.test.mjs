@@ -91,3 +91,15 @@ test('local default is project-local: subprocess from a consumer repo',
       fs.rmSync(dir, { recursive: true, force: true });
     }
   }, { timeout: 30000 });
+
+// ---- AXI pass (P6 task 6): help reachability ----
+
+test('help prints usage, files nothing (AXI 10)', () => {
+  const machine = tmp();
+  const r = run(['suggest', 'help', '--machine', machine,
+    '--store', path.join(tmp(), 'inbox.toon')]);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /usage: bee suggest/);
+  const folder = path.join(machine, 'suggestions');
+  assert.ok(!fs.existsSync(folder));
+});

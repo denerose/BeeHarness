@@ -263,3 +263,31 @@ test('report: fresh file gets protocol header + placeholder list', () => {
   assert.ok(after.includes('read before regenerating'));
   assert.ok(after.includes('sample ask two'));
 });
+
+// ---- AXI pass (P6 task 6): report help reachability + mutation hint
+
+test('report: help exits 0 with the family usage (AXI 10)', () => {
+  const r = run(['report', 'help']);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /usage: bee report/);
+});
+
+test('report: misuse exits 1 with usage, never a raw parse error (AXI 10)', () => {
+  const r = run(['report', '--bogus']);
+  assert.equal(r.code, 1);
+  assert.match(r.err, /usage: bee report/);
+  assert.ok(!r.err.includes('TypeError'));
+});
+
+test('report: write output carries one next-step line (AXI 9)', () => {
+  const dir = reportTmp();
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const r = run(['report', '--status',
+    path.join(dir, '.hivemind', 'status.md'), '--report', rp]);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /wrote .+\nnext: surface .+ to the keeper\n$/);
+  const check = run(['report', '--check', '--status',
+    path.join(dir, '.hivemind', 'status.md'), '--report', rp]);
+  assert.ok(!check.out.includes('next:')); // read/preview stays lean
+});

@@ -565,3 +565,18 @@ test('migrated store lists: header counts open items, ages are ?', () => {
   assert.ok(r.out.includes('PL-PP-013'));
   assert.ok(!r.out.includes('PL-PP-012')); // resolved → not listed
 });
+
+// ---- AXI pass (P6 task 6): resolve mutation hint ----
+
+test('resolve output carries the next step (AXI 9)', () => {
+  const p = tmpStore();
+  run(['park', 'add', 'a deferred choice', '--store', p]);
+  const r = run(['park', 'resolve', 'PL-001', '--how', 'settled',
+    '--store', p]);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /PL-001 resolved — bee park list/);
+  // idempotent second call is a no-op note, not a mutation
+  const again = run(['park', 'resolve', 'PL-001', '--store', p]);
+  assert.equal(again.code, 0);
+  assert.equal(again.out, 'PL-001 already resolved\n');
+});

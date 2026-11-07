@@ -439,7 +439,9 @@ function scaffoldReport(consumer, check) {
   if (consumer.harness) {
     return { code: 0,
       out: 'bee init: harness repo — scaffolding + managed block ' +
-        'skipped\n',
+        'skipped\n' +
+        (check ? '' : 'bee init: next — bee init --check reports ' +
+          'registration + drift\n'),
       err: '' };
   }
   // Pre-flight the harness sources this scaffold copies from — a
@@ -618,11 +620,46 @@ function scaffoldReport(consumer, check) {
   if (touched) {
     lines.push('bee init: next — commit the scaffold ' +
       '(git add -A && git commit -m "bee init")');
+  } else if (!check) {
+    // AXI P9: every write-mode run ends with one next-step line —
+    // the machine store registered even when nothing scaffolded.
+    lines.push('bee init: next — bee init --check reports ' +
+      'registration + drift');
   }
   return { code: 0, out: lines.map((l) => l + '\n').join(''), err: '' };
 }
 
+const INIT_USAGE = `bee init — register + scaffold a repo onto the harness
+
+usage: bee init [--check] [--settings <path>] [--machine <dir>]
+                [--repo <dir>]
+
+  Registers the harness skills path in the pi settings, records
+  the repo in the machine store (registry.toon) with the harness
+  commit, and scaffolds what's missing: .hivemind/ class dirs +
+  templates + born-at-init stores, roles/, and the managed
+  AGENTS.md block (pointer-only; bytes outside the fences are the
+  project's own). Idempotent; --check reports without writing.
+  Refused inside a linked worktree — return to the main worktree.
+
+flags:
+  --check           never write; report registration, drift, scaffold
+  --settings <path> pi settings file
+                    (default ~/.pi/agent/settings.json)
+  --machine <dir>   machine store dir (default ~/.bee)
+  --repo <dir>      consumer repo (test seam; default cwd)
+`;
+
+function initUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + INIT_USAGE };
+}
+
 function cmdInit(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: INIT_USAGE, err: '' };
+  }
   const f = flags(rest, {
     check: { type: 'boolean' },
     settings: { type: 'string' },
@@ -630,7 +667,7 @@ function cmdInit(rest) {
     repo: { type: 'string' },
   });
   if (f.error) {
-    return { code: 1, out: '', err: String(f.error) + '\n' };
+    return initUsageErr(f.error);
   }
   // Consumer repo resolution precedes every writing step: a linked
   // worktree refuses (exit 0, nothing written — PL-PO-002).
@@ -893,7 +930,33 @@ function mergeNeeds(derived, oldZone) {
     : all.map((t, i) => `${i + 1}. ${t}`).join('\n');
 }
 
+const REPORT_USAGE = `bee report — regenerate the keeper report (ADR-008 zones)
+
+usage: bee report [--check] [--status <path>] [--report <path>]
+                  [--store <path>]
+
+  Merges open keeper asks (from the inbox store; status bullets
+  only when the store is absent) into the keeper report,
+  preserving the keeper's own zone verbatim and merging the
+  agent zones. --check prints the report it would write.
+
+flags:
+  --check         never write; print the merged report
+  --status <path> status file (default .hivemind/status.md)
+  --report <path> report file (default .hivemind/keeper-report.md)
+  --store <path>  inbox store (default .hivemind/inbox.toon)
+`;
+
+function reportUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + REPORT_USAGE };
+}
+
 function cmdReport(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: REPORT_USAGE, err: '' };
+  }
   const f = flags(rest, {
     check: { type: 'boolean' },
     status: { type: 'string' },
@@ -901,7 +964,7 @@ function cmdReport(rest) {
     store: { type: 'string' },
   });
   if (f.error) {
-    return { code: 1, out: '', err: String(f.error) + '\n' };
+    return reportUsageErr(f.error);
   }
   const statusPath = f.values.status
     ? path.resolve(f.values.status)
@@ -979,7 +1042,8 @@ function cmdReport(rest) {
   atomicWrite(reportPath, out);
   return {
     code: 0,
-    out: `bee report: wrote ${reportPath}\n`,
+    out: `bee report: wrote ${reportPath}\n` +
+      `next: surface ${reportPath} to the keeper\n`,
     err: '',
   };
 }
@@ -1342,7 +1406,8 @@ function inboxDone(args) {
   }
   const w = writeInbox(storePath, r.items);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${it.id} done\n`, err: '' };
+  return { code: 0, out: `${it.id} done — bee inbox render refreshes ` +
+    `the status view\n`, err: '' };
 }
 
 // ---- render (P4 Task 2 — the status file's marked inbox region) ----
@@ -1469,10 +1534,14 @@ function inboxRender(args) {
       err: `bee inbox render: cannot write ${statusPath}: ${e.message}\n` };
   }
   return { code: 0,
-    out: `bee inbox render: ${res.note} — ${statusPath}\n`, err: '' };
+    out: `bee inbox render: ${res.note} — ${statusPath}\n` +
+      `next: bee report renders the keeper digest\n`, err: '' };
 }
 
 function cmdCapture(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: CAPTURE_USAGE, err: '' };
+  }
   const f = flags(rest, {
     check: { type: 'boolean' },
     store: { type: 'string' },
@@ -1622,6 +1691,9 @@ function suggestHarness(text, values) {
 }
 
 function cmdSuggest(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: SUGGEST_USAGE, err: '' };
+  }
   const f = flags(rest, {
     harness: { type: 'boolean' },
     origin: { type: 'string' },
@@ -1925,7 +1997,8 @@ function parkResolve(args) {
   const w = writeStore('bee park', storePath, r.items,
     PARK_FIELDS, PARK_HEADER);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${it.id} resolved\n`, err: '' };
+  return { code: 0,
+    out: `${it.id} resolved — bee park list\n`, err: '' };
 }
 
 // migrate: the named one-shot executor converting the markdown
@@ -3178,6 +3251,7 @@ function cmdVerify(rest) {
   }
   if (willWrite) {
     const byTask = new Map();
+    let wrote = 0;
     for (const r of results) {
       if (!byTask.has(r.n)) byTask.set(r.n, []);
       byTask.get(r.n).push(r);
@@ -3220,7 +3294,14 @@ function cmdVerify(rest) {
             err: `bee verify: cannot write ${file}: ${e.message}\n` };
         }
         out += `logbook: ${designShown(file)}\n`;
+        wrote++;
       }
+    }
+    if (wrote > 0) {
+      // AXI P9: one next-step line rides the mutation — the entry
+      // is the evidence bee task move done requires.
+      out += 'next: bee task move <plan> <task-n> done --record ' +
+        '<entry above>\n';
     }
   }
   return { code: anyFail ? 1 : 0, out, err: '' };
@@ -3456,6 +3537,9 @@ function logbookStamp(args) {
       'file, then re-run bee logbook stamp\n';
     return { code: 1, out, err: '' };
   }
+  if (!f.values.check && stamped.length + topped.length > 0) {
+    out += 'next: bee logbook index shows the derived view\n';
+  }
   return { code: 0, out, err: '' };
 }
 
@@ -3638,6 +3722,9 @@ function logbookCompact(args) {
       c.name + '\n';
   }
   for (const a of already) out += `already compacted: ${a}\n`;
+  if (!f.values.check) {
+    out += `next: bee phase close ${pos[0]} --check\n`;
+  }
   return { code: 0, out, err: '' };
 }
 
@@ -4056,7 +4143,8 @@ function glossaryConvert(args) {
   }
   const w = writeGlossary(storePath, viewPath, items);
   if (w.err) return { code: 1, out: '', err: w.err };
-  return { code: 0, out, err: '' };
+  return { code: 0, out: out + 'next: bee glossary lists the terms\n',
+    err: '' };
 }
 
 // ---- task (P4 Task 6 — work-item state moves, script-owned) ----
@@ -4420,7 +4508,8 @@ function taskMove(args) {
       err: `bee task move: cannot write ${r.planPath}: ${e.message}\n` };
   }
   return { code: 0, out: `task-${n} ${stateArg} · ${ts} by ${origin}\n` +
-    `plan: ${r.planPath}\n`, err: '' };
+    `plan: ${r.planPath}\n` +
+    `next: bee task show ${r.planPath}\n`, err: '' };
 }
 
 // ---- guidance (P4 Task 7 — docs/guidance topics, read-only) ----
@@ -5162,6 +5251,7 @@ function phaseClose(args) {
     }
     out.push('6 · push · origin main · pushed\n');
   }
+  out.push('next: bee phase list shows what remains\n');
   return { code: 0, out: out.join(''), err: '' };
 }
 
@@ -5299,7 +5389,10 @@ function worktreeCreate(arg) {
   if (add.status !== 0) {
     return { code: add.status, out: '', err: worktreeChatter(add) };
   }
-  return { code: 0, out: wt + '\n', err: worktreeChatter(add) };
+  // Next-step hint rides stderr — stdout is the machine contract
+  // (the worktree path alone; AXI P1 outweighs P9 there).
+  return { code: 0, out: wt + '\n',
+    err: worktreeChatter(add) + `bee worktree: next — cd ${wt}\n` };
 }
 
 function worktreeMerge(slug) {
@@ -5341,6 +5434,8 @@ function worktreeMerge(slug) {
   let out = `merged ${branch} into ${cur}\n`;
   if (wt !== null) out += `removed worktree ${wt}\n`;
   out += `deleted branch ${branch}\n`;
+  const phaseN = cur.slice('phase/'.length);
+  err += `bee worktree: next — bee phase close ${phaseN} --check\n`;
   return { code: 0, out, err };
 }
 
@@ -5378,6 +5473,8 @@ function worktreeAbandon(slug) {
   let out = '';
   if (wt !== null) out += `removed worktree ${wt}\n`;
   out += `deleted branch ${branch}\n`;
+  err += 'bee worktree: next — create a fresh task branch when ' +
+    'the task restarts\n';
   return { code: 0, out, err };
 }
 
