@@ -115,6 +115,8 @@ task-1: done 2026-11-07T16:00:48+11:00 by bee record: .hivemind/logbook/2026-11-
 task-2: done 2026-11-07T16:00:49+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task2-verify-r2.md
 task-3: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task3-verify-r2.md
 task-7: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task7-verify-r2.md
+task-4: done 2026-11-07T16:41:01+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task4-verify-r1.md
+task-8: done 2026-11-07T16:41:02+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task8-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -366,7 +368,7 @@ removed (review note). (d) closed already-landed per D12.
 **Provides:** self-healing settings registration — dead entries
   drop on the next init run.
 
-- [ ] Step: In `cmdInit`'s settings step (D6): before the
+- [x] Step: In `cmdInit`'s settings step (D6): before the
       exact-match check, filter `entries` — any entry whose
       resolved path (after `expandTilde`) does not exist drops.
       If any dropped AND not `--check`: write the pruned settings,
@@ -374,17 +376,17 @@ removed (review note). (d) closed already-landed per D12.
       `pruned ${n} dead entry(ies): <paths>` (informational, exit
       0). In `--check`: name them as `would prune: <paths>`,
       write nothing. Prune runs in both hit and miss paths.
-- [ ] Step: Extend `tests/bee-init.test.mjs`: a settings fixture
+- [x] Step: Extend `tests/bee-init.test.mjs`: a settings fixture
       with one live entry (the target) + one dead path → init
       (non-check) drops the dead entry, keeps the live, exit 0,
       note names the pruned path; `--check` writes nothing and
       prints `would prune`; a settings file with only live entries
       is byte-unchanged.
-- [ ] Step: run `node --test tests/bee-init.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/bee-init.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-07-po-settings-skills-lifecycle.md`
       per D7.
-- [ ] Commit: `init: prune dead settings entries (self-healing)`
+- [x] Commit: `init: prune dead settings entries (self-healing)`
 
 ## Task 5: merge-level worktree suite + test convention (item 12)
 
@@ -536,7 +538,7 @@ now carries its own definition.
 **Depends on:** nothing
 **Provides:** step 4 carries the ownership filter.
 
-- [ ] Step: Replace step 4's first sentence with:
+- [x] Step: Replace step 4's first sentence with:
       "4. **Record keeper decisions as ADRs** (global `adr` skill)
       as they are agreed — a decision is what the keeper decided,
       not what the conversation concluded; when unsure, offer
@@ -544,11 +546,11 @@ now carries its own definition.
       remembering gets an ADR. Don't batch them to the end."
       (The global-skill reference itself is Task 16's scope, not
       this edit's.)
-- [ ] Step: run `grep -q 'a decision is what the keeper decided' skills/session/bee-brainstorm/SKILL.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `grep -q 'a decision is what the keeper decided' skills/session/bee-brainstorm/SKILL.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-25-po-brainstorm-ownership-filter.md`
       per D7.
-- [ ] Commit: `brainstorm: ownership filter in step 4`
+- [x] Commit: `brainstorm: ownership filter in step 4`
 
 **Task 8 notes:** review r1 FIX-FIRST (0 blocking, 1 should-fix, 3
 notes). Fixed in-round, re-review WAIVED (supply-the-term fix, loop
