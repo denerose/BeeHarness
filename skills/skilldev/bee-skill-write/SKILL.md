@@ -94,6 +94,25 @@ cores. Split the procedure while drafting:
   glossary are the references a skill may name. Paths the skill
   operates on at runtime are inputs, not citations.
 
+## Entry discipline (when a skill should run)
+
+A skill that never gets called isn't worth its storage cost; agents
+bias toward acting directly, and permissive wording licenses silent
+skipping. State entry conditions in the skill:
+
+- DISCRETIONARY skills (use is a judgment call; the answer can
+  legitimately be no) carry a 'should you use this skill?' gate —
+  criteria meeting them means USE IT; skipping requires naming,
+  out loud, which entry condition fails. Never a silent default.
+- PIPELINE stages (trigger = position in the loop) and
+  EXTERNALLY-GATED skills (trigger = explicit direction or a
+  declared mode) carry their trigger conditions instead — a gate
+  there is noise.
+- The entry check governs SELF-initiated use. A KEEPER invocation
+  (their verb — the skill's name, or direct direction) IS the entry
+  decision, already made: recognition, not evaluation. Not using a
+  skill the keeper explicitly called is the failure mode.
+
 ## Lifecycle
 
 Drafting done is not skill done. Four steps, in order:

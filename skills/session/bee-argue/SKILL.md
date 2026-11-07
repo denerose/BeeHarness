@@ -56,6 +56,15 @@ recommendation.
 5. The decision-maker decides. Arguing in parallel informs the
    choice; it never makes it.
 
+## Should you use this skill?
+
+USE IT when the decision-maker asks for something better than one
+opinion, or when a fork is few, genuinely distinct, and worth the
+dispatch cost. SKIP by naming the failed condition out loud —
+'cheap fork: a plain recommendation carries it' or 'options not
+genuinely distinct' — never silently. A plain recommendation
+remains the common right move; this skill is entered on purpose.
+
 ## Notes
 
 - Worked example, generic: given a fork over where a shared queue
@@ -64,7 +73,5 @@ recommendation.
   states the question in one sentence, briefs three workers (one per
   option), dispatches in parallel, and summarizes the three cases
   with a recommendation.
-- A tool available to any agentic user of the harness, not a rule.
-  The common right move is still a plain recommendation from the
-  agent closest to the work — but when the decision-maker asks for
-  something better than one opinion, that ask settles it: use this.
+- Dispatched workers return the FINISHED case only — no working
+  notes, transcripts, or process narration.
