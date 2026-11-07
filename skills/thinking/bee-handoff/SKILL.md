@@ -12,6 +12,14 @@ content; the wake prompt is the pointer. Read `../../GLOSSARY.md`
 (the shared bee glossary, sibling of this kit folder) first —
 especially its handoff entry.
 
+## Before writing: the continuity-law check
+
+Confirm this is a same-role refresh the role file's continuity
+law permits. Where the role's law says delegate-harder or
+crash-recovery-only, that law wins over this skill: say so and
+stop — a handoff the role's law forbids is not this skill's
+to write.
+
 ## The handoff file
 
 One file per role, named for the role:
@@ -38,6 +46,12 @@ how they resolved — and the repo itself (`git status`,
 not from recall of the last hour.
 
 ## Write the handoff
+
+This skill supersedes the previous handoff wholesale and
+refreshes the session memory's standing sections without
+per-step keeper asks — scoped tidy authority. Surfaces the
+keeper gates (parking resolves, decision records, the
+report's keeper zone) stay gated.
 
 Sections in this order; the order is the successor's reading
 order.
