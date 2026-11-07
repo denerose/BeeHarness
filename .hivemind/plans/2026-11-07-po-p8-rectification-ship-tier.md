@@ -346,6 +346,17 @@ pick-up runs first.
 - [ ] Step: run `node --test tests/bee-render.test.mjs` — pass
 - [ ] Commit: `report regen: dedupe tails, fences, live ages, source`
 
+**Task 3 notes:** review r1 FIX-FIRST (0 blocking, 3 should-fix, 4
+notes). All three fixed in-round, re-reviews WAIVED (loop law:
+reviewer-validated near-verbatim fixes + probe pins): (P1) group
+headers close the open bullet in queueBullets — pinned; (P2) the
+broad `— …` tail strip REMOVED from normItem (load-bearing for no
+pin, falsely deduped distinct asks sharing a pre-dash prefix — the
+implementer's escalation candidate adjudicated real) — pinned;
+(P3) render-view `IN-003 · 5d — ` prefix stripped so the live
+old-zone shape dedupes — pinned. Duplicate untracked verify-r2
+removed (review note). (d) closed already-landed per D12.
+
 ## Task 4: init settings prune (item 28)
 
 **Files:** modify `bin/bee.js`, `tests/bee-init.test.mjs`

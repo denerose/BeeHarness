@@ -628,3 +628,83 @@ test('migration driver (fixture): bullets → adds → render → report', () =>
   assert.ok(!zone.includes('stale ask'));
   assert.ok(zone.includes('IN-001'));
 });
+
+// Review r1 fix pins (task 3 fix round):
+// P1 — a group header inside a multi-addressee render region never
+// glues onto the preceding bullet's ask text.
+test('fallback: multi-group region headers never join ask text (r1 P1)', () => {
+  const dir = tmpDir();
+  const st = path.join(dir, 'status.md');
+  fs.writeFileSync(st, `# Status — fixture
+## Awaiting keeper (rendered from inbox.toon)
+<!-- inbox:render -->
+2 open · oldest 5d
+keeper (1 open · oldest 5d):
+- IN-001 · 5d — keeper ask one · ref: designs/w.md
+po (1 open · oldest 2d):
+- IN-002 · 2d — po ask two
+<!-- /inbox:render -->
+## Open escalations
+- none
+`);
+  const rp = path.join(dir, 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  const r = run(['report', '--status', st, '--report', rp]);
+  assert.equal(r.code, 0, r.err);
+  const zone = fs.readFileSync(rp, 'utf8')
+    .split('## Needs the keeper')[1].split('##')[0];
+  // region bullets derive cleanly — headers never glue onto them
+  assert.ok(!zone.includes('keeper ask one po ('));
+  assert.ok(!zone.includes('(1 open · oldest'));
+  assert.match(zone, /IN-001 · 5d — keeper ask one/);
+  assert.match(zone, /IN-002 · 2d — po ask two/);
+});
+
+// P2 — distinct asks sharing a pre-dash prefix stay distinct: the
+// old-zone ask is NOT dropped when a different derived ask shares
+// its prefix before an em-dash.
+test('report: distinct asks sharing a pre-dash prefix never dedupe (r1 P2)', () => {
+  const dir = tmpDir();
+  const st = writeHandStatus(dir, '.hivemind/status.md');
+  const store = path.join(dir, 'inbox.toon');
+  seedStore(store, [
+    { text: 'revisit the auth split — gate on the perf numbers first',
+      opened: daysAgoIso(2), origin: 'po' },
+  ]);
+  const rp = path.join(dir, '.hivemind', 'keeper-report.md');
+  const base = fs.readFileSync(path.join(FIX, 'report.md'), 'utf8');
+  fs.writeFileSync(rp, base.replace('## Needs the keeper\n',
+    '## Needs the keeper\n' +
+    '1. revisit the auth split — option C blocked upstream\n'));
+  const r = run(['report', '--status', st, '--report', rp,
+    '--store', store]);
+  assert.equal(r.code, 0, r.err);
+  const zone = fs.readFileSync(rp, 'utf8')
+    .split('## Needs the keeper')[1].split('##')[0];
+  assert.ok(zone.includes('option C blocked upstream')); // kept — distinct ask
+});
+
+// P3 — the render-view old-zone shape (`IN-003 · 5d — text · ref:`)
+// dedupes against the store-derived ask of the same text.
+test('report: render-view old-zone lines dedupe against store asks (r1 P3)', () => {
+  const dir = tmpDir();
+  const st = writeHandStatus(dir, '.hivemind/status.md');
+  const store = path.join(dir, 'inbox.toon');
+  seedStore(store, [
+    { text: 'confirm the widget staging gate', opened: daysAgoIso(5),
+      origin: 'po', ref: '.hivemind/status.md' },
+  ]);
+  const rp = path.join(dir, '.hivemind', 'keeper-report.md');
+  fs.copyFileSync(path.join(FIX, 'report.md'), rp);
+  fs.appendFileSync(rp,
+    '\n1. IN-001 · 5d — confirm the widget staging gate · ref: ' +
+    path.join(dir, '.hivemind', 'status.md') + '\n');
+  const r = run(['report', '--status', st, '--report', rp,
+    '--store', store]);
+  assert.equal(r.code, 0, r.err);
+  const zone = fs.readFileSync(rp, 'utf8')
+    .split('## Needs the keeper')[1].split('##')[0];
+  const hits =
+    (zone.match(/confirm the widget staging gate/g) || []).length;
+  assert.equal(hits, 1);
+});

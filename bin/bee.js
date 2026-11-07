@@ -843,6 +843,13 @@ function queueBullets(statusText) {
       continue;
     }
     if (/^<!--.*-->$/.test(t)) continue; // markers, not asks
+    // view group headers (`name (N open · oldest X):`) close the
+    // open bullet too — in multi-addressee regions a header follows
+    // a bullet and must never glue onto it (review r1 P1)
+    if (/^\S[^(:]*\s\(\d+ open · oldest \S+\):$/.test(t)) {
+      if (cur !== null) { bullets.push(cur); cur = null; }
+      continue;
+    }
     if (line.startsWith('- ')) {
       if (cur !== null) bullets.push(cur);
       cur = line.slice(2);
@@ -896,12 +903,17 @@ function normItem(s) {
   return s.replace(/^\d+\.\s*/, '')
     .replace(/^\[[^\]]*\]\s*/, '') // leading [role] tag
     .replace(/^\d{4}-\d{2}-\d{2}\s*[—-]?\s*/, '') // leading date
-    // tail wrappers ride the same ask: a trailing (id · ref) group,
-    // a ` · ref: …` pointer, or an `— …` tail — compare on the
-    // core text (P8 item 24a)
+    // render-view wrapper: a leading `IN-003 · 5d — ` id·age prefix
+    // (the view's own bullet shape — review r1 P3; without this the
+    // tail strips below never see the core text)
+    .replace(/^IN-\d{3}\s+·\s+\S+\s+—\s+/, '')
+    // tail wrappers ride the same ask: a trailing (id · ref) group
+    // or a ` · ref: …` pointer — compare on the core text (P8 item
+    // 24a). No broad `— …` tail strip: it ate core text from the
+    // first mid-text dash and falsely deduped distinct asks sharing
+    // a pre-dash prefix (review r1 P2 — none of the pins needed it)
     .replace(/\s*\([^)]*\)$/, '')
     .replace(/\s+·\s+ref:\s*\S.*$/i, '')
-    .replace(/\s+[—–]\s+\S.*$/, '')
     .replace(/[*_`]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
