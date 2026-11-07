@@ -35,7 +35,10 @@ small task the keeper wants planned. Output: one file in
    plan, the references it names, and a minimal role file can
    execute the task cold — without asking the dispatcher anything
    the plan could have said. Repeat what matters; don't make
-   anyone hunt.
+   anyone hunt. State grep expectations as minimums (`≥ N`)
+   unless the exact count IS the contract (duplicate detection);
+   a wrong exact count forced a mid-loop plan correction once —
+   minimums keep the check honest when the corpus moves.
 5. **Declare the validation level** (GLOSSARY) in the header. It comes
    from the design doc if it declares one; otherwise you recommend a
    level with a one-line reason, and the keeper or bee-plan-review
@@ -65,7 +68,10 @@ mechanically. The task's verification command (rule 4) is its
 `checks:` entry's `cmd` — one command, both homes. Save as
 `.hivemind/plans/YYYY-MM-DD-<pp|po>-<slug>.md` — your role's initials
 in the slug (pp = power-planner, po = project-orchestrator) —
-with `**Reviewed:** PENDING`.
+with `**Reviewed:** PENDING`. Before writing corpus claims
+(counts, coverage, form-breakdowns), run `scripts/plan-census.sh`
+over the plans and logbook dirs and quote its numbers — the
+gate judges interpretation, not arithmetic.
 Then run the `bee-plan-review` skill on it — the gate is not
 optional. Fix the findings (the keeper may waive should-fix items —
 bee-plan-review's should-fix tier — with a one-line recorded reason), re-run
