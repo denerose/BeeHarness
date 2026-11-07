@@ -878,5 +878,5 @@ skill :: a procedure: how a class of work gets done; skills stay role-agnostic :
   authority, disclosed after.
 - Close ceremony: decisions inventory (new split counts) →
   mechanical `bee phase close 8` → keeper sign-off by decisions
-  (one card per judgment call; this plan's D5-D12 + in-phase
+  (one card per judgment call; this plan's D5-D13 + in-phase
   rulings) → final close card.
