@@ -54,9 +54,8 @@ checks:
     expect: exit 0
     files: [.hivemind/config.toon, scripts/structure.map, docs/adoption.md, README.md]
 suite: node --test tests/*.test.mjs
-task-1: done 2026-11-02T17:09:03+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task1-verify-r1.md
-task-5: done 2026-11-02T17:08:30+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task5-verify-r2.md
 task-2: done 2026-11-07T11:14:10+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task2-verify-r1.md
+task-4: done 2026-11-07T11:13:47+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task4-verify-r3.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -608,10 +607,10 @@ test('single fence: fail loud, no writes', () => {
 **Depends on:** task 1 (`--machine` seam, machine dir helpers)
 **Provides:** `bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>] [--store <path>] [--machine <dir>]` — USAGE line added to the top-level usage block.
 
-- [ ] Step: local default = `bee inbox add` semantics (addressee
+- [x] Step: local default = `bee inbox add` semantics (addressee
   `keeper`, origin from `--origin` else `agent`, text as given); output
   mirrors inbox add's confirmation (reuse `inboxAddItem`).
-- [ ] Step: `--harness` files one TOON document at
+- [x] Step: `--harness` files one TOON document at
   `<machine>/suggestions/<repo-name>/NNNN-<slug>.toon` where
   `<repo-name>` = basename of the consumer repo (cwd), NNNN = next
   number in that folder (zero-padded 4), slug = kebab-case of the first
@@ -627,10 +626,10 @@ harness :: <harness short sha>
 text :: <the suggestion text, one or more lines>
 ```
 
-- [ ] Step: output (AXI 4/9):
+- [x] Step: output (AXI 4/9):
   `bee suggest: filed <machine>/suggestions/<repo>/NNNN-<slug>.toon (#<NNNN>) · triage happens harness-side` — and exit 0.
   Empty text / missing quotes: structured error + usage, exit 1.
-- [ ] Step: create `tests/bee-suggest.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-suggest.test.mjs` (verbatim below) and run
   `node --test tests/bee-suggest.test.mjs` — all pass.
 
 ```javascript path=tests/bee-suggest.test.mjs
@@ -696,7 +695,7 @@ test('empty text: structured error, exit 1', () => {
 });
 ```
 
-- [ ] Commit: `bee suggest: local + harness feedback channel`
+- [x] Commit: `bee suggest: local + harness feedback channel`
 
 ## Task 5: `bee worktree` — fold the script into the CLI
 

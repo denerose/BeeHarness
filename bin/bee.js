@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`, `bee memory`, `bee design`, `bee verify`,
-// `bee logbook`, `bee glossary`, `bee task`, `bee guidance`, `bee phase`,
-// `bee worktree`.
+// `bee capture`, `bee suggest`, `bee park`, `bee memory`, `bee design`,
+// `bee verify`, `bee logbook`, `bee glossary`, `bee task`, `bee guidance`,
+// `bee phase`, `bee worktree`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -48,6 +48,8 @@ usage:
              | pick-up <doc> --phase <n> [--check]
              | implement <doc> --phase <n> --merge <hash> [--check]
   bee capture "<thought>"
+  bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>]
+              [--store <path>] [--machine <dir>]
   bee logbook [index [--logbook <dir>]]
              | stamp [--logbook <dir>]
              | compact <phase> [--logbook <dir>]
@@ -100,6 +102,9 @@ export function run(argv) {
   }
   if (cmd === 'capture') {
     return cmdCapture(rest);
+  }
+  if (cmd === 'suggest') {
+    return cmdSuggest(rest);
   }
   if (cmd === 'logbook') {
     return cmdLogbook(rest);
@@ -1375,6 +1380,166 @@ function cmdCapture(rest) {
     check: f.values.check,
     verb: 'captured',
   });
+}
+
+// ---- suggest (P6 Task 4 — feedback channel: project inbox by
+// default, harness machine store via --harness) -----------------------
+
+const SUGGEST_USAGE = `bee suggest "<text>" — feedback to the project inbox, or the harness
+
+usage: bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>]
+                      [--store <path>] [--machine <dir>]
+
+  default adds to the project inbox (addressee keeper; origin from
+  --origin, else agent); --harness files a numbered TOON document
+  under the machine store's suggestions/ — triage happens harness-side
+`;
+
+function suggestUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + SUGGEST_USAGE };
+}
+
+// Kebab slug of the first six words: lowercase, each
+// non-alphanumeric run collapses to a single '-'; an empty result
+// falls back to 'item'.
+function suggestSlug(text) {
+  const slug = text.trim().split(/\s+/).slice(0, 6).join(' ')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug || 'item';
+}
+
+// The LOCAL default store is PROJECT-LOCAL: the repo root of the
+// current directory (git common-dir aware — review r1 blocking:
+// storePathOf's REPO_ROOT default would route consumer-repo feedback
+// into the harness repo's own inbox). Falls back to cwd when not in
+// a git repo.
+function suggestStorePath(p) {
+  if (p) return path.resolve(p);
+  const r = spawnSync('git', ['rev-parse', '--path-format=absolute',
+    '--git-common-dir'], { cwd: process.cwd(), encoding: 'utf8' });
+  const root = r.status === 0
+    ? path.dirname(r.stdout.trim())
+    : process.cwd();
+  return path.join(root, '.hivemind', 'inbox.toon');
+}
+
+// NNNN = highest 4-digit prefix in the folder + 1; an absent folder
+// starts at 0001.
+function nextSuggestNumber(folder) {
+  let names = [];
+  try {
+    names = fs.readdirSync(folder);
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e;
+  }
+  let max = 0;
+  for (const n of names) {
+    const m = /^(\d{4})-/.exec(n);
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return String(max + 1).padStart(4, '0');
+}
+
+// The text value rides the 'text :: ' field, wrapped at 72 cols;
+// continuation lines indent to the value column so multi-line
+// values stay unambiguous in the document.
+function wrapText72(text) {
+  const indent = '        '; // 'text :: '.length
+  const out = [];
+  for (const srcLine of String(text).split('\n')) {
+    const words = srcLine.split(/\s+/).filter(Boolean);
+    if (words.length === 0) {
+      out.push('');
+      continue;
+    }
+    let line = '';
+    for (const w of words) {
+      const cand = line ? line + ' ' + w : w;
+      if (line && cand.length > 72 - indent.length) {
+        out.push(line);
+        line = w;
+      } else {
+        line = cand;
+      }
+    }
+    if (line) out.push(line);
+  }
+  return out.map((l, i) => i === 0 ? 'text :: ' + l
+    : l ? indent + l : l).join('\n');
+}
+
+// --harness: one TOON document per suggestion under
+// <machine>/suggestions/<repo-name>/, carrying provenance (repo,
+// role, date, harness commit — the pin the suggestion speaks to).
+function suggestHarness(text, values) {
+  const machine = machineDirOf(values.machine);
+  const repo = path.basename(process.cwd());
+  const headR = spawnSync('git', ['rev-parse', 'HEAD'],
+    { cwd: REPO_ROOT, encoding: 'utf8' });
+  if (headR.status !== 0) {
+    return { code: 1, out: '',
+      err: `bee suggest: cannot read harness commit in ${REPO_ROOT}: ` +
+        `${(headR.stderr || '').trim()}\n` };
+  }
+  const folder = path.join(machine, 'suggestions', repo);
+  const num = nextSuggestNumber(folder);
+  const file = path.join(folder, `${num}-${suggestSlug(text)}.toon`);
+  const doc =
+    `# harness feedback — ${repo}\n` +
+    `repo :: ${repo}\n` +
+    `role :: ${values.origin || 'agent'}\n` +
+    `date :: ${new Date().toISOString()}\n` +
+    `harness :: ${shortSha(headR.stdout.trim())}\n` +
+    wrapText72(text) + '\n';
+  try {
+    fs.mkdirSync(folder, { recursive: true });
+    atomicWrite(file, doc);
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee suggest: cannot write ${file}: ${e.message}\n` };
+  }
+  return { code: 0,
+    out: `bee suggest: filed ${file} (#${num}) · triage happens ` +
+      `harness-side\n`, err: '' };
+}
+
+function cmdSuggest(rest) {
+  const f = flags(rest, {
+    harness: { type: 'boolean' },
+    origin: { type: 'string' },
+    ref: { type: 'string' },
+    store: { type: 'string' },
+    machine: { type: 'string' },
+  }, true);
+  if (f.error) return suggestUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0].trim() === '') {
+    return { code: 1, out: '',
+      err: 'bee suggest: expected "<text>"\n\n' + SUGGEST_USAGE };
+  }
+  const text = pos[0];
+  if (f.values.harness) return suggestHarness(text, f.values);
+  const store = suggestStorePath(f.values.store);
+  const r = inboxAddItem({
+    storePath: store,
+    addressee: 'keeper',
+    text,
+    origin: f.values.origin || 'agent',
+    ref: f.values.ref,
+    verb: 'suggested',
+  });
+  // When the project-local store differs from `bee inbox`'s default
+  // (the harness checkout's), the follow-up hint must name the store
+  // — otherwise `bee inbox show IN-001` reads the wrong store
+  // (review r2 should-fix).
+  if (r.code === 0 && store !== storePathOf(undefined)) {
+    r.out = r.out.replace(/bee inbox show (IN-\d+)/,
+      `bee inbox show $1 --store ${store}`);
+  }
+  return r;
 }
 
 // ---- park (P4 Task 3 — .hivemind/memory/parking-lot.toon) ----
