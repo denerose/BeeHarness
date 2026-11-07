@@ -557,7 +557,7 @@ function scaffoldReport(consumer, check) {
   step('.hivemind/glossary.toon',
     fs.existsSync(path.join(repoRoot, '.hivemind', 'glossary.toon')),
     () => atomicWrite(path.join(repoRoot, '.hivemind', 'glossary.toon'),
-      GLOSSARY_HEADER + '\n'));
+      TEMPLATE_GLOSSARY_SEED));
   step('.hivemind/status.md',
     fs.existsSync(path.join(repoRoot, '.hivemind', 'status.md')),
     () => atomicWrite(path.join(repoRoot, '.hivemind', 'status.md'),
@@ -3980,6 +3980,35 @@ function logbookCompact(args) {
 
 const GLOSSARY_HEADER =
   '# glossary — shared vocabulary (term :: gist :: see; supply, never update)';
+
+// Template glossary seed (P8 task 17, item 4, D10): the core bee
+// vocabulary a fresh consumer repo starts with — the header plus
+// 21 term lines, self-contained and user-extendable. Written by
+// scaffold step 6; the step's exists-guard means a repo's
+// glossary.toon is never re-seeded once it exists.
+const TEMPLATE_GLOSSARY_SEED = GLOSSARY_HEADER + `
+bee :: the harness CLI; its commands operate on the project's .hivemind/ stores :: -
+bee- kit :: the shipped skills; the bee- prefix marks what ships with the harness :: -
+bee-loop :: the plan → implement → verify → review cycle; entered only by explicit direction :: -
+plan :: the step-by-step document a loop executes; lives in .hivemind/plans/ :: -
+phase list :: one line per phase in .hivemind/phases/; the queue's source of truth :: -
+dispatch :: a role sending work to a subagent within its own mandate :: -
+dispatch brief :: the contract sent with a dispatch: plan path, phase, escalation envelope, workspace, pass-back shape :: -
+keeper :: the human owner; final authority on every decision that matters :: -
+escalate :: stop and ask the keeper: one decision per card, options, a recommendation :: -
+logbook :: the loop's written account in .hivemind/logbook/; claims don't move states — records do :: -
+work-item states :: draft → implemented → verified → reviewed → done; each move needs its evidence :: -
+claim :: the phase list's owner column: role + timestamp, written before dispatch :: -
+validation level :: how much checking a stage gets: task · merge · phase · release :: -
+parking lot :: deferred decisions with unpark conditions; only the keeper resolves one :: -
+status surface :: the cross-role notes file; both roles read it at session start :: -
+inbox :: the store of items waiting on someone: add · list · show · done :: -
+TOON :: token-oriented notation: the token-lean, line-oriented store format agents read :: -
+handoff :: same role, fresh context: handoff file plus a wake prompt for the keeper :: -
+relay :: context between different roles: gated (keeper-passed) or ambient (shared surfaces) :: -
+role :: a named agent spec in roles/: mandate plus attributes; assumed by direction, never inferred :: -
+skill :: a procedure: how a class of work gets done; skills stay role-agnostic :: -
+`;
 
 const GLOSSARY_VIEW_MARKER = '<!-- glossary view — script-owned: ' +
   'bee glossary regenerates this file on every store write; ' +
