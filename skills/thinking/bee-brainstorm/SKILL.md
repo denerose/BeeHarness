@@ -39,8 +39,9 @@ Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) f
    always fine; what you may not do is finalize a design doc without
    the keeper approving each section.
 4. **Record keeper decisions as ADRs** (the project's own
-   decision-record practice) as they are agreed — a decision is what
-   the keeper decided, not what the conversation concluded; when
+   decision-record practice) as they are agreed —
+   a decision is what the keeper decided, not what the
+   conversation concluded; when
    unsure, offer first (GLOSSARY: memory ownership). Every decision
    worth remembering gets an ADR. Don't batch them to the end.
 5. **Write a design doc only if one design will guide several plans**

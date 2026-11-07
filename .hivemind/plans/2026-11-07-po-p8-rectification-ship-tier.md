@@ -899,6 +899,16 @@ Blocking = always re-reviewed → r2 dispatched.
 - [ ] Step: run `! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/` — exit 0
 - [ ] Commit: `ship-tier: self-contained rule text, records out of roles/`
 
+**Task 16 notes:** review r1 FIX-FIRST (1 blocking, 0 should-fix,
+3 notes). Blocking fixed in-round: the bee-brainstorm re-wrap split
+task-8's pinned grep phrase across lines — re-wrapped so the phrase
+sits contiguous; probe replicated (corrected-path grep PASS). THE
+LOAD-BEARING NOTE: Task 12 was never dispatched (reviewer's find —
+no records, unchecked boxes, bee-handoff lacks the section). The
+machine header's checks for tasks 8/11/12/13/14 still point at
+skills/session/ (Task-15-era staleness) — header paths need the
+loop's maintenance pass. Blocking = always re-reviewed → r2.
+
 ## Task 17: template glossary seed (item 4, D10)
 
 **Files:** modify `bin/bee.js`, `tests/bee-init.test.mjs`
