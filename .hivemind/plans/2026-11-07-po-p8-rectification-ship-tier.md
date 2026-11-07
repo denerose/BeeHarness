@@ -113,6 +113,8 @@ checks:
 suite: node --test tests/*.test.mjs
 task-1: done 2026-11-07T16:00:48+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task1-verify-r1.md
 task-2: done 2026-11-07T16:00:49+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task2-verify-r2.md
+task-3: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task3-verify-r2.md
+task-7: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task7-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -308,7 +310,7 @@ pick-up runs first.
   leak into ask text; ages never frozen; Source line truthful —
   pinned by tests either way.
 
-- [ ] Step: Pin FIRST (D12): write tests for all four defects
+- [x] Step: Pin FIRST (D12): write tests for all four defects
       against current code — (a) two asks differing only in tail
       (id/path/date wrappers: `[PO] 2026-11-07 — confirm X (IN-001
       · /abs/ref)` vs `confirm X · ref: .hivemind/status.md`)
@@ -323,16 +325,16 @@ pick-up runs first.
       `**Source:** \`…inbox.toon\``. Run; record which pass
       already — those sub-items close as already-landed, no code
       change.
-- [ ] Step: Fix (a) where failing: extend `normItem` to strip a
+- [x] Step: Fix (a) where failing: extend `normItem` to strip a
       trailing parenthetical group `\s*\([^)]*\)$` and any
       ` · ref: …` / `— …` tail separators before comparison —
       compare on the ask's core text.
-- [ ] Step: Fix (b) where failing: in `queueBullets`, stop
+- [x] Step: Fix (b) where failing: in `queueBullets`, stop
       absorbing continuation lines into an open bullet once a
       render-fence line (`<!-- inbox:render` /
       `<!-- /inbox:render` prefix) is seen; fences never join
       bullet text.
-- [ ] Step: Fix (c) where failing: after a successful store
+- [x] Step: Fix (c) where failing: after a successful store
       mutation in `cmdInbox` add/done, `cmdCapture`, and
       `cmdPark` add/resolve — when a status file with a balanced
       render region exists at the default/derived status path —
@@ -341,10 +343,10 @@ pick-up runs first.
       Failure to re-render (missing status file, unbalanced
       region) is an informational stderr note, never a nonzero
       exit.
-- [ ] Step: Fix (d) where failing: the merge-regen header replace
+- [x] Step: Fix (d) where failing: the merge-regen header replace
       must always end with the true `source` value.
-- [ ] Step: run `node --test tests/bee-render.test.mjs` — pass
-- [ ] Commit: `report regen: dedupe tails, fences, live ages, source`
+- [x] Step: run `node --test tests/bee-render.test.mjs` — pass
+- [x] Commit: `report regen: dedupe tails, fences, live ages, source`
 
 **Task 3 notes:** review r1 FIX-FIRST (0 blocking, 3 should-fix, 4
 notes). All three fixed in-round, re-reviews WAIVED (loop law:
@@ -483,7 +485,7 @@ removed (review note). (d) closed already-landed per D12.
 **Provides:** census helper `scripts/plan-census.sh`; the
   minimums rule in bee-plan + the template's verify-step line.
 
-- [ ] Step: `scripts/plan-census.sh` (bash, TOON-ish output like
+- [x] Step: `scripts/plan-census.sh` (bash, TOON-ish output like
       plan-checks.sh): usage `plan-census.sh <plans-dir>
       <logbook-dir>`; emits (a) per-plan-file: lines, has-machine
       block (y/n), `phase:` value, task count; (b) corpus counts:
@@ -494,7 +496,7 @@ removed (review note). (d) closed already-landed per D12.
       verdict line vs without); (c) exit 0 always except usage
       (2) / missing dir (1). No findings — it is a census, not a
       gate.
-- [ ] Step: bee-plan SKILL.md rule 4 (self-contained-task
+- [x] Step: bee-plan SKILL.md rule 4 (self-contained-task
       standard — it owns the verification-command standard; the
       design doc's "rule 3" anchor predates a renumbering) gains:
       "State grep
@@ -502,24 +504,24 @@ removed (review note). (d) closed already-landed per D12.
       the contract (duplicate detection); a wrong exact count
       forced a mid-loop plan correction once — minimums keep the
       check honest when the corpus moves."
-- [ ] Step: plan-template.md verify-step example line becomes:
+- [x] Step: plan-template.md verify-step example line becomes:
       `- [ ] Step: run \`verification command\` — expected result
       (grep expectations as minimums, ≥ N, unless the exact count
       is the contract)`.
-- [ ] Step: bee-plan SKILL.md Format section gains the census
+- [x] Step: bee-plan SKILL.md Format section gains the census
       step: "Before writing corpus claims (counts, coverage,
       form-breakdowns), run `scripts/plan-census.sh` over the
       plans and logbook dirs and quote its numbers — the gate
       judges interpretation, not arithmetic."
-- [ ] Step: `tests/plan-census.test.mjs`: fixtures (two plans,
+- [x] Step: `tests/plan-census.test.mjs`: fixtures (two plans,
       one headerless; three logbook files mixing Role forms and
       verdict lines) → assert emitted counts; usage error exits 2.
-- [ ] Step: run `node --test tests/plan-census.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/plan-census.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-20-verify-expectations-as-minimums.md`
       per D7. (The census suggestion is a LIVE file — stamp
       Outcome only, leave for triage per D7.)
-- [ ] Commit: `plan: grep minimums + corpus census helper`
+- [x] Commit: `plan: grep minimums + corpus census helper`
 
 **Task 7 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 3
 notes). Should-fix fixed in-round, re-review WAIVED (one-word key
