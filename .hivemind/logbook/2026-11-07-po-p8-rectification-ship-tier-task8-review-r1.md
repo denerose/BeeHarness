@@ -2,7 +2,7 @@
 
 **Role:** project-orchestrator (dispatching loop; reviewer cold-dispatched)
 **Reviewer:** bee-review stage agent, cold dispatch, 600s budget
-**Plan section:** [Task 8](../../plans/2026-11-07-po-p8-rectification-ship-tier.md)
+**Plan section:** [Task 8](../plans/2026-11-07-po-p8-rectification-ship-tier.md)
 **Verify record:** [task8-verify-r1](2026-11-07-po-p8-rectification-ship-tier-task8-verify-r1.md)
 
 Scope reviewed: `git diff d3e191e..HEAD` on `task/8-brainstorm-filter`
