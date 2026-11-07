@@ -2579,19 +2579,24 @@ function designShown(p) {
   return rel.startsWith('..') ? p : rel;
 }
 
-function runDesignScript(args) {
+function runDesignScript(args, opts = {}) {
+  // opts.cwd runs the script in another checkout (bee phase close
+  // stamps designs in the closed repo); opts.prog renames it in
+  // messages. No opts — behavior unchanged.
+  const prog = opts.prog || 'bee design';
   const script = path.join(REPO_ROOT, 'scripts', 'design.sh');
   if (!fs.existsSync(script)) {
     return { code: 1, out: '',
-      err: `bee design: missing ${script} — check the checkout\n` };
+      err: `${prog}: missing ${script} — check the checkout\n` };
   }
   const r = spawnSync('bash', [script, ...args], {
     encoding: 'utf8',
-    env: { ...process.env, BEE_DESIGN_PROG: 'bee design' },
+    cwd: opts.cwd,
+    env: { ...process.env, BEE_DESIGN_PROG: prog },
   });
   if (r.error) {
     return { code: 1, out: '',
-      err: `bee design: cannot run ${script}: ${r.error.message}\n` };
+      err: `${prog}: cannot run ${script}: ${r.error.message}\n` };
   }
   return { code: r.status ?? 1, out: r.stdout ?? '', err: r.stderr ?? '' };
 }
@@ -4657,11 +4662,14 @@ function guidanceShow(args) {
 // The close is the loop's mechanical tail: gate (branch exists +
 // suite green at its tree), no-ff merge phase/<n> → main (the P3/P7
 // lesson — a phase is a real merge commit, never a fast-forward),
-// rest the persistent worktree detached at main, delete the phase
-// branch, emit the close card with the decision count (the P7
-// calibration signal; threshold calibratable later), push. The
-// decision inventory is agent-assembled content in a script-owned
-// format: one line per decision, id · one-line · source-record-path.
+// flip the phase row → done + close note and stamp its unstamped
+// design docs via design.sh (P8 Task 2), rest the persistent
+// worktree detached at main, delete the phase branch, emit the
+// close card with the split decision count (front-loaded vs
+// in-phase — the under-asked flag fires on in-phase only), push.
+// The decision inventory is agent-assembled content in a
+// script-owned format: one line per decision, id · one-line ·
+// source-record-path.
 
 const PHASE_FLAG_THRESHOLD = 8;
 
@@ -4689,14 +4697,21 @@ commands:
                   2 merge   --no-ff phase/<n> → main, from the main
                             checkout on main, tree clean (the
                             decision inventory itself is exempt —
-                            it is expected pre-close)
+                            it is expected pre-close); then flip
+                            the phase row → done + close note and
+                            stamp its unstamped design docs
+                            (missing row: informational, never
+                            a failure)
                   3 rest    persistent worktree on phase/<n>
                             detached at main (skipped when none)
                   4 delete  branch phase/<n> (-d, merged only)
-                  5 card    decisions: <n> — the inventory's
-                            decision lines; flag 'under-asked
+                  5 card    decisions: <n> (front-loaded <k> ·
+                            in-phase <r>) — kickoff:/plan-time:
+                            one-lines count front-loaded; flag
+                            'under-asked
                             kickoff — front-load harder next phase'
-                            when n > ${PHASE_FLAG_THRESHOLD} (threshold
+                            when in-phase > ${PHASE_FLAG_THRESHOLD}
+                            and in-phase > front-loaded (threshold
                             calibratable later; waivers count —
                             a waiver is a decision)
                   6 push    origin main (skipped with a note when
@@ -4874,6 +4889,23 @@ function phaseDecisionLines(text) {
     .filter((l) => l.includes(' · '));
 }
 
+// P8 Task 2 (D5): the inventory's one-line text encodes provenance
+// — a kickoff/plan-time prefix marks a front-loaded decision; every
+// other prefix (review-driven, dogfood, …) is in-phase. Returns
+// { front, inPhase } over phaseDecisionLines output.
+function phaseDecisionSplit(lines) {
+  let front = 0;
+  for (const l of lines) {
+    const first = l.indexOf(' · ');
+    const last = l.lastIndexOf(' · ');
+    const oneLine = first === -1 || last === first
+      ? l
+      : l.slice(first + 3, last);
+    if (/^(kickoff|plan-time)\b/.test(oneLine.trim())) front++;
+  }
+  return { front, inPhase: lines.length - front };
+}
+
 function phaseInventory(args) {
   const f = flags(args, {
     decisions: { type: 'string' },
@@ -5024,6 +5056,141 @@ function phaseSuiteGate(root, branch, suite, pwt, pwtClean) {
   return res;
 }
 
+// The phase row: the first (sorted) .hivemind/phases/ file
+// carrying a '| P<n> |' table row. Returns { file, lines, rowIdx }
+// or { none: reason } — a missing board is a consumer-layout fact,
+// reported informationally, never a close failure.
+function phaseRowFind(root, n) {
+  const dir = path.join(root, '.hivemind', 'phases');
+  let names;
+  try {
+    names = fs.readdirSync(dir);
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      return { none: 'no .hivemind/phases/ directory' };
+    }
+    return { none: `cannot read ${dir}: ${e.message}` };
+  }
+  const re = new RegExp(`^\\| P${n} \\|`);
+  for (const name of names.sort()) {
+    let text;
+    try {
+      text = fs.readFileSync(path.join(dir, name), 'utf8');
+    } catch (e) {
+      continue; // unreadable — not a board candidate
+    }
+    const lines = text.split('\n');
+    const rowIdx = lines.findIndex((l) => re.test(l));
+    if (rowIdx !== -1) {
+      return { file: path.join(dir, name), lines, rowIdx };
+    }
+  }
+  return { none: `no | P${n} | row under .hivemind/phases/` };
+}
+
+// The row's backticked designs/<file>.md entries (designs cell).
+// An entry is stamped when the text after its closing backtick (to
+// the next backtick or cell end) carries '(implemented @'.
+function phaseRowDesigns(cell) {
+  const out = [];
+  const re = /`(designs\/[^`]+\.md)`/g;
+  let m;
+  while ((m = re.exec(cell)) !== null) {
+    const afterStart = m.index + m[0].length;
+    const nextTick = cell.indexOf('`', afterStart);
+    const after = cell.slice(afterStart,
+      nextTick === -1 ? cell.length : nextTick);
+    out.push({ entry: m[1], stamped: after.includes('(implemented @') });
+  }
+  return out;
+}
+
+// Step 2's mechanical tail: flip the phase row (status → done,
+// close note into the escalations cell — replacing a —/empty
+// placeholder) and stamp the row's unstamped design docs via
+// scripts/design.sh (cwd = the closed repo; refusals informational).
+// Flip, note, and (implemented @ …) annotations land in ONE atomic
+// row write. Returns { lines, written }; a missing row, an
+// already-done row, and design refusals are informational lines —
+// never failures. Only the row write itself failing sets err.
+function phaseRowFlip(root, n, mergeSha, check) {
+  const lines = [];
+  const found = phaseRowFind(root, n);
+  if (found.none !== undefined) {
+    lines.push(`  phase row: ${found.none} — ` +
+      (check ? 'would skip\n' : 'flip skipped\n'));
+    return { lines, written: false };
+  }
+  const rel = path.relative(root, found.file);
+  const cells = found.lines[found.rowIdx].split('|');
+  if (cells.length < 9) {
+    lines.push(`  phase row: ${rel} row does not follow the 7-column ` +
+      `template — ${check ? 'would skip' : 'flip skipped'}\n`);
+    return { lines, written: false };
+  }
+  const statusOld = cells[3].trim();
+  if (statusOld === 'done') {
+    lines.push(`  phase row: P${n} already done — no-op (${rel})\n`);
+    return { lines, written: false };
+  }
+  const designs = phaseRowDesigns(cells[4]);
+  const todo = designs.filter((d) => !d.stamped);
+  const designNote = designs.length === 0
+    ? `  designs: none linked in the P${n} row\n`
+    : '  designs: all stamped — none to implement\n';
+  if (check) {
+    lines.push(`  phase row: would flip P${n} ${statusOld} → done (${rel})\n`);
+    lines.push(todo.length === 0 ? designNote
+      : `  designs: would stamp ${todo
+          .map((d) => path.join('.hivemind', d.entry)).join(', ')}\n`);
+    return { lines, written: false };
+  }
+  // stamp the unstamped docs first — annotations ride the row write
+  const stamped = [];
+  for (const d of todo) {
+    const r = runDesignScript(
+      ['implement', path.join('.hivemind', d.entry),
+        '--phase', String(n), '--merge', mergeSha],
+      { cwd: root, prog: 'bee phase close' });
+    if (r.code === 0) {
+      stamped.push(d);
+      lines.push(`  designs: ${path.join('.hivemind', d.entry)} — ` +
+        `stamped (implemented @ ${mergeSha})\n`);
+    } else {
+      const first = (r.err.split('\n')
+        .find((l) => l.trim() !== '') || `exit ${r.code}`)
+        .replace(/^bee phase close: /, '');
+      lines.push(`  note: ${first}\n`);
+    }
+  }
+  if (todo.length === 0) lines.push(designNote);
+  cells[3] = statusOld === ''
+    ? ' done '
+    : cells[3].replace(statusOld, 'done');
+  for (const d of stamped) {
+    cells[4] = cells[4].replace('`' + d.entry + '`',
+      '`' + d.entry + '` (implemented @ ' + mergeSha + ')');
+  }
+  const escIdx = cells.length - 2;
+  const closeNote = `close via bee phase close ${n} (merge ${mergeSha})`;
+  const esc = cells[escIdx].trim();
+  cells[escIdx] = esc === '' || esc === '—'
+    ? ' ' + closeNote + ' '
+    : cells[escIdx].trimEnd() + ' · ' + closeNote + ' ';
+  const newLines = found.lines.slice();
+  newLines[found.rowIdx] = cells.join('|');
+  try {
+    atomicWrite(found.file, newLines.join('\n'));
+  } catch (e) {
+    return { lines,
+      err: `  phase row: cannot write ${rel}: ${e.message}\n` +
+        '  fix: repair the write, then re-run — the merge landed; ' +
+        'the row flip is idempotent\n' };
+  }
+  lines.unshift(`  phase row: P${n} ${statusOld} → done (${rel})\n`);
+  return { lines, written: true };
+}
+
 function phaseClose(args) {
   const f = flags(args, {
     check: { type: 'boolean' },
@@ -5151,7 +5318,9 @@ function phaseClose(args) {
       `bee phase inventory ${n} --decisions <file>\n`);
     return { code: 1, out: out.join(''), err: '' };
   }
-  const decCount = phaseDecisionLines(decText).length;
+  const decLines = phaseDecisionLines(decText);
+  const decCount = decLines.length;
+  const decSplit = phaseDecisionSplit(decLines);
   const hasOrigin = phaseGit(root, ['remote', 'get-url', 'origin'])
     .status === 0;
 
@@ -5159,13 +5328,16 @@ function phaseClose(args) {
   if (check) {
     out.push(`2 · merge · would --no-ff ${branch} → main ` +
       `(main @ ${mainSha})\n`);
+    out.push(...phaseRowFlip(root, n, mainSha, true).lines);
     out.push(pwt !== null
       ? `3 · rest · would detach ${pwt} at main\n`
       : `3 · rest · no worktree on ${branch} — would skip\n`);
     out.push(`4 · branch · would delete ${branch}\n`);
     out.push(`5 · close card · P${n} (preview)\n`);
-    out.push(`  decisions: ${decCount}\n`);
-    if (decCount > PHASE_FLAG_THRESHOLD) {
+    out.push(`  decisions: ${decCount} ` +
+      `(front-loaded ${decSplit.front} · in-phase ${decSplit.inPhase})\n`);
+    if (decSplit.inPhase > PHASE_FLAG_THRESHOLD &&
+        decSplit.inPhase > decSplit.front) {
       out.push('  flag: under-asked kickoff — front-load harder next phase\n');
     }
     out.push(hasOrigin
@@ -5195,6 +5367,16 @@ function phaseClose(args) {
   out.push(already
     ? `2 · merge · already merged (no merge commit) · ${mergeSha}\n`
     : `2 · merge · --no-ff ${branch} → main · ${mergeSha}\n`);
+
+  // step 2 tail — the phase-row flip + design stamps (mechanical;
+  // missing rows, already-done rows, and design refusals are
+  // informational — only a failed row write fails the close)
+  const flip = phaseRowFlip(root, n, mergeSha, false);
+  out.push(...flip.lines);
+  if (flip.err !== undefined) {
+    out.push(flip.err);
+    return { code: 1, out: out.join(''), err: '' };
+  }
 
   // step 3 — rest the persistent worktree detached at main
   if (pwt === null) {
@@ -5226,8 +5408,10 @@ function phaseClose(args) {
   out.push(already
     ? `  merge: ${mergeSha} (already merged)\n`
     : `  merge: ${mergeSha} (${branch} → main, no-ff)\n`);
-  out.push(`  decisions: ${decCount}\n`);
-  if (decCount > PHASE_FLAG_THRESHOLD) {
+  out.push(`  decisions: ${decCount} ` +
+    `(front-loaded ${decSplit.front} · in-phase ${decSplit.inPhase})\n`);
+  if (decSplit.inPhase > PHASE_FLAG_THRESHOLD &&
+      decSplit.inPhase > decSplit.front) {
     out.push('  flag: under-asked kickoff — front-load harder next phase\n');
   }
   // review r1 fix: surface the untracked inventory — exempt from
@@ -5251,7 +5435,9 @@ function phaseClose(args) {
     }
     out.push('6 · push · origin main · pushed\n');
   }
-  out.push('next: bee phase list shows what remains\n');
+  out.push(flip.written
+    ? 'next: commit the phase-row flip\n'
+    : 'next: bee phase list shows what remains\n');
   return { code: 0, out: out.join(''), err: '' };
 }
 
