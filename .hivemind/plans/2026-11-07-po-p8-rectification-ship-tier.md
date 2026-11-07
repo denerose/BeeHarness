@@ -119,6 +119,8 @@ task-4: done 2026-11-07T16:41:01+11:00 by bee record: .hivemind/logbook/2026-11-
 task-8: done 2026-11-07T16:41:02+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task8-verify-r2.md
 task-5: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task5-verify-r3.md
 task-10: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task10-verify-r2.md
+task-6: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task6-verify-r2.md
+task-9: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task9-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -446,7 +448,7 @@ confirmed the wiring fires — exit 1 + fix line).
 **Provides:** generalized inputs, the sixth question, the
   never-asks rule, observation-type line, status listing step.
 
-- [ ] Step: SKILL.md Inputs section — retitle to "Inputs — re-read
+- [x] Step: SKILL.md Inputs section — retitle to "Inputs — re-read
       whatever state your role produced" and generalize: keep the
       ordered re-read discipline; the loop's surfaces (session
       memory, phase list, plan, logbook records) as one example
@@ -454,10 +456,10 @@ confirmed the wiring fires — exit 1 + fix line).
       its session memory, the ADRs and design docs it wrote,
       status surface, the conversation's keeper corrections).
       Don't trust recall over the record stays the rule.
-- [ ] Step: Examination gains the sixth question after the
+- [x] Step: Examination gains the sixth question after the
       deficit list: "What worked that we should keep doing?
       Positive findings earn summary lines (not files)."
-- [ ] Step: Done-means gains the never-asks rule: "The summary
+- [x] Step: Done-means gains the never-asks rule: "The summary
       REPORTS what was filed — it never offers to file, asks
       permission, or tees up 'want this one too?'. Borderline
       items get filed (filing is adds-only, any-role work; the
@@ -465,17 +467,17 @@ confirmed the wiring fires — exit 1 + fix line).
       step: "List new suggestions in the status surface's prose,
       under Awaiting keeper — never inside the script-owned render
       region."
-- [ ] Step: `assets/suggestion-format.md`: Role line vocabulary →
+- [x] Step: `assets/suggestion-format.md`: Role line vocabulary →
       `<role name> — any role when the keeper asks`; add the
       observation-type line: "A problem with no proposed solution
       is a legitimate suggestion file — state the problem
       concretely; graduation treats it as a design input."
-- [ ] Step: `bin/bee.js` SUGGEST_USAGE: one help line — "A
+- [x] Step: `bin/bee.js` SUGGEST_USAGE: one help line — "A
       suggestion may be a problem with no proposed solution
       (observation-type); it routes as a design input." Pin with a
       `tests/bee-suggest.test.mjs` assertion on the usage text.
-- [ ] Step: run `node --test tests/bee-suggest.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/bee-suggest.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-25-pp-hindsight-skill-fixes.md`
       and
       `.hivemind/suggestions/planned/2026-11-02-po-hindsight-summary-never-asks-to-file.md`
@@ -483,7 +485,7 @@ confirmed the wiring fires — exit 1 + fix line).
       current asset — record as the already-landed half in the
       Outcome stamp; the role-vocabulary fix is NOT yet present
       and lands in this task's edit.)
-- [ ] Commit: `hindsight: generalized inputs, sixth question, never-asks`
+- [x] Commit: `hindsight: generalized inputs, sixth question, never-asks`
 
 **Task 6 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 2
 notes). Fixed in-round, re-review WAIVED (reviewer's own channel
@@ -580,14 +582,14 @@ held). Reviewer's byte-compared verbatim confirmation on record.
 **Provides:** the interim checkbox rule; the ordered close
   checklist; the scoped tidy-authority line.
 
-- [ ] Step: Record step (6) gains after the hand-edit rule:
+- [x] Step: Record step (6) gains after the hand-edit rule:
       "Check off exactly the current task's boxes at its commit —
       never batch checkbox edits across task or section
       boundaries (a partition slice sweeps everything downstream);
       checked boxes are state claims and land with their own
       evidence. Where `bee task` owns a state line, the state line
       is authoritative; the script's box-ticking is cosmetic."
-- [ ] Step: New close section after step 7, in order: "8.
+- [x] Step: New close section after step 7, in order: "8.
       **Close** — the checklist, in order: assemble the decisions
       inventory (`#`-comment header lines only, `id · one-line ·
       source-record-path` entries, middle-dot separators) → `bee
@@ -598,7 +600,7 @@ held). Reviewer's byte-compared verbatim confirmation on record.
       directs one (bootstrap-noise paydown with the P5 tooling —
       standing authority, no per-step ask; disclose after) →
       report to the keeper."
-- [ ] Step: Mechanics sweep (item 21): the dispatch mechanics the
+- [x] Step: Mechanics sweep (item 21): the dispatch mechanics the
       P6 handoff carried but no skill or script names — a handoff
       is not a durable home; any mechanic that appears in a
       handoff but in no skill or script is a codification gap.
@@ -613,13 +615,13 @@ held). Reviewer's byte-compared verbatim confirmation on record.
       resolve to the main checkout and fail files: checks; (c)
       WORKTREE ARGS — `bee worktree create <phase>-<slug>`, merge
       takes SLUG ONLY.
-- [ ] Step: run `grep -q 'exactly the current task' skills/loop/bee-loop/SKILL.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `grep -q 'exactly the current task' skills/loop/bee-loop/SKILL.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-po-per-task-checkbox-discipline.md`
       per D7. (The close-sequence and inventory-format suggestions
       are LIVE files — stamp Outcomes only, leave for triage per
       D7.)
-- [ ] Commit: `loop: record rule, close checklist, tidy authority`
+- [x] Commit: `loop: record rule, close checklist, tidy authority`
 
 **Task 9 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 6
 notes). Both fixed in-round, re-reviews WAIVED (reviewer's own
