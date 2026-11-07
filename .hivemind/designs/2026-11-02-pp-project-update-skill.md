@@ -23,8 +23,16 @@ inconsistent answers at inconsistent cost.
 
 **One skill, three altitudes.** Shared core: a lean gather from the
 stores that already exist, then a comparison at the role's altitude,
-then a short report. Role files route to their altitude (skills stay
-role-agnostic; routing lives in mandates).
+a GAP HUNT, then a short report. Role files route to their altitude
+(skills stay role-agnostic; routing lives in mandates).
+
+**The gap hunt (the skill's main purpose — not optional):** the
+target-state aims are a floor, not a ceiling. Every run reviews
+the artifacts (phase rows, designs, parking lot) and the recent
+conversation for aims that are planned or implied but NOT captured
+in the target section — and proposes additions on keeper approval.
+A run that only compares against the six bullets and skips the
+hunt has not run the skill.
 
 **The gather (identical for all altitudes — token-effective by
 construction):**

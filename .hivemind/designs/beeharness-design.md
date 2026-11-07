@@ -9,7 +9,10 @@ changes via ADR-003's amendment ritual.
 notes each bullet points at. This section changes only on
 keeper-approved target changes; position against it is computed at
 update time (the project-update skill), never stored here. Live work
-state lives in the phase list.*
+state lives in the phase list. THESE AIMS ARE A FLOOR, NOT A
+CEILING: the update skill's main purpose is reviewing the
+artifacts and conversation for aims NOT yet captured here —
+treating this list as the full picture is the known failure mode.*
 
 1. The harness comes alive in any project of the keeper's — init
    scaffolds everything and the tab workflow runs from day one,
