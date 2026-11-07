@@ -79,6 +79,10 @@ test('local default is project-local: subprocess from a consumer repo',
         encoding: 'utf8' });
       assert.match(r, /IN-001 suggested · keeper/);
       const inbox = path.join(dir, '.hivemind', 'inbox.toon');
+      assert.match(r, new RegExp(
+        `bee inbox show IN-001 --store ${
+          inbox.replace(/\//g, '\\/')}`),
+        'hint must name the non-default store (review r2)');
       assert.ok(fs.existsSync(inbox),
         'item must land in the CONSUMER repo inbox');
       assert.match(fs.readFileSync(inbox, 'utf8'),

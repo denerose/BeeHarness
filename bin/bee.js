@@ -1254,14 +1254,24 @@ function cmdSuggest(rest) {
   }
   const text = pos[0];
   if (f.values.harness) return suggestHarness(text, f.values);
-  return inboxAddItem({
-    storePath: suggestStorePath(f.values.store),
+  const store = suggestStorePath(f.values.store);
+  const r = inboxAddItem({
+    storePath: store,
     addressee: 'keeper',
     text,
     origin: f.values.origin || 'agent',
     ref: f.values.ref,
     verb: 'suggested',
   });
+  // When the project-local store differs from `bee inbox`'s default
+  // (the harness checkout's), the follow-up hint must name the store
+  // — otherwise `bee inbox show IN-001` reads the wrong store
+  // (review r2 should-fix).
+  if (r.code === 0 && store !== storePathOf(undefined)) {
+    r.out = r.out.replace(/bee inbox show (IN-\d+)/,
+      `bee inbox show $1 --store ${store}`);
+  }
+  return r;
 }
 
 // ---- park (P4 Task 3 — .hivemind/memory/parking-lot.toon) ----
