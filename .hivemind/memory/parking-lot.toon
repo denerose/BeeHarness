@@ -167,3 +167,11 @@ unpark-when: keeper and/or KS feedback from real use
 origin: power-planner
 opened: 2026-11-01T17:26:41+11:00
 resolved: -
+
+id: PL-PP-015
+item: observation-type suggestion files: allow problems with no proposed solution in the suggestions inbox
+context: keeper direction 2026-11-02: agents observing a breakage with no fix in mind have nowhere honest to file it (the hindsight law demands actionable suggestions). Proposed fix is a format extension, not a new store: observation-type files allowed (problem, no solution, legitimate); graduation treats them as design inputs. Visibility of known-and-routed problems = computed view over planned/ + phase inventories (P9 report render), NOT a second register. Routed home when unparked: P8 item (suggestion-format template, bee-hindsight assets; bee suggest template inherits).
+unpark-when: P8 skill pass planning, or the keeper's word
+origin: power-planner
+opened: 2026-11-07T11:15:50+11:00
+resolved: -
