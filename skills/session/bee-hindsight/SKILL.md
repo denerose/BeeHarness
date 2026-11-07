@@ -11,15 +11,19 @@ run it when the keeper asks; the project-orchestrator or power-planner
 may also self-schedule it at wrap points (end of a phase, end of a
 project). Read `../../GLOSSARY.md` (the shared bee glossary, sibling of this kit folder) first.
 
-## Inputs — re-read before judging
+## Inputs — re-read whatever state your role produced
 
-Don't trust recall over the record. Re-read, in this order:
+Don't trust recall over the record. Re-read, in a fixed order, the
+state your role produced. What that state is depends on how the work
+ran — two examples:
 
-1. session memory `.hivemind/sessions/<role>.md` (what actually happened)
-2. the phase list (`.hivemind/phases/`)
-3. the plan and its check-boxes
-4. verify records and review reports in `.hivemind/logbook/`
-5. keeper corrections in the conversation you still have in context
+- Loop work: session memory `.hivemind/sessions/<role>.md` (what
+  actually happened), the phase list (`.hivemind/phases/`), the plan
+  and its check-boxes, the verify records and review reports in
+  `.hivemind/logbook/`.
+- A planner or session role: its session memory, the ADRs and design
+  docs it wrote, the status surface, the conversation's keeper
+  corrections you still have in context.
 
 ## What to examine
 
@@ -36,6 +40,8 @@ Your own process, not the code (code quality was review's job):
   role files, GLOSSARY)? Flag each one — behavior documents stay
   generic (docs/WRITING-STANDARD.md); specifics belong to the
   records.
+- What worked that we should keep doing? Positive findings earn
+  summary lines (not files).
 
 ## What to produce
 
@@ -55,7 +61,13 @@ write no files.
 
 You added suggestion files (or declared none needed) **and** gave the
 keeper a short summary: what you examined, what you filed, what you'd
-most like acted on. You edit nothing that already exists.
+most like acted on. The summary REPORTS what was filed — it never
+offers to file, asks permission, or tees up "want this one too?".
+Borderline items get filed (filing is adds-only, any-role work; the
+keeper's gate is at promotion, not filing). Final step: list new
+suggestions in the status surface's prose, under Awaiting keeper —
+never inside the script-owned render region. You edit nothing that
+already exists.
 
 ## Boundaries
 

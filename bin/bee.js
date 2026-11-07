@@ -1727,6 +1727,9 @@ usage: bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>]
   default adds to the project inbox (addressee keeper; origin from
   --origin, else agent); --harness files a numbered TOON document
   under the machine store's suggestions/ — triage happens harness-side
+
+  A suggestion may be a problem with no proposed solution
+  (observation-type); it routes as a design input.
 `;
 
 function suggestUsageErr(e) {
