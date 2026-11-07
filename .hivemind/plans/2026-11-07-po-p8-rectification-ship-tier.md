@@ -125,6 +125,7 @@ task-11: done 2026-11-07T17:22:42+11:00 by bee record: .hivemind/logbook/2026-11
 task-13: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task13-verify-r1.md
 task-14: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task14-verify-r1.md
 task-17: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task17-verify-r1.md
+task-15: done 2026-11-07T17:47:20+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task15-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -831,17 +832,17 @@ skills); the checkbox rule now routes ticks through `bee task move`
   tasks edit)
 **Provides:** the D3 layout; every `kit:` field reads `thinking`.
 
-- [ ] Step: `git mv skills/session skills/thinking` — all seven
+- [x] Step: `git mv skills/session skills/thinking` — all seven
       skills (argue, brainstorm, handoff, hindsight,
       pickup-handoff, relay, project-update) move in one rename.
-- [ ] Step: Retag: every moved SKILL.md's front matter
+- [x] Step: Retag: every moved SKILL.md's front matter
       `kit: session` → `kit: thinking`.
-- [ ] Step: Pointer sweep: in every moved SKILL.md, the GLOSSARY
+- [x] Step: Pointer sweep: in every moved SKILL.md, the GLOSSARY
       pointer must read `../../GLOSSARY.md` (correct at depth two
       — verify each file; fix any wrong-depth pointer found, in
       moved AND unmoved skills: `grep -rn 'GLOSSARY.md' skills/
       --include='SKILL.md'`).
-- [ ] Step: Reference sweep (living files only — history in
+- [x] Step: Reference sweep (living files only — history in
       plans/logbook stays as written): `grep -rn 'skills/session'
       AGENTS.md docs/ roles/ skills/ bin/ tests/ scripts/` — every
       hit updates to `skills/thinking`. Expect: skills'
@@ -849,10 +850,10 @@ skills); the checkbox rule now routes ticks through `bee task move`
       docs. `scripts/structure.map` is kit-generic — verify no
       change needed. The GLOSSARY `bee- namespace` entry names no
       folders and stays accurate — no store edit.
-- [ ] Step: Full suite + structure check before commit (union
+- [x] Step: Full suite + structure check before commit (union
       discipline): `node --test tests/*.test.mjs` — pass.
-- [ ] Step: run `test -d skills/thinking -a ! -e skills/session` — exit 0
-- [ ] Commit: `reorg: session/ → thinking/ (D3), kit retags, refs`
+- [x] Step: run `test -d skills/thinking -a ! -e skills/session` — exit 0
+- [x] Commit: `reorg: session/ → thinking/ (D3), kit retags, refs`
 
 **Task 15 notes:** review r1 FIX-FIRST (1 blocking, 0 should-fix,
 7 notes). Blocking fixed in-round: the glossary STORE line
