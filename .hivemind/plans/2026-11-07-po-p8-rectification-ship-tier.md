@@ -621,6 +621,13 @@ held). Reviewer's byte-compared verbatim confirmation on record.
       D7.)
 - [ ] Commit: `loop: record rule, close checklist, tidy authority`
 
+**Task 9 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 6
+notes). Both fixed in-round, re-reviews WAIVED (reviewer's own
+one-line fixes, evidence in report): "P5 tooling" → "the harness's
+hygiene tooling" (writing standard — no phase numbers in shipped
+skills); the checkbox rule now routes ticks through `bee task move`
+(no hand-tick imperative; matches wave-commit practice).
+
 ## Task 10: dispatch-brief template lines (items 10, 13-line, 26)
 
 **Files:** modify `skills/loop/bee-loop/assets/dispatch-brief-template.md`
