@@ -17,7 +17,7 @@ targets:
   - tests/plan-checks.test.mjs (modify)
   - tests/plan-census.test.mjs (create)
   - tests/bee-phase.test.mjs (modify)
-  - tests/bee-report.test.mjs (modify)
+  - tests/bee-render.test.mjs (modify)
   - tests/bee-inbox.test.mjs (modify)
   - tests/bee-init.test.mjs (modify)
   - tests/bee-verify.test.mjs (modify)
@@ -35,27 +35,12 @@ targets:
   - skills/skilldev/bee-skill-write/SKILL.md (modify)
   - skills/session/bee-relay/SKILL.md (create)
   - skills/session/bee-project-update/SKILL.md (create)
-  - skills/thinking/ (create — reorg of skills/session/)
+  - skills/thinking/ (create)
   - skills/GLOSSARY.md (modify)
   - roles/power-planner.md (modify)
   - roles/project-orchestrator.md (modify)
   - roles/task-orc.md (modify)
-  - roles/retired-pp.md (delete — relocates to .hivemind/memory/retired-pp-role.md)
   - .hivemind/memory/retired-pp-role.md (create)
-  - .hivemind/suggestions/planned/2026-10-25-pp-hindsight-skill-fixes.md (delete)
-  - .hivemind/suggestions/planned/2026-11-02-po-hindsight-summary-never-asks-to-file.md (delete)
-  - .hivemind/suggestions/planned/2026-10-25-po-brainstorm-ownership-filter.md (delete)
-  - .hivemind/suggestions/planned/2026-10-20-verify-expectations-as-minimums.md (delete)
-  - .hivemind/suggestions/planned/2026-11-01-po-per-task-checkbox-discipline.md (delete)
-  - .hivemind/suggestions/planned/2026-11-01-pp-researcher-briefs-final-only.md (delete)
-  - .hivemind/suggestions/planned/2026-11-01-po-p7-close-hindsight.md (delete)
-  - .hivemind/suggestions/planned/2026-10-31-po-no-hardcoded-checkout-paths-in-tests.md (delete)
-  - .hivemind/suggestions/planned/2026-11-02-po-marker-surgery-edit-tool.md (delete)
-  - .hivemind/suggestions/planned/2026-11-02-po-union-merge-suite-gate.md (delete)
-  - .hivemind/suggestions/planned/2026-11-02-po-relays-are-final-artifacts.md (delete)
-  - .hivemind/suggestions/planned/2026-11-02-po-relayed-claims-verified.md (delete)
-  - .hivemind/suggestions/planned/2026-11-07-po-settings-skills-lifecycle.md (delete)
-  - .hivemind/suggestions/planned/2026-11-01-po-p4-hindsight-plan-size-guard.md (delete)
 checks:
   - id: task-1
     cmd: node --test tests/plan-checks.test.mjs
@@ -66,9 +51,9 @@ checks:
     expect: exit 0
     files: [bin/bee.js, tests/bee-phase.test.mjs]
   - id: task-3
-    cmd: node --test tests/bee-report.test.mjs
+    cmd: node --test tests/bee-render.test.mjs
     expect: exit 0
-    files: [bin/bee.js, tests/bee-report.test.mjs, tests/bee-inbox.test.mjs]
+    files: [bin/bee.js, tests/bee-render.test.mjs, tests/bee-inbox.test.mjs]
   - id: task-4
     cmd: node --test tests/bee-init.test.mjs
     expect: exit 0
@@ -106,9 +91,9 @@ checks:
     expect: exit 0
     files: [skills/session/bee-handoff/SKILL.md]
   - id: task-13
-    cmd: test -f skills/session/bee-relay/SKILL.md
+    cmd: test -f skills/session/bee-relay/SKILL.md && grep -q 'relay block' skills/GLOSSARY.md
     expect: exit 0
-    files: [skills/session/bee-relay/SKILL.md]
+    files: [skills/session/bee-relay/SKILL.md, skills/GLOSSARY.md]
   - id: task-14
     cmd: test -f skills/session/bee-project-update/SKILL.md
     expect: exit 0
@@ -116,11 +101,11 @@ checks:
   - id: task-15
     cmd: test -d skills/thinking -a ! -e skills/session
     expect: exit 0
-    files: [skills/thinking/, skills/GLOSSARY.md]
+    files: [skills/thinking/]
   - id: task-16
     cmd: ! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/
     expect: exit 0
-    files: [roles/power-planner.md, roles/project-orchestrator.md, roles/task-orc.md, roles/retired-pp.md, .hivemind/memory/retired-pp-role.md, skills/session/bee-brainstorm/SKILL.md]
+    files: [roles/power-planner.md, roles/project-orchestrator.md, roles/task-orc.md, .hivemind/memory/retired-pp-role.md, skills/session/bee-brainstorm/SKILL.md]
   - id: task-17
     cmd: node --test tests/bee-init.test.mjs
     expect: exit 0
@@ -269,7 +254,7 @@ as mechanical.
 
 ## Task 3: report-regen defect batch (item 24, check-then-apply per D12)
 
-**Files:** modify `bin/bee.js`, `tests/bee-report.test.mjs`, `tests/bee-inbox.test.mjs`
+**Files:** modify `bin/bee.js`, `tests/bee-render.test.mjs`, `tests/bee-inbox.test.mjs`
 **Depends on:** task 2 (bee.js chain)
 **Provides:** dedupe that survives tail drift; render fences never
   leak into ask text; ages never frozen; Source line truthful —
@@ -310,7 +295,7 @@ as mechanical.
       exit.
 - [ ] Step: Fix (d) where failing: the merge-regen header replace
       must always end with the true `source` value.
-- [ ] Step: run `node --test tests/bee-report.test.mjs` — pass
+- [ ] Step: run `node --test tests/bee-render.test.mjs` — pass
 - [ ] Commit: `report regen: dedupe tails, fences, live ages, source`
 
 ## Task 4: init settings prune (item 28)
