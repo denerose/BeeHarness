@@ -1,5 +1,5 @@
 ---
-kit: session
+kit: thinking
 name: bee-relay
 description: Carries context between roles as a final artifact — gated (keeper-passed) or ambient (shared surfaces). One topic per relay, self-contained, correctly sized; keeper-facing blocks are final — deltas arrive as standalone addenda.
 ---

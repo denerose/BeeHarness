@@ -41,6 +41,6 @@ or context running short (handoff).
 
 - `skills/GLOSSARY.md` — the shared vocabulary (thread-close,
   handoff, relay, status surface, ambient pickup).
-- `skills/session/bee-handoff/SKILL.md` and
-  `skills/session/bee-pickup-handoff/SKILL.md` — the handoff pair.
+- `skills/thinking/bee-handoff/SKILL.md` and
+  `skills/thinking/bee-pickup-handoff/SKILL.md` — the handoff pair.
 - `roles/` — the role files; your mandate and attributes live there.

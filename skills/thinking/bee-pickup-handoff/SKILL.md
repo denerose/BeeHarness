@@ -1,5 +1,5 @@
 ---
-kit: session
+kit: thinking
 name: bee-pickup-handoff
 description: Resumes a role from its handoff file — reads it whole, follows its boot sequence, re-reads law files changed since it was written, verifies state against the repo, and announces the resumed role and first move in the first reply. Use when waking into a role whose predecessor left a handoff (the keeper's wake prompt points here). Writing one is bee-handoff's; the pickup never re-interviews the keeper.
 ---

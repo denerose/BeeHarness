@@ -1,5 +1,5 @@
 ---
-kit: session
+kit: thinking
 name: bee-argue
 description: For genuine forks — one dispatched worker per option argues that option's best case in parallel; the caller summarizes the cases and puts the choice to the keeper with a recommendation. Use when options are few, genuinely distinct, and worth the dispatch cost. Not for cheap forks or exploration.
 ---

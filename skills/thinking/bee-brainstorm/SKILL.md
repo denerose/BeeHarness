@@ -1,5 +1,5 @@
 ---
-kit: session
+kit: thinking
 name: bee-brainstorm
 description: Design mode for BeeHarness. Use when the keeper deliberately opens design work — shaping a new project or feature, deciding how something should work, or shaping a project's SOUL. Not for implementation planning, code, or quick questions.
 ---

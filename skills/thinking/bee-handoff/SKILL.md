@@ -1,5 +1,5 @@
 ---
-kit: session
+kit: thinking
 name: bee-handoff
 description: Compacts a role's session into its handoff file so the same role can resume in a fresh context — working mode first, then task state, boot sequence, environment notes, and a fenced wake prompt for the keeper to paste; ends with a memory sync. Use when a role's context runs short or its session ends with work in flight. Picking a handoff up is bee-pickup-handoff's. Never a parking-lot sweep.
 ---

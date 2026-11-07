@@ -44,7 +44,7 @@
 
 **escalation envelope** — every ask_user card states: role, context (plan/phase), the question, and where the answer will be recorded. One decision per card, recommendation first (ADR-009).
 
-**handoff** — same role, fresh context: the `bee-handoff`/`bee-pickup-handoff` pair (`skills/session/`) and the `.pi/handoff-<role>.md` files they write. Ends with a memory sync and a **wake prompt** for the keeper — but no parking-lot sweep: that is a work-close ritual, never part of a refresh. Mid-session counterpart: thread-close.
+**handoff** — same role, fresh context: the `bee-handoff`/`bee-pickup-handoff` pair (`skills/thinking/`) and the `.pi/handoff-<role>.md` files they write. Ends with a memory sync and a **wake prompt** for the keeper — but no parking-lot sweep: that is a work-close ritual, never part of a refresh. Mid-session counterpart: thread-close.
 
 **hivemind** — the `.hivemind/` folder in a repo. Holds all the working files the agents produce: `decisions/` (ADRs), `designs/`, `plans/`, `phases/`, `suggestions/`, `memory/`, `logbook/`, `sessions/` (gitignored), `inbox.toon` (the inbox store), `status.md` (cross-role surface), and `keeper-report.md` (the keeper's zoned digest).
 

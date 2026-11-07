@@ -1,5 +1,5 @@
 ---
-kit: session
+kit: thinking
 name: bee-hindsight
 description: After a phase or project wraps (or when the keeper asks), review how the work went and file concrete improvement suggestions to the suggestions inbox. Examines process, not code quality. Adds new files only — edits nothing.
 ---

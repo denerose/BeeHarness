@@ -1,5 +1,5 @@
 ---
-kit: session
+kit: thinking
 name: bee-project-update
 description: Answers "where are we?" at one of three altitudes — design (compare the build against the target state), execution (on-track, blocked, starved), or a keeper digest (the gather in a few plain lines) — from one scripted gather, plus a mandatory hunt for aims not yet captured in the target state. Externally gated; the keeper asks any role for an update, or a role-file routing line fires. Not for working a task or writing records.
 ---
