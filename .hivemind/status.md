@@ -46,17 +46,21 @@ keeper (1 open · oldest 6s):
   rule for bee-hindsight's What-to-produce section (route
   findings by control axis, not owner; memory seeds, suggestions
   graduate); natural fit with item 6's pass.
-- [PO] 2026-11-07 — **P8 OPEN (keeper's word 2026-11-07)**: rectification
-  + ship-tier, one phase/plan in waves (kickoff D2), reorg+
-  ship-tier sweep LAST. Kickoff D1-D4 ruled: PL-PP-006 deferred
-  (block pointer-only); all session instruments → skills/thinking/
-  (D3, no session folder); PP relay dispatched for items 13/15/22/23
-  (law lands pre-loop, D4). 29-item checklist + close-step tidy
-  pass (PL-PP-005) at
-  `.hivemind/designs/2026-11-01-pp-p8-rectification-inputs.md`.
-  Next: bee-plan once the relay lands, then the gate, then the
-  loop. IN-001 (tier-confirm) still awaits the keeper — unrelated
-  to P8.
+- [PO] 2026-11-07 — **P8 COMPLETE + CLOSED** (merge f2ab9bf, close
+  via `bee phase close 8`): all 29 checklist items dispositioned —
+  17 tasks, 22 decisions (13 front-loaded + 9 in-phase;
+  front-loading held). Suite 348→386, structure 0. Shipped:
+  thinking/ reorg, entry-discipline standard + argue gate,
+  dispatch-brief template lines, loop close checklist + mechanics,
+  census helper, plan-checks notes, phase-close mechanical tail,
+  report-regen batch, settings prune, verify worktree suite,
+  hindsight fixes + never-asks + observation-type, brainstorm
+  ownership filter, relay + project-update skills, template
+  glossary (21 terms), handoff pre-write gate + authority,
+  ship-tier citation strip. T12 discovered unexecuted at T16
+  review → dispatched late; check header paths fixed post-reorg.
+  IN-001 (tier-confirm) still awaits the keeper. P9 next on the
+  keeper's word.
 
 - [PO] 2026-11-07 — **P6 COMPLETE + CLOSED** (merge b7e7397, close
   via `bee phase close 6`): the productization phase shipped — full
