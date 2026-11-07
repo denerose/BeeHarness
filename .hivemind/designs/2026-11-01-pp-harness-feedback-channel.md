@@ -1,10 +1,10 @@
 # Harness feedback channel — design note
 
 <!-- machine
-status: live
-phase: -
-hash: -
-merge: -
+status: implemented
+phase: 6
+hash: cfb8272
+merge: b7e7397
 -->
 
 **Date:** 2026-11-01

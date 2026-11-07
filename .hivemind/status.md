@@ -15,17 +15,22 @@ keeper (1 open · oldest 6s):
 
 ## Open escalations
 
-- [PO] 2026-11-02 — **P6 KICKOFF COMPLETE** — phase OPEN
-  (row in-progress, owner claimed): D1 dissolved by keeper
-  ruling — NO CONSUMERS BEFORE P8 (shipped-file seam moot);
-  D2 ruled — one phase, plan splits into tasks; D3 ruled via PP
-  relay, verified @ cfb8272 — version pins = registered-commit
-  record + informational drift line on every init run (exit 0),
-  no network fetch, pins ride registry entries; D4 ruled —
-  MINIMAL docs (one adoption doc in docs/ + README pointer).
-  PLAN WRITTEN + GATED (3 rounds: r1 FAIL → r2 FAIL → r3 PASS):
-   .hivemind/plans/2026-11-02-po-p6-productization.md, 7 tasks.
-  NEXT: the loop — spine phase/6, T1+T5 dispatch in parallel.
+- [PO] 2026-11-07 — **P6 COMPLETE + CLOSED** (merge b7e7397, close
+  via `bee phase close 6`): the productization phase shipped — full
+  `bee init` contract (green-fields scaffold, managed AGENTS.md
+  block, consumer config L1), `~/.bee` machine store + version
+  pins (registered-commit + informational drift), `bee suggest`
+  (project-local + --harness channel), `bee worktree` fold, AXI
+  pass (15 families, 17 gaps closed), adoption doc + dogfood
+  config. 7 tasks, 9 cold reviews (4 blocking caught+fixed:
+  wrong-worktree edge, consumer-feedback misroute, FAIL-run hint,
+  plus the 3 gate-round blockers pre-execution), 19 decisions.
+  Suite 307→348, structure 0. Keeper sign-off: 3 keep-as-built +
+  cleanup-at-close (executed: settings entry pruned, re-register
+  DRIFTED→in-sync live) + PP SUGGESTION filed: settings skills
+  entries have no lifecycle (suggestions/2026-11-07-po-
+  settings-skills-lifecycle.md). QUEUE (keeper-ruled 2026-11-02):
+  P8 next (rectification + ship-tier).
 
 - [PO] 2026-11-02 — **P5 COMPLETE** (merge f0766ee, close via
   `bee phase close 5`): memory/logbook/glossary stores shipped

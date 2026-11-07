@@ -1,10 +1,10 @@
 # References home (PL-PP-012) — design note
 
 <!-- machine
-status: live
-phase: -
-hash: -
-merge: -
+status: implemented
+phase: 6
+hash: 8ae6965
+merge: b7e7397
 -->
 
 **Date:** 2026-11-01
