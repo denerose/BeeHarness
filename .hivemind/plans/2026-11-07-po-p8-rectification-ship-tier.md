@@ -4,7 +4,7 @@
 **Design doc:** `.hivemind/designs/2026-11-01-pp-p8-rectification-inputs.md` (29-item checklist + close step) · `.hivemind/designs/2026-11-01-pp-skill-authoring-kit.md` · `.hivemind/designs/2026-11-02-pp-project-update-skill.md`
 **Validation level:** phase
 **Detail:** mixed — verbatim content for new files and one-line skill edits; behavior specs + pinned tests for CLI changes; check-then-apply instructions where items may already be partially landed (P8 discipline: verify what landed, apply idempotently)
-**Reviewed:** PENDING
+**Reviewed:** bee-plan-review passed 2026-11-07 (3 rounds: r1 4🔴/8🟡 → fixed; r2 1🔴 B5 → fixed; r3 PASS; 3 core prose waivers recorded in r1)
 
 <!-- machine
 phase: P8
