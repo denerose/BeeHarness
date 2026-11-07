@@ -557,7 +557,7 @@ function scaffoldReport(consumer, check) {
   step('.hivemind/glossary.toon',
     fs.existsSync(path.join(repoRoot, '.hivemind', 'glossary.toon')),
     () => atomicWrite(path.join(repoRoot, '.hivemind', 'glossary.toon'),
-      GLOSSARY_HEADER + '\n'));
+      TEMPLATE_GLOSSARY_SEED));
   step('.hivemind/status.md',
     fs.existsSync(path.join(repoRoot, '.hivemind', 'status.md')),
     () => atomicWrite(path.join(repoRoot, '.hivemind', 'status.md'),
@@ -708,27 +708,54 @@ function cmdInit(rest) {
 
   const entries = settings.skills ?? [];
   const target = path.resolve(skillsDir);
-  const hit = entries.find(
+  // D6 self-healing prune: an entry whose resolved path no longer
+  // exists drops on every init run, in both the hit and miss
+  // paths. --check names the dead entries without writing; write
+  // mode rewrites settings without them. Informational only — the
+  // prune never changes the exit code (drift-line semantics, D3).
+  // Non-string entries have no resolved path — they pass through.
+  const live = [];
+  const dead = [];
+  for (const e of entries) {
+    if (typeof e === 'string' &&
+        !fs.existsSync(path.resolve(expandTilde(e)))) {
+      dead.push(e);
+    } else {
+      live.push(e);
+    }
+  }
+  const pruneNote = dead.length === 0 ? '' : f.values.check
+    ? `bee init: would prune: ${dead.join(', ')}\n`
+    : `bee init: pruned ${dead.length} dead ` +
+      `entry(ies): ${dead.join(', ')}\n`;
+
+  const hit = live.find(
     (e) => typeof e === 'string' &&
       path.resolve(expandTilde(e)) === target);
 
   let code, out, err;
   if (hit !== undefined) {
     code = 0;
-    out = `bee init: already registered: ${hit} (${settingsPath})\n`;
+    out = `bee init: already registered: ${hit} (${settingsPath})\n` +
+      pruneNote;
     err = '';
+    if (dead.length > 0 && !f.values.check) {
+      settings.skills = live;
+      fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+      atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+    }
   } else if (f.values.check) {
     code = 1;
-    out = '';
+    out = pruneNote;
     err = `bee init: NOT registered (${tildeForm(skillsDir)}) ` +
       `— run without --check to add it (${settingsPath})\n`;
   } else {
-    settings.skills = [...entries, tildeForm(skillsDir)];
+    settings.skills = [...live, tildeForm(skillsDir)];
     fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
     atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
     code = 0;
     out = `bee init: registered ${tildeForm(skillsDir)} in ` +
-      `${settingsPath}\n`;
+      `${settingsPath}\n` + pruneNote;
     err = '';
   }
 
@@ -833,7 +860,23 @@ function queueBullets(statusText) {
       continue;
     }
     if (!inQueue) continue;
-    if (/^<!--.*-->$/.test(line.trim())) continue; // markers, not asks
+    // Render fences close any open bullet: the region's view lines
+    // (headers, counts) never join an ask (P8 item 24b). Runs before
+    // the generic marker skip — a fence must close, not just skip.
+    const t = line.trim();
+    if (t.startsWith(RENDER_OPEN.slice(0, -4)) ||
+        t.startsWith(RENDER_CLOSE.slice(0, -4))) {
+      if (cur !== null) { bullets.push(cur); cur = null; }
+      continue;
+    }
+    if (/^<!--.*-->$/.test(t)) continue; // markers, not asks
+    // view group headers (`name (N open · oldest X):`) close the
+    // open bullet too — in multi-addressee regions a header follows
+    // a bullet and must never glue onto it (review r1 P1)
+    if (/^\S[^(:]*\s\(\d+ open · oldest \S+\):$/.test(t)) {
+      if (cur !== null) { bullets.push(cur); cur = null; }
+      continue;
+    }
     if (line.startsWith('- ')) {
       if (cur !== null) bullets.push(cur);
       cur = line.slice(2);
@@ -887,6 +930,17 @@ function normItem(s) {
   return s.replace(/^\d+\.\s*/, '')
     .replace(/^\[[^\]]*\]\s*/, '') // leading [role] tag
     .replace(/^\d{4}-\d{2}-\d{2}\s*[—-]?\s*/, '') // leading date
+    // render-view wrapper: a leading `IN-003 · 5d — ` id·age prefix
+    // (the view's own bullet shape — review r1 P3; without this the
+    // tail strips below never see the core text)
+    .replace(/^IN-\d{3}\s+·\s+\S+\s+—\s+/, '')
+    // tail wrappers ride the same ask: a trailing (id · ref) group
+    // or a ` · ref: …` pointer — compare on the core text (P8 item
+    // 24a). No broad `— …` tail strip: it ate core text from the
+    // first mid-text dash and falsely deduped distinct asks sharing
+    // a pre-dash prefix (review r1 P2 — none of the pins needed it)
+    .replace(/\s*\([^)]*\)$/, '')
+    .replace(/\s+·\s+ref:\s*\S.*$/i, '')
     .replace(/[*_`]/g, '')
     .replace(/\s+/g, ' ')
     .trim()
@@ -1073,7 +1127,9 @@ flags:
   --ref <path>       optional pointer riding the item (default: -)
   --note <how>       how it was resolved (recorded on done)
   --status <path>    status file the render region lives in
-                     (default .hivemind/status.md)
+                     (render default .hivemind/status.md; add/done/
+                     capture accept it to refresh the region in the
+                     same run — else the store-derived default)
   --full             all fields, no truncation
   --check            never write; report what would happen
   --store <path>     internal: store path (default .hivemind/inbox.toon)
@@ -1092,7 +1148,7 @@ outside the region is never touched.
 const CAPTURE_USAGE = `bee capture "<thought>" — quick thought into the keeper's inbox
 (routing stays conversational; this only records the thought)
 
-usage: bee capture "<thought>" [--check] [--store <path>]
+usage: bee capture "<thought>" [--check] [--store <path>] [--status <path>]
 `;
 
 function inboxUsageErr(e) {
@@ -1223,7 +1279,7 @@ function cmdInbox(rest) {
 }
 
 function inboxAddItem({ storePath, addressee, text, origin, ref, check,
-  verb }) {
+  verb, statusFlag }) {
   for (const v of [addressee, text, origin, ref]) {
     if (v !== undefined && v.includes('\n')) {
       return { code: 1, out: '',
@@ -1250,8 +1306,11 @@ function inboxAddItem({ storePath, addressee, text, origin, ref, check,
   }
   const w = writeInbox(storePath, [...r.items, item]);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${id} ${verb} · ${addressee} — bee inbox show ${id}\n`,
-    err: '' };
+  return withRegionRefresh(storePath,
+    statusFlag ? path.resolve(statusFlag) : derivedStatusPath(storePath),
+    { code: 0,
+      out: `${id} ${verb} · ${addressee} — bee inbox show ${id}\n`,
+      err: '' });
 }
 
 function inboxAdd(args) {
@@ -1260,6 +1319,7 @@ function inboxAdd(args) {
     ref: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return inboxUsageErr(f.error);
   const pos = f.positionals;
@@ -1279,6 +1339,7 @@ function inboxAdd(args) {
     ref: f.values.ref,
     check: f.values.check,
     verb: 'added',
+    statusFlag: f.values.status,
   });
 }
 
@@ -1373,6 +1434,7 @@ function inboxDone(args) {
     note: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return inboxUsageErr(f.error);
   const pos = f.positionals;
@@ -1406,8 +1468,11 @@ function inboxDone(args) {
   }
   const w = writeInbox(storePath, r.items);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${it.id} done — bee inbox render refreshes ` +
-    `the status view\n`, err: '' };
+  return withRegionRefresh(storePath,
+    f.values.status ? path.resolve(f.values.status)
+      : derivedStatusPath(storePath),
+    { code: 0, out: `${it.id} done — bee inbox render refreshes ` +
+      `the status view\n`, err: '' });
 }
 
 // ---- render (P4 Task 2 — the status file's marked inbox region) ----
@@ -1538,6 +1603,89 @@ function inboxRender(args) {
       `next: bee report renders the keeper digest\n`, err: '' };
 }
 
+// ---- post-mutation region refresh (P8 item 24c) ----
+// After a successful store mutation (inbox add/done, capture, park
+// add/resolve), re-render the status region in the SAME invocation
+// so the view's membership and ages always match a fresh render —
+// never the frozen pre-mutation one. Any failure to refresh is an
+// informational stderr note: the mutation stands, exit stays 0.
+
+// The status surface derived from a store path: the .hivemind dir
+// when the store lives under one (works for both inbox.toon and
+// memory/parking-lot.toon layouts); the store's own dir otherwise.
+function derivedStatusPath(storePath) {
+  const marker = path.sep + '.hivemind' + path.sep;
+  const at = storePath.indexOf(marker);
+  const dir = at !== -1
+    ? storePath.slice(0, at + 1) + '.hivemind'
+    : path.dirname(storePath);
+  return path.join(dir, 'status.md');
+}
+
+// inboxStorePath is the INBOX store the view renders from (never
+// the park store — park refreshes the inbox-owned region).
+function refreshStatusRegion(inboxStorePath, statusPath) {
+  let text;
+  try {
+    text = fs.readFileSync(statusPath, 'utf8');
+  } catch (e) {
+    return { err: `status view not refreshed: cannot read ${statusPath} ` +
+      `(${e.message}) — run bee inbox render when a status file exists\n` };
+  }
+  if (!text.includes(RENDER_OPEN) && !text.includes(RENDER_CLOSE)) {
+    return { err: `status view not refreshed: no render region in ` +
+      `${statusPath} — bee inbox render creates one\n` };
+  }
+  if (!fs.existsSync(inboxStorePath)) {
+    return { err: `status view not refreshed: no inbox store at ` +
+      `${inboxStorePath} — nothing to render from\n` };
+  }
+  const r = readInbox(inboxStorePath);
+  if (r.err) {
+    return { err: `status view not refreshed: ` +
+      r.err.replace(/^bee inbox: /, '') };
+  }
+  const view = inboxRenderView(r.items);
+  if (view.includes(RENDER_OPEN) || view.includes(RENDER_CLOSE)) {
+    return { err: 'status view not refreshed: an item text contains a ' +
+      'render marker — hand-fix the store, then bee inbox render\n' };
+  }
+  const res = renderIntoStatus(text, view, statusPath);
+  if (res.err) {
+    return { err: 'status view not refreshed: ' +
+      res.err.replace(/^bee inbox render: /, '') };
+  }
+  try {
+    atomicWrite(statusPath, res.text);
+  } catch (e) {
+    return { err: `status view not refreshed: cannot write ${statusPath}: ` +
+      `${e.message}\n` };
+  }
+  return { ok: `status view refreshed: ${statusPath}\n` };
+}
+
+// Shared mutation-epilogue: refresh the region at statusPath
+// (rendered from inboxStorePath) and fold the note into the command
+// result without failing it.
+function withRegionRefresh(inboxStorePath, statusPath, base) {
+  const rf = refreshStatusRegion(inboxStorePath, statusPath);
+  return {
+    code: base.code,
+    out: base.out + (rf.ok || ''),
+    err: (base.err || '') + (rf.err || ''),
+  };
+}
+
+// Park variant: the status path derives from the PARK store, but
+// the region renders from the inbox store that owns it — the
+// sibling inbox.toon of the status file.
+function parkWithRegionRefresh(parkStorePath, statusFlag, base) {
+  const statusPath = statusFlag ? path.resolve(statusFlag)
+    : derivedStatusPath(parkStorePath);
+  return withRegionRefresh(
+    path.join(path.dirname(statusPath), 'inbox.toon'), statusPath, base);
+}
+
 function cmdCapture(rest) {
   if (rest[0] === 'help') {
     return { code: 0, out: CAPTURE_USAGE, err: '' };
@@ -1545,6 +1693,7 @@ function cmdCapture(rest) {
   const f = flags(rest, {
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) {
     const msg = f.error.message ? f.error.message
@@ -1563,6 +1712,7 @@ function cmdCapture(rest) {
     origin: 'capture',
     check: f.values.check,
     verb: 'captured',
+    statusFlag: f.values.status,
   });
 }
 
@@ -1577,6 +1727,9 @@ usage: bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>]
   default adds to the project inbox (addressee keeper; origin from
   --origin, else agent); --harness files a numbered TOON document
   under the machine store's suggestions/ — triage happens harness-side
+
+  A suggestion may be a problem with no proposed solution
+  (observation-type); it routes as a design input.
 `;
 
 function suggestUsageErr(e) {
@@ -1855,6 +2008,7 @@ function parkAdd(args) {
     origin: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return parkUsageErr(f.error);
   const pos = f.positionals;
@@ -1895,9 +2049,10 @@ function parkAdd(args) {
   const w = writeStore('bee park', storePath, [...r.items, entry],
     PARK_FIELDS, PARK_HEADER);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0,
-    out: `${id} parked · ${truncText(item)} — bee park show ${id}\n`,
-    err: '' };
+  return parkWithRegionRefresh(storePath, f.values.status,
+    { code: 0,
+      out: `${id} parked · ${truncText(item)} — bee park show ${id}\n`,
+      err: '' });
 }
 
 function parkList(args) {
@@ -1966,6 +2121,7 @@ function parkResolve(args) {
     how: { type: 'string' },
     check: { type: 'boolean' },
     store: { type: 'string' },
+    status: { type: 'string' },
   }, true);
   if (f.error) return parkUsageErr(f.error);
   const pos = f.positionals;
@@ -1997,8 +2153,9 @@ function parkResolve(args) {
   const w = writeStore('bee park', storePath, r.items,
     PARK_FIELDS, PARK_HEADER);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0,
-    out: `${it.id} resolved — bee park list\n`, err: '' };
+  return parkWithRegionRefresh(storePath, f.values.status,
+    { code: 0,
+      out: `${it.id} resolved — bee park list\n`, err: '' });
 }
 
 // migrate: the named one-shot executor converting the markdown
@@ -2579,19 +2736,24 @@ function designShown(p) {
   return rel.startsWith('..') ? p : rel;
 }
 
-function runDesignScript(args) {
+function runDesignScript(args, opts = {}) {
+  // opts.cwd runs the script in another checkout (bee phase close
+  // stamps designs in the closed repo); opts.prog renames it in
+  // messages. No opts — behavior unchanged.
+  const prog = opts.prog || 'bee design';
   const script = path.join(REPO_ROOT, 'scripts', 'design.sh');
   if (!fs.existsSync(script)) {
     return { code: 1, out: '',
-      err: `bee design: missing ${script} — check the checkout\n` };
+      err: `${prog}: missing ${script} — check the checkout\n` };
   }
   const r = spawnSync('bash', [script, ...args], {
     encoding: 'utf8',
-    env: { ...process.env, BEE_DESIGN_PROG: 'bee design' },
+    cwd: opts.cwd,
+    env: { ...process.env, BEE_DESIGN_PROG: prog },
   });
   if (r.error) {
     return { code: 1, out: '',
-      err: `bee design: cannot run ${script}: ${r.error.message}\n` };
+      err: `${prog}: cannot run ${script}: ${r.error.message}\n` };
   }
   return { code: r.status ?? 1, out: r.stdout ?? '', err: r.stderr ?? '' };
 }
@@ -3057,6 +3219,26 @@ function verifyEntryText(role, verdict, checksRun, planShown, planHash,
   return e;
 }
 
+// D9 (P8 Task 5): is the checkout at <root> the repo's MAIN
+// checkout? `git rev-parse --git-common-dir` (absolute) equal
+// to the checkout's own .git → main; any other value → the
+// checkout is a linked worktree. No git at all → { noGit } —
+// callers skip silently.
+function isMainCheckout(root) {
+  const r = spawnSync('git', ['rev-parse', '--path-format=absolute',
+    '--git-common-dir'], { cwd: root, encoding: 'utf8' });
+  if (r.status !== 0) return { noGit: true };
+  const norm = (p) => {
+    try {
+      return fs.realpathSync(p);
+    } catch (e) {
+      return path.resolve(p);
+    }
+  };
+  return { main: norm(r.stdout.trim()) ===
+    norm(path.join(root, '.git')) };
+}
+
 function cmdVerify(rest) {
   if (rest[0] === 'help') {
     return { code: 0, out: VERIFY_USAGE, err: '' };
@@ -3185,8 +3367,53 @@ function cmdVerify(rest) {
 
   const nPass = results.filter((r) => r.pass).length;
   const nFail = results.length - nPass;
+
+  // D9 (P8 Task 5) — merge-level worktree suite: once the
+  // declared checks pass at merge or phase level, re-run the
+  // plan's suite in a throwaway --detach worktree of HEAD, but
+  // only from the MAIN checkout. The class it catches: suites
+  // green only at the checkout they were written in (hardcoded
+  // checkout paths in tests). A verify already inside a linked
+  // worktree skips with a note; a plan without a suite line
+  // (or below merge level, or no git) skips silently. Reuses
+  // phaseSuiteGate's throwaway path — same env hygiene
+  // (NODE_TEST_CONTEXT strip), timeout, and cleanup.
+  const suiteCmd = (header.suite || '').trim();
+  let suiteLine = null;
+  const suiteFindings = [];
+  if (suiteCmd !== '' && results.length > 0 && nFail === 0 &&
+      (header.validation === 'merge' ||
+        header.validation === 'phase' ||
+        header.validation === 'release')) {
+    const mc = isMainCheckout(planRoot);
+    if (!mc.noGit && !mc.main) {
+      suiteLine = 'suite · skipped · already inside a linked ' +
+        'worktree (D9)';
+    } else if (!mc.noGit) {
+      const g = phaseSuiteGate(planRoot, 'HEAD', suiteCmd, null,
+        false);
+      if (g.err) {
+        suiteLine = `suite · ${truncText(suiteCmd, 60)} · FAIL · ` +
+          `cannot create worktree: ${g.err}`;
+        suiteFindings.push('fix: git worktree add --detach <tmp> ' +
+          'HEAD at the plan root failed — clear what it reports, ' +
+          'then re-run');
+      } else if (g.pass) {
+        suiteLine = `suite · ${truncText(suiteCmd, 60)} · PASS · ` +
+          `${g.note} · worktree re-run of HEAD`;
+      } else {
+        suiteLine = `suite · ${truncText(suiteCmd, 60)} · FAIL · ` +
+          `${g.note} · worktree re-run of HEAD`;
+        suiteFindings.push('fix: the suite fails in a fresh ' +
+          'worktree of HEAD — run it from a new checkout and repair ' +
+          'what it reports (a checkout-derived path is the usual ' +
+          'suspect)');
+      }
+    }
+  }
+
   const anyFail = nFail > 0 || linkFindings.length > 0 ||
-    structureFindings.length > 0;
+    structureFindings.length > 0 || suiteFindings.length > 0;
   let out = '';
   if (results.length === 0) {
     out += '0 checks\n' +
@@ -3208,6 +3435,12 @@ function cmdVerify(rest) {
   out += structureLine + '\n';
   for (const l of structureFindings) {
     out += `  ${l}\n`;
+  }
+  if (suiteLine !== null) {
+    out += suiteLine + '\n';
+    for (const l of suiteFindings) {
+      out += `  ${l}\n`;
+    }
   }
 
   // Logbook emission: one entry per task checked; written when
@@ -3260,7 +3493,8 @@ function cmdVerify(rest) {
       const taskFail = trs.filter((r) => !r.pass);
       const verdict = taskFail.length === 0 &&
         linkFindings.length === 0 &&
-        structureFindings.length === 0 ? 'PASS' : 'FAIL';
+        structureFindings.length === 0 &&
+        suiteFindings.length === 0 ? 'PASS' : 'FAIL';
       let anomalies = '';
       for (const r of taskFail) {
         anomalies += `${r.id} · ${r.shown} · FAIL · ${r.note}\n`;
@@ -3275,6 +3509,12 @@ function cmdVerify(rest) {
       if (structureFindings.length > 0) {
         anomalies += structureLine + '\n';
         for (const l of structureFindings) {
+          anomalies += `${l}\n`;
+        }
+      }
+      if (suiteFindings.length > 0) {
+        anomalies += suiteLine + '\n';
+        for (const l of suiteFindings) {
           anomalies += `${l}\n`;
         }
       }
@@ -3740,6 +3980,35 @@ function logbookCompact(args) {
 
 const GLOSSARY_HEADER =
   '# glossary — shared vocabulary (term :: gist :: see; supply, never update)';
+
+// Template glossary seed (P8 task 17, item 4, D10): the core bee
+// vocabulary a fresh consumer repo starts with — the header plus
+// 21 term lines, self-contained and user-extendable. Written by
+// scaffold step 6; the step's exists-guard means a repo's
+// glossary.toon is never re-seeded once it exists.
+const TEMPLATE_GLOSSARY_SEED = GLOSSARY_HEADER + `
+bee :: the harness CLI; its commands operate on the project's .hivemind/ stores :: -
+bee- kit :: the shipped skills; the bee- prefix marks what ships with the harness :: -
+bee-loop :: the plan → implement → verify → review cycle; entered only by explicit direction :: -
+plan :: the step-by-step document a loop executes; lives in .hivemind/plans/ :: -
+phase list :: one line per phase in .hivemind/phases/; the queue's source of truth :: -
+dispatch :: a role sending work to a subagent within its own mandate :: -
+dispatch brief :: the contract sent with a dispatch: plan path, phase, escalation envelope, workspace, pass-back shape :: -
+keeper :: the human owner; final authority on every decision that matters :: -
+escalate :: stop and ask the keeper: one decision per card, options, a recommendation :: -
+logbook :: the loop's written account in .hivemind/logbook/; claims don't move states — records do :: -
+work-item states :: draft → implemented → verified → reviewed → done; each move needs its evidence :: -
+claim :: the phase list's owner column: role + timestamp, written before dispatch :: -
+validation level :: how much checking a stage gets: task · merge · phase · release :: -
+parking lot :: deferred decisions with unpark conditions; only the keeper resolves one :: -
+status surface :: the cross-role notes file; both roles read it at session start :: -
+inbox :: the store of items waiting on someone: add · list · show · done :: -
+TOON :: token-oriented notation: the token-lean, line-oriented store format agents read :: -
+handoff :: same role, fresh context: handoff file plus a wake prompt for the keeper :: -
+relay :: context between different roles: gated (keeper-passed) or ambient (shared surfaces) :: -
+role :: a named agent spec in roles/: mandate plus attributes; assumed by direction, never inferred :: -
+skill :: a procedure: how a class of work gets done; skills stay role-agnostic :: -
+`;
 
 const GLOSSARY_VIEW_MARKER = '<!-- glossary view — script-owned: ' +
   'bee glossary regenerates this file on every store write; ' +
@@ -4657,11 +4926,14 @@ function guidanceShow(args) {
 // The close is the loop's mechanical tail: gate (branch exists +
 // suite green at its tree), no-ff merge phase/<n> → main (the P3/P7
 // lesson — a phase is a real merge commit, never a fast-forward),
-// rest the persistent worktree detached at main, delete the phase
-// branch, emit the close card with the decision count (the P7
-// calibration signal; threshold calibratable later), push. The
-// decision inventory is agent-assembled content in a script-owned
-// format: one line per decision, id · one-line · source-record-path.
+// flip the phase row → done + close note and stamp its unstamped
+// design docs via design.sh (P8 Task 2), rest the persistent
+// worktree detached at main, delete the phase branch, emit the
+// close card with the split decision count (front-loaded vs
+// in-phase — the under-asked flag fires on in-phase only), push.
+// The decision inventory is agent-assembled content in a
+// script-owned format: one line per decision, id · one-line ·
+// source-record-path.
 
 const PHASE_FLAG_THRESHOLD = 8;
 
@@ -4689,14 +4961,21 @@ commands:
                   2 merge   --no-ff phase/<n> → main, from the main
                             checkout on main, tree clean (the
                             decision inventory itself is exempt —
-                            it is expected pre-close)
+                            it is expected pre-close); then flip
+                            the phase row → done + close note and
+                            stamp its unstamped design docs
+                            (missing row: informational, never
+                            a failure)
                   3 rest    persistent worktree on phase/<n>
                             detached at main (skipped when none)
                   4 delete  branch phase/<n> (-d, merged only)
-                  5 card    decisions: <n> — the inventory's
-                            decision lines; flag 'under-asked
+                  5 card    decisions: <n> (front-loaded <k> ·
+                            in-phase <r>) — kickoff:/plan-time:
+                            one-lines count front-loaded; flag
+                            'under-asked
                             kickoff — front-load harder next phase'
-                            when n > ${PHASE_FLAG_THRESHOLD} (threshold
+                            when in-phase > ${PHASE_FLAG_THRESHOLD}
+                            and in-phase > front-loaded (threshold
                             calibratable later; waivers count —
                             a waiver is a decision)
                   6 push    origin main (skipped with a note when
@@ -4874,6 +5153,23 @@ function phaseDecisionLines(text) {
     .filter((l) => l.includes(' · '));
 }
 
+// P8 Task 2 (D5): the inventory's one-line text encodes provenance
+// — a kickoff/plan-time prefix marks a front-loaded decision; every
+// other prefix (review-driven, dogfood, …) is in-phase. Returns
+// { front, inPhase } over phaseDecisionLines output.
+function phaseDecisionSplit(lines) {
+  let front = 0;
+  for (const l of lines) {
+    const first = l.indexOf(' · ');
+    const last = l.lastIndexOf(' · ');
+    const oneLine = first === -1 || last === first
+      ? l
+      : l.slice(first + 3, last);
+    if (/^(kickoff|plan-time)\b/.test(oneLine.trim())) front++;
+  }
+  return { front, inPhase: lines.length - front };
+}
+
 function phaseInventory(args) {
   const f = flags(args, {
     decisions: { type: 'string' },
@@ -5024,6 +5320,178 @@ function phaseSuiteGate(root, branch, suite, pwt, pwtClean) {
   return res;
 }
 
+// The phase row: the first (sorted) .hivemind/phases/ file
+// carrying a '| P<n> |' table row. Returns { file, lines, rowIdx }
+// or { none: reason } — a missing board is a consumer-layout fact,
+// reported informationally, never a close failure.
+// The design doc's own machine block, as its implemented stamp —
+// used by the close's recovery path (a refused implement may mean
+// a previous run already stamped the doc; the row annotation
+// recovers from the doc's record, not a fresh stamp). Returns the
+// recorded merge sha, or null when the doc is absent, blockless,
+// or not implemented.
+function phaseDesignStampOf(root, entry) {
+  let text;
+  try {
+    text = fs.readFileSync(path.join(root, '.hivemind', entry), 'utf8');
+  } catch (e) {
+    return null;
+  }
+  const m = text.match(/<!--[\s]*machine[\s\S]*?-->/);
+  if (m === null) return null;
+  const st = /^status:[\s]*(\S+)/m.exec(m[0]);
+  const mg = /^merge:[\s]*(\S+)/m.exec(m[0]);
+  if (st === null || st[1] !== 'implemented' || mg === null) {
+    return null;
+  }
+  return /^[0-9a-fA-F]{7,40}$/.test(mg[1]) ? mg[1] : null;
+}
+
+function phaseRowFind(root, n) {
+  const dir = path.join(root, '.hivemind', 'phases');
+  let names;
+  try {
+    names = fs.readdirSync(dir);
+  } catch (e) {
+    if (e.code === 'ENOENT') {
+      return { none: 'no .hivemind/phases/ directory' };
+    }
+    return { none: `cannot read ${dir}: ${e.message}` };
+  }
+  const re = new RegExp(`^\\| P${n} \\|`);
+  // TEMPLATE.md is not a board — its example row must never win
+  // the scan (byte-sort puts it before lowercase-named project
+  // files; review r1 should-fix).
+  for (const name of names.filter((x) => x !== 'TEMPLATE.md').sort()) {
+    let text;
+    try {
+      text = fs.readFileSync(path.join(dir, name), 'utf8');
+    } catch (e) {
+      continue; // unreadable — not a board candidate
+    }
+    const lines = text.split('\n');
+    const rowIdx = lines.findIndex((l) => re.test(l));
+    if (rowIdx !== -1) {
+      return { file: path.join(dir, name), lines, rowIdx };
+    }
+  }
+  return { none: `no | P${n} | row under .hivemind/phases/` };
+}
+
+// The row's backticked designs/<file>.md entries (designs cell).
+// An entry is stamped when the text after its closing backtick (to
+// the next backtick or cell end) carries '(implemented @'.
+function phaseRowDesigns(cell) {
+  const out = [];
+  const re = /`(designs\/[^`]+\.md)`/g;
+  let m;
+  while ((m = re.exec(cell)) !== null) {
+    const afterStart = m.index + m[0].length;
+    const nextTick = cell.indexOf('`', afterStart);
+    const after = cell.slice(afterStart,
+      nextTick === -1 ? cell.length : nextTick);
+    out.push({ entry: m[1], stamped: after.includes('(implemented @') });
+  }
+  return out;
+}
+
+// Step 2's mechanical tail: flip the phase row (status → done,
+// close note into the escalations cell — replacing a —/empty
+// placeholder) and stamp the row's unstamped design docs via
+// scripts/design.sh (cwd = the closed repo; refusals informational).
+// Flip, note, and (implemented @ …) annotations land in ONE atomic
+// row write. Returns { lines, written }; a missing row, an
+// already-done row, and design refusals are informational lines —
+// never failures. Only the row write itself failing sets err.
+function phaseRowFlip(root, n, mergeSha, check) {
+  const lines = [];
+  const found = phaseRowFind(root, n);
+  if (found.none !== undefined) {
+    lines.push(`  phase row: ${found.none} — ` +
+      (check ? 'would skip\n' : 'flip skipped\n'));
+    return { lines, written: false };
+  }
+  const rel = path.relative(root, found.file);
+  const cells = found.lines[found.rowIdx].split('|');
+  if (cells.length < 9) {
+    lines.push(`  phase row: ${rel} row does not follow the 7-column ` +
+      `template — ${check ? 'would skip' : 'flip skipped'}\n`);
+    return { lines, written: false };
+  }
+  const statusOld = cells[3].trim();
+  if (statusOld === 'done') {
+    lines.push(`  phase row: P${n} already done — no-op (${rel})\n`);
+    return { lines, written: false };
+  }
+  const designs = phaseRowDesigns(cells[4]);
+  const todo = designs.filter((d) => !d.stamped);
+  const designNote = designs.length === 0
+    ? `  designs: none linked in the P${n} row\n`
+    : '  designs: all stamped — none to implement\n';
+  if (check) {
+    lines.push(`  phase row: would flip P${n} ${statusOld} → done (${rel})\n`);
+    lines.push(todo.length === 0 ? designNote
+      : `  designs: would stamp ${todo
+          .map((d) => path.join('.hivemind', d.entry)).join(', ')}\n`);
+    return { lines, written: false };
+  }
+  // stamp the unstamped docs first — annotations ride the row write
+  const stamped = [];
+  for (const d of todo) {
+    const r = runDesignScript(
+      ['implement', path.join('.hivemind', d.entry),
+        '--phase', String(n), '--merge', mergeSha],
+      { cwd: root, prog: 'bee phase close' });
+    if (r.code === 0) {
+      stamped.push(d);
+      lines.push(`  designs: ${path.join('.hivemind', d.entry)} — ` +
+        `stamped (implemented @ ${mergeSha})\n`);
+    } else {
+      // recovery path (review r1 should-fix): a refused implement
+      // may mean a PREVIOUS run stamped the doc and then failed its
+      // row write — design.sh refuses on implemented docs, but the
+      // row annotation recovers from the doc's own machine block.
+      const rec = phaseDesignStampOf(root, d.entry);
+      if (rec !== null) {
+        stamped.push({ ...d, sha: rec });
+        lines.push(`  designs: ${path.join('.hivemind', d.entry)} — ` +
+          `recovered (implemented @ ${rec})\n`);
+      } else {
+        const first = (r.err.split('\n')
+          .find((l) => l.trim() !== '') || `exit ${r.code}`)
+          .replace(/^bee phase close: /, '');
+        lines.push(`  note: ${first}\n`);
+      }
+    }
+  }
+  if (todo.length === 0) lines.push(designNote);
+  cells[3] = statusOld === ''
+    ? ' done '
+    : cells[3].replace(statusOld, 'done');
+  for (const d of stamped) {
+    cells[4] = cells[4].replace('`' + d.entry + '`',
+      '`' + d.entry + '` (implemented @ ' + (d.sha ?? mergeSha) + ')');
+  }
+  const escIdx = cells.length - 2;
+  const closeNote = `close via bee phase close ${n} (merge ${mergeSha})`;
+  const esc = cells[escIdx].trim();
+  cells[escIdx] = esc === '' || esc === '—'
+    ? ' ' + closeNote + ' '
+    : cells[escIdx].trimEnd() + ' · ' + closeNote + ' ';
+  const newLines = found.lines.slice();
+  newLines[found.rowIdx] = cells.join('|');
+  try {
+    atomicWrite(found.file, newLines.join('\n'));
+  } catch (e) {
+    return { lines,
+      err: `  phase row: cannot write ${rel}: ${e.message}\n` +
+        '  fix: repair the write, then re-run — the merge landed; ' +
+        'the row flip is idempotent\n' };
+  }
+  lines.unshift(`  phase row: P${n} ${statusOld} → done (${rel})\n`);
+  return { lines, written: true };
+}
+
 function phaseClose(args) {
   const f = flags(args, {
     check: { type: 'boolean' },
@@ -5151,7 +5619,9 @@ function phaseClose(args) {
       `bee phase inventory ${n} --decisions <file>\n`);
     return { code: 1, out: out.join(''), err: '' };
   }
-  const decCount = phaseDecisionLines(decText).length;
+  const decLines = phaseDecisionLines(decText);
+  const decCount = decLines.length;
+  const decSplit = phaseDecisionSplit(decLines);
   const hasOrigin = phaseGit(root, ['remote', 'get-url', 'origin'])
     .status === 0;
 
@@ -5159,13 +5629,16 @@ function phaseClose(args) {
   if (check) {
     out.push(`2 · merge · would --no-ff ${branch} → main ` +
       `(main @ ${mainSha})\n`);
+    out.push(...phaseRowFlip(root, n, mainSha, true).lines);
     out.push(pwt !== null
       ? `3 · rest · would detach ${pwt} at main\n`
       : `3 · rest · no worktree on ${branch} — would skip\n`);
     out.push(`4 · branch · would delete ${branch}\n`);
     out.push(`5 · close card · P${n} (preview)\n`);
-    out.push(`  decisions: ${decCount}\n`);
-    if (decCount > PHASE_FLAG_THRESHOLD) {
+    out.push(`  decisions: ${decCount} ` +
+      `(front-loaded ${decSplit.front} · in-phase ${decSplit.inPhase})\n`);
+    if (decSplit.inPhase > PHASE_FLAG_THRESHOLD &&
+        decSplit.inPhase > decSplit.front) {
       out.push('  flag: under-asked kickoff — front-load harder next phase\n');
     }
     out.push(hasOrigin
@@ -5195,6 +5668,16 @@ function phaseClose(args) {
   out.push(already
     ? `2 · merge · already merged (no merge commit) · ${mergeSha}\n`
     : `2 · merge · --no-ff ${branch} → main · ${mergeSha}\n`);
+
+  // step 2 tail — the phase-row flip + design stamps (mechanical;
+  // missing rows, already-done rows, and design refusals are
+  // informational — only a failed row write fails the close)
+  const flip = phaseRowFlip(root, n, mergeSha, false);
+  out.push(...flip.lines);
+  if (flip.err !== undefined) {
+    out.push(flip.err);
+    return { code: 1, out: out.join(''), err: '' };
+  }
 
   // step 3 — rest the persistent worktree detached at main
   if (pwt === null) {
@@ -5226,8 +5709,10 @@ function phaseClose(args) {
   out.push(already
     ? `  merge: ${mergeSha} (already merged)\n`
     : `  merge: ${mergeSha} (${branch} → main, no-ff)\n`);
-  out.push(`  decisions: ${decCount}\n`);
-  if (decCount > PHASE_FLAG_THRESHOLD) {
+  out.push(`  decisions: ${decCount} ` +
+    `(front-loaded ${decSplit.front} · in-phase ${decSplit.inPhase})\n`);
+  if (decSplit.inPhase > PHASE_FLAG_THRESHOLD &&
+      decSplit.inPhase > decSplit.front) {
     out.push('  flag: under-asked kickoff — front-load harder next phase\n');
   }
   // review r1 fix: surface the untracked inventory — exempt from
@@ -5251,7 +5736,9 @@ function phaseClose(args) {
     }
     out.push('6 · push · origin main · pushed\n');
   }
-  out.push('next: bee phase list shows what remains\n');
+  out.push(flip.written
+    ? 'next: commit the phase-row flip\n'
+    : 'next: bee phase list shows what remains\n');
   return { code: 0, out: out.join(''), err: '' };
 }
 

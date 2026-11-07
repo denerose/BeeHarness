@@ -33,16 +33,20 @@ function tmp() {
 test('init: adds skills entry, preserves other keys', () => {
   const dir = tmp();
   const sp = path.join(dir, 'settings.json');
+  // The pre-existing entry must be a live path — D6 (P8 task 4)
+  // prunes entries whose resolved path no longer exists.
+  const other = path.join(dir, 'other-skills');
+  fs.mkdirSync(other);
   fs.writeFileSync(sp, JSON.stringify({
     theme: 'dark',
-    skills: ['~/other/skills'],
+    skills: [other],
   }, null, 2));
   const r = run(['init', '--settings', sp, '--machine', tmp()]);
   assert.equal(r.code, 0);
   const after = JSON.parse(fs.readFileSync(sp, 'utf8'));
   assert.equal(after.theme, 'dark');
   assert.deepEqual(after.skills,
-    ['~/other/skills', BEE_SKILLS]);
+    [other, BEE_SKILLS]);
 });
 
 test('init: --check on unregistered exits 1, writes nothing', () => {

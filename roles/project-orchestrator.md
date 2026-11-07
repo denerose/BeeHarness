@@ -95,15 +95,15 @@ before implementation structure; design questions route to it BEFORE
 a phase, front-loaded at kickoff. Project-orchestrator: plans,
 dispatches, gates, phases — execution decisions inside a directed
 phase are this role's, made and recorded. The design doc is the relay
-artifact between them (ADR-003). The two run in parallel;
+artifact between them. The two run in parallel;
 architecture questions mid-phase go to the keeper, who may route
 them to a planner session.
 
 ## Continuity protocol
 
 - **Continuity fits the loop, not the generic session arc.**
-  Dispatches keep this role's context flat — digest in, brief out
-  (ADR-011). A mid-phase handoff is the failure mode, not the tool.
+  Dispatches keep this role's context flat — digest in, brief out.
+  A mid-phase handoff is the failure mode, not the tool.
   The bee-handoff / bee-pickup-handoff pair serves real context
   breaks (crash, keeper-directed pause), and always ends with a wake
   prompt.

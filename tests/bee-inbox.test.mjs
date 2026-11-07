@@ -399,3 +399,137 @@ test('capture help prints usage, records nothing (AXI 10)', () => {
   assert.match(r.out, /usage: bee capture/);
   assert.ok(!fs.existsSync(p));
 });
+
+// ---- P8 item 24c pins (check-then-apply, D12) ----
+// add/done must refresh the status render region in the SAME
+// invocation: the view in the file matches a fresh render (ages
+// computed at render time), never the frozen pre-mutation render.
+
+const RENDER_OPEN = '<!-- inbox:render -->';
+const RENDER_CLOSE = '<!-- /inbox:render -->';
+
+const daysAgoIso = (n) =>
+  new Date(Date.now() - n * 24 * 3600 * 1000).toISOString();
+
+function seedAgedStore(p, items) {
+  const blocks = items.map((it, i) => [
+    `id: IN-${String(i + 1).padStart(3, '0')}`,
+    `addressee: ${it.addressee ?? 'keeper'}`,
+    `origin: ${it.origin ?? 'bee'}`,
+    `ref: ${it.ref ?? '-'}`,
+    `text: ${it.text}`,
+    `state: ${it.state ?? 'open'}`,
+    `opened: ${it.opened}`,
+    'taken: -',
+    'done: -',
+  ].join('\n'));
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, `${STORE_HEADER}\n${blocks.join('\n\n')}\n`);
+}
+
+function fixtureStatus(dir) {
+  const st = path.join(dir, 'status.md');
+  fs.writeFileSync(st, '# Status\n\n## Awaiting keeper\n\n(none)\n');
+  return st;
+}
+
+test('add refreshes the status render region in the same invocation (item 24c)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-inbox-'));
+  const p = path.join(dir, 'inbox.toon');
+  const st = fixtureStatus(dir);
+  seedAgedStore(p, [{ text: 'aged ask', opened: daysAgoIso(5) }]);
+  const rr = run(['inbox', 'render', '--store', p, '--status', st]);
+  assert.equal(rr.code, 0, rr.err);
+  assert.match(fs.readFileSync(st, 'utf8'), /1 open · oldest 5d/);
+  const r = run(['inbox', 'add', 'keeper', 'fresh ask', '--store', p,
+    '--status', st]);
+  assert.equal(r.code, 0, r.err);
+  const after = fs.readFileSync(st, 'utf8');
+  // the region matches a fresh render: new item present, ages live
+  assert.match(after, /2 open · oldest 5d/);
+  assert.match(after, /- IN-002 · \d+[smhd] — fresh ask/);
+  assert.ok(after.startsWith('# Status\n')); // outside region intact
+});
+
+test('done refreshes the status render region in the same invocation (item 24c)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-inbox-'));
+  const p = path.join(dir, 'inbox.toon');
+  const st = fixtureStatus(dir);
+  seedAgedStore(p, [{ text: 'aged ask', opened: daysAgoIso(5) }]);
+  const rr = run(['inbox', 'render', '--store', p, '--status', st]);
+  assert.equal(rr.code, 0, rr.err);
+  assert.match(fs.readFileSync(st, 'utf8'), /1 open · oldest 5d/);
+  const r = run(['inbox', 'done', 'IN-001', '--store', p, '--status', st]);
+  assert.equal(r.code, 0, r.err);
+  const after = fs.readFileSync(st, 'utf8');
+  // the view recomputed: the item is gone, not frozen in the region
+  assert.match(after, /0 open/);
+  assert.ok(!after.includes('aged ask'));
+  assert.ok(after.startsWith('# Status\n')); // outside region intact
+});
+
+// The same refresh seam covers capture and the park mutations
+// (region re-rendered from the inbox store in the same invocation).
+test('capture refreshes the status render region (item 24c)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-inbox-'));
+  const p = path.join(dir, 'inbox.toon');
+  const st = fixtureStatus(dir);
+  seedAgedStore(p, [{ text: 'aged ask', opened: daysAgoIso(5) }]);
+  run(['inbox', 'render', '--store', p, '--status', st]);
+  const r = run(['capture', 'a captured thought', '--store', p,
+    '--status', st]);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /status view refreshed:/);
+  assert.match(fs.readFileSync(st, 'utf8'),
+    /- IN-002 · \d+[smhd] — a captured thought/);
+});
+
+test('park add/resolve refresh the status render region (item 24c)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-inbox-'));
+  const hive = path.join(dir, '.hivemind');
+  const st = path.join(hive, 'status.md');
+  fs.mkdirSync(path.join(hive, 'memory'), { recursive: true });
+  fs.writeFileSync(st, '# Status\n\n## Awaiting keeper\n\n(none)\n');
+  const inbox = path.join(hive, 'inbox.toon');
+  seedAgedStore(inbox, [{ text: 'aged ask', opened: daysAgoIso(5) }]);
+  const park = path.join(hive, 'memory', 'parking-lot.toon');
+  run(['inbox', 'render', '--store', inbox, '--status', st]);
+  // park add: --status names the region; the refresh renders from
+  // the sibling inbox store, never the park store
+  const ra = run(['park', 'add', 'a deferred choice', '--store', park,
+    '--status', st]);
+  assert.equal(ra.code, 0, ra.err);
+  assert.match(ra.out, /status view refreshed:/);
+  assert.match(fs.readFileSync(st, 'utf8'), /- IN-001 · 5d — aged ask/);
+  const rb = run(['park', 'resolve', 'PL-001', '--store', park,
+    '--status', st]);
+  assert.equal(rb.code, 0, rb.err);
+  assert.match(rb.out, /status view refreshed:/);
+});
+
+// Refresh failures are informational — the mutation stands.
+test('unbalanced region: add mutates, notes on stderr, exit 0 (item 24c)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-inbox-'));
+  const p = path.join(dir, 'inbox.toon');
+  const st = path.join(dir, 'status.md');
+  fs.writeFileSync(st,
+    `# S\n\n## Awaiting keeper\n\n${RENDER_OPEN}\n- orphan\n`);
+  seedAgedStore(p, [{ text: 'ask one', opened: daysAgoIso(1) }]);
+  const before = fs.readFileSync(st, 'utf8');
+  const r = run(['inbox', 'add', 'keeper', 'second ask', '--store', p,
+    '--status', st]);
+  assert.equal(r.code, 0); // never nonzero on refresh failure
+  assert.match(r.err, /status view not refreshed/);
+  assert.match(r.out, /IN-002 added/); // the mutation stands
+  assert.equal(fs.readFileSync(st, 'utf8'), before); // untouched
+});
+
+test('no status file: add notes on stderr, exit 0 (item 24c)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-inbox-'));
+  const p = path.join(dir, 'inbox.toon'); // sibling status.md absent
+  const r = run(['inbox', 'add', 'keeper', 'bare ask', '--store', p]);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /IN-001 added/);
+  assert.match(r.err, /status view not refreshed/);
+  assert.ok(fs.readFileSync(p, 'utf8').includes('bare ask'));
+});

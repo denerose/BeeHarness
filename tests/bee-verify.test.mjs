@@ -558,3 +558,91 @@ test('logbook writes carry the task-move next-step (AXI 9)', () => {
   assert.ok(!check.out.includes('next:'));
   assert.ok(fs.readdirSync(lb2).length === 0);
 });
+
+// ---- D9 (P8 Task 5): merge-level worktree suite ----
+
+// A committed repo whose plan verifies at merge level with a
+// suite. suite-probe.mjs derives its own location
+// (import.meta.url — never a checkout path) and reports it via
+// $BEE_VERIFY_SUITE_PROBE, proving it executed in the throwaway
+// worktree, not the checkout it was written in.
+function suiteRepo() {
+  const { dir, git } = tmpGitRepo();
+  fs.writeFileSync(path.join(dir, 'suite-probe.mjs'),
+    "import fs from 'node:fs';\n" +
+    "import path from 'node:path';\n" +
+    "import { fileURLToPath } from 'node:url';\n" +
+    'const out = process.env.BEE_VERIFY_SUITE_PROBE;\n' +
+    'if (out) fs.appendFileSync(out,\n' +
+    "  path.dirname(fileURLToPath(import.meta.url)) + '\\n');\n");
+  fs.writeFileSync(path.join(dir, 'plan.md'),
+    '# Plan\n\n<!-- machine\nphase: P1\nvalidation: merge\n' +
+    'suite: node suite-probe.mjs\nchecks:\n  - id: task-1\n' +
+    '    cmd: "true"\n-->\n');
+  git('add -A && git commit -qm base');
+  return { dir, git };
+}
+
+test('merge level, main checkout: suite re-runs in a temp worktree (D9)', () => {
+  const { dir, git } = suiteRepo();
+  const probe = path.join(tmpDir(), 'probe.out');
+  process.env.BEE_VERIFY_SUITE_PROBE = probe;
+  let r;
+  try {
+    r = run(['verify', '--plan', path.join(dir, 'plan.md')]);
+  } finally {
+    delete process.env.BEE_VERIFY_SUITE_PROBE;
+  }
+  assert.equal(r.code, 0, r.out + r.err);
+  assert.match(r.out,
+    /suite · node suite-probe\.mjs · PASS · exit 0 · worktree re-run of HEAD/);
+  // the suite genuinely ran in the throwaway worktree: the probe
+  // recorded a path derived from the script's own location —
+  // under the OS temp root, not the checkout it was written in,
+  // and gone again by the time verify returns
+  const seen = fs.readFileSync(probe, 'utf8').trim();
+  assert.ok(seen.startsWith(os.tmpdir()), `ran in tmp: ${seen}`);
+  assert.notEqual(seen, dir);
+  assert.equal(fs.existsSync(seen), false, 'worktree removed after run');
+  // cleanup: the throwaway worktree is gone — only the main remains
+  const wl = git('worktree list --porcelain');
+  assert.equal((wl.match(/^worktree /gm) ?? []).length, 1);
+});
+
+test('merge level inside a linked worktree: suite skips with a note (D9)', () => {
+  const { dir, git } = suiteRepo();
+  const wt = path.join(tmpDir(), 'linked');
+  git(`worktree add -q ${wt}`);
+  try {
+    const r = run(['verify', '--plan', path.join(wt, 'plan.md')]);
+    assert.equal(r.code, 0, r.out + r.err);
+    assert.match(r.out,
+      /suite · skipped · already inside a linked worktree \(D9\)/);
+  } finally {
+    execSync(`git -C ${dir} worktree remove --force ${wt}`,
+      { encoding: 'utf8', stdio: 'ignore' });
+  }
+});
+
+test('merge level from the main checkout: suite FAIL fails verify (r1 S2)', () => {
+  const { dir, git } = suiteRepo();
+  fs.writeFileSync(path.join(dir, 'fail-suite.mjs'), 'process.exit(1);\n');
+  fs.writeFileSync(path.join(dir, 'plan.md'),
+    '# Plan\n\n<!-- machine\nphase: P1\nvalidation: merge\n' +
+    'suite: node fail-suite.mjs\nchecks:\n  - id: task-1\n' +
+    '    cmd: "true"\n-->\n');
+  git('add -A && git commit -qm fail-base');
+  const r = run(['verify', '--plan', path.join(dir, 'plan.md')]);
+  assert.equal(r.code, 1);
+  assert.match(r.out, /suite · node fail-suite\.mjs · FAIL · exit 1 · worktree re-run of HEAD/);
+  assert.match(r.out, /fix: the suite fails in a fresh worktree of HEAD/);
+  // release level also gates (r1 S1): highest checking level runs the suite
+  const plan = fs.readFileSync(path.join(dir, 'plan.md'), 'utf8')
+    .replace('validation: merge', 'validation: release')
+    .replace('fail-suite', 'suite-probe');
+  fs.writeFileSync(path.join(dir, 'plan2.md'), plan);
+  git('add -A && git commit -qm release-base');
+  const r2 = run(['verify', '--plan', path.join(dir, 'plan2.md')]);
+  assert.equal(r2.code, 0, r2.out + r2.err);
+  assert.match(r2.out, /suite · node suite-probe\.mjs · PASS · exit 0 · worktree re-run of HEAD/);
+});

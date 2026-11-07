@@ -44,6 +44,10 @@ pass it so a fix round has its evidence. Then read the entry back:
 it is the evidence a state move needs, and reading it is where your
 judgment applies.
 
+Tests derive paths from the test's own location (`import.meta.url`)
+or fixtures — never a hardcoded checkout path; the merge-level
+worktree re-run exists to catch that class.
+
 If the declared checks cannot run — missing command, missing
 inputs — the run is BLOCKED, not a guess: report what is missing
 and escalate. BLOCKED is your verdict in the report, not an entry

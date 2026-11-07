@@ -33,11 +33,25 @@ does not read the worktree mid-flight.
 3. If you touched a live file by accident: `git restore` it
    immediately, verify porcelain clean, and disclose it in your
    report.
+4. Work from the pinned absolute working directory named in this
+   brief (`cwd` / `-C`) — never a look-alike path (a worktree of
+   the same repo is a different checkout).
+
+**Gate dispatch:** budget ≥ 900s; write the report even if
+incomplete — an incomplete report reaches the dispatcher, silence
+does not (standing default, effective 2026-11-07).
+
+**Relayed claims:** none | verified list. A pass-back claim is a
+factual claim — verify it against the repo before it enters a
+brief, or mark it 'claimed, unverified — confirm' so the reader
+treats it as a question, not a premise.
 
 **Pass-back (your return):** a done-ness digest ONLY — tasks
 complete; verify/review verdicts with logbook paths; commit hashes;
 plan/phase-list state; deviations with reasons; escalation and
 parking/suggestion candidates. Logbook paths, never contents — if the
 return carries what the logbook carries, the context win is zero.
+Return the FINISHED brief only — omit working notes, transcripts,
+and process narration.
 
 ---

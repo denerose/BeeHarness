@@ -44,7 +44,7 @@
 
 **escalation envelope** — every ask_user card states: role, context (plan/phase), the question, and where the answer will be recorded. One decision per card, recommendation first (ADR-009).
 
-**handoff** — same role, fresh context: the `bee-handoff`/`bee-pickup-handoff` pair (`skills/session/`) and the `.pi/handoff-<role>.md` files they write. Ends with a memory sync and a **wake prompt** for the keeper — but no parking-lot sweep: that is a work-close ritual, never part of a refresh. Mid-session counterpart: thread-close.
+**handoff** — same role, fresh context: the `bee-handoff`/`bee-pickup-handoff` pair (`skills/thinking/`) and the `.pi/handoff-<role>.md` files they write. Ends with a memory sync and a **wake prompt** for the keeper — but no parking-lot sweep: that is a work-close ritual, never part of a refresh. Mid-session counterpart: thread-close.
 
 **hivemind** — the `.hivemind/` folder in a repo. Holds all the working files the agents produce: `decisions/` (ADRs), `designs/`, `plans/`, `phases/`, `suggestions/`, `memory/`, `logbook/`, `sessions/` (gitignored), `inbox.toon` (the inbox store), `status.md` (cross-role surface), and `keeper-report.md` (the keeper's zoned digest).
 
@@ -55,6 +55,9 @@
 **logbook** — `.hivemind/logbook/`. The loop's written account of its own work: verify entries and review reports, named `<plan-slug>-task<N>-verify-r<N>.md` / `-review-r<N>.md`. Claims don't move states — these documents do (ADR-006).
 
 **logbook versioning** — verify and review entries carry a round suffix (`…-task3-verify-r2.md`); entries made in worktrees ride the task branch and reach main at merge (ADR-007 amendment 2).
+
+**memory ownership** — decision records are the keeper's — an ADR records what the human actually decided; session memory, working notes, and suggestions are agent-owned state; promotion into law is the keeper's call
+  see: `AGENTS.md`
 
 **parking lot** — `.hivemind/memory/parking-lot.toon` (`bee park add|list|show|resolve`). Deferred decisions with an unpark condition. Any agent may propose adding an item; only the keeper resolves one (`bee park resolve` is keeper-gated by law).
 
@@ -73,6 +76,8 @@
 **README** — the repo's front door: durable description only. Never a work log — live state belongs to the phase queue, the keeper report, the status surface. The test: if a sentence can go stale, it doesn't belong (ownership: ADR-007 amendment 1).
 
 **relay** — passing work or context between different roles. Two modes: gated (a short keeper-passed prompt — the keeper gates direction) and ambient (shared surfaces carry each role's state; roles pick up each other's context without the keeper relaying). The design doc is the relay artifact. Not a handoff.
+
+**relay block** — a relay's deliverable: self-contained, final on first hand-off; deltas arrive as standalone addenda, never splice requests
 
 **role** — a named agent spec in `roles/`: mandate plus attributes (entry, escalation, workspace, lifespan, continuity — ADR-010). Assumed by direction from the keeper or a handoff — never inferred from the work's shape. First-class roles take keeper direction and keep session files; dispatched roles are spawned by other roles and remember via their work's logbook. Not every role is first-class.
 

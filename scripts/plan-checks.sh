@@ -52,9 +52,15 @@ while IFS= read -r raw; do
   path=${line#- }
   case $path in
     *"(create)"*)  p="$PLAN_ROOT/${path% *}"
-                   a=$p
-                   while [[ ! -e $a && $a != "/" ]]; do a=$(dirname "$a"); done
-                   [[ -d $a ]] || note "finding files: create-target blocked by a non-directory ancestor: ${path% *}" ;;
+                   if [[ -e $p ]]; then
+                     # satisfied: exists already (e.g. completed
+                     # plan); non-blocking note, skip the walk
+                     echo "note files: ${path% *} exists (create-target satisfied)"
+                   else
+                     a=$p
+                     while [[ ! -e $a && $a != "/" ]]; do a=$(dirname "$a"); done
+                     [[ -d $a ]] || note "finding files: create-target blocked by a non-directory ancestor: ${path% *}" 
+                   fi ;;
     *"(modify)"*)  p="$PLAN_ROOT/${path% *}"
                    [[ -e $p ]] || note "finding files: modify-target missing: ${path% *}" ;;
     *)             [[ -e "$PLAN_ROOT/$path" ]] || note "finding files: target missing and unmarked: $path" ;;
@@ -66,6 +72,10 @@ done < "$PLAN"
 boxes_total=$(grep -c '^\s*- \[.\]' "$PLAN" || true)
 boxes_done=$(grep -c '^\s*- \[x\]' "$PLAN" || true)
 echo "boxes: $boxes_done/$boxes_total"
+# size: informational — large plans cost the gate more (never a
+# finding; the dispatcher sees the cost and budgets for it).
+n=$(wc -l < "$PLAN")
+[[ $n -gt 500 ]] && echo "note size: ${n} lines — large plan; gate cost rises"
 
 # 3 prose: ephemeral markers in the plan's own modify-targets
 # (durable docs the plan will touch that already exist).
@@ -112,11 +122,22 @@ if [[ $MODE == run ]]; then
   suite=$(grep -oE '^suite: .*' "$PLAN" | head -1 | cut -d' ' -f2-)
   if [[ -n $suite ]]; then
     echo "suite: $suite"
-    if (cd "$SANDBOX" && eval "$suite" >/dev/null 2>&1); then
+    # honesty: keep the suite's output — a pass with 0 tests ran
+    # (repo-wide suite, not block-reachable in the sandbox) is a
+    # note, not a silent pass. Node's summary line reads
+    # `# tests 0` (TAP) or `ℹ tests 0` (default reporter).
+    # env hygiene (bee.js convention): strip NODE_TEST_CONTEXT or
+    # a nested `node --test` skips running files, exits 0, and
+    # prints no summary at all.
+    suite_out=$(mktemp "${TMPDIR:-/tmp}/plan-checks-suite.XXXXXX")
+    if (cd "$SANDBOX" && unset NODE_TEST_CONTEXT && eval "$suite" >"$suite_out" 2>&1); then
       echo "suite: pass"
+      grep -Eq '^[#ℹ] tests 0$' "$suite_out" && \
+        echo "note suite: 0 tests ran in sandbox — repo-wide suite, not block-reachable"
     else
       note "finding suite: command failed in sandbox: $suite"
     fi
+    rm -f "$suite_out"
   else
     note "finding suite: no suite: line in machine block (--run given)"
   fi

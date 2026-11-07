@@ -22,19 +22,19 @@ targets:
   - tests/bee-init.test.mjs (modify)
   - tests/bee-verify.test.mjs (modify)
   - tests/bee-suggest.test.mjs (modify)
-  - skills/session/bee-hindsight/SKILL.md (modify)
-  - skills/session/bee-hindsight/assets/suggestion-format.md (modify)
-  - skills/session/bee-brainstorm/SKILL.md (modify)
-  - skills/session/bee-argue/SKILL.md (modify)
-  - skills/session/bee-handoff/SKILL.md (modify)
+  - skills/thinking/bee-hindsight/SKILL.md (modify)
+  - skills/thinking/bee-hindsight/assets/suggestion-format.md (modify)
+  - skills/thinking/bee-brainstorm/SKILL.md (modify)
+  - skills/thinking/bee-argue/SKILL.md (modify)
+  - skills/thinking/bee-handoff/SKILL.md (modify)
   - skills/loop/bee-loop/SKILL.md (modify)
   - skills/loop/bee-loop/assets/dispatch-brief-template.md (modify)
   - skills/loop/bee-plan/SKILL.md (modify)
   - skills/loop/bee-plan/assets/plan-template.md (modify)
   - skills/loop/bee-verify/SKILL.md (modify)
   - skills/skilldev/bee-skill-write/SKILL.md (modify)
-  - skills/session/bee-relay/SKILL.md (create)
-  - skills/session/bee-project-update/SKILL.md (create)
+  - skills/thinking/bee-relay/SKILL.md (create)
+  - skills/thinking/bee-project-update/SKILL.md (create)
   - skills/thinking/ (create)
   - skills/GLOSSARY.md (modify)
   - roles/power-planner.md (modify)
@@ -65,15 +65,15 @@ checks:
   - id: task-6
     cmd: node --test tests/bee-suggest.test.mjs
     expect: exit 0
-    files: [skills/session/bee-hindsight/SKILL.md, skills/session/bee-hindsight/assets/suggestion-format.md, bin/bee.js, tests/bee-suggest.test.mjs]
+    files: [skills/thinking/bee-hindsight/SKILL.md, skills/thinking/bee-hindsight/assets/suggestion-format.md, bin/bee.js, tests/bee-suggest.test.mjs]
   - id: task-7
     cmd: node --test tests/plan-census.test.mjs
     expect: exit 0
     files: [scripts/plan-census.sh, skills/loop/bee-plan/SKILL.md, skills/loop/bee-plan/assets/plan-template.md, tests/plan-census.test.mjs]
   - id: task-8
-    cmd: grep -q 'a decision is what the keeper decided' skills/session/bee-brainstorm/SKILL.md
+    cmd: grep -q 'a decision is what the keeper decided' skills/thinking/bee-brainstorm/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-brainstorm/SKILL.md]
+    files: [skills/thinking/bee-brainstorm/SKILL.md]
   - id: task-9
     cmd: grep -q 'exactly the current task' skills/loop/bee-loop/SKILL.md
     expect: exit 0
@@ -83,23 +83,23 @@ checks:
     expect: exit 0
     files: [skills/loop/bee-loop/assets/dispatch-brief-template.md]
   - id: task-11
-    cmd: grep -q 'Should you use this skill' skills/session/bee-argue/SKILL.md
+    cmd: grep -q 'Should you use this skill' skills/thinking/bee-argue/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-argue/SKILL.md, skills/skilldev/bee-skill-write/SKILL.md]
+    files: [skills/thinking/bee-argue/SKILL.md, skills/skilldev/bee-skill-write/SKILL.md]
   - id: task-12
-    cmd: grep -q 'continuity-law check' skills/session/bee-handoff/SKILL.md
+    cmd: grep -q 'continuity-law check' skills/thinking/bee-handoff/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-handoff/SKILL.md]
+    files: [skills/thinking/bee-handoff/SKILL.md]
   - id: task-13
-    cmd: test -f skills/session/bee-relay/SKILL.md && grep -q 'relay block' skills/GLOSSARY.md
+    cmd: test -f skills/thinking/bee-relay/SKILL.md && grep -q 'relay block' skills/GLOSSARY.md
     expect: exit 0
-    files: [skills/session/bee-relay/SKILL.md, skills/GLOSSARY.md]
+    files: [skills/thinking/bee-relay/SKILL.md, skills/GLOSSARY.md]
   - id: task-14
-    cmd: test -f skills/session/bee-project-update/SKILL.md
+    cmd: test -f skills/thinking/bee-project-update/SKILL.md
     expect: exit 0
-    files: [skills/session/bee-project-update/SKILL.md]
+    files: [skills/thinking/bee-project-update/SKILL.md]
   - id: task-15
-    cmd: test -d skills/thinking -a ! -e skills/session
+    cmd: test -d skills/thinking -a ! -e skills/thinking
     expect: exit 0
     files: [skills/thinking/]
   - id: task-16
@@ -111,6 +111,23 @@ checks:
     expect: exit 0
     files: [bin/bee.js, tests/bee-init.test.mjs]
 suite: node --test tests/*.test.mjs
+task-1: done 2026-11-07T16:00:48+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task1-verify-r1.md
+task-2: done 2026-11-07T16:00:49+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task2-verify-r2.md
+task-3: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task3-verify-r2.md
+task-7: done 2026-11-07T16:29:54+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task7-verify-r2.md
+task-4: done 2026-11-07T16:41:01+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task4-verify-r1.md
+task-8: done 2026-11-07T16:41:02+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task8-verify-r2.md
+task-5: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task5-verify-r3.md
+task-10: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task10-verify-r2.md
+task-6: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task6-verify-r2.md
+task-9: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task9-verify-r2.md
+task-11: done 2026-11-07T17:22:42+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task11-verify-r1.md
+task-13: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task13-verify-r1.md
+task-14: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task14-verify-r1.md
+task-17: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task17-verify-r1.md
+task-15: done 2026-11-07T17:47:20+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task15-verify-r2.md
+task-16: done 2026-11-07T18:02:51+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task16-verify-r2.md
+task-12: done 2026-11-07T18:15:19+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task12-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -185,43 +202,53 @@ are done.
 **Provides:** `exists` reporting for create-targets; the
 non-blocking size note — consumed by every future gate run.
 
-- [ ] Step: In check 1 (files), before the ancestor walk for a
+- [x] Step: In check 1 (files), before the ancestor walk for a
       `(create)` target: if the exact target path exists, report
       `note files: <path> exists (create-target satisfied)` via
       plain echo — NOT via `note()` (non-blocking) — and skip the
       walk. The ancestor walk (non-directory ancestor detection)
       still applies to missing paths, unchanged.
-- [ ] Step: After check 2 (boxes), add a size note:
+- [x] Step: After check 2 (boxes), add a size note:
       `n=$(wc -l < "$PLAN")`; if `n > 500`, echo
       `note size: ${n} lines — large plan; gate cost rises`
       (plain echo, never sets fail).
-- [ ] Step: Extend `tests/plan-checks.test.mjs`: (a) a plan
+- [x] Step: Extend `tests/plan-checks.test.mjs`: (a) a plan
       fixture whose create-target exists as a file → run exits 0
       and stdout contains `exists (create-target satisfied)`, with
       no `non-directory ancestor` finding; (b) a fixture of 501+
       lines → exit 0, stdout contains `note size:`; a short
       fixture → stdout does NOT contain `note size:`.
-- [ ] Step: `--run` honesty (gate r1 S7): the suite run's output
+- [x] Step: `--run` honesty (gate r1 S7): the suite run's output
       goes to a temp file, not /dev/null; when node's summary
       reads `# tests 0`, print `note suite: 0 tests ran in
       sandbox — repo-wide suite, not block-reachable` (plain
       echo, non-blocking). Pin: a fixture plan whose suite is
       `node --test tests/*.test.mjs` → `--run` prints the note,
       exit 0.
-- [ ] Step: run `node --test tests/plan-checks.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/plan-checks.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-po-p7-close-hindsight.md`
       (item 11) per D7 (stamp first, delete in the same commit).
       The item-14 suggestion is a LIVE file — stamp its Outcome
       (`.hivemind/suggestions/2026-11-01-po-p4-hindsight-plan-size-guard.md`,
       landed: size note) and LEAVE it for the keeper's triage
       read per D7.
-- [ ] Step: Items 15/22/23 landed pre-loop (D4, commit 3d2f4ba):
+- [x] Step: Items 15/22/23 landed pre-loop (D4, commit 3d2f4ba):
       stamp their Outcomes (landed pre-loop) and delete, per D7 —
       `.hivemind/suggestions/planned/2026-11-01-pp-design-note-consolidation.md`,
       `.hivemind/suggestions/planned/2026-11-02-po-union-merge-suite-gate.md`,
       `.hivemind/suggestions/planned/2026-11-02-po-marker-surgery-edit-tool.md`.
-- [ ] Commit: `plan-checks: exists satisfied + size note`
+- [x] Commit: `plan-checks: exists satisfied + size note`
+
+**Task 1 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 3
+notes). Should-fix fixed in-round, re-review WAIVED: the deleted
+p7-close-hindsight file carried undispositioned items #3/#4 — re-filed
+verbatim from history at 44eae33 as
+`2026-11-07-po-design-drift-repull-step.md` and
+`2026-11-07-po-worker-claims-gitlog-verify.md` (near-verbatim reviewer
+fix; probe = the files' origin headers cite the deleted file). Both
+implementer deviations adjudicated by the reviewer as load-bearing
+(both-reporter grep pattern; NODE_TEST_CONTEXT hygiene).
 
 ## Task 2: bee phase close — mechanical row flip, design stamps, flag split (items 17, 20)
 
@@ -231,7 +258,7 @@ non-blocking size note — consumed by every future gate run.
 counts the flag split — Task 9's close checklist names these steps
 as mechanical.
 
-- [ ] Step: Flag split (D5): in `phaseClose`, replace the single
+- [x] Step: Flag split (D5): in `phaseClose`, replace the single
       `decisions: ${decCount}` + threshold block (both the
       `--check` preview and step 5) with:
       `const dl = phaseDecisionLines(decText)`; classify each
@@ -241,7 +268,7 @@ as mechanical.
       `decisions: ${decCount} (front-loaded ${k} · in-phase ${r})`.
       Flag text `flag: under-asked kickoff` prints only when
       `r > PHASE_FLAG_THRESHOLD && r > k`.
-- [ ] Step: Row flip: after the merge step succeeds (and after the
+- [x] Step: Row flip: after the merge step succeeds (and after the
       `--check` preview names it as a would-step), locate the phase
       row: scan every file in `.hivemind/phases/` for a table row
       starting `| P${n} |` — first match wins. Change the row's
@@ -252,7 +279,7 @@ as mechanical.
       a failure (the row may live in a consumer layout); status
       already `done`: no-op line. When close writes the row, its
       output ends with `next: commit the phase-row flip`.
-- [ ] Step: Design stamps: parse the SAME row's designs cell for
+- [x] Step: Design stamps: parse the SAME row's designs cell for
       backticked `designs/<file>.md` paths; for each NOT already
       carrying `(implemented @`, after the merge run the existing
       `scripts/design.sh implement <doc> --phase ${n} --merge
@@ -261,7 +288,7 @@ as mechanical.
       read the script and reuse its function/steps verbatim in
       behavior; if design.sh is importable from bee.js, call it).
       Zero designs or all stamped → informational line, exit 0.
-- [ ] Step: Extend `tests/bee-phase.test.mjs`: (a) flag-split —
+- [x] Step: Extend `tests/bee-phase.test.mjs`: (a) flag-split —
       an inventory with 9 `kickoff:`/`plan-time:` lines + 3 others
       → no flag; 3 front-loaded + 9 in-phase → flag present, and
       the counts line reads `(front-loaded 3 · in-phase 9)`;
@@ -270,13 +297,23 @@ as mechanical.
       flipped row is a no-op (idempotence); (c) design stamps — a
       fixture row with two designs, one already stamped → only the
       other gains `(implemented @ <sha>)`.
-- [ ] Step: run `node --test tests/bee-phase.test.mjs` — pass
-- [ ] Step: Close-flag-calibration is a LIVE suggestion file —
+- [x] Step: run `node --test tests/bee-phase.test.mjs` — pass
+- [x] Step: Close-flag-calibration is a LIVE suggestion file —
       stamp its Outcome
       (`.hivemind/suggestions/2026-11-02-po-close-flag-counts-kickoff-separately.md`,
       landed: split counts + in-phase-only flag rule) and LEAVE
       it for the keeper's triage read per D7.
-- [ ] Commit: `phase close: row flip, design stamps, flag split`
+- [x] Commit: `phase close: row flip, design stamps, flag split`
+
+**Task 2 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 5
+notes). Both should-fixes fixed in-round, re-reviews WAIVED (loop law:
+near-verbatim reviewer fixes + replicated probes): (1) TEMPLATE.md
+excluded from phaseRowFind's scan — pinned by the ignores-TEMPLATE test
+(probe); (2) refused implement on an already-stamped doc recovers the
+row annotation from the doc's machine block — pinned by the recovery
+test (probe). Real-P8-close note carried: all three P8-row designs are
+live/blockless — close will refuse stamps informationally unless
+pick-up runs first.
 
 ## Task 3: report-regen defect batch (item 24, check-then-apply per D12)
 
@@ -286,7 +323,7 @@ as mechanical.
   leak into ask text; ages never frozen; Source line truthful —
   pinned by tests either way.
 
-- [ ] Step: Pin FIRST (D12): write tests for all four defects
+- [x] Step: Pin FIRST (D12): write tests for all four defects
       against current code — (a) two asks differing only in tail
       (id/path/date wrappers: `[PO] 2026-11-07 — confirm X (IN-001
       · /abs/ref)` vs `confirm X · ref: .hivemind/status.md`)
@@ -301,16 +338,16 @@ as mechanical.
       `**Source:** \`…inbox.toon\``. Run; record which pass
       already — those sub-items close as already-landed, no code
       change.
-- [ ] Step: Fix (a) where failing: extend `normItem` to strip a
+- [x] Step: Fix (a) where failing: extend `normItem` to strip a
       trailing parenthetical group `\s*\([^)]*\)$` and any
       ` · ref: …` / `— …` tail separators before comparison —
       compare on the ask's core text.
-- [ ] Step: Fix (b) where failing: in `queueBullets`, stop
+- [x] Step: Fix (b) where failing: in `queueBullets`, stop
       absorbing continuation lines into an open bullet once a
       render-fence line (`<!-- inbox:render` /
       `<!-- /inbox:render` prefix) is seen; fences never join
       bullet text.
-- [ ] Step: Fix (c) where failing: after a successful store
+- [x] Step: Fix (c) where failing: after a successful store
       mutation in `cmdInbox` add/done, `cmdCapture`, and
       `cmdPark` add/resolve — when a status file with a balanced
       render region exists at the default/derived status path —
@@ -319,10 +356,21 @@ as mechanical.
       Failure to re-render (missing status file, unbalanced
       region) is an informational stderr note, never a nonzero
       exit.
-- [ ] Step: Fix (d) where failing: the merge-regen header replace
+- [x] Step: Fix (d) where failing: the merge-regen header replace
       must always end with the true `source` value.
-- [ ] Step: run `node --test tests/bee-render.test.mjs` — pass
-- [ ] Commit: `report regen: dedupe tails, fences, live ages, source`
+- [x] Step: run `node --test tests/bee-render.test.mjs` — pass
+- [x] Commit: `report regen: dedupe tails, fences, live ages, source`
+
+**Task 3 notes:** review r1 FIX-FIRST (0 blocking, 3 should-fix, 4
+notes). All three fixed in-round, re-reviews WAIVED (loop law:
+reviewer-validated near-verbatim fixes + probe pins): (P1) group
+headers close the open bullet in queueBullets — pinned; (P2) the
+broad `— …` tail strip REMOVED from normItem (load-bearing for no
+pin, falsely deduped distinct asks sharing a pre-dash prefix — the
+implementer's escalation candidate adjudicated real) — pinned;
+(P3) render-view `IN-003 · 5d — ` prefix stripped so the live
+old-zone shape dedupes — pinned. Duplicate untracked verify-r2
+removed (review note). (d) closed already-landed per D12.
 
 ## Task 4: init settings prune (item 28)
 
@@ -331,7 +379,7 @@ as mechanical.
 **Provides:** self-healing settings registration — dead entries
   drop on the next init run.
 
-- [ ] Step: In `cmdInit`'s settings step (D6): before the
+- [x] Step: In `cmdInit`'s settings step (D6): before the
       exact-match check, filter `entries` — any entry whose
       resolved path (after `expandTilde`) does not exist drops.
       If any dropped AND not `--check`: write the pruned settings,
@@ -339,17 +387,17 @@ as mechanical.
       `pruned ${n} dead entry(ies): <paths>` (informational, exit
       0). In `--check`: name them as `would prune: <paths>`,
       write nothing. Prune runs in both hit and miss paths.
-- [ ] Step: Extend `tests/bee-init.test.mjs`: a settings fixture
+- [x] Step: Extend `tests/bee-init.test.mjs`: a settings fixture
       with one live entry (the target) + one dead path → init
       (non-check) drops the dead entry, keeps the live, exit 0,
       note names the pruned path; `--check` writes nothing and
       prints `would prune`; a settings file with only live entries
       is byte-unchanged.
-- [ ] Step: run `node --test tests/bee-init.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/bee-init.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-07-po-settings-skills-lifecycle.md`
       per D7.
-- [ ] Commit: `init: prune dead settings entries (self-healing)`
+- [x] Commit: `init: prune dead settings entries (self-healing)`
 
 ## Task 5: merge-level worktree suite + test convention (item 12)
 
@@ -358,7 +406,7 @@ as mechanical.
 **Provides:** the checkout-assumption class caught at merge level;
   the convention line in the verifier's skill.
 
-- [ ] Step: CLI (D9): in `cmdVerify`, after the declared checks
+- [x] Step: CLI (D9): in `cmdVerify`, after the declared checks
       pass at validation level `merge` or `phase`, when the
       current checkout is the repo's MAIN checkout (cwd's
       `git rev-parse --git-common-dir` equals the checkout's own
@@ -369,28 +417,34 @@ as mechanical.
       worktree. Suite failure = verify FAIL with the worktree
       note. Already in a linked worktree → skip with an
       informational note line. Suite line absent → skip silently.
-- [ ] Step: Skill line: `skills/loop/bee-verify/SKILL.md` gains,
+- [x] Step: Skill line: `skills/loop/bee-verify/SKILL.md` gains,
       in "Run the command": "Tests derive paths from the test's
       own location (`import.meta.url`) or fixtures — never a
       hardcoded checkout path; the merge-level worktree re-run
       exists to catch that class."
-- [ ] Step: Extend `tests/bee-verify.test.mjs`: at merge level
+- [x] Step: Extend `tests/bee-verify.test.mjs`: at merge level
       from the main checkout, a plan whose suite echoes a path
       derived from the test's location runs in the temp worktree
       (assert the note line); a verify invoked from inside a
       linked worktree skips (note line, exit 0).
-- [ ] Step: Sweep-audit: `grep -rn --include='*.test.mjs'
+- [x] Step: Sweep-audit: `grep -rn --include='*.test.mjs'
       'BeeHarness\|/home/' tests/` — known clean (one comment,
       bee.test.mjs:93); any live hit becomes a derive-from-
       location fix in this task. Fixture files are historical
       data and exempt — three 'BeeHarness' prose hits exist there
       today (tests/fixtures/parking-lot-v1.md:1,92,254) and are
       not path assumptions.
-- [ ] Step: run `node --test tests/bee-verify.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/bee-verify.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-31-po-no-hardcoded-checkout-paths-in-tests.md`
       per D7.
-- [ ] Commit: `verify: merge-level worktree suite + path convention`
+- [x] Commit: `verify: merge-level worktree suite + path convention`
+
+**Task 5 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 6
+notes). Both fixed in-round, re-reviews WAIVED (reviewer-suggested
+fixes + probe tests): release level joins the D9 gate condition;
+suite-FAIL wiring pinned by test (reviewer's own hand-probe had
+confirmed the wiring fires — exit 1 + fix line).
 
 ## Task 6: bee-hindsight pass (items 6, 29)
 
@@ -401,7 +455,7 @@ as mechanical.
 **Provides:** generalized inputs, the sixth question, the
   never-asks rule, observation-type line, status listing step.
 
-- [ ] Step: SKILL.md Inputs section — retitle to "Inputs — re-read
+- [x] Step: SKILL.md Inputs section — retitle to "Inputs — re-read
       whatever state your role produced" and generalize: keep the
       ordered re-read discipline; the loop's surfaces (session
       memory, phase list, plan, logbook records) as one example
@@ -409,10 +463,10 @@ as mechanical.
       its session memory, the ADRs and design docs it wrote,
       status surface, the conversation's keeper corrections).
       Don't trust recall over the record stays the rule.
-- [ ] Step: Examination gains the sixth question after the
+- [x] Step: Examination gains the sixth question after the
       deficit list: "What worked that we should keep doing?
       Positive findings earn summary lines (not files)."
-- [ ] Step: Done-means gains the never-asks rule: "The summary
+- [x] Step: Done-means gains the never-asks rule: "The summary
       REPORTS what was filed — it never offers to file, asks
       permission, or tees up 'want this one too?'. Borderline
       items get filed (filing is adds-only, any-role work; the
@@ -420,17 +474,17 @@ as mechanical.
       step: "List new suggestions in the status surface's prose,
       under Awaiting keeper — never inside the script-owned render
       region."
-- [ ] Step: `assets/suggestion-format.md`: Role line vocabulary →
+- [x] Step: `assets/suggestion-format.md`: Role line vocabulary →
       `<role name> — any role when the keeper asks`; add the
       observation-type line: "A problem with no proposed solution
       is a legitimate suggestion file — state the problem
       concretely; graduation treats it as a design input."
-- [ ] Step: `bin/bee.js` SUGGEST_USAGE: one help line — "A
+- [x] Step: `bin/bee.js` SUGGEST_USAGE: one help line — "A
       suggestion may be a problem with no proposed solution
       (observation-type); it routes as a design input." Pin with a
       `tests/bee-suggest.test.mjs` assertion on the usage text.
-- [ ] Step: run `node --test tests/bee-suggest.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/bee-suggest.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-25-pp-hindsight-skill-fixes.md`
       and
       `.hivemind/suggestions/planned/2026-11-02-po-hindsight-summary-never-asks-to-file.md`
@@ -438,7 +492,14 @@ as mechanical.
       current asset — record as the already-landed half in the
       Outcome stamp; the role-vocabulary fix is NOT yet present
       and lands in this task's edit.)
-- [ ] Commit: `hindsight: generalized inputs, sixth question, never-asks`
+- [x] Commit: `hindsight: generalized inputs, sixth question, never-asks`
+
+**Task 6 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 2
+notes). Fixed in-round, re-review WAIVED (reviewer's own channel
+fix, evidence in report): the status-listing step now names BOTH
+channels (inbox add renders into the script-owned region; prose
+notes ride outside it) — resolves the glossary channel conflict and
+the region-less destruction edge.
 
 ## Task 7: bee-plan minimums + census helper (items 8, 18)
 
@@ -450,7 +511,7 @@ as mechanical.
 **Provides:** census helper `scripts/plan-census.sh`; the
   minimums rule in bee-plan + the template's verify-step line.
 
-- [ ] Step: `scripts/plan-census.sh` (bash, TOON-ish output like
+- [x] Step: `scripts/plan-census.sh` (bash, TOON-ish output like
       plan-checks.sh): usage `plan-census.sh <plans-dir>
       <logbook-dir>`; emits (a) per-plan-file: lines, has-machine
       block (y/n), `phase:` value, task count; (b) corpus counts:
@@ -461,7 +522,7 @@ as mechanical.
       verdict line vs without); (c) exit 0 always except usage
       (2) / missing dir (1). No findings — it is a census, not a
       gate.
-- [ ] Step: bee-plan SKILL.md rule 4 (self-contained-task
+- [x] Step: bee-plan SKILL.md rule 4 (self-contained-task
       standard — it owns the verification-command standard; the
       design doc's "rule 3" anchor predates a renumbering) gains:
       "State grep
@@ -469,24 +530,31 @@ as mechanical.
       the contract (duplicate detection); a wrong exact count
       forced a mid-loop plan correction once — minimums keep the
       check honest when the corpus moves."
-- [ ] Step: plan-template.md verify-step example line becomes:
+- [x] Step: plan-template.md verify-step example line becomes:
       `- [ ] Step: run \`verification command\` — expected result
       (grep expectations as minimums, ≥ N, unless the exact count
       is the contract)`.
-- [ ] Step: bee-plan SKILL.md Format section gains the census
+- [x] Step: bee-plan SKILL.md Format section gains the census
       step: "Before writing corpus claims (counts, coverage,
       form-breakdowns), run `scripts/plan-census.sh` over the
       plans and logbook dirs and quote its numbers — the gate
       judges interpretation, not arithmetic."
-- [ ] Step: `tests/plan-census.test.mjs`: fixtures (two plans,
+- [x] Step: `tests/plan-census.test.mjs`: fixtures (two plans,
       one headerless; three logbook files mixing Role forms and
       verdict lines) → assert emitted counts; usage error exits 2.
-- [ ] Step: run `node --test tests/plan-census.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/plan-census.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-20-verify-expectations-as-minimums.md`
       per D7. (The census suggestion is a LIVE file — stamp
       Outcome only, leave for triage per D7.)
-- [ ] Commit: `plan: grep minimums + corpus census helper`
+- [x] Commit: `plan: grep minimums + corpus census helper`
+
+**Task 7 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 3
+notes). Should-fix fixed in-round, re-review WAIVED (one-word key
+rename, reviewer's own fix, test probe updated): census key
+`verdict-missing` → `verdict-line-missing` — 21 of 32 real-corpus
+"missing" files carry `## Verdict` heading-form verdicts; the key
+now carries its own definition.
 
 ## Task 8: bee-brainstorm ownership filter (item 7)
 
@@ -494,7 +562,7 @@ as mechanical.
 **Depends on:** nothing
 **Provides:** step 4 carries the ownership filter.
 
-- [ ] Step: Replace step 4's first sentence with:
+- [x] Step: Replace step 4's first sentence with:
       "4. **Record keeper decisions as ADRs** (global `adr` skill)
       as they are agreed — a decision is what the keeper decided,
       not what the conversation concluded; when unsure, offer
@@ -502,11 +570,17 @@ as mechanical.
       remembering gets an ADR. Don't batch them to the end."
       (The global-skill reference itself is Task 16's scope, not
       this edit's.)
-- [ ] Step: run `grep -q 'a decision is what the keeper decided' skills/session/bee-brainstorm/SKILL.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `grep -q 'a decision is what the keeper decided' skills/session/bee-brainstorm/SKILL.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-25-po-brainstorm-ownership-filter.md`
       per D7.
-- [ ] Commit: `brainstorm: ownership filter in step 4`
+- [x] Commit: `brainstorm: ownership filter in step 4`
+
+**Task 8 notes:** review r1 FIX-FIRST (0 blocking, 1 should-fix, 3
+notes). Fixed in-round, re-review WAIVED (supply-the-term fix, loop
+precedent Task 13): `memory ownership` added to the glossary store —
+the pointer in step 4 now resolves; plan text untouched (verbatim
+held). Reviewer's byte-compared verbatim confirmation on record.
 
 ## Task 9: bee-loop Record rule + close checklist + tidy authority (items 9, 17, 16)
 
@@ -515,14 +589,14 @@ as mechanical.
 **Provides:** the interim checkbox rule; the ordered close
   checklist; the scoped tidy-authority line.
 
-- [ ] Step: Record step (6) gains after the hand-edit rule:
+- [x] Step: Record step (6) gains after the hand-edit rule:
       "Check off exactly the current task's boxes at its commit —
       never batch checkbox edits across task or section
       boundaries (a partition slice sweeps everything downstream);
       checked boxes are state claims and land with their own
       evidence. Where `bee task` owns a state line, the state line
       is authoritative; the script's box-ticking is cosmetic."
-- [ ] Step: New close section after step 7, in order: "8.
+- [x] Step: New close section after step 7, in order: "8.
       **Close** — the checklist, in order: assemble the decisions
       inventory (`#`-comment header lines only, `id · one-line ·
       source-record-path` entries, middle-dot separators) → `bee
@@ -533,7 +607,7 @@ as mechanical.
       directs one (bootstrap-noise paydown with the P5 tooling —
       standing authority, no per-step ask; disclose after) →
       report to the keeper."
-- [ ] Step: Mechanics sweep (item 21): the dispatch mechanics the
+- [x] Step: Mechanics sweep (item 21): the dispatch mechanics the
       P6 handoff carried but no skill or script names — a handoff
       is not a durable home; any mechanic that appears in a
       handoff but in no skill or script is a codification gap.
@@ -548,13 +622,20 @@ as mechanical.
       resolve to the main checkout and fail files: checks; (c)
       WORKTREE ARGS — `bee worktree create <phase>-<slug>`, merge
       takes SLUG ONLY.
-- [ ] Step: run `grep -q 'exactly the current task' skills/loop/bee-loop/SKILL.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `grep -q 'exactly the current task' skills/loop/bee-loop/SKILL.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-po-per-task-checkbox-discipline.md`
       per D7. (The close-sequence and inventory-format suggestions
       are LIVE files — stamp Outcomes only, leave for triage per
       D7.)
-- [ ] Commit: `loop: record rule, close checklist, tidy authority`
+- [x] Commit: `loop: record rule, close checklist, tidy authority`
+
+**Task 9 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 6
+notes). Both fixed in-round, re-reviews WAIVED (reviewer's own
+one-line fixes, evidence in report): "P5 tooling" → "the harness's
+hygiene tooling" (writing standard — no phase numbers in shipped
+skills); the checkbox rule now routes ticks through `bee task move`
+(no hand-tick imperative; matches wave-commit practice).
 
 ## Task 10: dispatch-brief template lines (items 10, 13-line, 26)
 
@@ -563,26 +644,26 @@ as mechanical.
 **Provides:** the fourth safety line; return-contract line;
   gate-budget line; relayed-claims line.
 
-- [ ] Step: Safety lines gain: "4. Work from the pinned absolute
+- [x] Step: Safety lines gain: "4. Work from the pinned absolute
       working directory named in this brief (`cwd` / `-C`) —
       never a look-alike path (a worktree of the same repo is a
       different checkout)."
-- [ ] Step: Pass-back section gains: "Return the FINISHED brief
+- [x] Step: Pass-back section gains: "Return the FINISHED brief
       only — omit working notes, transcripts, and process
       narration."
-- [ ] Step: ADD a marked Gate-dispatch block to the template
+- [x] Step: ADD a marked Gate-dispatch block to the template
       body (no such section exists yet): "Gate dispatch: budget
       ≥ 900s; write the report even if incomplete — an incomplete
       report reaches the dispatcher, silence does not (standing
       default, effective 2026-11-07)."
-- [ ] Step: ADD to the dispatcher preamble, immediately above
+- [x] Step: ADD to the dispatcher preamble, immediately above
       Pass-back: "Relayed claims: none | verified list. A
       pass-back claim is a factual claim — verify it against the
       repo before it enters a brief, or mark it 'claimed,
       unverified — confirm' so the reader treats it as a
       question, not a premise."
-- [ ] Step: run `grep -q 'FINISHED brief only' skills/loop/bee-loop/assets/dispatch-brief-template.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `grep -q 'FINISHED brief only' skills/loop/bee-loop/assets/dispatch-brief-template.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-pp-researcher-briefs-final-only.md`
       and
       `.hivemind/suggestions/planned/2026-11-02-po-relayed-claims-verified.md`
@@ -591,7 +672,7 @@ as mechanical.
       (`.hivemind/suggestions/2026-11-01-po-p4-hindsight-gate-budget.md`,
       landed: template line, keeper standing word at kickoff D4)
       and LEAVE it for the keeper's triage read per D7.
-- [ ] Commit: `brief template: cwd pin, final-only, gate budget, claims`
+- [x] Commit: `brief template: cwd pin, final-only, gate budget, claims`
 
 ## Task 11: entry discipline — authoring standard + bee-argue (item 2)
 
@@ -601,7 +682,7 @@ as mechanical.
 **Provides:** the entry-discipline authoring standard (consumed
   by Tasks 13/14 and every future skill edit).
 
-- [ ] Step: bee-skill-write gains a section after Style:
+- [x] Step: bee-skill-write gains a section after Style:
       "## Entry discipline (when a skill should run)\n\nA skill
       that never gets called isn't worth its storage cost; agents
       bias toward acting directly, and permissive wording licenses
@@ -618,7 +699,7 @@ as mechanical.
       skill's name, or direct direction) IS the entry decision,
       already made: recognition, not evaluation. Not using a skill
       the keeper explicitly called is the failure mode."
-- [ ] Step: bee-argue: replace the Notes bullet "A tool available
+- [x] Step: bee-argue: replace the Notes bullet "A tool available
       to any agentic user of the harness, not a rule. The common
       right move is still a plain recommendation from the agent
       closest to the work — but when the decision-maker asks for
@@ -631,11 +712,11 @@ as mechanical.
       recommendation carries it' or 'options not genuinely
       distinct' — never silently. A plain recommendation remains
       the common right move; this skill is entered on purpose."
-- [ ] Step: bee-argue Notes gains: "Dispatched workers return the
+- [x] Step: bee-argue Notes gains: "Dispatched workers return the
       FINISHED case only — no working notes, transcripts, or
       process narration."
-- [ ] Step: run `grep -q 'Should you use this skill' skills/session/bee-argue/SKILL.md` — exit 0
-- [ ] Commit: `entry discipline: authoring standard + argue gate`
+- [x] Step: run `grep -q 'Should you use this skill' skills/session/bee-argue/SKILL.md` — exit 0
+- [x] Commit: `entry discipline: authoring standard + argue gate`
 
 ## Task 12: bee-handoff pre-write gate + scoped authority (items 5-verify, 19, 16)
 
@@ -644,30 +725,30 @@ as mechanical.
 **Provides:** the continuity-law gate; the scoped supersede/write
   authority line.
 
-- [ ] Step: Verify item 5 already landed: the skill's "Hand over
+- [x] Step: Verify item 5 already landed: the skill's "Hand over
       the wake prompt" step delivers the fenced block in-chat as
       the last act — confirm present (it is, as of this plan's
       writing); record in the commit body "verified present, no
       edit". Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-po-wake-prompt-must-be-delivered-in-chat.md`.
-- [ ] Step: New section before "## The handoff file": "## Before
+- [x] Step: New section before "## The handoff file": "## Before
       writing: the continuity-law check\n\nConfirm this is a
       same-role refresh the role file's continuity law permits.
       Where the role's law says delegate-harder or
       crash-recovery-only, that law wins over this skill: say so
       and stop — a handoff the role's law forbids is not this
       skill's to write."
-- [ ] Step: "Write the handoff" section gains the authority line:
+- [x] Step: "Write the handoff" section gains the authority line:
       "This skill supersedes the previous handoff wholesale and
       refreshes the session memory's standing sections without
       per-step keeper asks — scoped tidy authority. Surfaces the
       keeper gates (parking resolves, decision records, the
       report's keeper zone) stay gated."
-- [ ] Step: run `grep -q 'continuity-law check' skills/session/bee-handoff/SKILL.md` — exit 0
-- [ ] Step: Handoff-scheduling-guard is a LIVE suggestion file —
+- [x] Step: run `grep -q 'continuity-law check' skills/session/bee-handoff/SKILL.md` — exit 0
+- [x] Step: Handoff-scheduling-guard is a LIVE suggestion file —
       stamp its Outcome (landed: pre-write gate) and LEAVE it for
       the keeper's triage read per D7.
-- [ ] Commit: `handoff: pre-write gate + scoped tidy authority`
+- [x] Commit: `handoff: pre-write gate + scoped tidy authority`
 
 ## Task 13: relay skill (item 25)
 
@@ -677,7 +758,7 @@ as mechanical.
   standard)
 **Provides:** the relay contract as a shipped instrument.
 
-- [ ] Step: Create `skills/session/bee-relay/SKILL.md` with
+- [x] Step: Create `skills/session/bee-relay/SKILL.md` with
       front-matter `kit: session`, `name: bee-relay`, description:
       "Carries context between roles as a final artifact — gated
       (keeper-passed) or ambient (shared surfaces). One topic per
@@ -701,18 +782,18 @@ as mechanical.
       refresh is a handoff, not a relay; in-repo notes are the
       status surface's job). Judgment kept (what to include, what
       the delta is; the checklist is the skill).
-- [ ] Step: `skills/GLOSSARY.md` relay entry gains (via `bee
+- [x] Step: `skills/GLOSSARY.md` relay entry gains (via `bee
       glossary add`? No — supply-not-update applies to the store;
       the rendered view regenerates): add a NEW entry
       `relay block` :: "a relay's deliverable: self-contained,
       final on first hand-off; deltas arrive as standalone
       addenda, never splice requests" :: `-`. (Store op: `bee
       glossary add 'relay block' '<gist>' --see -`.)
-- [ ] Step: run `test -f skills/session/bee-relay/SKILL.md` — exit 0
-- [ ] Step: Stamp + delete
+- [x] Step: run `test -f skills/session/bee-relay/SKILL.md` — exit 0
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-02-po-relays-are-final-artifacts.md`
       per D7.
-- [ ] Commit: `relay skill: the contract as an instrument`
+- [x] Commit: `relay skill: the contract as an instrument`
 
 ## Task 14: project-update skill (item 27)
 
@@ -720,7 +801,7 @@ as mechanical.
 **Depends on:** task 11 (authored under the standard)
 **Provides:** one skill, three altitudes, per its design note.
 
-- [ ] Step: Create `skills/session/bee-project-update/SKILL.md`
+- [x] Step: Create `skills/session/bee-project-update/SKILL.md`
       (`kit: session`, `name: bee-project-update`), from the
       design note `2026-11-02-pp-project-update-skill.md`:
       The gather (identical all altitudes): `bee design status`;
@@ -741,8 +822,8 @@ as mechanical.
       trigger = the keeper asks any role for an update, or a
       role-file routing line fires). Judgment kept: the comparison
       and the findings; the gather is scripted.
-- [ ] Step: run `test -f skills/session/bee-project-update/SKILL.md` — exit 0
-- [ ] Commit: `project-update skill: one skill, three altitudes`
+- [x] Step: run `test -f skills/session/bee-project-update/SKILL.md` — exit 0
+- [x] Commit: `project-update skill: one skill, three altitudes`
 
 ## Task 15: reorg sweep — session/ → thinking/ (item 1, D3)
 
@@ -753,17 +834,17 @@ as mechanical.
   tasks edit)
 **Provides:** the D3 layout; every `kit:` field reads `thinking`.
 
-- [ ] Step: `git mv skills/session skills/thinking` — all seven
+- [x] Step: `git mv skills/session skills/thinking` — all seven
       skills (argue, brainstorm, handoff, hindsight,
       pickup-handoff, relay, project-update) move in one rename.
-- [ ] Step: Retag: every moved SKILL.md's front matter
+- [x] Step: Retag: every moved SKILL.md's front matter
       `kit: session` → `kit: thinking`.
-- [ ] Step: Pointer sweep: in every moved SKILL.md, the GLOSSARY
+- [x] Step: Pointer sweep: in every moved SKILL.md, the GLOSSARY
       pointer must read `../../GLOSSARY.md` (correct at depth two
       — verify each file; fix any wrong-depth pointer found, in
       moved AND unmoved skills: `grep -rn 'GLOSSARY.md' skills/
       --include='SKILL.md'`).
-- [ ] Step: Reference sweep (living files only — history in
+- [x] Step: Reference sweep (living files only — history in
       plans/logbook stays as written): `grep -rn 'skills/session'
       AGENTS.md docs/ roles/ skills/ bin/ tests/ scripts/` — every
       hit updates to `skills/thinking`. Expect: skills'
@@ -771,10 +852,18 @@ as mechanical.
       docs. `scripts/structure.map` is kit-generic — verify no
       change needed. The GLOSSARY `bee- namespace` entry names no
       folders and stays accurate — no store edit.
-- [ ] Step: Full suite + structure check before commit (union
+- [x] Step: Full suite + structure check before commit (union
       discipline): `node --test tests/*.test.mjs` — pass.
-- [ ] Step: run `test -d skills/thinking -a ! -e skills/session` — exit 0
-- [ ] Commit: `reorg: session/ → thinking/ (D3), kit retags, refs`
+- [x] Step: run `test -d skills/thinking -a ! -e skills/session` — exit 0
+- [x] Commit: `reorg: session/ → thinking/ (D3), kit retags, refs`
+
+**Task 15 notes:** review r1 FIX-FIRST (1 blocking, 0 should-fix,
+7 notes). Blocking fixed in-round: the glossary STORE line
+(.hivemind/glossary.toon:35) still read skills/session — the view
+hand-edit would self-revert on the next store write (the view is
+script-owned). Store line hand-fixed per the tool's own duplicate-
+error guidance; probe replicated (zero stale refs store+view).
+Blocking = always re-reviewed → r2 dispatched.
 
 ## Task 16: ship-tier citation strip (item 3, D8)
 
@@ -787,20 +876,20 @@ as mechanical.
 **Provides:** shipped components carry self-contained rule text;
   no authority citations in shipped skills or living role specs.
 
-- [ ] Step: Census first:
+- [x] Step: Census first:
       `grep -rn 'ADR-[0-9]' roles/ skills/ --include='*.md'` —
       expected: 10 role-file hits, GLOSSARY only in skills/.
       GLOSSARY keeps its anchors (ours, keeper direction:
       two-glossaries rule) — NOT this task's target.
-- [ ] Step: Role files: each ADR citation either drops (the rule
+- [x] Step: Role files: each ADR citation either drops (the rule
       text already stands alone) or the ruling inlines as plain
       text where the ADR was the carrier (e.g. "ADR-012" beside
       worktree law → the law sentence itself). Keep functional
       references (paths the role operates on). Same treatment for
       citations naming designs/plans/logbook paths.
-- [ ] Step: `git mv roles/retired-pp.md
+- [x] Step: `git mv roles/retired-pp.md
       .hivemind/memory/retired-pp-role.md` (D8).
-- [ ] Step: bee-brainstorm step 4: "(global `adr` skill)" →
+- [x] Step: bee-brainstorm step 4: "(global `adr` skill)" →
       "(the project's own decision-record practice)" — shipped
       skills name no global instrument (ADR-015 face;
       user-side). Check the other shipped skills for global-kit
@@ -808,9 +897,19 @@ as mechanical.
       — bee-plan's two "not the global plan skill" notes stay
       (harmless disambiguation, per the kit note); anything that
       DEPENDS on a global gets self-contained wording.
-- [ ] Step: Full suite + structure check: `node --test tests/*.test.mjs` — pass.
-- [ ] Step: run `! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/` — exit 0
-- [ ] Commit: `ship-tier: self-contained rule text, records out of roles/`
+- [x] Step: Full suite + structure check: `node --test tests/*.test.mjs` — pass.
+- [x] Step: run `! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/` — exit 0
+- [x] Commit: `ship-tier: self-contained rule text, records out of roles/`
+
+**Task 16 notes:** review r1 FIX-FIRST (1 blocking, 0 should-fix,
+3 notes). Blocking fixed in-round: the bee-brainstorm re-wrap split
+task-8's pinned grep phrase across lines — re-wrapped so the phrase
+sits contiguous; probe replicated (corrected-path grep PASS). THE
+LOAD-BEARING NOTE: Task 12 was never dispatched (reviewer's find —
+no records, unchecked boxes, bee-handoff lacks the section). The
+machine header's checks for tasks 8/11/12/13/14 still point at
+skills/session/ (Task-15-era staleness) — header paths need the
+loop's maintenance pass. Blocking = always re-reviewed → r2.
 
 ## Task 17: template glossary seed (item 4, D10)
 
@@ -819,7 +918,7 @@ as mechanical.
 **Provides:** init seeds the project's own glossary with the core
   bee terms, self-contained, user-extendable.
 
-- [ ] Step: In `bin/bee.js`, replace the glossary seed constant's
+- [x] Step: In `bin/bee.js`, replace the glossary seed constant's
       use in scaffold step 6: seed `.hivemind/glossary.toon` with
       `TEMPLATE_GLOSSARY_SEED` (new constant) instead of
       `GLOSSARY_HEADER + '\n'` — the header line followed by the
@@ -853,15 +952,15 @@ role :: a named agent spec in roles/: mandate plus attributes; assumed by direct
 skill :: a procedure: how a class of work gets done; skills stay role-agnostic :: -
 ```
 
-- [ ] Step: The seed rides the existing step-6 idempotence: a repo
+- [x] Step: The seed rides the existing step-6 idempotence: a repo
       whose glossary.toon exists is never overwritten (verify the
       existing `step()` guard covers it — it does).
-- [ ] Step: Extend `tests/bee-init.test.mjs`: green-fields init
+- [x] Step: Extend `tests/bee-init.test.mjs`: green-fields init
       produces a glossary.toon whose term-line count is ≥ 21 and
       which contains the `bee-loop` and `keeper` lines verbatim;
       re-run init on the seeded repo changes nothing.
-- [ ] Step: run `node --test tests/bee-init.test.mjs` — pass
-- [ ] Commit: `init: seed template glossary (core terms)`
+- [x] Step: run `node --test tests/bee-init.test.mjs` — pass
+- [x] Commit: `init: seed template glossary (core terms)`
 
 ## Phase exit
 

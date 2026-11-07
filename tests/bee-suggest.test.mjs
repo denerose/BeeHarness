@@ -100,6 +100,9 @@ test('help prints usage, files nothing (AXI 10)', () => {
     '--store', path.join(tmp(), 'inbox.toon')]);
   assert.equal(r.code, 0);
   assert.match(r.out, /usage: bee suggest/);
+  // P8 Task 6: observation-type help line (plan-verbatim wording)
+  assert.match(r.out,
+    /problem with no proposed solution\s+\(observation-type\); it routes as a design input\./);
   const folder = path.join(machine, 'suggestions');
   assert.ok(!fs.existsSync(folder));
 });

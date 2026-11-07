@@ -9,3 +9,8 @@
 Routed to the P8 pass — non-blocking size note in plan-checks.sh
 output above ~500 lines. Design note:
 2026-11-01-pp-p8-rectification-inputs.md, item 14.
+
+## Outcome (2026-11-07)
+Landed: size note — plans over 500 lines emit `note size: <n>
+lines — large plan; gate cost rises` in scripts/plan-checks.sh
+(plain echo, non-blocking; tests pin it). P8 Task 1.

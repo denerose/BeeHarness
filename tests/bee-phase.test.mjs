@@ -56,6 +56,25 @@ function fixtureRepo(opts = {}) {
   fs.writeFileSync(path.join(dir, '.hivemind', 'plans', `${PLAN_SLUG}.md`),
     planText(opts.suite ?? 'node --test tests/green.test.mjs'));
   fs.writeFileSync(path.join(dir, 'tests', 'green.test.mjs'), GREEN_TEST);
+  // board + design docs ride the BASE commit — the close's
+  // clean-tree gate refuses uncommitted fixture files
+  if (opts.phasesFile) {
+    fs.mkdirSync(path.join(dir, '.hivemind', 'phases'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.hivemind', 'phases', 'phases.md'),
+      opts.phasesFile);
+  }
+  if (opts.templateFile) {
+    fs.mkdirSync(path.join(dir, '.hivemind', 'phases'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.hivemind', 'phases', 'TEMPLATE.md'),
+      opts.templateFile);
+  }
+  if (opts.designDocs) {
+    fs.mkdirSync(path.join(dir, '.hivemind', 'designs'), { recursive: true });
+    for (const d of opts.designDocs) {
+      fs.writeFileSync(path.join(dir, '.hivemind', 'designs', d.name),
+        d.text);
+    }
+  }
   git('add -A && git commit -qm base');
   git('branch phase/4');
   git('checkout -q phase/4');
@@ -84,6 +103,50 @@ function decisionsFile(dir, n, name = 'decisions.txt') {
   }
   fs.writeFileSync(file, lines.join('\n') + '\n');
   return file;
+}
+
+// decisions with provenance prefixes (the D5 split's input):
+// [{ prefix: 'kickoff', n: 9 }, …] → one line per decision
+function prefixedDecisionsFile(pairs) {
+  const src = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-phase-dec-'));
+  const file = path.join(src, 'decisions.txt');
+  const lines = [];
+  let id = 0;
+  for (const p of pairs) {
+    for (let i = 0; i < p.n; i++) {
+      id++;
+      lines.push(`D${id} · ${p.prefix}: ruling ${i + 1} · rec-${id}.md`);
+    }
+  }
+  fs.writeFileSync(file, lines.join('\n') + '\n');
+  return file;
+}
+
+// a design doc with a machine block the design.sh state machine
+// accepts (implement refuses anything but picked-up)
+function designDocText(status, merge = '-') {
+  return [
+    '# Design: fixture', '',
+    '<!-- machine',
+    `status: ${status}`,
+    'phase: P4',
+    'hash: -',
+    `merge: ${merge}`,
+    '-->', '',
+    '## Goal', '',
+    'fixture design body — close-stamp test', '',
+  ].join('\n');
+}
+
+// a one-row phase board; designsCell is the row's designs cell
+function phasesBoard(designsCell) {
+  return [
+    '# Phases — fixture', '',
+    '| id | description | status | designs | plan | owner | escalations |',
+    '|---|---|---|---|---|---|---|',
+    `| P4 | fixture phase | in-progress | ${designsCell} | — | — | — |`,
+    '',
+  ].join('\n');
 }
 
 function runInventory(fx, n) {
@@ -445,4 +508,167 @@ test('close reads the inventory from the phase tree when main lacks it', () => {
   assert.equal(r.code, 0, r.out);
   assert.match(r.out, /decisions: 9/);
   assert.match(r.out, /flag: under-asked kickoff — front-load harder next phase/);
+});
+
+// ---- close: flag split (P8 Task 2, D5) ----
+
+test('close splits decision counts; flag fires only on in-phase', () => {
+  // 9 front-loaded (kickoff + plan-time) + 3 in-phase → no flag
+  const fx = fixtureRepo();
+  let r = run(['phase', 'inventory', '4', '--decisions',
+    prefixedDecisionsFile([
+      { prefix: 'kickoff', n: 6 },
+      { prefix: 'plan-time', n: 3 },
+      { prefix: 'review-driven', n: 3 },
+    ]), '--root', fx.dir]);
+  assert.equal(r.code, 0, r.err);
+  r = run(['phase', 'close', '4', '--check', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /decisions: 12 \(front-loaded 9 · in-phase 3\)/);
+  assert.doesNotMatch(r.out, /flag:/);
+  // 3 front-loaded + 9 in-phase → flag fires (in-phase > 8, dominant)
+  const fx2 = fixtureRepo();
+  r = run(['phase', 'inventory', '4', '--decisions',
+    prefixedDecisionsFile([
+      { prefix: 'kickoff', n: 3 },
+      { prefix: 'dogfood', n: 9 },
+    ]), '--root', fx2.dir]);
+  assert.equal(r.code, 0, r.err);
+  r = run(['phase', 'close', '4', '--root', fx2.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  assert.match(r.out, /decisions: 12 \(front-loaded 3 · in-phase 9\)/);
+  assert.match(r.out, /flag: under-asked kickoff — front-load harder next phase/);
+});
+
+// ---- close: phase-row flip + design stamps (P8 Task 2) ----
+
+test('close flips the phase row with the close note; re-close is a no-op', () => {
+  const fx = fixtureRepo({ phasesFile: phasesBoard('—') });
+  runInventory(fx, 3);
+  let r = run(['phase', 'close', '4', '--check', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out,
+    /  phase row: would flip P4 in-progress → done \(\.hivemind\/phases\/phases\.md\)/);
+  assert.match(r.out, /  designs: none linked in the P4 row/);
+  r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  const mergeSha = fx.git('rev-parse --short main').trim();
+  assert.match(r.out,
+    /  phase row: P4 in-progress → done \(\.hivemind\/phases\/phases\.md\)/);
+  assert.match(r.out, /next: commit the phase-row flip\n$/);
+  const board = path.join(fx.dir, '.hivemind', 'phases', 'phases.md');
+  assert.match(fs.readFileSync(board, 'utf8'), new RegExp(
+    '^\\| P4 \\| fixture phase \\| done \\| — \\| — \\| — \\| ' +
+    `close via bee phase close 4 \\(merge ${mergeSha}\\) \\|$`, 'm'));
+  // second close — flip committed, branch re-created at main: the
+  // already-merged path meets a done row → no-op, byte-identical
+  fx.git('add -A && git commit -qm "phase row flip"');
+  fx.git('branch phase/4 main');
+  const before = fs.readFileSync(board, 'utf8');
+  r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  assert.match(r.out, /2 · merge · already merged \(no merge commit\)/);
+  assert.match(r.out, /  phase row: P4 already done — no-op/);
+  assert.equal(fs.readFileSync(board, 'utf8'), before);
+  assert.match(r.out, /next: bee phase list shows what remains\n$/);
+});
+
+test('close stamps unstamped design docs; pre-stamped untouched', () => {
+  const fx = fixtureRepo({
+    phasesFile: phasesBoard(
+      '`designs/design-a.md` (implemented @ aaaaaaa) · `designs/design-b.md`'),
+    designDocs: [
+      { name: 'design-a.md', text: designDocText('implemented', 'aaaaaaa') },
+      { name: 'design-b.md', text: designDocText('picked-up') },
+    ],
+  });
+  runInventory(fx, 2);
+  const r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  const mergeSha = fx.git('rev-parse --short main').trim();
+  // row: flipped + only the unstamped entry annotated
+  const board = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'phases.md'), 'utf8');
+  assert.match(board, /\| P4 \| fixture phase \| done \|/);
+  assert.ok(board.includes('`designs/design-a.md` (implemented @ aaaaaaa)'));
+  assert.ok(board.includes(`\`designs/design-b.md\` (implemented @ ${mergeSha})`));
+  // doc b: machine block stamped in the closed repo
+  const docB = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'designs', 'design-b.md'), 'utf8');
+  assert.match(docB, /^status: implemented$/m);
+  assert.match(docB, new RegExp(`^merge: ${mergeSha}$`, 'm'));
+  // doc a: untouched
+  assert.equal(fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'designs', 'design-a.md'), 'utf8'),
+  designDocText('implemented', 'aaaaaaa'));
+  assert.match(r.out,
+    new RegExp(`designs: \\.hivemind/designs/design-b\\.md — stamped ` +
+      `\\(implemented @ ${mergeSha}\\)`));
+  assert.match(r.out, /next: commit the phase-row flip\n$/);
+});
+
+test('design-stamp refusal is informational — close still succeeds', () => {
+  const fx = fixtureRepo({
+    phasesFile: phasesBoard('`designs/design-live.md`'),
+    designDocs: [{ name: 'design-live.md', text: designDocText('live') }],
+  });
+  runInventory(fx, 2);
+  const r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  assert.match(r.out,
+    /  note: implement \.hivemind\/designs\/design-live\.md: refused — status is 'live' \(must be picked-up\)/);
+  // the row still flips; the refused entry gains no annotation
+  const board = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'phases.md'), 'utf8');
+  assert.match(board, /\| P4 \| fixture phase \| done \|/);
+  assert.ok(!board.includes('(implemented @'));
+  assert.match(r.out, /next: commit the phase-row flip\n$/);
+});
+
+test('close ignores TEMPLATE.md when finding the phase row', () => {
+  // byte-sort puts TEMPLATE.md before lowercase-named boards — its
+  // example row must never win the scan (review r1 should-fix)
+  const fx = fixtureRepo({
+    phasesFile: phasesBoard('—'),
+    templateFile: [
+      '# Phases — template', '',
+      '| id | description | status | designs | plan | owner | escalations |',
+      '|---|---|---|---|---|---|---|',
+      '| P4 | example row — never flip | planned | — | — | — | — |',
+      '',
+    ].join('\n'),
+  });
+  runInventory(fx, 3);
+  const r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  const board = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'phases.md'), 'utf8');
+  assert.match(board, /\| P4 \| fixture phase \| done \|/);
+  const tmpl = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'TEMPLATE.md'), 'utf8');
+  assert.match(tmpl, /\| P4 \| example row — never flip \| planned \|/);
+  assert.ok(!tmpl.includes('close via'));
+});
+
+test('recovery: refused implement on an already-stamped doc recovers the row annotation', () => {
+  // crash-recovery shape (review r1 should-fix): a previous run
+  // stamped the doc, then failed its row write — the row entry is
+  // still bare; design.sh refuses; the annotation recovers from
+  // the doc's machine block
+  const fx = fixtureRepo({
+    phasesFile: phasesBoard('`designs/design-done.md`'),
+    designDocs: [
+      { name: 'design-done.md', text: designDocText('implemented', '0aaaaaa') },
+    ],
+  });
+  runInventory(fx, 2);
+  const r = run(['phase', 'close', '4', '--root', fx.dir]);
+  assert.equal(r.code, 0, r.out + r.err);
+  assert.match(r.out, /designs: \.hivemind\/designs\/design-done\.md — recovered \(implemented @ 0aaaaaa\)/);
+  const board = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'phases', 'phases.md'), 'utf8');
+  assert.ok(board.includes('`designs/design-done.md` (implemented @ 0aaaaaa)'));
+  const doc = fs.readFileSync(
+    path.join(fx.dir, '.hivemind', 'designs', 'design-done.md'), 'utf8');
+  assert.match(doc, /^merge: 0aaaaaa$/m);
 });
