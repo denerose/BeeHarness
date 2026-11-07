@@ -111,6 +111,8 @@ checks:
     expect: exit 0
     files: [bin/bee.js, tests/bee-init.test.mjs]
 suite: node --test tests/*.test.mjs
+task-1: done 2026-11-07T16:00:48+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task1-verify-r1.md
+task-2: done 2026-11-07T16:00:49+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task2-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -185,43 +187,43 @@ are done.
 **Provides:** `exists` reporting for create-targets; the
 non-blocking size note — consumed by every future gate run.
 
-- [ ] Step: In check 1 (files), before the ancestor walk for a
+- [x] Step: In check 1 (files), before the ancestor walk for a
       `(create)` target: if the exact target path exists, report
       `note files: <path> exists (create-target satisfied)` via
       plain echo — NOT via `note()` (non-blocking) — and skip the
       walk. The ancestor walk (non-directory ancestor detection)
       still applies to missing paths, unchanged.
-- [ ] Step: After check 2 (boxes), add a size note:
+- [x] Step: After check 2 (boxes), add a size note:
       `n=$(wc -l < "$PLAN")`; if `n > 500`, echo
       `note size: ${n} lines — large plan; gate cost rises`
       (plain echo, never sets fail).
-- [ ] Step: Extend `tests/plan-checks.test.mjs`: (a) a plan
+- [x] Step: Extend `tests/plan-checks.test.mjs`: (a) a plan
       fixture whose create-target exists as a file → run exits 0
       and stdout contains `exists (create-target satisfied)`, with
       no `non-directory ancestor` finding; (b) a fixture of 501+
       lines → exit 0, stdout contains `note size:`; a short
       fixture → stdout does NOT contain `note size:`.
-- [ ] Step: `--run` honesty (gate r1 S7): the suite run's output
+- [x] Step: `--run` honesty (gate r1 S7): the suite run's output
       goes to a temp file, not /dev/null; when node's summary
       reads `# tests 0`, print `note suite: 0 tests ran in
       sandbox — repo-wide suite, not block-reachable` (plain
       echo, non-blocking). Pin: a fixture plan whose suite is
       `node --test tests/*.test.mjs` → `--run` prints the note,
       exit 0.
-- [ ] Step: run `node --test tests/plan-checks.test.mjs` — pass
-- [ ] Step: Stamp + delete
+- [x] Step: run `node --test tests/plan-checks.test.mjs` — pass
+- [x] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-po-p7-close-hindsight.md`
       (item 11) per D7 (stamp first, delete in the same commit).
       The item-14 suggestion is a LIVE file — stamp its Outcome
       (`.hivemind/suggestions/2026-11-01-po-p4-hindsight-plan-size-guard.md`,
       landed: size note) and LEAVE it for the keeper's triage
       read per D7.
-- [ ] Step: Items 15/22/23 landed pre-loop (D4, commit 3d2f4ba):
+- [x] Step: Items 15/22/23 landed pre-loop (D4, commit 3d2f4ba):
       stamp their Outcomes (landed pre-loop) and delete, per D7 —
       `.hivemind/suggestions/planned/2026-11-01-pp-design-note-consolidation.md`,
       `.hivemind/suggestions/planned/2026-11-02-po-union-merge-suite-gate.md`,
       `.hivemind/suggestions/planned/2026-11-02-po-marker-surgery-edit-tool.md`.
-- [ ] Commit: `plan-checks: exists satisfied + size note`
+- [x] Commit: `plan-checks: exists satisfied + size note`
 
 **Task 1 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 3
 notes). Should-fix fixed in-round, re-review WAIVED: the deleted
@@ -241,7 +243,7 @@ implementer deviations adjudicated by the reviewer as load-bearing
 counts the flag split — Task 9's close checklist names these steps
 as mechanical.
 
-- [ ] Step: Flag split (D5): in `phaseClose`, replace the single
+- [x] Step: Flag split (D5): in `phaseClose`, replace the single
       `decisions: ${decCount}` + threshold block (both the
       `--check` preview and step 5) with:
       `const dl = phaseDecisionLines(decText)`; classify each
@@ -251,7 +253,7 @@ as mechanical.
       `decisions: ${decCount} (front-loaded ${k} · in-phase ${r})`.
       Flag text `flag: under-asked kickoff` prints only when
       `r > PHASE_FLAG_THRESHOLD && r > k`.
-- [ ] Step: Row flip: after the merge step succeeds (and after the
+- [x] Step: Row flip: after the merge step succeeds (and after the
       `--check` preview names it as a would-step), locate the phase
       row: scan every file in `.hivemind/phases/` for a table row
       starting `| P${n} |` — first match wins. Change the row's
@@ -262,7 +264,7 @@ as mechanical.
       a failure (the row may live in a consumer layout); status
       already `done`: no-op line. When close writes the row, its
       output ends with `next: commit the phase-row flip`.
-- [ ] Step: Design stamps: parse the SAME row's designs cell for
+- [x] Step: Design stamps: parse the SAME row's designs cell for
       backticked `designs/<file>.md` paths; for each NOT already
       carrying `(implemented @`, after the merge run the existing
       `scripts/design.sh implement <doc> --phase ${n} --merge
@@ -271,7 +273,7 @@ as mechanical.
       read the script and reuse its function/steps verbatim in
       behavior; if design.sh is importable from bee.js, call it).
       Zero designs or all stamped → informational line, exit 0.
-- [ ] Step: Extend `tests/bee-phase.test.mjs`: (a) flag-split —
+- [x] Step: Extend `tests/bee-phase.test.mjs`: (a) flag-split —
       an inventory with 9 `kickoff:`/`plan-time:` lines + 3 others
       → no flag; 3 front-loaded + 9 in-phase → flag present, and
       the counts line reads `(front-loaded 3 · in-phase 9)`;
@@ -280,13 +282,13 @@ as mechanical.
       flipped row is a no-op (idempotence); (c) design stamps — a
       fixture row with two designs, one already stamped → only the
       other gains `(implemented @ <sha>)`.
-- [ ] Step: run `node --test tests/bee-phase.test.mjs` — pass
-- [ ] Step: Close-flag-calibration is a LIVE suggestion file —
+- [x] Step: run `node --test tests/bee-phase.test.mjs` — pass
+- [x] Step: Close-flag-calibration is a LIVE suggestion file —
       stamp its Outcome
       (`.hivemind/suggestions/2026-11-02-po-close-flag-counts-kickoff-separately.md`,
       landed: split counts + in-phase-only flag rule) and LEAVE
       it for the keeper's triage read per D7.
-- [ ] Commit: `phase close: row flip, design stamps, flag split`
+- [x] Commit: `phase close: row flip, design stamps, flag split`
 
 **Task 2 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 5
 notes). Both should-fixes fixed in-round, re-reviews WAIVED (loop law:
