@@ -126,6 +126,7 @@ task-13: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11
 task-14: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task14-verify-r1.md
 task-17: done 2026-11-07T17:35:15+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task17-verify-r1.md
 task-15: done 2026-11-07T17:47:20+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task15-verify-r2.md
+task-16: done 2026-11-07T18:02:51+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task16-verify-r2.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -874,20 +875,20 @@ Blocking = always re-reviewed → r2 dispatched.
 **Provides:** shipped components carry self-contained rule text;
   no authority citations in shipped skills or living role specs.
 
-- [ ] Step: Census first:
+- [x] Step: Census first:
       `grep -rn 'ADR-[0-9]' roles/ skills/ --include='*.md'` —
       expected: 10 role-file hits, GLOSSARY only in skills/.
       GLOSSARY keeps its anchors (ours, keeper direction:
       two-glossaries rule) — NOT this task's target.
-- [ ] Step: Role files: each ADR citation either drops (the rule
+- [x] Step: Role files: each ADR citation either drops (the rule
       text already stands alone) or the ruling inlines as plain
       text where the ADR was the carrier (e.g. "ADR-012" beside
       worktree law → the law sentence itself). Keep functional
       references (paths the role operates on). Same treatment for
       citations naming designs/plans/logbook paths.
-- [ ] Step: `git mv roles/retired-pp.md
+- [x] Step: `git mv roles/retired-pp.md
       .hivemind/memory/retired-pp-role.md` (D8).
-- [ ] Step: bee-brainstorm step 4: "(global `adr` skill)" →
+- [x] Step: bee-brainstorm step 4: "(global `adr` skill)" →
       "(the project's own decision-record practice)" — shipped
       skills name no global instrument (ADR-015 face;
       user-side). Check the other shipped skills for global-kit
@@ -895,9 +896,9 @@ Blocking = always re-reviewed → r2 dispatched.
       — bee-plan's two "not the global plan skill" notes stay
       (harmless disambiguation, per the kit note); anything that
       DEPENDS on a global gets self-contained wording.
-- [ ] Step: Full suite + structure check: `node --test tests/*.test.mjs` — pass.
-- [ ] Step: run `! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/` — exit 0
-- [ ] Commit: `ship-tier: self-contained rule text, records out of roles/`
+- [x] Step: Full suite + structure check: `node --test tests/*.test.mjs` — pass.
+- [x] Step: run `! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/` — exit 0
+- [x] Commit: `ship-tier: self-contained rule text, records out of roles/`
 
 **Task 16 notes:** review r1 FIX-FIRST (1 blocking, 0 should-fix,
 3 notes). Blocking fixed in-round: the bee-brainstorm re-wrap split
