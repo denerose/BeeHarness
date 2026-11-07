@@ -75,15 +75,15 @@ directed by the keeper) says to. Read `../../GLOSSARY.md` (the shared bee glossa
    Carry a `Role:` trailer (GLOSSARY). Never hand-edit state a script
    owns: when a script owns a piece of state (checkboxes it checks off,
    lists it generates, files it rewrites), you move it by running the
-   script — never by editing the state directly. Check off
-   exactly the current task's boxes at its commit — never batch
-   checkbox edits across task or section boundaries (a partition
+   script — never by editing the state directly. Plan boxes tick
+   via `bee task move` — exactly the current task's section, never
+   a batch slice across task or section boundaries (a partition
    slice sweeps everything downstream); checked boxes are state
-   claims and land with their own evidence. Where `bee task` owns
-   a state line, the state line is authoritative; the script's
-   box-ticking is cosmetic. Records ride the task branch with the
-   task's diff and reach main at merge; from other checkouts,
-   mid-flight records read via `git show <branch>:<path>`.
+   claims and land with their own evidence. The state line is
+   authoritative; box-ticking is cosmetic. Records ride the task
+   branch with the task's diff and reach main at merge; from
+   other checkouts, mid-flight records read via
+   `git show <branch>:<path>`.
 7. Repeat until the plan is done, then run **bee-verify at the phase
    level** (GLOSSARY: validation level — the full suite the plan lists)
    and report to the keeper.
@@ -94,7 +94,8 @@ directed by the keeper) says to. Read `../../GLOSSARY.md` (the shared bee glossa
    merges, flips the phase row, stamps designs, counts front-loaded
    vs in-phase decisions) → the status note for the phase → the tidy
    pass where the keeper's word directs one (bootstrap-noise paydown
-   with the P5 tooling — standing authority, no per-step ask;
+   with the harness's hygiene tooling — standing authority, no
+   per-step ask;
    disclose after) → report to the keeper.
 
 ## States
