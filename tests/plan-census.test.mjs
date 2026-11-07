@@ -106,7 +106,7 @@ test('census counts corpus: plans, headerless, role forms, verdict coverage', ()
   assert.match(r.out, /^role-machine: 1$/m);
   assert.match(r.out, /^role-none: 0$/m);
   assert.match(r.out, /^verdict-line: 2$/m);
-  assert.match(r.out, /^verdict-missing: 1$/m);
+  assert.match(r.out, /^verdict-line-missing: 1$/m);
   assert.match(r.out, new RegExp(`^plan: plan-a\\.md lines=${wc(PLAN_A)} machine=y phase=P1 tasks=2$`, 'm'));
   assert.match(r.out, new RegExp(`^plan: plan-b\\.md lines=${wc(PLAN_B)} machine=n phase=- tasks=1$`, 'm'));
 });

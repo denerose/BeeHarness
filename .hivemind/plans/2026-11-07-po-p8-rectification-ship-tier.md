@@ -510,6 +510,13 @@ pick-up runs first.
       Outcome only, leave for triage per D7.)
 - [ ] Commit: `plan: grep minimums + corpus census helper`
 
+**Task 7 notes:** review r1 APPROVE (0 blocking, 1 should-fix, 3
+notes). Should-fix fixed in-round, re-review WAIVED (one-word key
+rename, reviewer's own fix, test probe updated): census key
+`verdict-missing` → `verdict-line-missing` — 21 of 32 real-corpus
+"missing" files carry `## Verdict` heading-form verdicts; the key
+now carries its own definition.
+
 ## Task 8: bee-brainstorm ownership filter (item 7)
 
 **Files:** modify `skills/session/bee-brainstorm/SKILL.md`

@@ -70,7 +70,7 @@ echo "role-plain: $role_plain"
 echo "role-machine: $role_machine"
 echo "role-none: $role_none"
 echo "verdict-line: $v_line"
-echo "verdict-missing: $v_missing"
+echo "verdict-line-missing: $v_missing"
 
 # per-plan rows: lines, machine-block presence, first `phase:`
 # value (`-` when headerless), task-section count.
