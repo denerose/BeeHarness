@@ -121,6 +121,7 @@ task-5: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-
 task-10: done 2026-11-07T17:02:45+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task10-verify-r2.md
 task-6: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task6-verify-r2.md
 task-9: done 2026-11-07T17:22:32+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task9-verify-r2.md
+task-11: done 2026-11-07T17:22:42+11:00 by bee record: .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task11-verify-r1.md
 -->
 
 ## Kickoff rulings (2026-11-07, keeper)
@@ -675,7 +676,7 @@ skills); the checkbox rule now routes ticks through `bee task move`
 **Provides:** the entry-discipline authoring standard (consumed
   by Tasks 13/14 and every future skill edit).
 
-- [ ] Step: bee-skill-write gains a section after Style:
+- [x] Step: bee-skill-write gains a section after Style:
       "## Entry discipline (when a skill should run)\n\nA skill
       that never gets called isn't worth its storage cost; agents
       bias toward acting directly, and permissive wording licenses
@@ -692,7 +693,7 @@ skills); the checkbox rule now routes ticks through `bee task move`
       skill's name, or direct direction) IS the entry decision,
       already made: recognition, not evaluation. Not using a skill
       the keeper explicitly called is the failure mode."
-- [ ] Step: bee-argue: replace the Notes bullet "A tool available
+- [x] Step: bee-argue: replace the Notes bullet "A tool available
       to any agentic user of the harness, not a rule. The common
       right move is still a plain recommendation from the agent
       closest to the work — but when the decision-maker asks for
@@ -705,11 +706,11 @@ skills); the checkbox rule now routes ticks through `bee task move`
       recommendation carries it' or 'options not genuinely
       distinct' — never silently. A plain recommendation remains
       the common right move; this skill is entered on purpose."
-- [ ] Step: bee-argue Notes gains: "Dispatched workers return the
+- [x] Step: bee-argue Notes gains: "Dispatched workers return the
       FINISHED case only — no working notes, transcripts, or
       process narration."
-- [ ] Step: run `grep -q 'Should you use this skill' skills/session/bee-argue/SKILL.md` — exit 0
-- [ ] Commit: `entry discipline: authoring standard + argue gate`
+- [x] Step: run `grep -q 'Should you use this skill' skills/session/bee-argue/SKILL.md` — exit 0
+- [x] Commit: `entry discipline: authoring standard + argue gate`
 
 ## Task 12: bee-handoff pre-write gate + scoped authority (items 5-verify, 19, 16)
 
