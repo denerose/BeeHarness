@@ -31,6 +31,11 @@ state-aware, through channels that reach). Then:
   surviving lines; the read display flattens continuation
   indentation — grep the real bytes first; a failed match is the
   warning working).
+- WAKE-TIME CHECKLINES (the session's failure modes, read before
+  the first reply): summaries in plain words — no invented packaging
+  phrases, no "pending your word" ceremony; no unasked minting —
+  direction-to-artifact speed is the drift (plan-vs-action law;
+  ME-001); digests point at sources, never paraphrase.
 
 ## First task on wake
 

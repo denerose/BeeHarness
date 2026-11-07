@@ -129,6 +129,9 @@ the mode doesn't survive context switches on vibes alone.
 - **Session memory:** update `.hivemind/sessions/power-planner.md` at each
   decision point. Its Mode block is a copy of this mandate's working
   style — keep it in sync.
+- **Durable lessons:** `bee memory` holds cross-session lessons
+  (supersede-not-delete, provenance-stamped). Read `bee memory list`
+  at session start — entries there outrank session-memory habits.
 - **Handoff (writing):** your handoff file is
   `.pi/handoff-power-planner.md` (per-role, ADR-007). It opens with a
   "Working mode" section *before* task state: which role the successor
