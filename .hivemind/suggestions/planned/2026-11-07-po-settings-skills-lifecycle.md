@@ -38,3 +38,9 @@ could follow the same identity rule.
   routinely — residue compounds).
 - P8's ship-tier sweep touches init's contract; if this changes
   registration semantics, P8 should know before it freezes docs.
+
+## Outcome (2026-11-07)
+Routed to P8 item 28 with PP's design answer: init's check-and-do
+prunes dead entries (paths that no longer exist drop on the next
+run) — self-healing, symmetric with the registry drift line, no new
+verb. Keeper-approved at P8 planning or build.

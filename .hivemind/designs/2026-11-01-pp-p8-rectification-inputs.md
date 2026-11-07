@@ -180,9 +180,16 @@ suggestion file carries its Outcome pointing here):**
     against the target state), execution (on-track against
     phases/tasks/goals), keeper digest (light). Shared lean
     gather: `bee design status` + phase list + `bee task show` +
-    inbox/park counts. One new mechanic: a Target-state section in
-    the governing design doc (PP-maintained, keeper-approved).
+    inbox/park counts. MANDATORY GAP HUNT every run (the target
+    aims are a floor, not a ceiling — a run that skips the hunt
+    has not run the skill). One mechanic: the Target-state section
+    in the governing design doc (landed, nine aims).
     Design: `designs/2026-11-02-pp-project-update-skill.md`.
+28. Settings-registration lifecycle (P6 close, PO's find, PP
+    design answer): `bee init`'s check-and-do PRUNES dead entries
+    — paths that no longer exist drop on the next init run,
+    symmetric with the registry's self-healing drift line. No new
+    verb. File: `suggestions/2026-11-07-po-settings-skills-lifecycle.md`.
 
 **Determinism split:** items 1, 5, 11, 12 are script work; 2–4, 6–10
 are skill-text authoring (judgment over shipped-law text); 13 is a
