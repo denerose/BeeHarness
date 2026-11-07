@@ -51,7 +51,7 @@ checks:
     expect: exit 0
     files: [bin/bee.js, tests/bee-phase.test.mjs]
   - id: task-3
-    cmd: node --test tests/bee-render.test.mjs
+    cmd: node --test tests/bee-render.test.mjs tests/bee-inbox.test.mjs
     expect: exit 0
     files: [bin/bee.js, tests/bee-render.test.mjs, tests/bee-inbox.test.mjs]
   - id: task-4
@@ -59,7 +59,7 @@ checks:
     expect: exit 0
     files: [bin/bee.js, tests/bee-init.test.mjs]
   - id: task-5
-    cmd: node --test tests/bee-verify.test.mjs
+    cmd: node --test tests/bee-verify.test.mjs && grep -q "derive paths from the test's own location" skills/loop/bee-verify/SKILL.md
     expect: exit 0
     files: [bin/bee.js, skills/loop/bee-verify/SKILL.md, tests/bee-verify.test.mjs]
   - id: task-6
@@ -103,9 +103,9 @@ checks:
     expect: exit 0
     files: [skills/thinking/]
   - id: task-16
-    cmd: ! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/
+    cmd: test -f .hivemind/memory/retired-pp-role.md && ! grep -rq 'ADR-[0-9]' roles/ && ! grep -rq --include='SKILL.md' 'ADR-[0-9]' skills/
     expect: exit 0
-    files: [roles/power-planner.md, roles/project-orchestrator.md, roles/task-orc.md, .hivemind/memory/retired-pp-role.md, skills/session/bee-brainstorm/SKILL.md]
+    files: [roles/power-planner.md, roles/project-orchestrator.md, roles/task-orc.md, .hivemind/memory/retired-pp-role.md, skills/thinking/bee-brainstorm/SKILL.md]
   - id: task-17
     cmd: node --test tests/bee-init.test.mjs
     expect: exit 0
@@ -162,6 +162,12 @@ suite: node --test tests/*.test.mjs
   `queueBullets`; the `fromStore` Source logic). Task 3 pins each
   with a test FIRST; where a pinned test already passes, the item
   closes as already-landed and no code changes.
+- **D13** Census helper home (item 18): the design named
+  "bee-plan's assets"; the plan builds `scripts/plan-census.sh`
+  per ADR-014's scripts-over-skills — deterministic corpus
+  counting is script work; the skill names the step, the script
+  does the counting. Accepted deviation, recorded here; the
+  keeper sees it at sign-off.
 
 ## Wave structure (D2)
 
@@ -195,12 +201,26 @@ non-blocking size note — consumed by every future gate run.
       no `non-directory ancestor` finding; (b) a fixture of 501+
       lines → exit 0, stdout contains `note size:`; a short
       fixture → stdout does NOT contain `note size:`.
+- [ ] Step: `--run` honesty (gate r1 S7): the suite run's output
+      goes to a temp file, not /dev/null; when node's summary
+      reads `# tests 0`, print `note suite: 0 tests ran in
+      sandbox — repo-wide suite, not block-reachable` (plain
+      echo, non-blocking). Pin: a fixture plan whose suite is
+      `node --test tests/*.test.mjs` → `--run` prints the note,
+      exit 0.
 - [ ] Step: run `node --test tests/plan-checks.test.mjs` — pass
 - [ ] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-po-p7-close-hindsight.md`
-      (item 11) and
-      `.hivemind/suggestions/planned/2026-11-01-po-p4-hindsight-plan-size-guard.md`
-      (item 14) per D7 (stamp first, delete in the same commit).
+      (item 11) per D7 (stamp first, delete in the same commit).
+      The item-14 suggestion is a LIVE file — stamp its Outcome
+      (`.hivemind/suggestions/2026-11-01-po-p4-hindsight-plan-size-guard.md`,
+      landed: size note) and LEAVE it for the keeper's triage
+      read per D7.
+- [ ] Step: Items 15/22/23 landed pre-loop (D4, commit 3d2f4ba):
+      stamp their Outcomes (landed pre-loop) and delete, per D7 —
+      `.hivemind/suggestions/planned/2026-11-01-pp-design-note-consolidation.md`,
+      `.hivemind/suggestions/planned/2026-11-02-po-union-merge-suite-gate.md`,
+      `.hivemind/suggestions/planned/2026-11-02-po-marker-surgery-edit-tool.md`.
 - [ ] Commit: `plan-checks: exists satisfied + size note`
 
 ## Task 2: bee phase close — mechanical row flip, design stamps, flag split (items 17, 20)
@@ -235,9 +255,10 @@ as mechanical.
 - [ ] Step: Design stamps: parse the SAME row's designs cell for
       backticked `designs/<file>.md` paths; for each NOT already
       carrying `(implemented @`, after the merge run the existing
-      `scripts/design.sh implement <doc> --merge ${mergeSha}`
-      mechanics (inline the same edit design.sh performs — read
-      the script and reuse its function/steps verbatim in
+      `scripts/design.sh implement <doc> --phase ${n} --merge
+      ${mergeSha}` mechanics (the --phase flag is required by the
+      script's usage; inline the same edit design.sh performs —
+      read the script and reuse its function/steps verbatim in
       behavior; if design.sh is importable from bee.js, call it).
       Zero designs or all stamped → informational line, exit 0.
 - [ ] Step: Extend `tests/bee-phase.test.mjs`: (a) flag-split —
@@ -250,6 +271,11 @@ as mechanical.
       fixture row with two designs, one already stamped → only the
       other gains `(implemented @ <sha>)`.
 - [ ] Step: run `node --test tests/bee-phase.test.mjs` — pass
+- [ ] Step: Close-flag-calibration is a LIVE suggestion file —
+      stamp its Outcome
+      (`.hivemind/suggestions/2026-11-02-po-close-flag-counts-kickoff-separately.md`,
+      landed: split counts + in-phase-only flag rule) and LEAVE
+      it for the keeper's triage read per D7.
 - [ ] Commit: `phase close: row flip, design stamps, flag split`
 
 ## Task 3: report-regen defect batch (item 24, check-then-apply per D12)
@@ -353,9 +379,13 @@ as mechanical.
       derived from the test's location runs in the temp worktree
       (assert the note line); a verify invoked from inside a
       linked worktree skips (note line, exit 0).
-- [ ] Step: Sweep-audit: `grep -rn 'BeeHarness\|/home/' tests/`
-      — known clean (one comment); any live hit becomes a
-      derive-from-location fix in this task.
+- [ ] Step: Sweep-audit: `grep -rn --include='*.test.mjs'
+      'BeeHarness\|/home/' tests/` — known clean (one comment,
+      bee.test.mjs:93); any live hit becomes a derive-from-
+      location fix in this task. Fixture files are historical
+      data and exempt — three 'BeeHarness' prose hits exist there
+      today (tests/fixtures/parking-lot-v1.md:1,92,254) and are
+      not path assumptions.
 - [ ] Step: run `node --test tests/bee-verify.test.mjs` — pass
 - [ ] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-10-31-po-no-hardcoded-checkout-paths-in-tests.md`
@@ -404,9 +434,10 @@ as mechanical.
       `.hivemind/suggestions/planned/2026-10-25-pp-hindsight-skill-fixes.md`
       and
       `.hivemind/suggestions/planned/2026-11-02-po-hindsight-summary-never-asks-to-file.md`
-      per D7. (Slug-format and role-vocabulary fixes already
-      verified present in the current asset — record as
-      already-landed halves in the Outcome stamp.)
+      per D7. (Slug-format fix already verified present in the
+      current asset — record as the already-landed half in the
+      Outcome stamp; the role-vocabulary fix is NOT yet present
+      and lands in this task's edit.)
 - [ ] Commit: `hindsight: generalized inputs, sixth question, never-asks`
 
 ## Task 7: bee-plan minimums + census helper (items 8, 18)
@@ -430,7 +461,10 @@ as mechanical.
       verdict line vs without); (c) exit 0 always except usage
       (2) / missing dir (1). No findings — it is a census, not a
       gate.
-- [ ] Step: bee-plan SKILL.md rule 3 gains: "State grep
+- [ ] Step: bee-plan SKILL.md rule 4 (self-contained-task
+      standard — it owns the verification-command standard; the
+      design doc's "rule 3" anchor predates a renumbering) gains:
+      "State grep
       expectations as minimums (`≥ N`) unless the exact count IS
       the contract (duplicate detection); a wrong exact count
       forced a mid-loop plan correction once — minimums keep the
@@ -536,22 +570,27 @@ as mechanical.
 - [ ] Step: Pass-back section gains: "Return the FINISHED brief
       only — omit working notes, transcripts, and process
       narration."
-- [ ] Step: GATE dispatches (bee-plan-review / cold reviews) gain
-      a marked block: "Gate dispatch: budget ≥ 900s; write the
-      report even if incomplete — an incomplete report reaches the
-      dispatcher, silence does not (standing default, effective
-      2026-11-07)."
-- [ ] Step: Brief-writing (dispatcher-side) line above Pass-back:
-      "Relayed claims: none | verified list. A pass-back claim is
-      a factual claim — verify it against the repo before it
-      enters a brief, or mark it 'claimed, unverified — confirm'
-      so the reader treats it as a question, not a premise."
+- [ ] Step: ADD a marked Gate-dispatch block to the template
+      body (no such section exists yet): "Gate dispatch: budget
+      ≥ 900s; write the report even if incomplete — an incomplete
+      report reaches the dispatcher, silence does not (standing
+      default, effective 2026-11-07)."
+- [ ] Step: ADD to the dispatcher preamble, immediately above
+      Pass-back: "Relayed claims: none | verified list. A
+      pass-back claim is a factual claim — verify it against the
+      repo before it enters a brief, or mark it 'claimed,
+      unverified — confirm' so the reader treats it as a
+      question, not a premise."
 - [ ] Step: run `grep -q 'FINISHED brief only' skills/loop/bee-loop/assets/dispatch-brief-template.md` — exit 0
 - [ ] Step: Stamp + delete
       `.hivemind/suggestions/planned/2026-11-01-pp-researcher-briefs-final-only.md`
       and
       `.hivemind/suggestions/planned/2026-11-02-po-relayed-claims-verified.md`
-      per D7.
+      per D7. Gate-budget is a LIVE suggestion file — stamp its
+      Outcome
+      (`.hivemind/suggestions/2026-11-01-po-p4-hindsight-gate-budget.md`,
+      landed: template line, keeper standing word at kickoff D4)
+      and LEAVE it for the keeper's triage read per D7.
 - [ ] Commit: `brief template: cwd pin, final-only, gate budget, claims`
 
 ## Task 11: entry discipline — authoring standard + bee-argue (item 2)
@@ -740,8 +779,9 @@ as mechanical.
 ## Task 16: ship-tier citation strip (item 3, D8)
 
 **Files:** modify `roles/power-planner.md`, `roles/project-orchestrator.md`,
-  `roles/task-orc.md`, `skills/session/bee-brainstorm/SKILL.md`;
-  delete `roles/retired-pp.md`; create
+  `roles/task-orc.md`, `skills/thinking/bee-brainstorm/SKILL.md`
+  (skills/session/ until Task 15's rename); delete
+  `roles/retired-pp.md`; create
   `.hivemind/memory/retired-pp-role.md`
 **Depends on:** task 15 (the tree is final)
 **Provides:** shipped components carry self-contained rule text;
@@ -784,7 +824,10 @@ as mechanical.
       `TEMPLATE_GLOSSARY_SEED` (new constant) instead of
       `GLOSSARY_HEADER + '\n'` — the header line followed by the
       21 term lines below, format `term :: gist :: see` with
-      `see: -` throughout:
+      `see: -` throughout. The fenced block is the constant's
+      payload, INLINED into bin/bee.js as TEMPLATE_GLOSSARY_SEED
+      — the path= label is its sandbox home for review, not a
+      repo file to create:
 
 ```toon path=bin/template-glossary-seed.toon
 bee :: the harness CLI; its commands operate on the project's .hivemind/ stores :: -
