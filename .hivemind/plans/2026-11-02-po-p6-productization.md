@@ -57,6 +57,7 @@ suite: node --test tests/*.test.mjs
 task-2: done 2026-11-07T11:14:10+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task2-verify-r1.md
 task-4: done 2026-11-07T11:13:47+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task4-verify-r3.md
 task-3: done 2026-11-07T11:29:15+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task3-verify-r2.md
+task-6: done 2026-11-07T12:00:01+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task6-verify-r2.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -753,7 +754,7 @@ test('empty text: structured error, exit 1', () => {
 **Depends on:** tasks 1–5 (audits the final command set)
 **Provides:** an audit table recorded in this task's verify entry; fixes for every gap found.
 
-- [ ] Step: audit every command family against the ten principles
+- [x] Step: audit every command family against the ten principles
   (`docs/AXI.md`): report · init · inbox · park · memory · design ·
   capture · logbook · glossary · verify · task · guidance · phase ·
   suggest · worktree. The judgment this step keeps (not scriptable):
@@ -761,7 +762,7 @@ test('empty text: structured error, exit 1', () => {
   Write the table (command × principle × verdict × action) into the
   verify record at task end — the table IS the deliverable, fixes ride
   it.
-- [ ] Step: guided findings, pre-named (audit may add):
+- [x] Step: guided findings, pre-named (audit may add):
   - principle 5 (definitive empty states): every list surface prints an
     explicit `0 <noun>` line when empty — check each;
   - principle 9 (contextual disclosure): apply to MUTATION outputs
@@ -770,12 +771,12 @@ test('empty text: structured error, exit 1', () => {
   - principle 10 (consistent help): every command family carries a
     per-subcommand usage block reachable the same way (`<cmd>` misuse
     prints it; `help` lists all).
-- [ ] Step: fix every gap the table marks; keep behavior changes tested
+- [x] Step: fix every gap the table marks; keep behavior changes tested
   (extend the command's existing test file where one exists; new gaps
   without a test file get assertions added to the closest one).
-- [ ] Step: run the full suite `node --test tests/*.test.mjs` — green;
+- [x] Step: run the full suite `node --test tests/*.test.mjs` — green;
   record the audit table + fix list in the verify entry body.
-- [ ] Commit: `AXI pass: close compliance gaps across bee commands`
+- [x] Commit: `AXI pass: close compliance gaps across bee commands`
 
 ## Task 7: adoption doc + README + dogfood + map
 
