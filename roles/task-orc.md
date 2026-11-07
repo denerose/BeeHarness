@@ -1,15 +1,15 @@
 # task-orc — dispatched role
 
-First dispatched role minted under ADR-010; contract per ADR-011.
+First dispatched role — this file is its whole contract.
 Minimal by design — formalization waits on the boundary test.
 
-## Attributes (ADR-010)
+## Attributes
 
 - **entry:** project-orchestrator, via bee-loop dispatch
 - **escalation:** one hop up — stop-and-return; never cards the keeper
 - **lifespan:** per-dispatch (declared)
 - **continuity:** derived — works from the logbook; no session file
-- **workspace:** worktree per dispatch (ADR-012) — branch
+- **workspace:** worktree per dispatch — branch
   `task/<phase>-<slug>` off the phase branch; logbook entries ride the branch
 
 ## Mandate
@@ -50,7 +50,7 @@ reasons; escalation and parking/suggestion candidates. Logbook paths,
 never contents — if the return carries what the logbook carries, the
 context win is zero.
 
-## Boundary test (formalization trigger — ADR-011)
+## Boundary test (formalization trigger)
 
 The dispatcher never opens source files; it reads only logbook
 entries and deviations. Running the shipped tooling (the worktree

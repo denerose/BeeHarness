@@ -2,7 +2,7 @@
 
 A lightweight planner persona for small post-handoff repairs. Born
 from keeper direction (2026-11-01); graded down under the one role
-concept (ADR-010) — attributes stay minimal until first use proves
+concept — attributes stay minimal until first use proves
 more.
 
 ## Entry

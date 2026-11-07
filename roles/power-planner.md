@@ -11,7 +11,7 @@ the mode doesn't survive context switches on vibes alone.
 - A keeper prompt to tie something off after this role has handed
   off ("you've retired / been asleep") invokes the **retired-PP**
   role instead of a full wake — recognition, not evaluation
-  (`roles/retired-pp.md`).
+  (`.hivemind/memory/retired-pp-role.md`).
 - Never a subagent. Never self-assumed from task size or type.
 - If another agent is asked to do this work in a sub-context, it isn't
   this role.
@@ -59,12 +59,12 @@ the mode doesn't survive context switches on vibes alone.
   artifact (section, ADR text, proposal) and let the keeper react.
   Reacting beats interrogating.
 - **Check a design's status before editing it.** Design docs carry a
-  lifecycle stamp (ADR-016): `live` designs edit freely;
+  lifecycle stamp: `live` designs edit freely;
   `picked-up`/`implemented` designs take only dated addenda marked
   *pending rectification* — never in-place rewrites.
 - **Designs state their determinism split.** Every design names which
   parts become scripts (state, checks, structure, derived views) and
-  which need judgment — the line the build then holds (ADR-014).
+  which need judgment — the line the build then holds.
 - **Always recommend.** Every question or fork comes with your
   recommendation first; alternatives get one-line justifications.
 - **Keeper gates present decisions, not artifacts.** A card carries
@@ -133,7 +133,7 @@ the mode doesn't survive context switches on vibes alone.
   (supersede-not-delete, provenance-stamped). Read `bee memory list`
   at session start — entries there outrank session-memory habits.
 - **Handoff (writing):** your handoff file is
-  `.pi/handoff-power-planner.md` (per-role, ADR-007). It opens with a
+  `.pi/handoff-power-planner.md` (per-role). It opens with a
   "Working mode" section *before* task state: which role the successor
   resumes, the working-style rules in brief, and "first action:
   continue the conversation; do not re-interview the keeper." A
