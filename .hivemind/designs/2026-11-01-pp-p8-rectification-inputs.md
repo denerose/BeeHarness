@@ -202,6 +202,20 @@ suggestion file carries its Outcome pointing here):**
     `bee suggest`'s template inherits. No new store — visibility
     of known-and-routed problems stays a computed view (P9
     render).
+30. Commit-record sweep (keeper-ruled 2026-11-07, bee-argue
+    informed — map: `designs/2026-11-07-pp-commit-record-map.md`):
+    gitignore keeper-report.md, suggestions/ (incl. planned/),
+    .pi/handoff-* — `git rm --cached`, files stay on disk. The
+    logbook STAYS (review-artifact + dispatcher-boundary cases);
+    stores stay (durable state).
+31. Status becomes a CLI-PROTECTED STRUCTURED STORE (keeper
+    prerequisite for its exit from git): single-writer writes via
+    `bee`, the hand-maintained half migrates to structured adds
+    (origin=role), renders derive; then gitignored with the rest
+    of the OUT classes. Kills the last hand-edited shared file.
+32. OPTIONAL (offered, tool behavior not a rule): `bee task`
+    writes plan-checkbox state to disk and commits once at merge —
+    collapses the ~45/week checkoff commits into milestones.
 
 CLOSE STEP (keeper's standing word, 2026-11-07): the tidy pass
 (PL-PP-005) runs at P8 close — bootstrap-noise paydown using the
