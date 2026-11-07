@@ -9,3 +9,8 @@
 Routed to the P8 pass — dispatch-brief template line (900s +
 write-even-if-incomplete default for cold gate reviews). Design
 note: 2026-11-01-pp-p8-rectification-inputs.md, item 13.
+
+## Outcome (2026-11-07)
+LANDED: the dispatch-brief template's Gate-dispatch block carries
+the standing word (budget ≥ 900s; write the report even if
+incomplete). Left live for the keeper's triage read per D7.
