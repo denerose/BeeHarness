@@ -708,27 +708,54 @@ function cmdInit(rest) {
 
   const entries = settings.skills ?? [];
   const target = path.resolve(skillsDir);
-  const hit = entries.find(
+  // D6 self-healing prune: an entry whose resolved path no longer
+  // exists drops on every init run, in both the hit and miss
+  // paths. --check names the dead entries without writing; write
+  // mode rewrites settings without them. Informational only — the
+  // prune never changes the exit code (drift-line semantics, D3).
+  // Non-string entries have no resolved path — they pass through.
+  const live = [];
+  const dead = [];
+  for (const e of entries) {
+    if (typeof e === 'string' &&
+        !fs.existsSync(path.resolve(expandTilde(e)))) {
+      dead.push(e);
+    } else {
+      live.push(e);
+    }
+  }
+  const pruneNote = dead.length === 0 ? '' : f.values.check
+    ? `bee init: would prune: ${dead.join(', ')}\n`
+    : `bee init: pruned ${dead.length} dead ` +
+      `entry(ies): ${dead.join(', ')}\n`;
+
+  const hit = live.find(
     (e) => typeof e === 'string' &&
       path.resolve(expandTilde(e)) === target);
 
   let code, out, err;
   if (hit !== undefined) {
     code = 0;
-    out = `bee init: already registered: ${hit} (${settingsPath})\n`;
+    out = `bee init: already registered: ${hit} (${settingsPath})\n` +
+      pruneNote;
     err = '';
+    if (dead.length > 0 && !f.values.check) {
+      settings.skills = live;
+      fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+      atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+    }
   } else if (f.values.check) {
     code = 1;
-    out = '';
+    out = pruneNote;
     err = `bee init: NOT registered (${tildeForm(skillsDir)}) ` +
       `— run without --check to add it (${settingsPath})\n`;
   } else {
-    settings.skills = [...entries, tildeForm(skillsDir)];
+    settings.skills = [...live, tildeForm(skillsDir)];
     fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
     atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
     code = 0;
     out = `bee init: registered ${tildeForm(skillsDir)} in ` +
-      `${settingsPath}\n`;
+      `${settingsPath}\n` + pruneNote;
     err = '';
   }
 

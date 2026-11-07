@@ -167,3 +167,78 @@ test('harness repo: write run still ends with the next-step line (AXI 9)', () =>
   assert.match(r.out,
     /bee init: next — bee init --check reports registration \+ drift/);
 });
+
+// ---- settings prune (P8 task 4, D6): dead entries self-heal
+
+function targetEntry() {
+  return path.resolve(TESTS_DIR, '..', 'skills');
+}
+
+test('init: dead settings entry drops on a write run, live kept (D6)', () => {
+  const dir = tmp();
+  const machine = tmp();
+  const sp = path.join(dir, 's.json');
+  const dead = path.join(dir, 'gone-skill');
+  fs.writeFileSync(sp, JSON.stringify(
+    { skills: [targetEntry(), dead] }, null, 2));
+  const repo = path.join(dir, 'repo');
+  fs.mkdirSync(repo);
+  const r = run(['init', '--settings', sp, '--machine', machine, '--repo', repo]);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /already registered: /);
+  assert.match(r.out, /pruned 1 dead entry\(ies\): .*gone-skill/);
+  const after = JSON.parse(fs.readFileSync(sp, 'utf8'));
+  assert.deepEqual(after.skills, [targetEntry()]);
+});
+
+test('init: --check names would-prune entries, writes nothing (D6)', () => {
+  const dir = tmp();
+  const machine = tmp();
+  const sp = path.join(dir, 's.json');
+  const dead = path.join(dir, 'gone-skill');
+  const original = JSON.stringify(
+    { skills: [targetEntry(), dead] }, null, 2) + '\n';
+  fs.writeFileSync(sp, original);
+  const repo = path.join(dir, 'repo');
+  fs.mkdirSync(repo);
+  const r = run(['init', '--check', '--settings', sp,
+    '--machine', machine, '--repo', repo]);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /would prune: .*gone-skill/);
+  assert.ok(!r.out.includes('pruned 1'));
+  assert.equal(fs.readFileSync(sp, 'utf8'), original);
+});
+
+test('init: settings with only live entries stay byte-unchanged (D6)', () => {
+  const dir = tmp();
+  const machine = tmp();
+  const sp = path.join(dir, 's.json');
+  const other = path.join(dir, 'other-skill');
+  fs.mkdirSync(other);
+  const original = JSON.stringify(
+    { skills: [targetEntry(), other] }, null, 2) + '\n';
+  fs.writeFileSync(sp, original);
+  const repo = path.join(dir, 'repo');
+  fs.mkdirSync(repo);
+  const r = run(['init', '--settings', sp, '--machine', machine, '--repo', repo]);
+  assert.equal(r.code, 0, r.err);
+  assert.ok(!r.out.includes('pruned'));
+  assert.equal(fs.readFileSync(sp, 'utf8'), original);
+});
+
+test('init: miss path prunes too — one write registers without the dead (D6)', () => {
+  const dir = tmp();
+  const machine = tmp();
+  const sp = path.join(dir, 's.json');
+  const dead = path.join(dir, 'gone-skill');
+  fs.writeFileSync(sp, JSON.stringify({ skills: [dead] }, null, 2));
+  const repo = path.join(dir, 'repo');
+  fs.mkdirSync(repo);
+  const r = run(['init', '--settings', sp, '--machine', machine, '--repo', repo]);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /bee init: registered /);
+  assert.match(r.out, /pruned 1 dead entry\(ies\): .*gone-skill/);
+  const after = JSON.parse(fs.readFileSync(sp, 'utf8'));
+  assert.equal(after.skills.length, 1); // registered, dead gone
+  assert.ok(after.skills[0].endsWith('skills'));
+});
