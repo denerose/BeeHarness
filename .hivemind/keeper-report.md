@@ -62,6 +62,21 @@ resolves them; the keeper may edit freely or just say the word)
   enforces it.” Role files:
   /home/saphron/BeeHarness/roles/keeper-secretary.md ·
   /home/saphron/BeeHarness/roles/power-planner.md
+- Ephemera commit volume — QUESTION for PP (keeper thought
+  2026-11-07): are we committing WAY too much ephemera? Pros and
+  cons need a real discussion. The CON side is visible: 7 commits
+  on keeper-report.md alone across 11-01→11-07, most
+  single-list-item note edits; task-checkoff commits add more; the
+  history reads as conversation, not milestones. The PRO side is
+  structural: parallel contexts (PP/PO/KS share one checkout) rely
+  on shared surfaces being committed-current — the
+  immediate-commit rule for shared files and ambient pickup both
+  depend on it. Already-existing limits: sessions/ are gitignored
+  (one ephemera class excluded); logbook tidy passes exist
+  (PL-PP-005). The question: which commit classes earn history,
+  and is the fix habits, .gitignore, squash-at-phase-close, or
+  accept the noise? Joins the role-gate/edit-authority notes for
+  the same PP session.
 
 ## Needs the keeper
 
