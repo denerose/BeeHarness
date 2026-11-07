@@ -429,6 +429,12 @@ removed (review note). (d) closed already-landed per D12.
       per D7.
 - [ ] Commit: `verify: merge-level worktree suite + path convention`
 
+**Task 5 notes:** review r1 APPROVE (0 blocking, 2 should-fix, 6
+notes). Both fixed in-round, re-reviews WAIVED (reviewer-suggested
+fixes + probe tests): release level joins the D9 gate condition;
+suite-FAIL wiring pinned by test (reviewer's own hand-probe had
+confirmed the wiring fires — exit 1 + fix line).
+
 ## Task 6: bee-hindsight pass (items 6, 29)
 
 **Files:** modify `skills/session/bee-hindsight/SKILL.md`,

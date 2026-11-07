@@ -3380,7 +3380,8 @@ function cmdVerify(rest) {
   const suiteFindings = [];
   if (suiteCmd !== '' && results.length > 0 && nFail === 0 &&
       (header.validation === 'merge' ||
-        header.validation === 'phase')) {
+        header.validation === 'phase' ||
+        header.validation === 'release')) {
     const mc = isMainCheckout(planRoot);
     if (!mc.noGit && !mc.main) {
       suiteLine = 'suite · skipped · already inside a linked ' +

@@ -623,3 +623,26 @@ test('merge level inside a linked worktree: suite skips with a note (D9)', () =>
       { encoding: 'utf8', stdio: 'ignore' });
   }
 });
+
+test('merge level from the main checkout: suite FAIL fails verify (r1 S2)', () => {
+  const { dir, git } = suiteRepo();
+  fs.writeFileSync(path.join(dir, 'fail-suite.mjs'), 'process.exit(1);\n');
+  fs.writeFileSync(path.join(dir, 'plan.md'),
+    '# Plan\n\n<!-- machine\nphase: P1\nvalidation: merge\n' +
+    'suite: node fail-suite.mjs\nchecks:\n  - id: task-1\n' +
+    '    cmd: "true"\n-->\n');
+  git('add -A && git commit -qm fail-base');
+  const r = run(['verify', '--plan', path.join(dir, 'plan.md')]);
+  assert.equal(r.code, 1);
+  assert.match(r.out, /suite · node fail-suite\.mjs · FAIL · exit 1 · worktree re-run of HEAD/);
+  assert.match(r.out, /fix: the suite fails in a fresh worktree of HEAD/);
+  // release level also gates (r1 S1): highest checking level runs the suite
+  const plan = fs.readFileSync(path.join(dir, 'plan.md'), 'utf8')
+    .replace('validation: merge', 'validation: release')
+    .replace('fail-suite', 'suite-probe');
+  fs.writeFileSync(path.join(dir, 'plan2.md'), plan);
+  git('add -A && git commit -qm release-base');
+  const r2 = run(['verify', '--plan', path.join(dir, 'plan2.md')]);
+  assert.equal(r2.code, 0, r2.out + r2.err);
+  assert.match(r2.out, /suite · node suite-probe\.mjs · PASS · exit 0 · worktree re-run of HEAD/);
+});
