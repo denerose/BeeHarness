@@ -1,0 +1,29 @@
+# decisions — P8 close inventory (plan: 2026-11-07-po-p8-rectification-ship-tier)
+# one line per decision: id · one-line · source-record-path
+phase: P8
+plan: .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+count: 22
+assembled: 2026-11-07T18:16:52+11:00 by bee
+
+D1 · kickoff: PL-PP-006 deferred (rectification-only; block pointer-only; park holds) · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D2 · kickoff: ONE phase/plan, waves by artifact type, reorg+ship-tier LAST · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D3 · kickoff: all session instruments → skills/thinking/ (no session folder; supersedes mid-P7 session-kit ruling) · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D4 · kickoff: PP relay for items 13/15/22/23 — law lands BEFORE the loop opens · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D5 · plan-time: close-flag split — in-phase > 8 AND in-phase > front-loaded fires the flag · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D6 · plan-time: settings prune check-and-do, informational, exit 0 both modes · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D7 · plan-time: suggestion-file disposition — planned stamped+deleted at landing; LIVE stamped, left for triage · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D8 · plan-time: retired-pp.md relocates to .hivemind/memory/ (records live in the records) · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D9 · plan-time: merge-level worktree suite from main checkout only (D9 skip-note in linked worktrees) · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D10 · plan-time: template glossary term set — 21 terms verbatim, self-contained, see: - · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D11 · plan-time: new session skills land in skills/session/ (D3's reorg renames at T15) · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D12 · plan-time: item 24 check-then-apply — pin tests first, fix only failing pins · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+D13 · plan-time: census helper in scripts/ per ADR-014 (accepted deviation from design's assets wording) · .hivemind/plans/2026-11-07-po-p8-rectification-ship-tier.md
+R1 · review-driven (T2 r1): phase row scan skips TEMPLATE.md; crash-recovery recovers stamp annotations from doc machine blocks · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task2-review-r1.md
+R2 · review-driven (T3 r1): em-dash tail strip REMOVED from normItem (falsely deduped distinct asks); render-view prefix strip added; group headers close bullets · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task3-review-r1.md
+R3 · review-driven (T5 r1): release level joins the D9 gate; suite-FAIL wiring pinned by test · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task5-review-r1.md
+R4 · review-driven (T6 r1): status-listing step names BOTH channels (inbox add renders into region; prose notes ride outside) · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task6-review-r1.md
+R5 · review-driven (T8 r1): GLOSSARY term supplied for memory-ownership pointer (no plan-text deviation) · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task8-review-r1.md
+R6 · review-driven (T9 r1): P5 tooling → harness's hygiene tooling; checkbox rule routes ticks through bee task move · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task9-review-r1.md
+R7 · review-driven (T15 r1): glossary STORE line fixed (view hand-edit would self-revert; store is the regen source) · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task15-review-r1.md
+R8 · review-driven (T16 r1): bee-brainstorm re-wrap fixed so task-8's pinned grep phrase stays contiguous · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task16-review-r1.md
+R9 · loop (T16 review find): Task 12 discovered unexecuted → dispatched late; machine-header paths fixed post-reorg (5 stale checks) · .hivemind/logbook/2026-11-07-po-p8-rectification-ship-tier-task16-review-r1.md
