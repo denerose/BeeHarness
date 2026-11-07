@@ -288,6 +288,7 @@ cmd_implement() {
   fi
   stamp_doc "$DOC_ABS"
   echo "implement: $DOC_REL · picked-up → implemented · phase $PHASE · merge $MERGE"
+  echo "next: $PROG status shows the family"
 }
 
 cmd_status() {

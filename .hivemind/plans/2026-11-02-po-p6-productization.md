@@ -54,6 +54,13 @@ checks:
     expect: exit 0
     files: [.hivemind/config.toon, scripts/structure.map, docs/adoption.md, README.md]
 suite: node --test tests/*.test.mjs
+task-1: done 2026-11-02T17:09:03+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task1-verify-r1.md
+task-5: done 2026-11-02T17:08:30+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task5-verify-r2.md
+task-2: done 2026-11-07T11:14:10+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task2-verify-r1.md
+task-4: done 2026-11-07T11:13:47+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task4-verify-r3.md
+task-3: done 2026-11-07T11:29:15+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task3-verify-r2.md
+task-6: done 2026-11-07T12:00:01+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task6-verify-r2.md
+task-7: done 2026-11-07T12:13:50+11:00 by project-orchestrator record: .hivemind/logbook/2026-11-02-po-p6-productization-task7-verify-r1.md
 -->
 
 ## Ruled at kickoff (binding; recorded on the P6 row)
@@ -134,9 +141,9 @@ suite: node --test tests/*.test.mjs
 **Depends on:** nothing
 **Provides:** `machineDirOf(flagValue)` → path; `machineRegistryPath(dir)`; `readMachineRegistry(dir)` → array of entry objects `{ repo, commit, date }`; `writeMachineRegistry(dir, entries)` (atomicWrite); drift-line computation used by init; `--machine <dir>` flag parsed by `cmdInit`.
 
-- [ ] Step: add to `cmdInit`'s flag spec: `machine: { type: 'string' }`;
+- [x] Step: add to `cmdInit`'s flag spec: `machine: { type: 'string' }`;
   `machineDirOf(v)` resolves `v` if given, else `path.join(os.homedir(), '.bee')`.
-- [ ] Step: registry store at `<machine>/registry.toon`. File shape
+- [x] Step: registry store at `<machine>/registry.toon`. File shape
   (TOON, header comments + one line per repo):
 
 ```text (shape — baked into bee.js as constants)
@@ -152,7 +159,7 @@ suite: node --test tests/*.test.mjs
   the CLI's own store writers emit (`INBOX_HEADER`, `GLOSSARY_HEADER` —
   review r1 J4: a divergent seed header would be silently replaced at
   the first add).
-- [ ] Step: after the existing skills-registration step in `cmdInit`
+- [x] Step: after the existing skills-registration step in `cmdInit`
   (both check and write modes), init reports the machine-store state.
   Write mode also ensures the registry entry: current harness commit =
   `git rev-parse HEAD` executed in `REPO_ROOT` (the PINNED commit at
@@ -166,16 +173,16 @@ bee init: harness <registered-short> · head <head-short> · DRIFTED (pull + bee
 bee init: machine store: not registered (run without --check to add <repo-abs-path>)              (--check only, absent entry)
 ```
 
-- [ ] Step: `--check` reports the drift/registry lines WITHOUT writing
+- [x] Step: `--check` reports the drift/registry lines WITHOUT writing
   the registry file. Exit code unchanged by drift (0) — drift is
   informational (D3).
-- [ ] Step: hygiene (review r1 J6) — every write-mode `init` call in
+- [x] Step: hygiene (review r1 J6) — every write-mode `init` call in
   the EXISTING `tests/bee.test.mjs` gains `--machine <tmp>` (a tmp dir
   per test), so the suite never writes the real `~/.bee/` (the
   unconditional registry-ensure would otherwise touch the user's home
   on every suite run; the dogfood write in task 7 is the ONE
   intentional real-machine write).
-- [ ] Step: create `tests/bee-machine.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-machine.test.mjs` (verbatim below) and run
   `node --test tests/bee-machine.test.mjs` — all pass.
 
 ```javascript path=tests/bee-machine.test.mjs
@@ -270,7 +277,7 @@ test('registry survives unrelated lines (read-modify-write keeps them)', () => {
 });
 ```
 
-- [ ] Commit: `bee init: machine registry + drift pins`
+- [x] Commit: `bee init: machine registry + drift pins`
 
 ## Task 2: init contract — green-fields-first + consumer scaffolding
 
@@ -278,9 +285,9 @@ test('registry survives unrelated lines (read-modify-write keeps them)', () => {
 **Depends on:** task 1 (registry/drift already wired)
 **Provides:** `consumerRepoRoot()` (cwd-based, common-dir aware); scaffold steps in `cmdInit`; `config.toon` default content; empty-store headers; `--repo <dir>` flag as the consumer-repo test seam (tests never chdir; default = `process.cwd()`).
 
-- [ ] Step: add `repo: { type: 'string' }` to `cmdInit` flags; resolved
+- [x] Step: add `repo: { type: 'string' }` to `cmdInit` flags; resolved
   consumer repo = `f.values.repo ? path.resolve(f.values.repo) : process.cwd()`.
-- [ ] Step: repo-root resolution, in order (worktree edge, PL-PO-002
+- [x] Step: repo-root resolution, in order (worktree edge, PL-PO-002
   ruling): run `git rev-parse --path-format=absolute --git-common-dir`
   in the consumer dir. Not a repo → GREEN-FIELDS path (below). A repo →
   main-checkout test: the repo root is the common dir's dirname; if the
@@ -291,12 +298,12 @@ test('registry survives unrelated lines (read-modify-write keeps them)', () => {
 bee init: running inside a worktree — return to the main worktree (<main-root>) and branch there, then re-run
 ```
 
-- [ ] Step: GREEN-FIELDS: no git in the consumer dir → `git init`
+- [x] Step: GREEN-FIELDS: no git in the consumer dir → `git init`
   (execFileSync, `cwd` = consumer dir; fail loud with git's stderr and
   exit 1 if git is missing — structured error, no guessing). Output:
   `bee init: created git repository at <path>`. NO first commit
   (decision 8); the scaffold summary carries the next-step line.
-- [ ] Step: scaffolding, check-and-do per item, each printing
+- [x] Step: scaffolding, check-and-do per item, each printing
   `scaffolded <path>` or `exists: <path>` (write mode) and
   `would scaffold <path>` / `exists: <path>` (`--check` mode, writes
   nothing). Item list, in order:
@@ -347,12 +354,12 @@ gates :: SOUL/identity · irreversible acts · direction beyond the design · co
      consumer repo's `roles/` (as-is, D1 ruling; P8 sweeps);
   10. `.gitignore` — create if absent, else append if the line is
       missing: `.hivemind/sessions/`.
-- [ ] Step: harness-repo skip (decision 2): when the resolved consumer
+- [x] Step: harness-repo skip (decision 2): when the resolved consumer
   repo equals `REPO_ROOT`, print
   `bee init: harness repo — scaffolding + managed block skipped` and
   skip items 1–10 and task 3's block (registry + drift still ran in
   task 1's step). Dogfood assertions ride this rule.
-- [ ] Step: create `tests/bee-init.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-init.test.mjs` (verbatim below) and run
   `node --test tests/bee-init.test.mjs` — all pass.
 
 ```javascript path=tests/bee-init.test.mjs
@@ -471,7 +478,7 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
 });
 ```
 
-- [ ] Commit: `bee init: green-fields scaffold per P6 rulings`
+- [x] Commit: `bee init: green-fields scaffold per P6 rulings`
 
 ## Task 3: MANAGED AGENTS.md BLOCK
 
@@ -479,7 +486,7 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
 **Depends on:** task 2 (scaffold step order; harness-skip rule)
 **Provides:** `ensureManagedBlock(repoRoot)` — create-if-absent, idempotent regen, fail-loud on corrupt fences; wired as init's final scaffold step (runs on every init, after item 10; skipped for the harness repo).
 
-- [ ] Step: block content (verbatim — pointer-only until P8's PL-PP-006
+- [x] Step: block content (verbatim — pointer-only until P8's PL-PP-006
   distillation; decisions 2 + 5):
 
 ```text path=AGENTS.md managed block (exact fenced content)
@@ -490,7 +497,7 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
 <!-- bee:managed:end -->
 ```
 
-- [ ] Step: `ensureManagedBlock(repoRoot)` behavior:
+- [x] Step: `ensureManagedBlock(repoRoot)` behavior:
   - no `AGENTS.md` → create it with a one-line header
     (`# AGENTS.md — <Project>`) + blank line + the block; report
     `managed block: created AGENTS.md`;
@@ -502,10 +509,10 @@ test('harness repo: skip line, no scaffold writes beyond registry', () => {
   - exactly one fence → structured error, exit 1:
     `bee init: corrupt managed block in <path> — found one fence, expected a start/end pair; fix by hand`;
   - never write anything outside the fences (marker-surgery seam law).
-- [ ] Step: wire into `cmdInit` after scaffold item 10 (write mode
+- [x] Step: wire into `cmdInit` after scaffold item 10 (write mode
   executes it; `--check` reports `managed block: <state>` without
   writing).
-- [ ] Step: create `tests/bee-agents.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-agents.test.mjs` (verbatim below) and run
   `node --test tests/bee-agents.test.mjs` — all pass.
 
 ```javascript path=tests/bee-agents.test.mjs
@@ -597,7 +604,7 @@ test('single fence: fail loud, no writes', () => {
 });
 ```
 
-- [ ] Commit: `bee init: managed AGENTS.md block, fence-safe`
+- [x] Commit: `bee init: managed AGENTS.md block, fence-safe`
 
 ## Task 4: `bee suggest` — project-local + harness channel
 
@@ -605,10 +612,10 @@ test('single fence: fail loud, no writes', () => {
 **Depends on:** task 1 (`--machine` seam, machine dir helpers)
 **Provides:** `bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>] [--store <path>] [--machine <dir>]` — USAGE line added to the top-level usage block.
 
-- [ ] Step: local default = `bee inbox add` semantics (addressee
+- [x] Step: local default = `bee inbox add` semantics (addressee
   `keeper`, origin from `--origin` else `agent`, text as given); output
   mirrors inbox add's confirmation (reuse `inboxAddItem`).
-- [ ] Step: `--harness` files one TOON document at
+- [x] Step: `--harness` files one TOON document at
   `<machine>/suggestions/<repo-name>/NNNN-<slug>.toon` where
   `<repo-name>` = basename of the consumer repo (cwd), NNNN = next
   number in that folder (zero-padded 4), slug = kebab-case of the first
@@ -624,10 +631,10 @@ harness :: <harness short sha>
 text :: <the suggestion text, one or more lines>
 ```
 
-- [ ] Step: output (AXI 4/9):
+- [x] Step: output (AXI 4/9):
   `bee suggest: filed <machine>/suggestions/<repo>/NNNN-<slug>.toon (#<NNNN>) · triage happens harness-side` — and exit 0.
   Empty text / missing quotes: structured error + usage, exit 1.
-- [ ] Step: create `tests/bee-suggest.test.mjs` (verbatim below) and run
+- [x] Step: create `tests/bee-suggest.test.mjs` (verbatim below) and run
   `node --test tests/bee-suggest.test.mjs` — all pass.
 
 ```javascript path=tests/bee-suggest.test.mjs
@@ -693,7 +700,7 @@ test('empty text: structured error, exit 1', () => {
 });
 ```
 
-- [ ] Commit: `bee suggest: local + harness feedback channel`
+- [x] Commit: `bee suggest: local + harness feedback channel`
 
 ## Task 5: `bee worktree` — fold the script into the CLI
 
@@ -701,7 +708,7 @@ test('empty text: structured error, exit 1', () => {
 **Depends on:** nothing (parallel-safe with tasks 1–4)
 **Provides:** `bee worktree create <phase>-<slug> | merge <slug> | abandon <slug>`; USAGE line in the top-level usage block.
 
-- [ ] Step: port `scripts/worktree.sh`'s three subcommands to Node in
+- [x] Step: port `scripts/worktree.sh`'s three subcommands to Node in
   `bin/bee.js` (`cmdWorktree`). The script is the spec — semantics,
   validation order, error classes (usage exit 1; not-a-phase-branch
   exit 2; branch/worktree already-exists exit 3; no-match and
@@ -711,12 +718,12 @@ test('empty text: structured error, exit 1', () => {
   script does (dirname of `--git-common-dir`), never from REPO_ROOT.
   stdout of `create` carries only the worktree path; git chatter goes
   to stderr (match the script).
-- [ ] Step: port the test cases from `tests/worktree-sh.test.mjs` to
+- [x] Step: port the test cases from `tests/worktree-sh.test.mjs` to
   `tests/bee-worktree.test.mjs`: same scenarios and assertions, invoked
   as `run(['worktree', 'create', ...])` etc.; where the suite ran the
   script with `bash`, run `bee` in-process instead. Then delete
   `tests/worktree-sh.test.mjs` and `scripts/worktree.sh`.
-- [ ] Step: sweep the live references (review r1 J7 — three, not one):
+- [x] Step: sweep the live references (review r1 J7 — three, not one):
   (a) `skills/loop/bee-loop/assets/dispatch-brief-template.md` names
   `scripts/worktree.sh create <phase>-<slug>` — rewrite that phrase to
   `bee worktree create <phase>-<slug>` (the template's other text
@@ -733,9 +740,16 @@ test('empty text: structured error, exit 1', () => {
   review r2 J2. (Records under `.hivemind/plans|logbook|sessions` keep
   the old name as history; `.pi/handoff-*` is an ephemeral crash-brief
   replaced at the next handoff write — out of scope.)
-- [ ] Step: run `node --test tests/bee-worktree.test.mjs` — all pass;
+- [x] Step: run `node --test tests/bee-worktree.test.mjs` — all pass;
   full suite still green (`node --test tests/*.test.mjs`).
-- [ ] Commit: `bee worktree: fold helper script into CLI`
+- [x] Commit: `bee worktree: fold helper script into CLI`
+
+  Task notes: review r1 (task5-review-r1) verdict FIX-FIRST on one
+  should-fix (prefix-match in worktreeOfBranch → wrong-worktree
+  removal). Fix round 1: reviewer's one-token exact-match fix applied
+  near-verbatim + permanent regression test; verify r2 carries the
+  probe. Re-review waived — near-verbatim fix + probe replicated
+  (verify r2 body).
 
 ## Task 6: AXI compliance pass
 
@@ -743,7 +757,7 @@ test('empty text: structured error, exit 1', () => {
 **Depends on:** tasks 1–5 (audits the final command set)
 **Provides:** an audit table recorded in this task's verify entry; fixes for every gap found.
 
-- [ ] Step: audit every command family against the ten principles
+- [x] Step: audit every command family against the ten principles
   (`docs/AXI.md`): report · init · inbox · park · memory · design ·
   capture · logbook · glossary · verify · task · guidance · phase ·
   suggest · worktree. The judgment this step keeps (not scriptable):
@@ -751,7 +765,7 @@ test('empty text: structured error, exit 1', () => {
   Write the table (command × principle × verdict × action) into the
   verify record at task end — the table IS the deliverable, fixes ride
   it.
-- [ ] Step: guided findings, pre-named (audit may add):
+- [x] Step: guided findings, pre-named (audit may add):
   - principle 5 (definitive empty states): every list surface prints an
     explicit `0 <noun>` line when empty — check each;
   - principle 9 (contextual disclosure): apply to MUTATION outputs
@@ -760,19 +774,19 @@ test('empty text: structured error, exit 1', () => {
   - principle 10 (consistent help): every command family carries a
     per-subcommand usage block reachable the same way (`<cmd>` misuse
     prints it; `help` lists all).
-- [ ] Step: fix every gap the table marks; keep behavior changes tested
+- [x] Step: fix every gap the table marks; keep behavior changes tested
   (extend the command's existing test file where one exists; new gaps
   without a test file get assertions added to the closest one).
-- [ ] Step: run the full suite `node --test tests/*.test.mjs` — green;
+- [x] Step: run the full suite `node --test tests/*.test.mjs` — green;
   record the audit table + fix list in the verify entry body.
-- [ ] Commit: `AXI pass: close compliance gaps across bee commands`
+- [x] Commit: `AXI pass: close compliance gaps across bee commands`
 
 ## Task 7: adoption doc + README + dogfood + map
 
 **Files:** create `docs/adoption.md` · modify `README.md` · modify `scripts/structure.map` · create `.hivemind/config.toon`
 **Depends on:** tasks 1–6 (dogfood exercises the finished contract)
 
-- [ ] Step: create `docs/adoption.md` (verbatim below).
+- [x] Step: create `docs/adoption.md` (verbatim below).
 
 ```markdown path=docs/adoption.md
 # Adopting BeeHarness

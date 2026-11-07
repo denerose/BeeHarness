@@ -55,6 +55,7 @@ machine. See `SOUL.md`.
   binding for `bee`), `WRITING-STANDARD.md` (how behavior documents
   are written), `guidance/` (working-discipline how-tos, read via
   `bee guidance`)
+- `docs/adoption.md` — how a consuming repo adopts the harness
 - `roles/` — role specs (power-planner, project-orchestrator, task-orc)
 - `.hivemind/` — the hive's working space; purposes per class live in
   the design doc's artifacts map

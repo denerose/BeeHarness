@@ -436,3 +436,16 @@ test('unparseable store line fails loud (hand-fix message)', () => {
   assert.match(r.err, /cannot parse/);
   assert.match(r.err, /hand-fix/);
 });
+
+// ---- AXI pass (P6 task 6): convert mutation hint ----
+
+test('convert output carries the next step (AXI 9)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bee-gl-axi-'));
+  const md = path.join(dir, 'g.md');
+  fs.writeFileSync(md, '- **term** — a gist\n');
+  const p = path.join(dir, 'store.toon');
+  const v = path.join(dir, 'view.md');
+  const r = run(['glossary', 'convert', md, '--store', p, '--view', v]);
+  assert.equal(r.code, 0, r.err);
+  assert.match(r.out, /next: bee glossary lists the terms\n$/);
+});

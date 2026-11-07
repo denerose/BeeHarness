@@ -1,0 +1,26 @@
+# decisions — P6 close inventory (plan: 2026-11-02-po-p6-productization)
+# one line per decision: id · one-line · source-record-path
+phase: P6
+plan: .hivemind/plans/2026-11-02-po-p6-productization.md
+count: 19
+assembled: 2026-11-07T12:16:20+11:00 by project-orchestrator
+
+D1 · kickoff: no consumers before P8 — shipped-file seam moot · .hivemind/plans/2026-11-02-po-p6-productization.md
+D2 · kickoff: one phase; tasks carry the split · .hivemind/plans/2026-11-02-po-p6-productization.md
+D3 · kickoff (via PP relay @ cfb8272): version pins = registered-commit record + informational drift line · .hivemind/plans/2026-11-02-po-p6-productization.md
+D4 · kickoff: docs MINIMAL — one adoption doc + README pointer · .hivemind/plans/2026-11-02-po-p6-productization.md
+D5 · plan-time: --machine/--settings/--repo test seams; machine dir ~/.bee final · .hivemind/plans/2026-11-02-po-p6-productization.md
+D6 · plan-time: consumer default level L1; harness config L0 by hand · .hivemind/plans/2026-11-02-po-p6-productization.md
+D7 · plan-time: HTML-comment fences for the managed block · .hivemind/plans/2026-11-02-po-p6-productization.md
+D8 · plan-time: suggest local = inbox add; curated suggestion docs stay separate · .hivemind/plans/2026-11-02-po-p6-productization.md
+D9 · plan-time: consumer stores ship at init (empty, canonical headers) · .hivemind/plans/2026-11-02-po-p6-productization.md
+D10 · plan-time: green-fields git init, NO auto first-commit · .hivemind/plans/2026-11-02-po-p6-productization.md
+D11 · review-driven (task5 r1): porcelain branch match is EXACT, not prefix · .hivemind/logbook/2026-11-02-po-p6-productization-task5-verify-r2.md
+D12 · review-driven (task4 r1 blocking): suggest local default is PROJECT-LOCAL (cwd repo root) · .hivemind/logbook/2026-11-02-po-p6-productization-task4-verify-r2.md
+D13 · review-driven (task4 r2): non-default store named in the follow-up hint · .hivemind/logbook/2026-11-02-po-p6-productization-task4-verify-r3.md
+D14 · implementation design (task2, review-ruled within intent): harness skip by COMMON DIR; registry keyed by resolved root · .hivemind/logbook/2026-11-02-po-p6-productization-task2-review-r1.md
+D15 · review-driven (task3 r1): unreadable AGENTS.md = structured cannot-read error · .hivemind/logbook/2026-11-02-po-p6-productization-task3-verify-r2.md
+D16 · review-driven (task6 r1 blocking): verify's task-move hint gates on !anyFail · .hivemind/logbook/2026-11-02-po-p6-productization-task6-review-r1.md
+D17 · review-driven (task6 r1): populated read outputs stay lean (pointer lines dropped) · .hivemind/logbook/2026-11-02-po-p6-productization-task6-verify-r1.md
+D18 · review-driven (task6): worktree next-step hints ride stderr (stdout is machine contract) · .hivemind/logbook/2026-11-02-po-p6-productization-task6-verify-r1.md
+D19 · dogfood (task7): worktree-dispatch deviation accepted; merge-close obligation — delete dangling skills entry + re-register from main · .hivemind/logbook/2026-11-02-po-p6-productization-task7-verify-r1.md

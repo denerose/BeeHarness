@@ -116,7 +116,8 @@ test('bare bee phase lists phases (content first, aggregate header)', () => {
   assert.equal(r.code, 0);
   assert.match(r.out, /^1 phase\n/);
   assert.match(r.out, new RegExp(`P4 · ${PLAN_SLUG} · fixture close plan`));
-  assert.match(r.out, /next: bee phase close <phase-id> --check/);
+  // populated list output stays lean (AXI P1/P9 split — review r1)
+  assert.ok(!r.out.includes('next:'));
 });
 
 test('list: definitive empty state over a bare dir', () => {
@@ -406,6 +407,8 @@ test('close: full scripted run — no-ff merge, rest, delete, card, push', () =>
   assert.match(r.out, /flag: under-asked kickoff — front-load harder next phase/);
   // push: origin/main advanced to the merge
   assert.match(r.out, /6 · push · origin main · pushed/);
+  // AXI 9: the mutation output ends with one next-step line
+  assert.match(r.out, /next: bee phase list shows what remains\n$/);
   assert.equal(fx.git('rev-parse origin/main').trim(),
     fx.git('rev-parse main').trim());
   // no leftover worktrees beyond main + the rested persistent one

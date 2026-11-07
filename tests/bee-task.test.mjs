@@ -529,3 +529,23 @@ test('--full untruncates long task titles (review r1 SF2 regression)', () => {
   const full = run(['task', 'show', plan, '--full']);
   assert.ok(full.out.includes(longTitle));
 });
+
+// ---- AXI pass (P6 task 6): move mutation hint ----
+test('move output carries the next step (AXI 9)', () => {
+  const dir = tmpDir();
+  const { plan } = writePlan(dir);
+  const rec = path.join(dir, 'entry.md');
+  fs.writeFileSync(rec, 'entry\n');
+  const r = run(['task', 'move', plan, '1', 'done', '--record', rec]);
+  assert.equal(r.code, 0, r.err);
+  const planRe = plan.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  assert.match(r.out,
+    new RegExp('^task-1 done · \\S+ by bee\n' +
+      `plan: ${planRe}\nnext: bee task show ${planRe}\n$`));
+  // --check previews the move: no next-step hint
+  const p2 = writePlan(tmpDir());
+  const check = run(['task', 'move', p2.plan, '2', 'implemented',
+    '--check']);
+  assert.equal(check.code, 0, check.err);
+  assert.ok(!check.out.includes('next:'));
+});

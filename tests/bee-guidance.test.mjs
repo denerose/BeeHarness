@@ -113,8 +113,8 @@ test('list: one-liner skips the heading; non-md files ignored', () => {
   const r = run(['guidance', 'list', '--dir', dir]);
   assert.equal(r.code, 0);
   assert.equal(r.out, `1 topics\n` +
-    `alpha · Purpose line of topic A.\n` +
-    `show one: bee guidance show <topic>\n`);
+    `alpha · Purpose line of topic A.\n`);
+  // populated list output stays lean (AXI P1/P9 split — review r1)
 });
 
 test('truncation with size hint; --full relieves it', () => {

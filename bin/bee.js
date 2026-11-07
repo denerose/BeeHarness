@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // bee — BeeHarness CLI. `bee report`, `bee init`, `bee inbox`,
-// `bee capture`, `bee park`, `bee memory`, `bee design`, `bee verify`,
-// `bee logbook`, `bee glossary`, `bee task`, `bee guidance`, `bee phase`.
+// `bee capture`, `bee suggest`, `bee park`, `bee memory`, `bee design`,
+// `bee verify`, `bee logbook`, `bee glossary`, `bee task`, `bee guidance`,
+// `bee phase`, `bee worktree`.
 // Specs: ADR-008 (keeper report zones/protocol), ADR-005 amendment
 // (plugin registration), ADR-014 + docs/AXI.md (agent-first CLI),
 // ADR-016 (design state machine — delegated to scripts/design.sh).
@@ -28,7 +29,7 @@ const USAGE = `bee ${VERSION} — BeeHarness CLI
 
 usage:
   bee report [--check] [--status <path>] [--report <path>] [--store <path>]
-  bee init   [--check] [--settings <path>]
+  bee init   [--check] [--settings <path>] [--machine <dir>] [--repo <dir>]
   bee inbox  [list [--for <addressee>] [--full]]
              | add <addressee> <text> [--origin <role>] [--ref <path>]
              | show <id> [--full] | done <id> [--note <how>]
@@ -47,6 +48,8 @@ usage:
              | pick-up <doc> --phase <n> [--check]
              | implement <doc> --phase <n> --merge <hash> [--check]
   bee capture "<thought>"
+  bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>]
+              [--store <path>] [--machine <dir>]
   bee logbook [index [--logbook <dir>]]
              | stamp [--logbook <dir>]
              | compact <phase> [--logbook <dir>]
@@ -61,6 +64,9 @@ usage:
   bee phase  [list [--full]]
              | inventory <phase-id> --decisions <file> [--origin <role>]
              | close <phase-id> [--check]
+  bee worktree create <phase>-<slug>
+             | merge <slug>
+             | abandon <slug>
   bee help | version
 
   --check   never write; report what would happen
@@ -97,6 +103,9 @@ export function run(argv) {
   if (cmd === 'capture') {
     return cmdCapture(rest);
   }
+  if (cmd === 'suggest') {
+    return cmdSuggest(rest);
+  }
   if (cmd === 'logbook') {
     return cmdLogbook(rest);
   }
@@ -114,6 +123,9 @@ export function run(argv) {
   }
   if (cmd === 'phase') {
     return cmdPhase(rest);
+  }
+  if (cmd === 'worktree') {
+    return cmdWorktree(rest);
   }
   return { code: 1, out: '', err: `bee: unknown command '${cmd}'\n\n` + USAGE };
 }
@@ -140,13 +152,531 @@ function tildeForm(p) {
     : p;
 }
 
+// ---- machine store (P6, task 1) -------------------------------------
+// One registry per machine dir (default ~/.bee), keyed by absolute
+// repo path; entries pin the harness commit at registration (D3).
+// Drift (registered commit vs REPO_ROOT head) is informational on
+// every init run — exit code unchanged; --check reports only.
+
+const MACHINE_REGISTRY_HEADER =
+  '# bee machine registry — one line per harnessed repo\n' +
+  '# repo :: <absolute path> :: commit <sha at registration> :: ' +
+  '<ISO date>\n';
+
+function machineDirOf(v) {
+  return v ? path.resolve(v) : path.join(os.homedir(), '.bee');
+}
+
+function machineRegistryPath(dir) {
+  return path.join(dir, 'registry.toon');
+}
+
+// Read: `#` lines ignored; absent/empty file = zero entries (the
+// file is created on first write only). Well-formed entry lines are
+// `<repo> :: commit <sha> :: <date>`; anything else drops on the
+// next write.
+function readMachineRegistry(dir) {
+  let text;
+  try {
+    text = fs.readFileSync(machineRegistryPath(dir), 'utf8');
+  } catch (e) {
+    if (e.code === 'ENOENT') return [];
+    throw e;
+  }
+  const entries = [];
+  for (const line of text.split('\n')) {
+    if (!line || line.startsWith('#')) continue;
+    const parts = line.split(' :: ');
+    if (parts.length < 3 || !parts[1].startsWith('commit ')) continue;
+    entries.push({
+      repo: parts[0],
+      commit: parts[1].slice('commit '.length),
+      date: parts[2],
+    });
+  }
+  return entries;
+}
+
+function writeMachineRegistry(dir, entries) {
+  fs.mkdirSync(dir, { recursive: true });
+  const body = entries
+    .map((e) => `${e.repo} :: commit ${e.commit} :: ${e.date}`)
+    .join('\n');
+  atomicWrite(machineRegistryPath(dir),
+    MACHINE_REGISTRY_HEADER + body + (body ? '\n' : ''));
+}
+
+function shortSha(sha) {
+  return sha.slice(0, 7);
+}
+
+// Runs after the skills-registration step in both modes. Write mode
+// ensures this repo's entry (update-in-place, never a duplicate);
+// check mode reports only. Drift never changes the exit code — only
+// a structured failure (harness commit unread) does. Keyed by the
+// resolved consumer repo root (task 2's --repo seam; cwd default).
+function machineStoreReport(machineFlag, check, repo) {
+  const dir = machineDirOf(machineFlag);
+  const headR = spawnSync('git', ['rev-parse', 'HEAD'],
+    { cwd: REPO_ROOT, encoding: 'utf8' });
+  if (headR.status !== 0) {
+    return {
+      code: 1,
+      out: '',
+      err: `bee init: cannot read harness commit in ${REPO_ROOT}: ` +
+        `${(headR.stderr || '').trim()}\n`,
+    };
+  }
+  const head = headR.stdout.trim();
+  const entries = readMachineRegistry(dir);
+  const prior = entries.find((e) => e.repo === repo);
+  let out = '';
+  if (prior !== undefined) {
+    out += prior.commit === head
+      ? `bee init: harness ${shortSha(prior.commit)} · head ` +
+        `${shortSha(head)} · in sync\n`
+      : `bee init: harness ${shortSha(prior.commit)} · head ` +
+        `${shortSha(head)} · DRIFTED (pull + bee init to re-register)\n`;
+  }
+  if (!check) {
+    const entry = { repo, commit: head, date: new Date().toISOString() };
+    const next = [...entries];
+    const at = next.findIndex((e) => e.repo === repo);
+    if (at === -1) {
+      next.push(entry);
+    } else {
+      next[at] = entry;
+    }
+    writeMachineRegistry(dir, next);
+    out += `bee init: machine registry: ${machineRegistryPath(dir)} ` +
+      `— registered ${repo} @ ${shortSha(head)}\n`;
+    if (prior === undefined) {
+      // A fresh registration is in sync by construction — say so,
+      // so drift reporting doesn't wait for the second run.
+      out += `bee init: harness ${shortSha(head)} · head ` +
+        `${shortSha(head)} · in sync\n`;
+    }
+  } else if (prior === undefined) {
+    out += `bee init: machine store: not registered ` +
+      `(run without --check to add ${repo})\n`;
+  }
+  return { code: 0, out, err: '' };
+}
+
+// ---- consumer repo resolution + scaffold (P6, task 2) ---------------
+// `bee init` consumers are OTHER repos (--repo is the test seam;
+// default cwd). Root resolution is common-dir aware (PL-PO-002):
+// the repo root is the git-common-dir's dirname; a consumer dir not
+// under that root sits in a linked worktree — refuse (respect the
+// branch, not the worktree), exit 0, write nothing. No git at all →
+// green-fields: git init happens in the scaffold step, no first
+// commit (decision 8). Any checkout of the harness itself (same
+// common dir as REPO_ROOT) takes the harness-skip path (decision 2).
+
+function gitCommonDirOf(cwd) {
+  const r = spawnSync('git', ['rev-parse', '--path-format=absolute',
+    '--git-common-dir'], { cwd, encoding: 'utf8' });
+  if (r.error) {
+    return { err: `bee init: cannot run git in ${cwd}: ` +
+      `${r.error.message}\n` };
+  }
+  if (r.status !== 0) {
+    return { notRepo: true };
+  }
+  return { commonDir: r.stdout.trim() };
+}
+
+function consumerRepoRoot(repoFlag) {
+  const dir = repoFlag ? path.resolve(repoFlag) : process.cwd();
+  const consumer = gitCommonDirOf(dir);
+  if (consumer.err) {
+    return { dir, err: consumer.err };
+  }
+  if (consumer.notRepo) {
+    return { dir, root: dir, greenFields: true };
+  }
+  const root = path.dirname(consumer.commonDir);
+  const harness = gitCommonDirOf(REPO_ROOT);
+  if (harness.err) {
+    return { dir, root, err: harness.err };
+  }
+  if (!harness.notRepo && harness.commonDir === consumer.commonDir) {
+    return { dir, root, harness: true };
+  }
+  if (dir !== root && !dir.startsWith(root + path.sep)) {
+    return {
+      dir, root,
+      refuse: `bee init: running inside a worktree — return to the ` +
+        `main worktree (${root}) and branch there, then re-run\n`,
+    };
+  }
+  return { dir, root };
+}
+
+// Consumer-default config (decision 3: safe default L1; this repo's
+// own L0 lives in .hivemind/config.toon, written by hand in task 7).
+const CONSUMER_CONFIG_DEFAULT =
+  '# bee config — automation level + keeper gates; ' +
+  'level changes are keeper-only\n' +
+  'level :: L1\n' +
+  'gates :: SOUL/identity · irreversible acts · direction beyond ' +
+  'the design · config-named items\n';
+
+const CONSUMER_STATUS_SEED =
+  '# Status — cross-role surface\n' +
+  '\n' +
+  'Open escalations, cross-role notes. Roles read at session start;\n' +
+  'prefix your lines with a role tag.\n';
+
+const HIVEMIND_CLASS_DIRS = ['phases', 'designs', 'plans', 'decisions',
+  'logbook', 'memory', 'suggestions', 'sessions'];
+
+// ---- managed AGENTS.md block (P6, task 3) ---------------------------
+// Marker-fenced, scripted-only (marker-surgery seam law): bytes
+// outside the fences are the project's own and are never rewritten.
+// A fence without its proper pair fails loud — never a guess.
+
+const MANAGED_START = '<!-- bee:managed:start -->';
+const MANAGED_END = '<!-- bee:managed:end -->';
+const MANAGED_BLOCK = [
+  MANAGED_START,
+  '<!-- BeeHarness managed section — regenerated by `bee init`; ' +
+    'everything outside these fences is the project\'s own. -->',
+  '- This project runs BeeHarness. Vocabulary: ' +
+    '`bee glossary <term>` · `bee glossary` lists all.',
+  '- Guidance: `bee guidance list` for topics, ' +
+    '`bee guidance show <topic>` to read one.',
+  MANAGED_END,
+].join('\n');
+
+// Returns { code, out, err, wrote }: `out` is one report line (no
+// trailing newline; `err` carries one). `check` reports the state
+// without writing; `wrote` feeds the scaffold's next-step line.
+// Fence detection is line-exact (trimmed equality): prose quoting
+// a fence mid-line is prose, not a fence.
+function ensureManagedBlock(repoRoot, check) {
+  const agPath = path.join(repoRoot, 'AGENTS.md');
+  let text;
+  try {
+    text = fs.readFileSync(agPath, 'utf8');
+  } catch (e) {
+    if (e.code !== 'ENOENT') {
+      // Unexpected read failure (e.g. AGENTS.md is a directory) —
+      // structured error per house convention, never a raw stack
+      // (review r1 should-fix).
+      return {
+        code: 1, out: '', wrote: false,
+        err: `bee init: cannot read ${agPath}: ${e.message}\n`,
+      };
+    }
+    // No AGENTS.md: one-line header + blank line + the block.
+    if (!check) {
+      atomicWrite(agPath,
+        `# AGENTS.md — ${path.basename(repoRoot)}\n\n` +
+        MANAGED_BLOCK + '\n');
+    }
+    return {
+      code: 0, wrote: !check, err: '',
+      out: check ? 'managed block: would create AGENTS.md'
+        : 'managed block: created AGENTS.md',
+    };
+  }
+
+  const lines = text.split('\n');
+  const starts = lines.filter((l) => l.trim() === MANAGED_START).length;
+  const ends = lines.filter((l) => l.trim() === MANAGED_END).length;
+  if (starts === 0 && ends === 0) {
+    // Existing file, no fences: append blank line + the block.
+    if (!check) {
+      const base = text.endsWith('\n') || text === '' ? text : text + '\n';
+      atomicWrite(agPath, base + '\n' + MANAGED_BLOCK + '\n');
+    }
+    return {
+      code: 0, wrote: !check, err: '',
+      out: check ? 'managed block: would append'
+        : 'managed block: appended',
+    };
+  }
+
+  // Anything but exactly one start before exactly one end is
+  // corrupt — structured error, nothing written.
+  const s = lines.findIndex((l) => l.trim() === MANAGED_START);
+  const e = lines.findIndex((l) => l.trim() === MANAGED_END);
+  if (!(starts === 1 && ends === 1 && s < e)) {
+    const n = starts + ends;
+    const found = n === 1 ? 'one fence' : `${n} fences`;
+    return {
+      code: 1, out: '', wrote: false,
+      err: `bee init: corrupt managed block in ${agPath} — found ` +
+        `${found}, expected a start/end pair; fix by hand\n`,
+    };
+  }
+
+  // Fences present: replace ONLY the between-fences lines, and
+  // only when they differ from canonical (idempotent regen).
+  const inner = MANAGED_BLOCK.split('\n').slice(1, -1);
+  if (lines.slice(s + 1, e).join('\n') === inner.join('\n')) {
+    return { code: 0, wrote: false, err: '',
+      out: 'managed block: current' };
+  }
+  if (!check) {
+    atomicWrite(agPath,
+      [...lines.slice(0, s + 1), ...inner, ...lines.slice(e)]
+        .join('\n'));
+  }
+  return {
+    code: 0, wrote: !check, err: '',
+    out: check ? 'managed block: would update'
+      : 'managed block: updated',
+  };
+}
+
+// Check-and-do scaffold for the consumer repo. One line per item —
+// exists:/scaffolded (write mode), exists:/would scaffold (--check,
+// which writes nothing). The harness-repo skip replaces every
+// per-item line (decision 2; registry + drift already ran above).
+function scaffoldReport(consumer, check) {
+  if (consumer.harness) {
+    return { code: 0,
+      out: 'bee init: harness repo — scaffolding + managed block ' +
+        'skipped\n' +
+        (check ? '' : 'bee init: next — bee init --check reports ' +
+          'registration + drift\n'),
+      err: '' };
+  }
+  // Pre-flight the harness sources this scaffold copies from — a
+  // broken harness fails loud before any item write, never
+  // half-scaffolded.
+  const phasesSrc = path.join(REPO_ROOT, '.hivemind', 'phases',
+    'TEMPLATE.md');
+  const designsSrc = path.join(REPO_ROOT, '.hivemind', 'designs',
+    'TEMPLATE.md');
+  const rolesSrc = path.join(REPO_ROOT, 'roles');
+  for (const src of [phasesSrc, designsSrc]) {
+    if (!fs.existsSync(src)) {
+      return { code: 1, out: '',
+        err: `bee init: harness template missing: ${src}\n` };
+    }
+  }
+  if (!fs.existsSync(rolesSrc)) {
+    return { code: 1, out: '',
+      err: `bee init: harness roles directory missing: ${rolesSrc}\n` };
+  }
+
+  const repoRoot = consumer.root;
+  const lines = [];
+  let touched = false;
+  const step = (rel, present, write) => {
+    if (present) {
+      lines.push(`exists: ${rel}`);
+      return;
+    }
+    if (check) {
+      lines.push(`would scaffold ${rel}`);
+      return;
+    }
+    write();
+    touched = true;
+    lines.push(`scaffolded ${rel}`);
+  };
+
+  // Green-fields: git init, no first commit (decision 8) — the
+  // next-step line below suggests it.
+  if (consumer.greenFields) {
+    if (check) {
+      lines.push(`bee init: would create git repository at ${repoRoot}`);
+    } else {
+      const r = spawnSync('git', ['init'],
+        { cwd: repoRoot, encoding: 'utf8' });
+      if (r.error) {
+        return { code: 1, out: '',
+          err: `bee init: cannot run git in ${repoRoot}: ` +
+            `${r.error.message}\n` };
+      }
+      if (r.status !== 0) {
+        return { code: 1, out: '',
+          err: `bee init: git init failed in ${repoRoot}: ` +
+            `${(r.stderr || '').trim()}\n` };
+      }
+      touched = true;
+      lines.push(`bee init: created git repository at ${repoRoot}`);
+    }
+  }
+
+  // 1. docs/ + docs/research/ (references-home): an existing docs/
+  //    keeps its shape and gains research/; a missing one ships with
+  //    a .gitkeep (an empty dir alone does not survive git).
+  const docsDir = path.join(repoRoot, 'docs');
+  if (fs.existsSync(docsDir)) {
+    const research = path.join(docsDir, 'research');
+    step('docs/research', fs.existsSync(research), () => {
+      fs.mkdirSync(research, { recursive: true });
+    });
+  } else {
+    step('docs', false, () => {
+      fs.mkdirSync(docsDir, { recursive: true });
+      atomicWrite(path.join(docsDir, '.gitkeep'), '');
+    });
+  }
+
+  // 2. .hivemind class dirs.
+  for (const d of HIVEMIND_CLASS_DIRS) {
+    const dir = path.join(repoRoot, '.hivemind', d);
+    step(`.hivemind/${d}`, fs.existsSync(dir), () => {
+      fs.mkdirSync(dir, { recursive: true });
+    });
+  }
+
+  // 3. Phase/design templates, verbatim from the harness repo.
+  step('.hivemind/phases/TEMPLATE.md',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'phases',
+      'TEMPLATE.md')),
+    () => fs.copyFileSync(phasesSrc,
+      path.join(repoRoot, '.hivemind', 'phases', 'TEMPLATE.md')));
+  step('.hivemind/designs/TEMPLATE.md',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'designs',
+      'TEMPLATE.md')),
+    () => fs.copyFileSync(designsSrc,
+      path.join(repoRoot, '.hivemind', 'designs', 'TEMPLATE.md')));
+
+  // 4. Phase list for THIS project: the phases template verbatim.
+  const project = path.basename(repoRoot);
+  step(`.hivemind/phases/${project}.md`,
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'phases',
+      `${project}.md`)),
+    () => fs.copyFileSync(phasesSrc,
+      path.join(repoRoot, '.hivemind', 'phases', `${project}.md`)));
+
+  // 5–8. Born-at-init stores + surfaces. The store seeds use the
+  // same canonical headers the CLI's own writers emit, so a seed
+  // header is never replaced at the first add (review r1 J4).
+  step('.hivemind/inbox.toon',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'inbox.toon')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'inbox.toon'),
+      INBOX_HEADER + '\n'));
+  step('.hivemind/glossary.toon',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'glossary.toon')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'glossary.toon'),
+      GLOSSARY_HEADER + '\n'));
+  step('.hivemind/status.md',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'status.md')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'status.md'),
+      CONSUMER_STATUS_SEED));
+  step('.hivemind/config.toon',
+    fs.existsSync(path.join(repoRoot, '.hivemind', 'config.toon')),
+    () => atomicWrite(path.join(repoRoot, '.hivemind', 'config.toon'),
+      CONSUMER_CONFIG_DEFAULT));
+
+  // 9. Role files, as-is (D1 — no consumers before P8; P8 sweeps).
+  if (!check) {
+    fs.mkdirSync(path.join(repoRoot, 'roles'), { recursive: true });
+  }
+  for (const name of fs.readdirSync(rolesSrc)
+    .filter((n) => n.endsWith('.md')).sort()) {
+    step(`roles/${name}`,
+      fs.existsSync(path.join(repoRoot, 'roles', name)),
+      () => fs.copyFileSync(path.join(rolesSrc, name),
+        path.join(repoRoot, 'roles', name)));
+  }
+
+  // 10. .gitignore carries the sessions line (create or append).
+  const gitignore = path.join(repoRoot, '.gitignore');
+  const SESSIONS_LINE = '.hivemind/sessions/';
+  const hasSessionsLine = () => {
+    try {
+      return fs.readFileSync(gitignore, 'utf8').split('\n')
+        .includes(SESSIONS_LINE);
+    } catch (e) {
+      if (e.code === 'ENOENT') return false;
+      throw e;
+    }
+  };
+  step('.gitignore', hasSessionsLine(), () => {
+    if (fs.existsSync(gitignore)) {
+      const text = fs.readFileSync(gitignore, 'utf8');
+      fs.appendFileSync(gitignore,
+        (text.endsWith('\n') || text === '' ? '' : '\n') +
+        SESSIONS_LINE + '\n');
+    } else {
+      atomicWrite(gitignore, SESSIONS_LINE + '\n');
+    }
+  });
+
+  // Managed block (task 3): init's final scaffold step — after
+  // item 10, before the next-step line; the harness-skip path
+  // above already returned, so the block never runs for the
+  // harness repo. Corrupt fences fail loud (write nothing).
+  const block = ensureManagedBlock(repoRoot, check);
+  if (block.code === 1) {
+    return {
+      code: 1,
+      out: lines.map((l) => l + '\n').join(''),
+      err: block.err,
+    };
+  }
+  lines.push(block.out);
+  if (block.wrote) touched = true;
+
+  if (touched) {
+    lines.push('bee init: next — commit the scaffold ' +
+      '(git add -A && git commit -m "bee init")');
+  } else if (!check) {
+    // AXI P9: every write-mode run ends with one next-step line —
+    // the machine store registered even when nothing scaffolded.
+    lines.push('bee init: next — bee init --check reports ' +
+      'registration + drift');
+  }
+  return { code: 0, out: lines.map((l) => l + '\n').join(''), err: '' };
+}
+
+const INIT_USAGE = `bee init — register + scaffold a repo onto the harness
+
+usage: bee init [--check] [--settings <path>] [--machine <dir>]
+                [--repo <dir>]
+
+  Registers the harness skills path in the pi settings, records
+  the repo in the machine store (registry.toon) with the harness
+  commit, and scaffolds what's missing: .hivemind/ class dirs +
+  templates + born-at-init stores, roles/, and the managed
+  AGENTS.md block (pointer-only; bytes outside the fences are the
+  project's own). Idempotent; --check reports without writing.
+  Refused inside a linked worktree — return to the main worktree.
+
+flags:
+  --check           never write; report registration, drift, scaffold
+  --settings <path> pi settings file
+                    (default ~/.pi/agent/settings.json)
+  --machine <dir>   machine store dir (default ~/.bee)
+  --repo <dir>      consumer repo (test seam; default cwd)
+`;
+
+function initUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + INIT_USAGE };
+}
+
 function cmdInit(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: INIT_USAGE, err: '' };
+  }
   const f = flags(rest, {
     check: { type: 'boolean' },
     settings: { type: 'string' },
+    machine: { type: 'string' },
+    repo: { type: 'string' },
   });
   if (f.error) {
-    return { code: 1, out: '', err: String(f.error) + '\n' };
+    return initUsageErr(f.error);
+  }
+  // Consumer repo resolution precedes every writing step: a linked
+  // worktree refuses (exit 0, nothing written — PL-PO-002).
+  const consumer = consumerRepoRoot(f.values.repo);
+  if (consumer.err) {
+    return { code: 1, out: '', err: consumer.err };
+  }
+  if (consumer.refuse) {
+    return { code: 0, out: consumer.refuse, err: '' };
   }
   const settingsPath = f.values.settings
     ? path.resolve(f.values.settings)
@@ -182,30 +712,45 @@ function cmdInit(rest) {
     (e) => typeof e === 'string' &&
       path.resolve(expandTilde(e)) === target);
 
+  let code, out, err;
   if (hit !== undefined) {
-    return {
-      code: 0,
-      out: `bee init: already registered: ${hit} (${settingsPath})\n`,
-      err: '',
-    };
-  }
-  if (f.values.check) {
-    return {
-      code: 1,
-      out: '',
-      err: `bee init: NOT registered (${tildeForm(skillsDir)}) ` +
-           `— run without --check to add it (${settingsPath})\n`,
-    };
+    code = 0;
+    out = `bee init: already registered: ${hit} (${settingsPath})\n`;
+    err = '';
+  } else if (f.values.check) {
+    code = 1;
+    out = '';
+    err = `bee init: NOT registered (${tildeForm(skillsDir)}) ` +
+      `— run without --check to add it (${settingsPath})\n`;
+  } else {
+    settings.skills = [...entries, tildeForm(skillsDir)];
+    fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
+    atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+    code = 0;
+    out = `bee init: registered ${tildeForm(skillsDir)} in ` +
+      `${settingsPath}\n`;
+    err = '';
   }
 
-  settings.skills = [...entries, tildeForm(skillsDir)];
-  fs.mkdirSync(path.dirname(settingsPath), { recursive: true });
-  atomicWrite(settingsPath, JSON.stringify(settings, null, 2) + '\n');
+  // Machine store runs after the skills step in both modes; drift
+  // never changes the exit code (D3).
+  const machine = machineStoreReport(f.values.machine,
+    !!f.values.check, consumer.root);
+  if (machine.code === 1) {
+    code = 1;
+  }
+
+  // Scaffold (or the harness-repo skip) runs last in both modes;
+  // --check reports without writing. Task 3's managed block hooks
+  // in after scaffold item 10.
+  const scaffold = scaffoldReport(consumer, !!f.values.check);
+  if (scaffold.code === 1) {
+    code = 1;
+  }
   return {
-    code: 0,
-    out: `bee init: registered ${tildeForm(skillsDir)} in ` +
-         `${settingsPath}\n`,
-    err: '',
+    code,
+    out: out + machine.out + scaffold.out,
+    err: err + machine.err + scaffold.err,
   };
 }
 
@@ -385,7 +930,33 @@ function mergeNeeds(derived, oldZone) {
     : all.map((t, i) => `${i + 1}. ${t}`).join('\n');
 }
 
+const REPORT_USAGE = `bee report — regenerate the keeper report (ADR-008 zones)
+
+usage: bee report [--check] [--status <path>] [--report <path>]
+                  [--store <path>]
+
+  Merges open keeper asks (from the inbox store; status bullets
+  only when the store is absent) into the keeper report,
+  preserving the keeper's own zone verbatim and merging the
+  agent zones. --check prints the report it would write.
+
+flags:
+  --check         never write; print the merged report
+  --status <path> status file (default .hivemind/status.md)
+  --report <path> report file (default .hivemind/keeper-report.md)
+  --store <path>  inbox store (default .hivemind/inbox.toon)
+`;
+
+function reportUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + REPORT_USAGE };
+}
+
 function cmdReport(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: REPORT_USAGE, err: '' };
+  }
   const f = flags(rest, {
     check: { type: 'boolean' },
     status: { type: 'string' },
@@ -393,7 +964,7 @@ function cmdReport(rest) {
     store: { type: 'string' },
   });
   if (f.error) {
-    return { code: 1, out: '', err: String(f.error) + '\n' };
+    return reportUsageErr(f.error);
   }
   const statusPath = f.values.status
     ? path.resolve(f.values.status)
@@ -471,7 +1042,8 @@ function cmdReport(rest) {
   atomicWrite(reportPath, out);
   return {
     code: 0,
-    out: `bee report: wrote ${reportPath}\n`,
+    out: `bee report: wrote ${reportPath}\n` +
+      `next: surface ${reportPath} to the keeper\n`,
     err: '',
   };
 }
@@ -834,7 +1406,8 @@ function inboxDone(args) {
   }
   const w = writeInbox(storePath, r.items);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${it.id} done\n`, err: '' };
+  return { code: 0, out: `${it.id} done — bee inbox render refreshes ` +
+    `the status view\n`, err: '' };
 }
 
 // ---- render (P4 Task 2 — the status file's marked inbox region) ----
@@ -961,10 +1534,14 @@ function inboxRender(args) {
       err: `bee inbox render: cannot write ${statusPath}: ${e.message}\n` };
   }
   return { code: 0,
-    out: `bee inbox render: ${res.note} — ${statusPath}\n`, err: '' };
+    out: `bee inbox render: ${res.note} — ${statusPath}\n` +
+      `next: bee report renders the keeper digest\n`, err: '' };
 }
 
 function cmdCapture(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: CAPTURE_USAGE, err: '' };
+  }
   const f = flags(rest, {
     check: { type: 'boolean' },
     store: { type: 'string' },
@@ -987,6 +1564,169 @@ function cmdCapture(rest) {
     check: f.values.check,
     verb: 'captured',
   });
+}
+
+// ---- suggest (P6 Task 4 — feedback channel: project inbox by
+// default, harness machine store via --harness) -----------------------
+
+const SUGGEST_USAGE = `bee suggest "<text>" — feedback to the project inbox, or the harness
+
+usage: bee suggest "<text>" [--harness] [--origin <role>] [--ref <path>]
+                      [--store <path>] [--machine <dir>]
+
+  default adds to the project inbox (addressee keeper; origin from
+  --origin, else agent); --harness files a numbered TOON document
+  under the machine store's suggestions/ — triage happens harness-side
+`;
+
+function suggestUsageErr(e) {
+  const msg = e && e.message ? e.message
+    : String(e).replace(/^Error: /, '');
+  return { code: 1, out: '', err: msg + '\n\n' + SUGGEST_USAGE };
+}
+
+// Kebab slug of the first six words: lowercase, each
+// non-alphanumeric run collapses to a single '-'; an empty result
+// falls back to 'item'.
+function suggestSlug(text) {
+  const slug = text.trim().split(/\s+/).slice(0, 6).join(' ')
+    .toLowerCase().replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return slug || 'item';
+}
+
+// The LOCAL default store is PROJECT-LOCAL: the repo root of the
+// current directory (git common-dir aware — review r1 blocking:
+// storePathOf's REPO_ROOT default would route consumer-repo feedback
+// into the harness repo's own inbox). Falls back to cwd when not in
+// a git repo.
+function suggestStorePath(p) {
+  if (p) return path.resolve(p);
+  const r = spawnSync('git', ['rev-parse', '--path-format=absolute',
+    '--git-common-dir'], { cwd: process.cwd(), encoding: 'utf8' });
+  const root = r.status === 0
+    ? path.dirname(r.stdout.trim())
+    : process.cwd();
+  return path.join(root, '.hivemind', 'inbox.toon');
+}
+
+// NNNN = highest 4-digit prefix in the folder + 1; an absent folder
+// starts at 0001.
+function nextSuggestNumber(folder) {
+  let names = [];
+  try {
+    names = fs.readdirSync(folder);
+  } catch (e) {
+    if (e.code !== 'ENOENT') throw e;
+  }
+  let max = 0;
+  for (const n of names) {
+    const m = /^(\d{4})-/.exec(n);
+    if (m) max = Math.max(max, Number(m[1]));
+  }
+  return String(max + 1).padStart(4, '0');
+}
+
+// The text value rides the 'text :: ' field, wrapped at 72 cols;
+// continuation lines indent to the value column so multi-line
+// values stay unambiguous in the document.
+function wrapText72(text) {
+  const indent = '        '; // 'text :: '.length
+  const out = [];
+  for (const srcLine of String(text).split('\n')) {
+    const words = srcLine.split(/\s+/).filter(Boolean);
+    if (words.length === 0) {
+      out.push('');
+      continue;
+    }
+    let line = '';
+    for (const w of words) {
+      const cand = line ? line + ' ' + w : w;
+      if (line && cand.length > 72 - indent.length) {
+        out.push(line);
+        line = w;
+      } else {
+        line = cand;
+      }
+    }
+    if (line) out.push(line);
+  }
+  return out.map((l, i) => i === 0 ? 'text :: ' + l
+    : l ? indent + l : l).join('\n');
+}
+
+// --harness: one TOON document per suggestion under
+// <machine>/suggestions/<repo-name>/, carrying provenance (repo,
+// role, date, harness commit — the pin the suggestion speaks to).
+function suggestHarness(text, values) {
+  const machine = machineDirOf(values.machine);
+  const repo = path.basename(process.cwd());
+  const headR = spawnSync('git', ['rev-parse', 'HEAD'],
+    { cwd: REPO_ROOT, encoding: 'utf8' });
+  if (headR.status !== 0) {
+    return { code: 1, out: '',
+      err: `bee suggest: cannot read harness commit in ${REPO_ROOT}: ` +
+        `${(headR.stderr || '').trim()}\n` };
+  }
+  const folder = path.join(machine, 'suggestions', repo);
+  const num = nextSuggestNumber(folder);
+  const file = path.join(folder, `${num}-${suggestSlug(text)}.toon`);
+  const doc =
+    `# harness feedback — ${repo}\n` +
+    `repo :: ${repo}\n` +
+    `role :: ${values.origin || 'agent'}\n` +
+    `date :: ${new Date().toISOString()}\n` +
+    `harness :: ${shortSha(headR.stdout.trim())}\n` +
+    wrapText72(text) + '\n';
+  try {
+    fs.mkdirSync(folder, { recursive: true });
+    atomicWrite(file, doc);
+  } catch (e) {
+    return { code: 1, out: '',
+      err: `bee suggest: cannot write ${file}: ${e.message}\n` };
+  }
+  return { code: 0,
+    out: `bee suggest: filed ${file} (#${num}) · triage happens ` +
+      `harness-side\n`, err: '' };
+}
+
+function cmdSuggest(rest) {
+  if (rest[0] === 'help') {
+    return { code: 0, out: SUGGEST_USAGE, err: '' };
+  }
+  const f = flags(rest, {
+    harness: { type: 'boolean' },
+    origin: { type: 'string' },
+    ref: { type: 'string' },
+    store: { type: 'string' },
+    machine: { type: 'string' },
+  }, true);
+  if (f.error) return suggestUsageErr(f.error);
+  const pos = f.positionals;
+  if (pos.length !== 1 || pos[0].trim() === '') {
+    return { code: 1, out: '',
+      err: 'bee suggest: expected "<text>"\n\n' + SUGGEST_USAGE };
+  }
+  const text = pos[0];
+  if (f.values.harness) return suggestHarness(text, f.values);
+  const store = suggestStorePath(f.values.store);
+  const r = inboxAddItem({
+    storePath: store,
+    addressee: 'keeper',
+    text,
+    origin: f.values.origin || 'agent',
+    ref: f.values.ref,
+    verb: 'suggested',
+  });
+  // When the project-local store differs from `bee inbox`'s default
+  // (the harness checkout's), the follow-up hint must name the store
+  // — otherwise `bee inbox show IN-001` reads the wrong store
+  // (review r2 should-fix).
+  if (r.code === 0 && store !== storePathOf(undefined)) {
+    r.out = r.out.replace(/bee inbox show (IN-\d+)/,
+      `bee inbox show $1 --store ${store}`);
+  }
+  return r;
 }
 
 // ---- park (P4 Task 3 — .hivemind/memory/parking-lot.toon) ----
@@ -1257,7 +1997,8 @@ function parkResolve(args) {
   const w = writeStore('bee park', storePath, r.items,
     PARK_FIELDS, PARK_HEADER);
   if (w) return { code: 1, out: '', err: w };
-  return { code: 0, out: `${it.id} resolved\n`, err: '' };
+  return { code: 0,
+    out: `${it.id} resolved — bee park list\n`, err: '' };
 }
 
 // migrate: the named one-shot executor converting the markdown
@@ -2510,6 +3251,7 @@ function cmdVerify(rest) {
   }
   if (willWrite) {
     const byTask = new Map();
+    let wrote = 0;
     for (const r of results) {
       if (!byTask.has(r.n)) byTask.set(r.n, []);
       byTask.get(r.n).push(r);
@@ -2552,7 +3294,16 @@ function cmdVerify(rest) {
             err: `bee verify: cannot write ${file}: ${e.message}\n` };
         }
         out += `logbook: ${designShown(file)}\n`;
+        wrote++;
       }
+    }
+    if (wrote > 0 && !anyFail) {
+      // AXI P9: one next-step line rides the mutation — the entry
+      // is the evidence bee task move done requires. FAIL runs
+      // never take the hint: --record exists to capture failed
+      // rounds, and a FAIL entry is not done-evidence (review r1).
+      out += 'next: bee task move <plan> <task-n> done --record ' +
+        '<entry above>\n';
     }
   }
   return { code: anyFail ? 1 : 0, out, err: '' };
@@ -2788,6 +3539,9 @@ function logbookStamp(args) {
       'file, then re-run bee logbook stamp\n';
     return { code: 1, out, err: '' };
   }
+  if (!f.values.check && stamped.length + topped.length > 0) {
+    out += 'next: bee logbook index shows the derived view\n';
+  }
   return { code: 0, out, err: '' };
 }
 
@@ -2970,6 +3724,9 @@ function logbookCompact(args) {
       c.name + '\n';
   }
   for (const a of already) out += `already compacted: ${a}\n`;
+  if (!f.values.check && compacted.length > 0) {
+    out += `next: bee phase close ${pos[0]} --check\n`;
+  }
   return { code: 0, out, err: '' };
 }
 
@@ -3388,7 +4145,8 @@ function glossaryConvert(args) {
   }
   const w = writeGlossary(storePath, viewPath, items);
   if (w.err) return { code: 1, out: '', err: w.err };
-  return { code: 0, out, err: '' };
+  return { code: 0, out: out + 'next: bee glossary lists the terms\n',
+    err: '' };
 }
 
 // ---- task (P4 Task 6 — work-item state moves, script-owned) ----
@@ -3752,7 +4510,8 @@ function taskMove(args) {
       err: `bee task move: cannot write ${r.planPath}: ${e.message}\n` };
   }
   return { code: 0, out: `task-${n} ${stateArg} · ${ts} by ${origin}\n` +
-    `plan: ${r.planPath}\n`, err: '' };
+    `plan: ${r.planPath}\n` +
+    `next: bee task show ${r.planPath}\n`, err: '' };
 }
 
 // ---- guidance (P4 Task 7 — docs/guidance topics, read-only) ----
@@ -3861,7 +4620,6 @@ function guidanceList(args) {
     const line = guidanceOneLiner(text);
     out += `${stem} · ${f.values.full ? line : truncText(line)}\n`;
   }
-  out += 'show one: bee guidance show <topic>\n';
   return { code: 0, out, err: '' };
 }
 
@@ -4042,7 +4800,7 @@ function phaseFindPlan(root, n) {
 }
 
 // The worktree holding <branch> checked out (null when none) —
-// the same porcelain walk worktree.sh uses.
+// the same porcelain walk `bee worktree` uses.
 function phaseWorktreeOf(root, branch) {
   const r = phaseGit(root, ['worktree', 'list', '--porcelain']);
   if (r.status !== 0) return null;
@@ -4104,7 +4862,6 @@ function phaseList(args) {
     const title = f.values.full ? p.title : truncText(p.title, 48);
     out += `P${p.n} · ${slug} · ${title}\n`;
   }
-  out += 'next: bee phase close <phase-id> --check\n';
   return { code: 0, out, err: '' };
 }
 
@@ -4494,7 +5251,251 @@ function phaseClose(args) {
     }
     out.push('6 · push · origin main · pushed\n');
   }
+  out.push('next: bee phase list shows what remains\n');
   return { code: 0, out: out.join(''), err: '' };
+}
+
+// ---- worktree (P6 Task 5 — task-tier worktree helper, ADR-012) ----
+
+const WORKTREE_USAGE = `bee worktree — task-tier worktree helper (ADR-012: task branch mechanics)
+
+usage: bee worktree create <phase>-<slug>
+       bee worktree merge <slug>
+       bee worktree abandon <slug>
+
+  create <phase>-<slug>  branch task/<phase>-<slug> + worktree
+                         <root-parent>/$(basename <root>)-task-<slug> at HEAD
+  merge <slug>           resolve unique task/*-<slug>, merge into current
+                         phase/<n>; remove worktree first, delete branch second
+  abandon <slug>         resolve unique task/*-<slug>; remove worktree, then
+                         delete branch (git branch -d — merged only)
+
+Repo context resolves from the CURRENT DIRECTORY, never from the
+harness checkout; git ops run in cwd.
+`;
+
+// git in the caller's cwd — the helper's repo context is always
+// process.cwd(), never REPO_ROOT (ADR-012).
+function worktreeGit(args) {
+  return spawnSync('git', args, { cwd: process.cwd(), encoding: 'utf8' });
+}
+
+// Chatter discipline inherited from the script: git's stdout and
+// stderr ride the caller's stderr; callers read status only.
+function worktreeChatter(r) {
+  return (r.stdout ?? '') + (r.stderr ?? '');
+}
+
+// Repo root from cwd: dirname of the absolute git-common-dir —
+// stable across main checkout, phase worktree, and test sandboxes.
+function worktreeRepoRoot() {
+  const r = worktreeGit(['rev-parse', '--path-format=absolute',
+    '--git-common-dir']);
+  if (r.status !== 0) {
+    return { err: 'bee worktree: not a git repository (or any parent): ' +
+      `${process.cwd()}\n`, code: 1 };
+  }
+  return { root: path.dirname(r.stdout.trim()) };
+}
+
+// A slug may not contain '/' or ref-invalid characters (usage, exit
+// 1). Validation is delegated to git itself via check-ref-format.
+// Returns the error message or null.
+function worktreeCheckSlug(arg) {
+  if (arg.includes('/')) {
+    return `bee worktree: '${arg}': '/' not allowed in a slug\n`;
+  }
+  if (worktreeGit(['check-ref-format', '--branch', `task/x-${arg}`]).status !== 0) {
+    return `bee worktree: '${arg}': ref-invalid characters\n`;
+  }
+  return null;
+}
+
+// Exit 2 unless the current checkout is on a phase/<n> branch; on
+// success the branch name rides .branch.
+function worktreePhaseBranch() {
+  const r = worktreeGit(['branch', '--show-current']);
+  const cur = (r.stdout ?? '').trim();
+  if (!/^phase\/[0-9]+$/.test(cur)) {
+    return { err: `bee worktree: not on a phase branch (current: ` +
+      `${cur || 'detached HEAD'})\n`, code: 2 };
+  }
+  return { branch: cur };
+}
+
+// Resolve <slug> to the unique branch matching task/*-<slug>; rides
+// .branch. 0 or 2+ matches: exit 4 (candidates listed when 2+).
+function worktreeResolve(slug) {
+  const r = worktreeGit(['for-each-ref', '--format=%(refname:short)',
+    'refs/heads/task/']);
+  const matches = (r.stdout ?? '').split('\n').filter(Boolean)
+    .filter((b) => b.startsWith('task/') && b.endsWith('-' + slug));
+  if (matches.length === 1) return { branch: matches[0] };
+  if (matches.length === 0) {
+    return { err: `bee worktree: no branch matches task/*-${slug}\n`,
+      code: 4 };
+  }
+  return {
+    err: `bee worktree: ambiguous slug '${slug}' — matches:\n` +
+      matches.map((b) => `  ${b}\n`).join(''),
+    code: 4,
+  };
+}
+
+// The worktree holding <branch> checked out (null when none) —
+// robust to worktrees created by any means.
+function worktreeOfBranch(branch) {
+  const r = worktreeGit(['worktree', 'list', '--porcelain']);
+  if (r.status !== 0) return null;
+  let wt = null;
+  for (const line of r.stdout.split('\n')) {
+    if (line.startsWith('worktree ')) wt = line.slice(9);
+    // Exact line match, not prefix: task/9-ax must never match a
+    // porcelain line for task/9-axx (review r1 should-fix).
+    else if (line === `branch refs/heads/${branch}`) return wt;
+  }
+  return null;
+}
+
+function worktreeCreate(arg) {
+  const slugErr = worktreeCheckSlug(arg);
+  if (slugErr !== null) {
+    return { code: 1, out: '', err: slugErr + WORKTREE_USAGE };
+  }
+  if (!arg.includes('-')) {
+    return { code: 1, out: '', err:
+      "bee worktree: create takes <phase>-<slug> (phase separator '-' " +
+      `missing)\n` + WORKTREE_USAGE };
+  }
+  const pb = worktreePhaseBranch();
+  if (pb.err) return { code: pb.code, out: '', err: pb.err };
+  const rr = worktreeRepoRoot();
+  if (rr.err) return { code: rr.code, out: '', err: rr.err };
+  const parent = path.dirname(rr.root);
+  const base = path.basename(rr.root);
+  const branch = `task/${arg}`;
+  const wt = path.join(parent, `${base}-task-${arg.slice(arg.indexOf('-') + 1)}`);
+  if (worktreeGit(['show-ref', '--verify', '--quiet',
+    `refs/heads/${branch}`]).status === 0) {
+    return { code: 3, out: '', err: `bee worktree: branch ${branch} already exists\n` };
+  }
+  if (fs.existsSync(wt)) {
+    return { code: 3, out: '',
+      err: `bee worktree: worktree path already exists: ${wt}\n` };
+  }
+  // One step: branch + worktree. Git's chatter rides stderr so
+  // stdout carries only the worktree path.
+  const add = worktreeGit(['worktree', 'add', '-b', branch, wt]);
+  if (add.status !== 0) {
+    return { code: add.status, out: '', err: worktreeChatter(add) };
+  }
+  // Next-step hint rides stderr — stdout is the machine contract
+  // (the worktree path alone; AXI P1 outweighs P9 there).
+  return { code: 0, out: wt + '\n',
+    err: worktreeChatter(add) + `bee worktree: next — cd ${wt}\n` };
+}
+
+function worktreeMerge(slug) {
+  const slugErr = worktreeCheckSlug(slug);
+  if (slugErr !== null) {
+    return { code: 1, out: '', err: slugErr + WORKTREE_USAGE };
+  }
+  const rv = worktreeResolve(slug);
+  if (rv.err) return { code: rv.code, out: '', err: rv.err };
+  const branch = rv.branch;
+  const pb = worktreePhaseBranch();
+  if (pb.err) return { code: pb.code, out: '', err: pb.err };
+  const cur = pb.branch;
+  const merge = worktreeGit(['merge', branch]);
+  if (merge.status !== 0) {
+    return { code: merge.status, out: '', err: worktreeChatter(merge) };
+  }
+  let err = worktreeChatter(merge);
+  const wt = worktreeOfBranch(branch);
+  if (wt !== null) {
+    // Worktree first (a branch checked out in a worktree cannot be
+    // deleted first); dirty worktrees fail here with git's message.
+    const rm = worktreeGit(['worktree', 'remove', wt]);
+    err += worktreeChatter(rm);
+    if (rm.status !== 0) return { code: rm.status, out: '', err };
+  } else {
+    err += `bee worktree: no worktree registered for ${branch} ` +
+      `(nothing to remove)\n`;
+  }
+  const del = worktreeGit(['branch', '-d', branch]);
+  err += worktreeChatter(del);
+  if (del.status !== 0) {
+    if (wt !== null) {
+      err += `bee worktree: worktree ${wt} removed but branch ${branch} ` +
+        `remains\n`;
+    }
+    return { code: del.status, out: '', err };
+  }
+  let out = `merged ${branch} into ${cur}\n`;
+  if (wt !== null) out += `removed worktree ${wt}\n`;
+  out += `deleted branch ${branch}\n`;
+  const phaseN = cur.slice('phase/'.length);
+  err += `bee worktree: next — bee phase close ${phaseN} --check\n`;
+  return { code: 0, out, err };
+}
+
+function worktreeAbandon(slug) {
+  const slugErr = worktreeCheckSlug(slug);
+  if (slugErr !== null) {
+    return { code: 1, out: '', err: slugErr + WORKTREE_USAGE };
+  }
+  const rv = worktreeResolve(slug);
+  if (rv.err) return { code: rv.code, out: '', err: rv.err };
+  const branch = rv.branch;
+  // No phase-branch requirement: abandon operates on named refs from
+  // any checkout (task reset is PO's call anywhere, ADR-012).
+  const wt = worktreeOfBranch(branch);
+  let err = '';
+  if (wt !== null) {
+    const rm = worktreeGit(['worktree', 'remove', wt]);
+    err += worktreeChatter(rm);
+    if (rm.status !== 0) return { code: rm.status, out: '', err };
+  } else {
+    err += `bee worktree: no worktree registered for ${branch} ` +
+      `(nothing to remove)\n`;
+  }
+  const del = worktreeGit(['branch', '-d', branch]);
+  err += worktreeChatter(del);
+  if (del.status !== 0) {
+    if (wt !== null) {
+      err += `bee worktree: worktree ${wt} removed but branch ${branch} ` +
+        `still present\n`;
+    }
+    err += `bee worktree: branch ${branch} is not fully merged; run ` +
+      `'git branch -D ${branch}' if that is really intended\n`;
+    return { code: 5, out: '', err };
+  }
+  let out = '';
+  if (wt !== null) out += `removed worktree ${wt}\n`;
+  out += `deleted branch ${branch}\n`;
+  err += 'bee worktree: next — create a fresh task branch when ' +
+    'the task restarts\n';
+  return { code: 0, out, err };
+}
+
+function cmdWorktree(rest) {
+  const [cmd] = rest;
+  if (cmd === 'help') return { code: 0, out: WORKTREE_USAGE, err: '' };
+  if (cmd === undefined) {
+    return { code: 1, out: '', err: WORKTREE_USAGE };
+  }
+  if (cmd !== 'create' && cmd !== 'merge' && cmd !== 'abandon') {
+    return { code: 1, out: '',
+      err: `bee worktree: unknown subcommand: ${cmd}\n` + WORKTREE_USAGE };
+  }
+  if (rest.length !== 2) {
+    return { code: 1, out: '',
+      err: `bee worktree: ${cmd} takes exactly one argument\n` +
+        WORKTREE_USAGE };
+  }
+  if (cmd === 'create') return worktreeCreate(rest[1]);
+  if (cmd === 'merge') return worktreeMerge(rest[1]);
+  return worktreeAbandon(rest[1]);
 }
 
 if (process.argv[1] &&

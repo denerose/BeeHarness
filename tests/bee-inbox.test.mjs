@@ -365,3 +365,37 @@ done: -
   assert.match(text, /escalation: later-phase-field\n/); // not deleted
   assert.match(text, /state: done\n/);
 });
+
+// ---- AXI pass (P6 task 6): mutation hints + capture help ----
+
+test('done output carries the next step (AXI 9)', () => {
+  const p = tmpStore();
+  add(p, 'keeper', 'ship the aging rule');
+  const r = run(['inbox', 'done', 'IN-001', '--store', p]);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /IN-001 done — bee inbox render refreshes the status view/);
+  // idempotent second call is a no-op note, not a mutation
+  const again = run(['inbox', 'done', 'IN-001', '--store', p]);
+  assert.equal(again.code, 0);
+  assert.equal(again.out, 'IN-001 already done\n');
+});
+
+test('render output carries the next step (AXI 9)', () => {
+  const p = tmpStore();
+  add(p, 'keeper', 'ship the aging rule');
+  const dir = path.dirname(p);
+  const status = path.join(dir, 'status.md');
+  fs.writeFileSync(status, '# Status\n\n## Awaiting keeper\n\n(none)\n');
+  const r = run(['inbox', 'render', '--store', p, '--status', status]);
+  assert.equal(r.code, 0);
+  assert.match(r.out,
+    /bee inbox render: .+ — .+\nnext: bee report renders the keeper digest\n$/);
+});
+
+test('capture help prints usage, records nothing (AXI 10)', () => {
+  const p = tmpStore();
+  const r = run(['capture', 'help', '--store', p]);
+  assert.equal(r.code, 0);
+  assert.match(r.out, /usage: bee capture/);
+  assert.ok(!fs.existsSync(p));
+});
